@@ -501,7 +501,7 @@ This project is open source and available under the [MIT License](LICENSE).
 <br/>
 <img src="https://img.shields.io/badge/✨-Design_%26_AI-8B5CF6?style=for-the-badge" />
 <br/><br/>
-<strong>Avika</strong>
+<strong>Avika Srivastava</strong>
 <br/>
 <sub>UI/UX Design · AI Training · Testing</sub>
 <br/><br/>
@@ -512,7 +512,7 @@ This project is open source and available under the [MIT License](LICENSE).
 <br/>
 <img src="https://img.shields.io/badge/⭐_Team_Leader-FFD700?style=flat-square&logoColor=black" />
 <br/><br/>
-<strong>Harshika</strong>
+<strong>Harshika Dixit</strong>
 <br/>
 <sub>Govt. Guidelines Research · Architecture · Presentation · Testing</sub>
 <br/><br/>
