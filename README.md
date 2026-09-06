@@ -500,6 +500,8 @@ This project is open source and available under the [MIT License](LICENSE).
 <td align="center" width="25%">
 <br/>
 <img src="https://img.shields.io/badge/📋-Research-E11D48?style=for-the-badge" />
+<br/>
+<img src="https://img.shields.io/badge/⭐_Team_Leader-FFD700?style=flat-square&logoColor=black" />
 <br/><br/>
 <strong>Harshika</strong>
 <br/>
