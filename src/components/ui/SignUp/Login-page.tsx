@@ -11,7 +11,7 @@ import {
 } from "@/firebase/auth"
 import { useAuth } from "@/components/hooks/use-auth"
 
-const REMEMBER_KEY = "finease_remember"
+const REMEMBER_KEY = "voicekhata_remember"
 
 export function LoginPage() {
   const navigate = useNavigate()
@@ -177,7 +177,7 @@ export function LoginPage() {
           <p className="text-muted-foreground text-sm">
             {showForgot
               ? "Enter your email to receive a password reset link"
-              : "Sign in to your FinEase account"}
+              : "Sign in to your VoiceKhata account"}
           </p>
         </div>
 

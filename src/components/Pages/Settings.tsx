@@ -49,7 +49,7 @@ export default function SettingsPage() {
 
               <p className="text-sm text-text-muted mt-1">
                 {activeTab === "profile" && "Your identity across the platform."}
-                {activeTab === "appearance" && "Customize how Finease looks across your workspace."}
+                {activeTab === "appearance" && "Customize how VoiceKhata looks across your workspace."}
                 {activeTab === "financial" && "Keep your financial data accurate for better insights."}
                 {activeTab === "security" && "Protect your account with a strong password."}
                 {activeTab === "danger" && "Destructive actions — proceed with extreme caution."}

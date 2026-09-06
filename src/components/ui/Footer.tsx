@@ -129,7 +129,7 @@ export function Footer() {
             <div className="h-px w-full bg-linear-to-r via-border" />
             <div className="flex w-full items-center justify-center py-4">
                 <p className="text-muted-foreground text-sm">
-                    &copy; {new Date().getFullYear()} Finease, All rights reserved
+                    &copy; {new Date().getFullYear()} VoiceKhata, All rights reserved
                 </p>
             </div>
         </footer>

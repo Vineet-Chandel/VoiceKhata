@@ -24,13 +24,13 @@ const categories = [
 ];
 
 const faqs = [
-  { id: 1, category: "getting-started", title: "How do I start using Finease?",           content: "Simply create a free account and connect your bank or upload transactions manually. Within minutes, you'll get a clear overview of your income, expenses, and spending trends." },
-  { id: 2, category: "getting-started", title: "Is Finease free to use?",                 content: "Yes! Finease offers a free tier with essential budgeting and tracking features. Premium features like advanced analytics and AI insights are available in paid plans." },
-  { id: 3, category: "features",        title: "How does smart budgeting work?",           content: "Finease automatically categorizes your expenses and tracks them against your set budgets. You'll receive alerts when you're close to overspending." },
-  { id: 4, category: "features",        title: "Can Finease detect expenses from emails?", content: "Yes. Finease can securely scan transaction emails (like bank alerts) to automatically detect and log expenses in real time." },
+  { id: 1, category: "getting-started", title: "How do I start using VoiceKhata?",           content: "Simply create a free account and connect your bank or upload transactions manually. Within minutes, you'll get a clear overview of your income, expenses, and spending trends." },
+  { id: 2, category: "getting-started", title: "Is VoiceKhata free to use?",                 content: "Yes! VoiceKhata offers a free tier with essential budgeting and tracking features. Premium features like advanced analytics and AI insights are available in paid plans." },
+  { id: 3, category: "features",        title: "How does smart budgeting work?",           content: "VoiceKhata automatically categorizes your expenses and tracks them against your set budgets. You'll receive alerts when you're close to overspending." },
+  { id: 4, category: "features",        title: "Can VoiceKhata detect expenses from emails?", content: "Yes. VoiceKhata can securely scan transaction emails (like bank alerts) to automatically detect and log expenses in real time." },
   { id: 5, category: "features",        title: "What are AI-powered financial insights?",  content: "Our AI analyzes your spending habits and provides suggestions to help you save more, reduce unnecessary expenses, and improve financial health." },
-  { id: 6, category: "security",        title: "Is my financial data secure?",             content: "Absolutely. Finease uses encrypted connections and secure authentication methods to ensure your data is safe and private at all times." },
-  { id: 7, category: "security",        title: "Do you store my bank credentials?",        content: "No. Finease never stores your bank passwords. We use secure APIs and encrypted systems to access only the necessary transaction data." },
+  { id: 6, category: "security",        title: "Is my financial data secure?",             content: "Absolutely. VoiceKhata uses encrypted connections and secure authentication methods to ensure your data is safe and private at all times." },
+  { id: 7, category: "security",        title: "Do you store my bank credentials?",        content: "No. VoiceKhata never stores your bank passwords. We use secure APIs and encrypted systems to access only the necessary transaction data." },
   { id: 8, category: "support",         title: "How can I contact support?",               content: "You can reach our support team via email or through the in-app help section. We typically respond within 24 hours." },
   { id: 9, category: "support",         title: "Do you offer onboarding guidance?",        content: "Yes! We provide tutorials and walkthroughs to help you understand budgeting, expense tracking, and AI insights effectively." },
 ];
@@ -58,7 +58,7 @@ export function FaqsSection() {
             Frequently Asked Questions
           </h2>
           <p className="text-center text-muted-foreground text-sm sm:text-base">
-            Everything you need to know about Finease and how it helps you take control of your finances.
+            Everything you need to know about VoiceKhata and how it helps you take control of your finances.
           </p>
         </div>
 

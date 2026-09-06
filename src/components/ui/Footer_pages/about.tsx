@@ -23,7 +23,7 @@ const team = [
 const values = [
     { icon: Heart, title: "User-first, always", desc: "Every decision starts with one question: does this make the user's financial life simpler?" },
     { icon: Target, title: "Radical transparency", desc: "We're upfront about how we use your data, how we make money, and what we can and can't do." },
-    { icon: Lightbulb, title: "Simplify complexity", desc: "Personal finance is complicated. FinEase's job is to hide that complexity and surface only what matters." },
+    { icon: Lightbulb, title: "Simplify complexity", desc: "Personal finance is complicated. VoiceKhata's job is to hide that complexity and surface only what matters." },
 ]
 
 export default function AboutUs() {
@@ -47,9 +47,9 @@ export default function AboutUs() {
                         <span style={{ background: "linear-gradient(135deg,#fff 30%,#444)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>hated spreadsheets</span>
                     </motion.h1>
                     <motion.p variants={itemVariants} className="text-base leading-relaxed" style={{ color: "#555" }}>
-                        FinEase started in 2023 when our founder Aarav realized he'd spent 3 hours in Excel trying to understand why he'd run out of money 10 days before his next paycheck. There had to be a better way.
+                        VoiceKhata started in 2023 when our founder Aarav realized he'd spent 3 hours in Excel trying to understand why he'd run out of money 10 days before his next paycheck. There had to be a better way.
                         <br /><br />
-                        Today, FinEase is used by over 50,000 students and professionals across India to track expenses, automate budgets, and make smarter financial decisions — without the complexity.
+                        Today, VoiceKhata is used by over 50,000 students and professionals across India to track expenses, automate budgets, and make smarter financial decisions — without the complexity.
                     </motion.p>
                 </motion.section>
 

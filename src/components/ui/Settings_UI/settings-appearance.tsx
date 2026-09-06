@@ -12,7 +12,7 @@ export function AppearancePanel() {
       <div>
         <SectionLabel>Theme</SectionLabel>
         <Card className="p-6">
-          <p className="text-sm font-medium text-text-primary mb-1">Customize how Finease looks</p>
+          <p className="text-sm font-medium text-text-primary mb-1">Customize how VoiceKhata looks</p>
           <p className="text-xs text-text-secondary mb-6">Choose your preferred appearance for the entire workspace.</p>
           
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

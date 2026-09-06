@@ -56,7 +56,7 @@ export default function Features() {
                         </span>
                     </motion.h1>
                     <motion.p variants={itemVariants} className="text-lg max-w-2xl mx-auto mb-10" style={{ color: "#555", lineHeight: 1.7 }}>
-                        From tracking every rupee to predicting your financial future — FinEase gives students and professionals a complete money management workspace.
+                        From tracking every rupee to predicting your financial future — VoiceKhata gives students and professionals a complete money management workspace.
                     </motion.p>
                     <motion.div variants={itemVariants} className="flex justify-center gap-4 flex-wrap">
                         <Link to="/signup"><Button className="font-semibold px-6 gap-2" style={{ background: "#fff", color: "#000" }}>Start for free <ArrowRight className="w-4 h-4" /></Button></Link>
@@ -117,7 +117,7 @@ export default function Features() {
                         <div className="absolute inset-0" style={{ background: "radial-gradient(ellipse at 50% 0%,rgba(255,255,255,0.04) 0%,transparent 65%)" }} />
                         <Layers className="w-10 h-10 mx-auto mb-4 relative z-10" style={{ color: "rgba(255,255,255,0.4)" }} />
                         <h2 className="text-3xl font-black mb-3 text-text-primary relative z-10" style={{ fontFamily: "'Syne',sans-serif" }}>Ready to master your money?</h2>
-                        <p className="mb-8 relative z-10" style={{ color: "#444" }}>Join thousands of users already using FinEase to make smarter financial decisions.</p>
+                        <p className="mb-8 relative z-10" style={{ color: "#444" }}>Join thousands of users already using VoiceKhata to make smarter financial decisions.</p>
                         <div className="flex justify-center gap-4 relative z-10 flex-wrap">
                             <Link to="/signup"><Button className="font-bold px-8 gap-2" style={{ background: "#fff", color: "#000" }}>Get Started Free <ArrowRight className="w-4 h-4" /></Button></Link>
                             <Link to="/faqs"><Button variant="ghost" style={{ border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.4)" }}>Read FAQs</Button></Link>

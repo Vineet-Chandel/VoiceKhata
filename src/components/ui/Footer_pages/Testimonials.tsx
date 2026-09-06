@@ -25,13 +25,13 @@ const itemVariants: Variants = {
 }
 
 const testimonials = [
-    { name: "Arjun Sharma", role: "Software Engineer, Bengaluru", avatar: "AS", rating: 5, text: "FinEase completely changed how I manage money. The AI suggestions actually helped me save ₹8,000 extra last month. It's like having a financial advisor in my pocket." },
+    { name: "Arjun Sharma", role: "Software Engineer, Bengaluru", avatar: "AS", rating: 5, text: "VoiceKhata completely changed how I manage money. The AI suggestions actually helped me save ₹8,000 extra last month. It's like having a financial advisor in my pocket." },
     { name: "Priya Mehta", role: "MBA Student, Delhi", avatar: "PM", rating: 5, text: "As a student on a tight budget, the budget alerts are a lifesaver. I get notified before I overspend, not after. Game changer." },
     { name: "Rahul Nair", role: "Freelance Designer, Mumbai", avatar: "RN", rating: 5, text: "The auto expense detection from emails is pure magic. I never have to enter transactions manually anymore. It just works." },
-    { name: "Sneha Iyer", role: "Product Manager, Hyderabad", avatar: "SI", rating: 5, text: "I've tried every budgeting app out there. FinEase is the only one that actually sticks because the UX is beautiful and the insights are genuinely useful." },
+    { name: "Sneha Iyer", role: "Product Manager, Hyderabad", avatar: "SI", rating: 5, text: "I've tried every budgeting app out there. VoiceKhata is the only one that actually sticks because the UX is beautiful and the insights are genuinely useful." },
     { name: "Karthik Rajan", role: "Data Scientist, Chennai", avatar: "KR", rating: 5, text: "The SIP tracking feature alone is worth it. Being able to see all my investments, savings, and spending in one dashboard is incredibly powerful." },
-    { name: "Ananya Gupta", role: "CA, Pune", avatar: "AG", rating: 5, text: "I recommend FinEase to all my clients who want to get serious about their finances. The export features and reports are excellent for tax season too." },
-    { name: "Vikram Singh", role: "Startup Founder, Gurgaon", avatar: "VS", rating: 4, text: "Running a startup means chaotic cashflow. FinEase helps me separate personal and business expenses clearly. The analytics are top-notch." },
+    { name: "Ananya Gupta", role: "CA, Pune", avatar: "AG", rating: 5, text: "I recommend VoiceKhata to all my clients who want to get serious about their finances. The export features and reports are excellent for tax season too." },
+    { name: "Vikram Singh", role: "Startup Founder, Gurgaon", avatar: "VS", rating: 4, text: "Running a startup means chaotic cashflow. VoiceKhata helps me separate personal and business expenses clearly. The analytics are top-notch." },
     { name: "Divya Krishnan", role: "Doctor, Coimbatore", avatar: "DK", rating: 5, text: "Finally an app that respects your privacy and still delivers amazing features. The security-first approach gives me confidence to link my accounts." },
     { name: "Mohit Joshi", role: "Teacher, Jaipur", avatar: "MJ", rating: 5, text: "The free plan alone is better than most paid apps I've used. The UI is clean, fast, and doesn't feel overwhelming. Perfect for everyday use." },
 ]
@@ -64,7 +64,7 @@ export default function Testimonials() {
                         <span style={{ background: "linear-gradient(135deg,#fff 30%,#444)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>thousands</span>
                     </motion.h1>
                     <motion.p variants={itemVariants} style={{ color: "#555", lineHeight: 1.7 }}>
-                        Real people. Real results. See how FinEase is transforming the way India manages money.
+                        Real people. Real results. See how VoiceKhata is transforming the way India manages money.
                     </motion.p>
                 </motion.section>
 

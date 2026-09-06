@@ -42,7 +42,6 @@ export function BulkTransactionCard({ onSend, onConfirmAll, onCancel }: Props) {
       const allTerminal = drafts.every(d => 
         d.status === "completed" || 
         d.status === "skipped" || 
-        d.status === "failed" || 
         d.status === "error"
       )
       
@@ -85,7 +84,7 @@ export function BulkTransactionCard({ onSend, onConfirmAll, onCancel }: Props) {
             <div className="flex items-center gap-2 shrink-0">
               <span className="text-text-muted text-[10px] uppercase tracking-wider">{d.type || ''}</span>
               {d.status === 'completed' && <CheckCircle2 size={12} className="text-green-400/70" />}
-              {d.status === 'duplicate' && <AlertTriangle size={12} className="text-yellow-400/70" title="Possible Duplicate" />}
+              {d.status === 'duplicate' && <span title="Possible Duplicate"><AlertTriangle size={12} className="text-yellow-400/70" /></span>}
               {d.status === 'error' && <AlertCircle size={12} className="text-red-400/70" />}
               {isCurrent && <span className="size-1.5 rounded-full bg-white animate-pulse" />}
             </div>

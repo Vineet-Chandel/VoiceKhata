@@ -16,7 +16,7 @@ export type AITransactionResult = {
 
 const GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
 
-const SYSTEM_PROMPT = `You are the transaction intelligence engine for FinEase.
+const SYSTEM_PROMPT = `You are the transaction intelligence engine for VoiceKhata.
 Your job is to understand what the user likely spent money on (or received money from), then normalize it intelligently.
 
 Return ONLY valid JSON with this shape:

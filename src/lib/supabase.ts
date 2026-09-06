@@ -5,7 +5,7 @@ const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string
 const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string
 
 if (!supabaseUrl || !supabaseKey) {
-  console.warn("⚠️ FinEase: Missing VITE_SUPABASE_URL or VITE_SUPABASE_ANON_KEY in environment variables.")
+  console.warn("⚠️ VoiceKhata: Missing VITE_SUPABASE_URL or VITE_SUPABASE_ANON_KEY in environment variables.")
 }
 
 export const supabase = createClient(

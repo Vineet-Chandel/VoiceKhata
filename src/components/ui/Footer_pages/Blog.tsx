@@ -17,8 +17,8 @@ const posts = [
     { title: "SIP vs lump sum: which is better for beginners?", excerpt: "The age-old debate in mutual fund investing. We break down the math and psychology behind each approach.", date: "Jan 10, 2025", readTime: "7 min read", category: "Investing", featured: false },
     { title: "5 expense tracking habits that changed how I save money", excerpt: "Small changes in how you track spending can compound into major savings over time. Our top users share their habits.", date: "Jan 5, 2025", readTime: "4 min read", category: "Personal Finance", featured: false },
     { title: "Understanding credit card reward optimization", excerpt: "Most people leave thousands of rupees in rewards unclaimed every year. Here's how to maximize every swipe.", date: "Dec 28, 2024", readTime: "6 min read", category: "Credit", featured: false },
-    { title: "The FinEase AI assistant: what it can (and can't) do", excerpt: "An honest look at what our AI financial assistant does well, its limitations, and how we're improving it.", date: "Dec 20, 2024", readTime: "5 min read", category: "Product", featured: false },
-    { title: "Tax season prep: using FinEase export features", excerpt: "How to use FinEase's CSV and PDF exports to make your CA's job easier and ensure you don't miss any deductions.", date: "Dec 15, 2024", readTime: "4 min read", category: "Tax", featured: false },
+    { title: "The VoiceKhata AI assistant: what it can (and can't) do", excerpt: "An honest look at what our AI financial assistant does well, its limitations, and how we're improving it.", date: "Dec 20, 2024", readTime: "5 min read", category: "Product", featured: false },
+    { title: "Tax season prep: using VoiceKhata export features", excerpt: "How to use VoiceKhata's CSV and PDF exports to make your CA's job easier and ensure you don't miss any deductions.", date: "Dec 15, 2024", readTime: "4 min read", category: "Tax", featured: false },
 ]
 
 const categories = ["All", "Budgeting", "Investing", "Personal Finance", "Credit", "Product", "Tax"]
@@ -47,7 +47,7 @@ export default function Blog() {
                         <span style={{ background: "linear-gradient(135deg,#fff 30%,#444)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>insights</span>
                     </motion.h1>
                     <motion.p variants={itemVariants} style={{ color: "#555", lineHeight: 1.7 }}>
-                        Practical personal finance tips, product updates, and deep dives from the FinEase team.
+                        Practical personal finance tips, product updates, and deep dives from the VoiceKhata team.
                     </motion.p>
                 </motion.section>
 

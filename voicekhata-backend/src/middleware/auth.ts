@@ -30,9 +30,9 @@ if (!getApps().length) {
       console.log("✅ [Firebase Admin] Initialized with individual credentials")
     } else {
       firebaseApp = initializeApp({
-        projectId: process.env.FIREBASE_PROJECT_ID || "finease-23i23",
+        projectId: process.env.FIREBASE_PROJECT_ID || "voicekhata-23i23",
       })
-      console.log("ℹ️ [Firebase Admin] Initialized with project ID:", process.env.FIREBASE_PROJECT_ID || "finease-23i23")
+      console.log("ℹ️ [Firebase Admin] Initialized with project ID:", process.env.FIREBASE_PROJECT_ID || "voicekhata-23i23")
     }
   } catch (err: any) {
     console.error("❌ [Firebase Admin] Initialization error:", err.message)

@@ -20,8 +20,8 @@ const PORT = process.env.PORT || 3001
 
 // ── Allowed Origins Whitelist ────────────────────────────────────────────────
 const ALLOWED_ORIGINS = [
-  "https://finease.tech",
-  "https://www.finease.tech",
+  "https://voicekhata.tech",
+  "https://www.voicekhata.tech",
   "http://localhost:5173",
   "http://localhost:3000",
   "http://localhost:3001",
@@ -46,8 +46,8 @@ function isOriginAllowed(origin: string): boolean {
   const normalized = origin.trim().replace(/\/+$/, "")
   if (ALLOWED_ORIGINS.includes(normalized)) return true
 
-  // Allow any *.finease.tech subdomain
-  if (/^https:\/\/([a-zA-Z0-9-]+\.)*finease\.tech(:[0-9]+)?$/.test(normalized)) {
+  // Allow any *.voicekhata.tech subdomain
+  if (/^https:\/\/([a-zA-Z0-9-]+\.)*voicekhata\.tech(:[0-9]+)?$/.test(normalized)) {
     return true
   }
 
@@ -146,7 +146,7 @@ app.get("/auth/gmail/callback", async (req, res) => {
   const state = req.query.state as string
   if (!code || !state) return res.status(400).json({ error: "Missing code or state" })
 
-  const baseUrl = (process.env.FRONTEND_URL?.split(",")[0] || "https://finease.tech").replace(/\/+$/, "")
+  const baseUrl = (process.env.FRONTEND_URL?.split(",")[0] || "https://voicekhata.tech").replace(/\/+$/, "")
 
   try {
     await handleCallback(code, state)
@@ -166,7 +166,7 @@ app.get("/health", (req, res) => {
   }
   res.json({
     status: "ok",
-    service: "finease-backend",
+    service: "voicekhata-backend",
     timestamp: new Date().toISOString(),
     originDetected: origin || "none",
   })
@@ -203,7 +203,7 @@ function checkStartupEnvironment() {
   const supabaseUrl = process.env.SUPABASE_URL?.trim()
 
   console.log("================================================================================")
-  console.log(`🚀 [FinEase Backend] Booting on port ${PORT} in ${process.env.NODE_ENV || "development"} mode`)
+  console.log(`🚀 [VoiceKhata Backend] Booting on port ${PORT} in ${process.env.NODE_ENV || "development"} mode`)
   console.log(`🌐 [CORS] Allowed Origins:`, ALLOWED_ORIGINS.join(", "))
   console.log(`📧 [Service] Email Transaction Detection & Background Cron Engine`)
   
@@ -233,6 +233,6 @@ function checkStartupEnvironment() {
 checkStartupEnvironment()
 
 app.listen(PORT, () => {
-  console.log(`FinEase backend running on port ${PORT}`)
+  console.log(`VoiceKhata backend running on port ${PORT}`)
   startCron()
 })

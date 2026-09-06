@@ -9,13 +9,13 @@ const itemV: Variants = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, 
 
 const sections = [
     { title: "1. Information We Collect", body: "We collect information you provide directly (name, email, financial transactions), information from connected services (bank email parsing, UPI apps), and usage data (pages visited, features used). We never collect your banking passwords or credentials." },
-    { title: "2. How We Use Your Information", body: "Your data is used to provide and improve the FinEase service, generate personalized financial insights, send relevant notifications and reports, and prevent fraud. We do not sell your personal data to any third party." },
+    { title: "2. How We Use Your Information", body: "Your data is used to provide and improve the VoiceKhata service, generate personalized financial insights, send relevant notifications and reports, and prevent fraud. We do not sell your personal data to any third party." },
     { title: "3. Data Storage & Security", body: "All data is encrypted at rest using AES-256 and in transit using TLS 1.3. Your data is stored on ISO 27001-certified servers located in India. We conduct regular security audits and penetration tests." },
     { title: "4. Data Sharing", body: "We share data only with sub-processors necessary to deliver the service (e.g., cloud hosting, email providers), and only under strict data processing agreements. We disclose data to authorities only when legally required." },
     { title: "5. Your Rights", body: "You have the right to access, correct, or delete your personal data at any time via Settings. You can request a full export of your data in JSON or CSV format. Account deletion permanently removes all your data within 30 days." },
     { title: "6. Cookies", body: "We use essential cookies for authentication and preferences, and optional analytics cookies to understand how the product is used. You can disable optional cookies from your browser settings." },
     { title: "7. Changes to This Policy", body: "We'll notify you by email and in-app notification at least 14 days before any material changes to this privacy policy. Continued use after that date constitutes acceptance of the updated policy." },
-    { title: "8. Contact", body: "For any privacy-related concerns, contact our Data Protection Officer at privacy@finease.app or write to: FinEase Technologies Pvt. Ltd., 123 Startup Hub, Bengaluru, Karnataka 560001." },
+    { title: "8. Contact", body: "For any privacy-related concerns, contact our Data Protection Officer at privacy@voicekhata.app or write to: VoiceKhata Technologies Pvt. Ltd., 123 Startup Hub, Bengaluru, Karnataka 560001." },
 ]
 
 export function PrivacyPolicy() {
@@ -34,7 +34,7 @@ export function PrivacyPolicy() {
                         <p className="text-sm" style={{ color: "#444" }}>Last updated: January 1, 2025 · Effective: January 15, 2025</p>
                     </motion.div>
                     <motion.p variants={itemV} className="text-sm leading-relaxed mb-10" style={{ color: "#555" }}>
-                        At FinEase, your privacy is foundational — not an afterthought. This policy explains exactly what data we collect, why, and how we protect it.
+                        At VoiceKhata, your privacy is foundational — not an afterthought. This policy explains exactly what data we collect, why, and how we protect it.
                     </motion.p>
                     {sections.map((s, i) => (
                         <motion.div key={i} variants={itemV} className="mb-8">

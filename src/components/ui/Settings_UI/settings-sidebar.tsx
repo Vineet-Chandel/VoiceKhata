@@ -88,7 +88,7 @@ export function useInstallPrompt() {
         clearInterval(interval)
         setWaiting(false)
         // Non-blocking toast — only reached on truly unsupported browsers
-        showToast("Use the browser menu → Install FinEase")
+        showToast("Use the browser menu → Install VoiceKhata")
       }
     }, 200)
   }
@@ -211,7 +211,7 @@ export function SettingsSidebar({
               <CheckCircle className="size-3.5 text-emerald-400 shrink-0" />
               <div>
                 <p className="text-[12px] font-semibold text-emerald-400">App Installed</p>
-                <p className="text-[10px] text-text-muted leading-tight">FinEase is on your device</p>
+                <p className="text-[10px] text-text-muted leading-tight">VoiceKhata is on your device</p>
               </div>
             </div>
 
@@ -231,7 +231,7 @@ export function SettingsSidebar({
           ) : (
             /* ── Chrome / Edge / Android / Desktop ──
                Clicking always results in the browser's native
-               "Install app" dialog (FinEase · Install · Cancel).
+               "Install app" dialog (VoiceKhata · Install · Cancel).
                If beforeinstallprompt hasn't fired yet the button
                waits up to 3 s and retries — no alert() fallback.
             ── */

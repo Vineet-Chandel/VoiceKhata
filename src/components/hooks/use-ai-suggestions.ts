@@ -11,7 +11,7 @@ const GROQ_FALLBACK_MODELS = [
   "groq/compound",
   "llama-3.3-70b-versatile",
 ] as const
-const CACHE_KEY = "finease_ai_suggestions"
+const CACHE_KEY = "voicekhata_ai_suggestions"
 
 function buildHash(transactions: Transaction[], budgets: Budget[], metrics: FinancialMetrics, salt: number): string {
   const tx = transactions.map((t) => `${t.id}-${t.amount}-${t.type}-${t.category}`).join("|")
@@ -76,7 +76,7 @@ async function fetchFromGroq(
       .join("\n")
     : "No budgets set for current month"
 
-  const prompt = `You are FinEase AI, a practical Indian finance companion.
+  const prompt = `You are VoiceKhata AI, a practical Indian finance companion.
 
 Use ONLY the exact numbers provided below. Do not invent percentages or totals.
 If you mention savings rate, you MUST use the canonical savings rate exactly as given.

@@ -1,6 +1,6 @@
-# FinEase Supabase Migrations Guide
+# VoiceKhata Supabase Migrations Guide
 
-This folder contains the official database migrations for FinEase.
+This folder contains the official database migrations for VoiceKhata.
 
 ---
 
@@ -36,7 +36,7 @@ npx supabase db push
 ---
 
 ## Why RLS Issues Occur and How This Fix Resolves Them
-FinEase uses **Firebase Authentication** on the client side with the Supabase **Anon Key**. Because native `auth.uid()` belongs to Supabase Auth and returns `NULL` for Firebase-authenticated anon clients, default restrictive RLS policies block row inserts and reads.
+VoiceKhata uses **Firebase Authentication** on the client side with the Supabase **Anon Key**. Because native `auth.uid()` belongs to Supabase Auth and returns `NULL` for Firebase-authenticated anon clients, default restrictive RLS policies block row inserts and reads.
 
 [`20260818000002_fix_rls_policies.sql`](./20260818000002_fix_rls_policies.sql) establishes:
 - Schema-wide usage and default table privileges for `anon`, `authenticated`, and `service_role`.

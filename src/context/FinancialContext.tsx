@@ -54,7 +54,7 @@ function getCurrentMonth(): string {
 }
 
 function getMonthStorageKey(uid: string): string {
-  return `finease:selectedMonth:${uid}`
+  return `voicekhata:selectedMonth:${uid}`
 }
 
 function readPersistedSelectedMonth(uid: string): string {

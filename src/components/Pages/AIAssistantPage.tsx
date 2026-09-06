@@ -150,7 +150,7 @@ export default function AIAssistantPage() {
               <Bot size={15} className="text-violet-400" />
             </div>
             <div>
-              <h1 className="text-sm font-medium text-text-primary leading-tight">FinEase AI</h1>
+              <h1 className="text-sm font-medium text-text-primary leading-tight">VoiceKhata AI</h1>
               <div className="flex items-center gap-1.5 mt-0.5">
                 <span className="size-1.5 rounded-full bg-emerald-400" />
                 <span className="text-[11px] text-white/35">Online</span>

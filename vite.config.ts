@@ -12,8 +12,8 @@ export default defineConfig({
       registerType: "autoUpdate",
       includeAssets: ["logo-192.png", "logo-512.png", "maskable-black.png"],
       manifest: {
-        name: "FinEase",
-        short_name: "FinEase",
+        name: "VoiceKhata",
+        short_name: "VoiceKhata",
         start_url: "/",
         display: "standalone",
         theme_color: "#000000",

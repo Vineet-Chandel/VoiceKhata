@@ -57,7 +57,7 @@ const releases: Release[] = [
         version: "v2.2.0",
         date: "November 30, 2024",
         title: "Email Auto-Detection",
-        summary: "Let FinEase read your bank transaction emails so you don't have to.",
+        summary: "Let VoiceKhata read your bank transaction emails so you don't have to.",
         changes: [
             { type: "new", text: "Gmail and Outlook integration for auto expense detection" },
             { type: "new", text: "Supports 12+ major Indian banks and payment apps" },

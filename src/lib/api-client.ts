@@ -1,6 +1,6 @@
 import { auth } from "@/firebase/firebase"
 
-const BACKEND_URL = (import.meta.env.VITE_BACKEND_URL || "https://api.finease.tech").replace(/\/+$/, "")
+const BACKEND_URL = (import.meta.env.VITE_BACKEND_URL || "https://api.voicekhata.tech").replace(/\/+$/, "")
 
 export interface ApiFetchOptions extends Omit<RequestInit, "body"> {
   body?: any

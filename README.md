@@ -1,15 +1,15 @@
-# 🚀 FinEase
+# 🚀 VoiceKhata
 
 > AI-Powered Personal Finance Management Platform
 
-FinEase is a modern full-stack finance management platform focused on helping users track expenses, manage budgets, analyze spending habits, and generate AI-powered financial insights.
+VoiceKhata is a modern full-stack finance management platform focused on helping users track expenses, manage budgets, analyze spending habits, and generate AI-powered financial insights.
 
 Built with scalability and user experience in mind, the platform combines modern web technologies with AI integration to simplify personal finance management.
 
 ---
 
-<a href="https://finease.tech/" target="_blank">
-  <img width="1900" height="966" alt="FinEase Dashboard" src="https://github.com/user-attachments/assets/8171d8d4-bdad-488f-aad2-dba2caa70d43" />
+<a href="https://voicekhata.tech/" target="_blank">
+  <img width="1900" height="966" alt="VoiceKhata Dashboard" src="https://github.com/user-attachments/assets/8171d8d4-bdad-488f-aad2-dba2caa70d43" />
 </a>
 
 ## ✨ Features
@@ -295,8 +295,8 @@ Built with scalability and user experience in mind, the platform combines modern
 ### 1️⃣ Clone Repository
 
 ```bash
-git clone https://github.com/Mayank-23-Dev/FinEase.git
-cd FinEase
+git clone https://github.com/Mayank-23-Dev/VoiceKhata.git
+cd VoiceKhata
 ```
 
 ---
@@ -340,7 +340,7 @@ VITE_MERCHANT_SEARCH_ENDPOINT=""
 
 ### 3️⃣ Create Backend `.env`
 
-Create another `.env` file inside `finease-backend/`
+Create another `.env` file inside `voicekhata-backend/`
 
 ```env
 GOOGLE_CLIENT_SECRET=""
@@ -412,7 +412,7 @@ GitHub: https://github.com/Mayank-23-Dev
 
 ## 🌐 Live Project
 
-https://finease.tech/
+https://voicekhata.tech/
 
 ---
 

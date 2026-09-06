@@ -50,7 +50,7 @@ export default function Brand() {
                     </motion.div>
                     <motion.h1 variants={itemVariants} className="font-black mb-4 text-text-primary" style={{ fontSize: "clamp(2rem,5vw,3rem)", fontFamily: "'Syne',sans-serif" }}>Brand Assets</motion.h1>
                     <motion.p variants={itemVariants} style={{ color: "#555", lineHeight: 1.7 }}>
-                        Official logos, colors, and guidelines for using the FinEase brand. Please read our usage guidelines before using these assets.
+                        Official logos, colors, and guidelines for using the VoiceKhata brand. Please read our usage guidelines before using these assets.
                     </motion.p>
                 </motion.section>
 
@@ -72,7 +72,7 @@ export default function Brand() {
                                                     <path d="M8 24 C8 16 16 8 24 8" stroke={v.fg} strokeWidth="3" strokeLinecap="round" />
                                                     <path d="M8 18 C10 14 14 10 20 10" stroke={v.fg} strokeWidth="2" strokeLinecap="round" opacity="0.6" />
                                                 </svg>
-                                                <span style={{ fontFamily: "'Syne',sans-serif", fontSize: "1.2rem", color: v.fg, fontWeight: 800 }}>FinEase</span>
+                                                <span style={{ fontFamily: "'Syne',sans-serif", fontSize: "1.2rem", color: v.fg, fontWeight: 800 }}>VoiceKhata</span>
                                             </div>
                                         </div>
                                         <div className="px-4 py-3 flex items-center justify-between" style={{ background: "#0a0a0a", borderTop: "1px solid rgba(255,255,255,0.06)" }}>
@@ -140,7 +140,7 @@ export default function Brand() {
                                     ["✓ Do", "Use on approved background colors only"],
                                     ["✓ Do", "Maintain aspect ratio when resizing"],
                                     ["✗ Don't", "Modify, recolor, or distort the logo"],
-                                    ["✗ Don't", "Use FinEase branding to imply partnership without permission"],
+                                    ["✗ Don't", "Use VoiceKhata branding to imply partnership without permission"],
                                     ["✗ Don't", "Place the logo on busy backgrounds"],
                                 ].map(([tag, text], i) => (
                                     <div key={i} className="flex items-start gap-2.5">

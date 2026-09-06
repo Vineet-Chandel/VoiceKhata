@@ -16,7 +16,7 @@ export default function GetStarted() {
 
                     {/* Subtext */}
                     <p className="text-text-secondary text-lg max-w-2xl mx-auto mb-10">
-                        Join Finease today and start your journey towards financial freedom.
+                        Join VoiceKhata today and start your journey towards financial freedom.
                         No credit card required for the free tier.
                     </p>
 

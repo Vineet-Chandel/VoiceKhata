@@ -1,5 +1,5 @@
 -- ==============================================================================
--- FinEase Supabase Database Migration: 02_fix_rls_policies
+-- VoiceKhata Supabase Database Migration: 02_fix_rls_policies
 -- Description: Completely resolves Row Level Security (RLS) issues across all
 --              tables and storage objects for Firebase Auth + Supabase client.
 -- ==============================================================================

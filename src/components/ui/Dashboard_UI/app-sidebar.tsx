@@ -4,19 +4,19 @@ import {
   IconChartPie, IconDashboard, IconWallet,
   IconReport, IconSettings, IconRobot, IconRepeat, IconPigMoney, IconBell
 } from "@tabler/icons-react"
-import { Link }          from "react-router-dom"
-import { NavMain }       from "@/components/ui/Dashboard_UI/nav-main"
-import { NavSecondary }  from "@/components/ui/Dashboard_UI/nav-secondary"
-import { NavUser }       from "@/components/ui/Dashboard_UI/nav-user"
-import logo              from "@/assets/Logo_white.png"
+import { Link } from "react-router-dom"
+import { NavMain } from "@/components/ui/Dashboard_UI/nav-main"
+import { NavSecondary } from "@/components/ui/Dashboard_UI/nav-secondary"
+import { NavUser } from "@/components/ui/Dashboard_UI/nav-user"
+import logo from "@/assets/Logo_white.png"
 import {
   Sidebar, SidebarContent, SidebarFooter,
   SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem,
 } from "@/components/ui/Dashboard_UI/sidebar"
-import { useAuth }        from "@/components/hooks/use-auth"
+import { useAuth } from "@/components/hooks/use-auth"
 import { getUserProfile } from "@/firebase/user"
 import { hasCustomAvatar, getAvatarPublicUrl } from "@/lib/avatar"
-import { avatarEvents }   from "@/lib/avatarEvents"
+import { avatarEvents } from "@/lib/avatarEvents"
 
 // ── Hook: resolves avatar with priority + listens for live updates ─────────────
 function useResolvedAvatar() {
@@ -73,22 +73,22 @@ function useResolvedAvatar() {
 // ── Sidebar ───────────────────────────────────────────────────────────────────
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { user } = useAuth()
-  const avatar   = useResolvedAvatar()
+  const avatar = useResolvedAvatar()
 
   const data = {
     user: {
-      name:   user?.displayName || "User",
-      email:  user?.email       || "",
+      name: user?.displayName || "User",
+      email: user?.email || "",
       avatar,
     },
     navMain: [
-      { title: "Dashboard",    url: "/dashboard",              icon: IconDashboard },
-      { title: "Transaction",  url: "/dashboard/transactions", icon: IconWallet    },
-      { title: "Budget",       url: "/dashboard/budget",       icon: IconChartPie  },
-      { title: "Reports",      url: "/dashboard/reports",      icon: IconReport    },
-      { title: "FinVault",     url: "/dashboard/finvault",     icon: IconPigMoney  }, // ← was Stocks
-      { title: "AutoFlow",     url: "/dashboard/autopay",      icon: IconRepeat    },
-      { title: "AI Assistant", url: "/dashboard/ai-assistant", icon: IconRobot     },
+      { title: "Dashboard", url: "/dashboard", icon: IconDashboard },
+      { title: "Transaction", url: "/dashboard/transactions", icon: IconWallet },
+      { title: "Budget", url: "/dashboard/budget", icon: IconChartPie },
+      { title: "Reports", url: "/dashboard/reports", icon: IconReport },
+      { title: "FinVault", url: "/dashboard/finvault", icon: IconPigMoney }, // ← was Stocks
+      { title: "AutoFlow", url: "/dashboard/autopay", icon: IconRepeat },
+      { title: "AI Assistant", url: "/dashboard/ai-assistant", icon: IconRobot },
       // { title:"Notifications", url: "/dashboard/notifications", icon: IconBell },
     ],
     navSecondary: [
@@ -103,9 +103,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <SidebarMenuItem>
             <SidebarMenuButton asChild className="p-1.5 cursor-pointer">
               <Link to="/dashboard" className="flex items-center gap-2">
-                <img src={logo} className="w-9 h-9" alt="FinEase Logo" />
+                <img src={logo} className="w-9 h-9" alt="VoiceKhata Logo" />
                 <span className="text-xl font-bold">
-                  Fin<span className="font-semibold text-text-secondary">Ease</span>
+                  Voice<span className="font-semibold text-text-secondary">Khata</span>
                 </span>
               </Link>
             </SidebarMenuButton>
@@ -114,7 +114,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
 
       <SidebarContent>
-        <NavMain      items={data.navMain} />
+        <NavMain items={data.navMain} />
         <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
 

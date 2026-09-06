@@ -28,7 +28,7 @@ const Logo = ({
     <div className={`flex items-center gap-1.5 ${className}`}>
       <img
         src={logo}
-        alt="Finease Logo"
+        alt="VoiceKhata Logo"
         className={`${sizeClasses[size]} w-auto object-contain dark:invert`}
       />
       {showText && (

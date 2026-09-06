@@ -105,7 +105,7 @@ export function AuthPage() {
             Create an Account
           </h1>
           <p className="text-muted-foreground text-sm">
-            Start managing your personal finances with FinEase
+            Start managing your personal finances with VoiceKhata
           </p>
         </div>
 

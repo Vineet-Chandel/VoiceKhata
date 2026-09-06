@@ -1,5 +1,5 @@
 -- ==============================================================================
--- FinEase Supabase Database Migration: 01_initial_schema
+-- VoiceKhata Supabase Database Migration: 01_initial_schema
 -- Description: Core schema matching live production database
 -- ==============================================================================
 

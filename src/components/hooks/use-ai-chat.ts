@@ -3,7 +3,7 @@ import type { Dispatch, SetStateAction } from "react"
 import { format } from "date-fns"
 import type { Transaction } from "@/components/hooks/use-transactions"
 import type { Budget } from "@/components/hooks/use-budgets"
-import type { MultiGuidedState } from "@/components/hooks/use-chat-store"
+import type { MultiGuidedState, DraftItem, MultiGuidedStep } from "@/components/hooks/use-chat-store"
 import { useAITransaction } from "@/components/hooks/use-ai-transaction"
 import { useAuth } from "@/components/hooks/use-auth"
 import {
@@ -1130,7 +1130,7 @@ function buildSystemPrompt(
 
   const todayFormatted = format(new Date(), "EEEE, MMMM d, yyyy")
 
-return `You are FinEase AI, a smart finance companion.
+return `You are VoiceKhata AI, a smart finance companion.
 
 Today's date: ${todayFormatted}
 
@@ -1184,8 +1184,8 @@ function getSoftRedirectMessage(input: string, languageMode: LanguageMode): stri
   // Only redirect for small talk (greetings with no finance context)
   if (isSmallTalkIntent(text) && !isLikelyUnrelated(text)) {
     return localizeByMode(languageMode, {
-      english: "Hey! I'm FinEase AI. Ask me anything about your finances, or log a transaction!",
-      hinglish: "Hey! Main FinEase AI hoon. Finances ke baare mein kuch bhi pucho, ya transaction log karo!",
+      english: "Hey! I'm VoiceKhata AI. Ask me anything about your finances, or log a transaction!",
+      hinglish: "Hey! Main VoiceKhata AI hoon. Finances ke baare mein kuch bhi pucho, ya transaction log karo!",
       hindi: "",
     })
   }
@@ -1193,8 +1193,8 @@ function getSoftRedirectMessage(input: string, languageMode: LanguageMode): stri
   // Only redirect for hard-blocked content
   if (isLikelyUnrelated(text)) {
     return localizeByMode(languageMode, {
-      english: "I'm FinEase AI — I can only help with your finances. Want to log a transaction or check your spending?",
-      hinglish: "Main FinEase AI hoon — sirf finance ke liye hoon. Transaction log karein ya spending check karein?",
+      english: "I'm VoiceKhata AI — I can only help with your finances. Want to log a transaction or check your spending?",
+      hinglish: "Main VoiceKhata AI hoon — sirf finance ke liye hoon. Transaction log karein ya spending check karein?",
       hindi: "",
     })
   }
@@ -2499,8 +2499,8 @@ if (isLikelyUnrelated(trimmedContent)) {
   addMessage({
     role: "assistant",
     content: localizeByMode(nextLanguageMode, {
-      english: "I'm FinEase AI — I can only help with your finances. Want to log a transaction or check your spending?",
-      hinglish: "Main FinEase AI hoon — sirf finance ke liye hoon. Transaction log karein ya spending check karein?",
+      english: "I'm VoiceKhata AI — I can only help with your finances. Want to log a transaction or check your spending?",
+      hinglish: "Main VoiceKhata AI hoon — sirf finance ke liye hoon. Transaction log karein ya spending check karein?",
       hindi: "",
     }),
   })
@@ -2618,8 +2618,8 @@ if (isLikelyUnrelated(trimmedContent)) {
 const looksOffTopic = /```[\s\S]{40,}```|#include\s|def \w+\(|function \w+\(|import [a-z]|\bclass \w+/.test(text)
 const safeText = looksOffTopic
   ? localizeByMode(nextLanguageMode, {
-      english: "I'm FinEase AI — I'm here to help with your finances only. Want to log a transaction, check your budget, or review your spending?",
-      hinglish: "Main FinEase AI hoon — sirf finance ke liye hoon. Transaction log karein, budget check karein, ya spending review karein?",
+      english: "I'm VoiceKhata AI — I'm here to help with your finances only. Want to log a transaction, check your budget, or review your spending?",
+      hinglish: "Main VoiceKhata AI hoon — sirf finance ke liye hoon. Transaction log karein, budget check karein, ya spending review karein?",
       hindi: "",
     })
   : text

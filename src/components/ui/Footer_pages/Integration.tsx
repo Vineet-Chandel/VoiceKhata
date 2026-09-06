@@ -19,7 +19,7 @@ const integrations = [
     { icon: BarChart3, name: "Zerodha / Groww", desc: "Import your SIPs, stocks, and mutual fund portfolio for unified tracking.", tag: "Investments", status: "Live" },
     { icon: Shield, name: "DigiLocker", desc: "Fetch your financial documents and statements securely via DigiLocker.", tag: "Documents", status: "Beta" },
     { icon: RefreshCw, name: "Account Aggregator", desc: "RBI-regulated AA framework for consent-based bank data access.", tag: "Banking", status: "Coming Soon" },
-    { icon: Zap, name: "Zapier / n8n", desc: "Automate workflows between FinEase and 1000+ apps with no code.", tag: "Automation", status: "Coming Soon" },
+    { icon: Zap, name: "Zapier / n8n", desc: "Automate workflows between VoiceKhata and 1000+ apps with no code.", tag: "Automation", status: "Coming Soon" },
 ]
 
 const statusColors: Record<string, { bg: string; color: string }> = {
@@ -48,7 +48,7 @@ export default function Integration() {
                         <span style={{ background: "linear-gradient(135deg,#fff 30%,#444)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>financial world</span>
                     </motion.h1>
                     <motion.p variants={itemVariants} style={{ color: "#555", lineHeight: 1.7 }}>
-                        FinEase plugs into the apps and services you already use. No complex setup. Just connect and go.
+                        VoiceKhata plugs into the apps and services you already use. No complex setup. Just connect and go.
                     </motion.p>
                 </motion.section>
 
@@ -85,7 +85,7 @@ export default function Integration() {
                     <h2 className="text-center text-2xl font-black mb-10 text-text-primary" style={{ fontFamily: "'Syne',sans-serif" }}>How integrations work</h2>
                     <div className="grid md:grid-cols-3 gap-5">
                         {[
-                            { step: "01", title: "Connect", desc: "Authorize FinEase with read-only access to your accounts and email." },
+                            { step: "01", title: "Connect", desc: "Authorize VoiceKhata with read-only access to your accounts and email." },
                             { step: "02", title: "Sync", desc: "Transactions and data are fetched automatically in the background." },
                             { step: "03", title: "Insights", desc: "AI processes your data and surfaces actionable financial insights." },
                         ].map(s => (

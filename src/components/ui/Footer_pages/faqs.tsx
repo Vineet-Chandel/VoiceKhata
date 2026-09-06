@@ -18,18 +18,18 @@ const itemVariants: Variants = {
 const categories = ["All", "Getting Started", "Security", "Billing", "Features", "Account"]
 
 const faqs = [
-    { q: "What is FinEase?", a: "FinEase is an AI-powered personal finance dashboard that helps students and professionals track expenses, manage budgets, and get intelligent saving suggestions — all in one place.", cat: "Getting Started" },
-    { q: "How do I get started with FinEase?", a: "Simply sign up for a free account, connect your preferred payment methods or manually add transactions, and FinEase will start building your financial picture immediately.", cat: "Getting Started" },
+    { q: "What is VoiceKhata?", a: "VoiceKhata is an AI-powered personal finance dashboard that helps students and professionals track expenses, manage budgets, and get intelligent saving suggestions — all in one place.", cat: "Getting Started" },
+    { q: "How do I get started with VoiceKhata?", a: "Simply sign up for a free account, connect your preferred payment methods or manually add transactions, and VoiceKhata will start building your financial picture immediately.", cat: "Getting Started" },
     { q: "Is my financial data secure?", a: "Absolutely. We use bank-grade AES-256 encryption for all stored data, TLS 1.3 for data in transit, and never sell or share your personal information with third parties.", cat: "Security" },
-    { q: "Does FinEase store my bank credentials?", a: "No. FinEase uses read-only API connections and email parsing — we never store your banking passwords. Your credentials never touch our servers.", cat: "Security" },
-    { q: "Is FinEase free to use?", a: "FinEase offers a generous free tier with core expense tracking and budgeting. Pro features like AI insights, email auto-detection, and fund tracking are available on our premium plan.", cat: "Billing" },
+    { q: "Does VoiceKhata store my bank credentials?", a: "No. VoiceKhata uses read-only API connections and email parsing — we never store your banking passwords. Your credentials never touch our servers.", cat: "Security" },
+    { q: "Is VoiceKhata free to use?", a: "VoiceKhata offers a generous free tier with core expense tracking and budgeting. Pro features like AI insights, email auto-detection, and fund tracking are available on our premium plan.", cat: "Billing" },
     { q: "Can I cancel my subscription anytime?", a: "Yes, you can cancel at any time from your account settings. You'll retain access to Pro features until the end of your billing period with no hidden fees.", cat: "Billing" },
-    { q: "How does Auto Expense Detection work?", a: "FinEase reads transaction confirmation emails from your connected email account using a secure, read-only scope. It parses the amount, merchant, and date — then logs it automatically.", cat: "Features" },
-    { q: "Can I track my SIPs and mutual funds?", a: "Yes! FinEase's investment tracker supports SIPs, mutual funds, and ETFs. It fetches live NAV data daily and shows your portfolio health, gains/losses, and goal progress.", cat: "Features" },
+    { q: "How does Auto Expense Detection work?", a: "VoiceKhata reads transaction confirmation emails from your connected email account using a secure, read-only scope. It parses the amount, merchant, and date — then logs it automatically.", cat: "Features" },
+    { q: "Can I track my SIPs and mutual funds?", a: "Yes! VoiceKhata's investment tracker supports SIPs, mutual funds, and ETFs. It fetches live NAV data daily and shows your portfolio health, gains/losses, and goal progress.", cat: "Features" },
     { q: "How accurate are the AI suggestions?", a: "Our AI is trained on anonymized spending patterns and improves over time as it learns your habits. Most users see relevant saving suggestions within the first 2 weeks.", cat: "Features" },
     { q: "Can I export my financial data?", a: "Yes. You can export all your transaction history, budgets, and reports as CSV or PDF at any time from the Reports section — no restrictions even on the free plan.", cat: "Account" },
     { q: "How do I change my email or password?", a: "Visit Settings → Profile to update your email address or password. Changes require email verification for security.", cat: "Account" },
-    { q: "What currencies does FinEase support?", a: "FinEase primarily supports INR (₹) for Indian users, with USD, EUR, GBP, and other major currencies available in the Pro plan.", cat: "Account" },
+    { q: "What currencies does VoiceKhata support?", a: "VoiceKhata primarily supports INR (₹) for Indian users, with USD, EUR, GBP, and other major currencies available in the Pro plan.", cat: "Account" },
 ]
 
 export default function FAQs() {
@@ -63,7 +63,7 @@ export default function FAQs() {
                         <span style={{ background: "linear-gradient(135deg,#fff 30%,#444)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>Questions</span>
                     </motion.h1>
                     <motion.p variants={itemVariants} className="mb-8" style={{ color: "#555", lineHeight: 1.7 }}>
-                        Everything you need to know about FinEase. Can't find the answer? Reach out to our support team.
+                        Everything you need to know about VoiceKhata. Can't find the answer? Reach out to our support team.
                     </motion.p>
                     {/* Search */}
                     <motion.div variants={itemVariants} className="relative max-w-lg mx-auto">
@@ -158,7 +158,7 @@ export default function FAQs() {
                         <h2 className="text-xl font-black mb-2 text-text-primary relative z-10" style={{ fontFamily: "'Syne',sans-serif" }}>Still have questions?</h2>
                         <p className="mb-6 text-sm relative z-10" style={{ color: "#444" }}>Our support team usually responds within 2 hours.</p>
                         <div className="flex justify-center gap-3 relative z-10 flex-wrap">
-                            <a href="mailto:support@finease.app"><Button className="font-bold gap-2" style={{ background: "#fff", color: "#000" }}>Email Support <ArrowRight className="w-4 h-4" /></Button></a>
+                            <a href="mailto:support@voicekhata.app"><Button className="font-bold gap-2" style={{ background: "#fff", color: "#000" }}>Email Support <ArrowRight className="w-4 h-4" /></Button></a>
                             <Link to="/features"><Button variant="ghost" style={{ border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.4)" }}>View Features</Button></Link>
                         </div>
                     </div>

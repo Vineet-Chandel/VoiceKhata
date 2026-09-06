@@ -218,7 +218,7 @@ export function ProfilePanel({
                             </div>
                             <div>
                                 <p className="text-[13px] font-semibold text-text-primary">App Installed</p>
-                                <p className="text-[11px] text-text-muted">FinEase is on your home screen</p>
+                                <p className="text-[11px] text-text-muted">VoiceKhata is on your home screen</p>
                             </div>
                         </div>
                     </Card>
@@ -234,7 +234,7 @@ export function ProfilePanel({
                                 <Download className="size-4 text-text-secondary" />
                             </div>
                             <div className="flex-1 min-w-0">
-                                <p className="text-[13px] font-semibold text-text-primary">Install FinEase</p>
+                                <p className="text-[13px] font-semibold text-text-primary">Install VoiceKhata</p>
                                 <p className="text-[11px] text-text-muted">Add to home screen for quick access</p>
                             </div>
                             <div className="shrink-0 px-3 py-1.5 rounded-lg bg-surface-secondary border border-border">
@@ -250,7 +250,7 @@ export function ProfilePanel({
                                 <Download className="size-4 text-text-muted" />
                             </div>
                             <div>
-                                <p className="text-[13px] font-semibold text-text-secondary">Install FinEase</p>
+                                <p className="text-[13px] font-semibold text-text-secondary">Install VoiceKhata</p>
                                 <p className="text-[11px] text-text-muted leading-snug mt-0.5">
                                     Tap the Share button, then choose<br />"Add to Home Screen"
                                 </p>
@@ -261,7 +261,7 @@ export function ProfilePanel({
                     /* Chrome: prompt not triggered yet — show hint */
                     <Card>
                         <button
-                            onClick={() => alert("To install: look for the install icon (⊕) in your browser address bar, or go to browser menu → Install FinEase")}
+                            onClick={() => alert("To install: look for the install icon (⊕) in your browser address bar, or go to browser menu → Install VoiceKhata")}
                             className="w-full px-5 py-4 flex items-center gap-3 cursor-pointer
                                 hover:bg-surface-secondary transition-colors rounded-xl text-left"
                         >
@@ -269,7 +269,7 @@ export function ProfilePanel({
                                 <Download className="size-4 text-text-muted" />
                             </div>
                             <div className="flex-1 min-w-0">
-                                <p className="text-[13px] font-semibold text-text-secondary">Install FinEase</p>
+                                <p className="text-[13px] font-semibold text-text-secondary">Install VoiceKhata</p>
                                 <p className="text-[11px] text-text-muted leading-snug">
                                     Tap ⊕ in your browser address bar
                                 </p>

@@ -1,5 +1,5 @@
 -- ==============================================================================
--- FinEase Supabase Database Schema & RLS Setup
+-- VoiceKhata Supabase Database Schema & RLS Setup
 -- Run this SQL in your Supabase Project: SQL Editor -> New Query -> Run
 -- ==============================================================================
 

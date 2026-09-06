@@ -2,7 +2,7 @@ import { initializeApp } from "firebase/app"
 import { getAuth } from "firebase/auth"
 import { getStorage } from "firebase/storage"
 
-const projectId = import.meta.env.VITE_FIREBASE_PROJECT_ID || "finease-23i23"
+const projectId = import.meta.env.VITE_FIREBASE_PROJECT_ID || "voicekhata-23i23"
 const envAuthDomain = import.meta.env.VITE_FIREBASE_AUTH_DOMAIN
 
 const firebaseConfig = {
