@@ -47,6 +47,24 @@
 
 ---
 
+## 🌐 Live Demo
+
+🔗 **[Launch VoiceKhata Live Demo](https://voicekhata-frontend-jjtk.onrender.com)**
+
+---
+
+## 📊 Project Presentation
+
+📄 **[View VoiceKhata Presentation (PDF)](docs/VoiceKhata-presentation.pdf)**
+
+---
+
+## ⚠️ Important
+
+> **Note:** VoiceKhata is currently a **demo/MVP**. The project is intended to demonstrate voice-based Khata management and is not a production accounting system.
+
+---
+
 ## ⚡ Why VoiceKhata?
 
 > Traditional finance apps overwhelm you with spreadsheets. VoiceKhata replaces complexity with **AI intelligence** — automatically categorizing transactions, predicting spending patterns, and delivering actionable financial insights in real-time.
@@ -79,6 +97,82 @@
 ## ✨ Features
 
 <table>
+<tr>
+<td align="center" width="25%">
+<br/>
+<img src="https://img.icons8.com/fluency/48/microphone.png" width="40" />
+<br/><br/>
+<strong>Voice & Manual Entry</strong>
+<br/>
+<sub>Voice and manual transaction recording with real-time speech-to-text</sub>
+<br/><br/>
+</td>
+<td align="center" width="25%">
+<br/>
+<img src="https://img.icons8.com/fluency/48/language.png" width="40" />
+<br/><br/>
+<strong>Hindi/English Speech</strong>
+<br/>
+<sub>Bilingual speech recognition using the browser Web Speech API</sub>
+<br/><br/>
+</td>
+<td align="center" width="25%">
+<br/>
+<img src="https://img.icons8.com/fluency/48/automation.png" width="40" />
+<br/><br/>
+<strong>Auto Extraction</strong>
+<br/>
+<sub>Automatic extraction of customer name, amount & transaction type from voice</sub>
+<br/><br/>
+</td>
+<td align="center" width="25%">
+<br/>
+<img src="https://img.icons8.com/fluency/48/conference-call.png" width="40" />
+<br/><br/>
+<strong>Customer Management</strong>
+<br/>
+<sub>Organized customer directory with contact info and account status</sub>
+<br/><br/>
+</td>
+</tr>
+<tr>
+<td align="center" width="25%">
+<br/>
+<img src="https://img.icons8.com/fluency/48/debt.png" width="40" />
+<br/><br/>
+<strong>Credit & Payment Tracking</strong>
+<br/>
+<sub>Real-time tracking of customer credit (Udhar) and payments (Jama)</sub>
+<br/><br/>
+</td>
+<td align="center" width="25%">
+<br/>
+<img src="https://img.icons8.com/fluency/48/order-history.png" width="40" />
+<br/><br/>
+<strong>Transaction History</strong>
+<br/>
+<sub>Full chronological customer transaction logs and ledger history</sub>
+<br/><br/>
+</td>
+<td align="center" width="25%">
+<br/>
+<img src="https://img.icons8.com/fluency/48/financial-growth-analysis.png" width="40" />
+<br/><br/>
+<strong>Sales Reports</strong>
+<br/>
+<sub>Comprehensive sales reports, cash flows, and ledger summaries</sub>
+<br/><br/>
+</td>
+<td align="center" width="25%">
+<br/>
+<img src="https://img.icons8.com/fluency/48/bot.png" width="40" />
+<br/><br/>
+<strong>Voice/Text Khata Assistant</strong>
+<br/>
+<sub>Conversational assistant to query customer balances and sales by voice or text</sub>
+<br/><br/>
+</td>
+</tr>
 <tr>
 <td align="center" width="25%">
 <br/>
@@ -511,7 +605,15 @@ This project is open source and available under the [MIT License](LICENSE).
 
 <div align="center">
 
-## 👥 Team
+## 👥 Team Details
+
+<p>
+  <strong>Team Name:</strong> Fin Fusion &nbsp;•&nbsp; 
+  <strong>Project Name:</strong> VoiceKhata &nbsp;•&nbsp; 
+  <strong>Track Name:</strong> Fintech + AI + NLP
+</p>
+
+<br/>
 
 <table>
 <tr>
@@ -561,5 +663,11 @@ This project is open source and available under the [MIT License](LICENSE).
 <strong>If you found this project helpful, consider giving it a ⭐</strong>
 
 <br/><br/>
+
+<p>
+  <em>Built with 💖 for a simple voice-first Khata experience.</em>
+</p>
+
+<br/>
 
 </div>
