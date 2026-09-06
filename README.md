@@ -94,200 +94,31 @@
 
 ---
 
-## ✨ Features
+## ✨ Features & Capabilities
 
-<table>
-<tr>
-<td align="center" width="25%">
-<br/>
-<img src="https://img.icons8.com/fluency/48/microphone.png" width="40" />
-<br/><br/>
-<strong>Voice & Manual Entry</strong>
-<br/>
-<sub>Voice and manual transaction recording with real-time speech-to-text</sub>
-<br/><br/>
-</td>
-<td align="center" width="25%">
-<br/>
-<img src="https://img.icons8.com/fluency/48/language.png" width="40" />
-<br/><br/>
-<strong>Hindi/English Speech</strong>
-<br/>
-<sub>Bilingual speech recognition using the browser Web Speech API</sub>
-<br/><br/>
-</td>
-<td align="center" width="25%">
-<br/>
-<img src="https://img.icons8.com/fluency/48/automation.png" width="40" />
-<br/><br/>
-<strong>Auto Extraction</strong>
-<br/>
-<sub>Automatic extraction of customer name, amount & transaction type from voice</sub>
-<br/><br/>
-</td>
-<td align="center" width="25%">
-<br/>
-<img src="https://img.icons8.com/fluency/48/conference-call.png" width="40" />
-<br/><br/>
-<strong>Customer Management</strong>
-<br/>
-<sub>Organized customer directory with contact info and account status</sub>
-<br/><br/>
-</td>
-</tr>
-<tr>
-<td align="center" width="25%">
-<br/>
-<img src="https://img.icons8.com/fluency/48/debt.png" width="40" />
-<br/><br/>
-<strong>Credit & Payment Tracking</strong>
-<br/>
-<sub>Real-time tracking of customer credit (Udhar) and payments (Jama)</sub>
-<br/><br/>
-</td>
-<td align="center" width="25%">
-<br/>
-<img src="https://img.icons8.com/fluency/48/order-history.png" width="40" />
-<br/><br/>
-<strong>Transaction History</strong>
-<br/>
-<sub>Full chronological customer transaction logs and ledger history</sub>
-<br/><br/>
-</td>
-<td align="center" width="25%">
-<br/>
-<img src="https://img.icons8.com/fluency/48/financial-growth-analysis.png" width="40" />
-<br/><br/>
-<strong>Sales Reports</strong>
-<br/>
-<sub>Comprehensive sales reports, cash flows, and ledger summaries</sub>
-<br/><br/>
-</td>
-<td align="center" width="25%">
-<br/>
-<img src="https://img.icons8.com/fluency/48/bot.png" width="40" />
-<br/><br/>
-<strong>Voice/Text Khata Assistant</strong>
-<br/>
-<sub>Conversational assistant to query customer balances and sales by voice or text</sub>
-<br/><br/>
-</td>
-</tr>
-<tr>
-<td align="center" width="25%">
-<br/>
-<img src="https://img.icons8.com/fluency/48/transaction-list.png" width="40" />
-<br/><br/>
-<strong>Smart Transactions</strong>
-<br/>
-<sub>AI-powered expense & income tracking with auto-categorization</sub>
-<br/><br/>
-</td>
-<td align="center" width="25%">
-<br/>
-<img src="https://img.icons8.com/fluency/48/artificial-intelligence.png" width="40" />
-<br/><br/>
-<strong>AI Insights</strong>
-<br/>
-<sub>Personalized financial analysis powered by Llama & GPT models</sub>
-<br/><br/>
-</td>
-<td align="center" width="25%">
-<br/>
-<img src="https://img.icons8.com/fluency/48/receipt-dollar.png" width="40" />
-<br/><br/>
-<strong>Receipt Scanner</strong>
-<br/>
-<sub>Snap a photo and let vision AI extract transaction details</sub>
-<br/><br/>
-</td>
-<td align="center" width="25%">
-<br/>
-<img src="https://img.icons8.com/fluency/48/combo-chart.png" width="40" />
-<br/><br/>
-<strong>Analytics Dashboard</strong>
-<br/>
-<sub>Interactive charts and visual breakdowns of your finances</sub>
-<br/><br/>
-</td>
-</tr>
-<tr>
-<td align="center" width="25%">
-<br/>
-<img src="https://img.icons8.com/fluency/48/money-bag.png" width="40" />
-<br/><br/>
-<strong>Budget Manager</strong>
-<br/>
-<sub>Set category-wise budgets and track spending in real-time</sub>
-<br/><br/>
-</td>
-<td align="center" width="25%">
-<br/>
-<img src="https://img.icons8.com/fluency/48/goal.png" width="40" />
-<br/><br/>
-<strong>Savings Goals</strong>
-<br/>
-<sub>Create savings targets with visual progress tracking</sub>
-<br/><br/>
-</td>
-<td align="center" width="25%">
-<br/>
-<img src="https://img.icons8.com/fluency/48/stocks-growth.png" width="40" />
-<br/><br/>
-<strong>Investment Tracker</strong>
-<br/>
-<sub>Monitor stocks, SIPs & manual investments with live data</sub>
-<br/><br/>
-</td>
-<td align="center" width="25%">
-<br/>
-<img src="https://img.icons8.com/fluency/48/gmail.png" width="40" />
-<br/><br/>
-<strong>Gmail Sync</strong>
-<br/>
-<sub>Auto-import transactions from bank emails via OAuth</sub>
-<br/><br/>
-</td>
-</tr>
-<tr>
-<td align="center" width="25%">
-<br/>
-<img src="https://img.icons8.com/fluency/48/autopay.png" width="40" />
-<br/><br/>
-<strong>AutoPay Tracking</strong>
-<br/>
-<sub>Monitor recurring subscriptions and scheduled payments</sub>
-<br/><br/>
-</td>
-<td align="center" width="25%">
-<br/>
-<img src="https://img.icons8.com/fluency/48/alarm.png" width="40" />
-<br/><br/>
-<strong>Smart Alerts</strong>
-<br/>
-<sub>Custom alert rules for overspending, budget thresholds & more</sub>
-<br/><br/>
-</td>
-<td align="center" width="25%">
-<br/>
-<img src="https://img.icons8.com/fluency/48/drag-and-drop.png" width="40" />
-<br/><br/>
-<strong>Drag & Drop</strong>
-<br/>
-<sub>Reorder and organize dashboard widgets with drag-and-drop</sub>
-<br/><br/>
-</td>
-<td align="center" width="25%">
-<br/>
-<img src="https://img.icons8.com/fluency/48/installing-updates.png" width="40" />
-<br/><br/>
-<strong>PWA Ready</strong>
-<br/>
-<sub>Install as a native app on mobile and desktop devices</sub>
-<br/><br/>
-</td>
-</tr>
-</table>
+### 🎙️ Core Voice & Khata Management
+- 🎙️ **Voice and Manual Transaction Entry** — Record credits and payments seamlessly using natural speech input or quick manual forms.
+- 🌐 **Hindi/English Speech Recognition** — In-browser speech-to-text recognition supporting conversational Hindi and English commands without third-party plugins.
+- ⚡ **Automatic Transaction Extraction** — Intelligent NLP extracts customer name, transaction amount, and credit/debit intent automatically from spoken phrases.
+- 👥 **Customer Management** — Dedicated customer directory with contact information, credit limits, and individual account status.
+- ⚖️ **Credit and Payment Tracking (Udhar/Jama)** — Real-time ledger calculations for customer credit, partial repayments, and settled balances.
+- 📜 **Customer Transaction History** — Comprehensive chronological transaction logs and complete ledger audit trail per customer.
+- 📊 **Sales Reports & Summaries** — Summary reports of daily, weekly, and monthly sales, cash flows, and credit summaries.
+- 🤖 **Voice/Text Khata Assistant** — Conversational AI assistant to query customer balances, pending dues, and accounts via voice or text commands.
+
+### 💼 Smart Finance & Dashboard Capabilities
+- 💳 **Smart Transactions** — AI-powered expense and income tracking with automatic merchant categorization.
+- 🧠 **AI Financial Insights** — Personalized financial analysis, savings suggestions, and spending health scores powered by Meta Llama & GPT models.
+- 🧾 **Smart Receipt Scanner** — Snap a photo of physical bills or receipts and let vision AI extract merchants, line items, and totals.
+- 📈 **Interactive Analytics Dashboard** — Dynamic charts, visual spending breakdowns, and month-over-month cash flow analysis.
+- 💰 **Budget Manager** — Set category-wise spending limits with real-time budget threshold warnings.
+- 🎯 **Savings Goals** — Create target-based savings milestones with visual progress indicators.
+- 📊 **Investment Tracker** — Monitor stocks, SIP plans, and manual assets with live market data feeds.
+- 📬 **Gmail Sync** — Securely import transaction records and receipts from bank alert emails via Google OAuth 2.0.
+- 🔄 **AutoPay & Recurring Tracking** — Monitor scheduled payments, active subscriptions, and recurring income.
+- 🔔 **Smart Alerts** — Configurable notification rules for overspending, low balances, and due dates.
+- 🖱️ **Drag & Drop Customization** — Reorder and customize dashboard analytics widgets using smooth drag-and-drop interactions.
+- 📱 **PWA Ready** — Installable on mobile and desktop devices with offline service worker support.
 
 ---
 
