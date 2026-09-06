@@ -41,27 +41,58 @@
 
 ---
 
+## 👥 Team Details
+
+**Team Name:** Fin Fusion  
+**Project Name:** VoiceKhata  
+**Track Name:** Fintech + AI + NLP  
+
+<br/>
+
+<table>
+<tr>
+<th align="left">Name</th>
+<th align="center">Role</th>
+<th align="left">Email</th>
+<th align="left">Contributions</th>
+</tr>
+<tr>
+<td><strong>Harshika Dixit</strong></td>
+<td align="center"><img src="https://img.shields.io/badge/📋-Research-E11D48?style=flat-square" /> <img src="https://img.shields.io/badge/⭐_Team_Leader-FFD700?style=flat-square" /></td>
+<td><a href="mailto:harshikadixit9@gmail.com">harshikadixit9@gmail.com</a></td>
+<td>Govt. Guidelines Research · Architecture · Presentation · Testing</td>
+</tr>
+<tr>
+<td><strong>Vansh Raj</strong></td>
+<td align="center"><img src="https://img.shields.io/badge/🎨-Frontend-61DAFB?style=flat-square" /></td>
+<td><a href="mailto:vanshraj8858@gmail.com">vanshraj8858@gmail.com</a></td>
+<td>Frontend Development</td>
+</tr>
+<tr>
+<td><strong>Vansh Gupta</strong></td>
+<td align="center"><img src="https://img.shields.io/badge/⚙️-Backend-339933?style=flat-square" /></td>
+<td><a href="mailto:vanshgupta26112005@gmail.com">vanshgupta26112005@gmail.com</a></td>
+<td>Backend Development</td>
+</tr>
+<tr>
+<td><strong>Vineet Singh Chandel</strong></td>
+<td align="center"><img src="https://img.shields.io/badge/🔮-Full_Stack-F97316?style=flat-square" /></td>
+<td><a href="mailto:vineetsinghk06@gmail.com">vineetsinghk06@gmail.com</a></td>
+<td>Frontend + Backend Development</td>
+</tr>
+<tr>
+<td><strong>Avika Srivastava</strong></td>
+<td align="center"><img src="https://img.shields.io/badge/✨-Design_%26_AI-8B5CF6?style=flat-square" /></td>
+<td><a href="mailto:Avika.srivastava.280@gmail.com">Avika.srivastava.280@gmail.com</a></td>
+<td>UI/UX Design · AI Training · Testing</td>
+</tr>
+</table>
+
+---
+
 ## 📖 About
 
-> **VoiceKhata** is a voice-enabled khata management demo for recording customer credit and payment transactions using **Hindi/English voice input**. It allows users and merchants to maintain digital ledgers seamlessly through natural voice commands, automating transaction entry, credit tracking, and balance updates.
-
----
-
-## 🌐 Live Demo
-
-🔗 **[Launch VoiceKhata Live Demo](https://voicekhata-frontend-jjtk.onrender.com)**
-
----
-
-## 📊 Project Presentation
-
-📄 **[View VoiceKhata Presentation (PDF)](docs/VoiceKhata-presentation.pdf)**
-
----
-
-## ⚠️ Important
-
-> **Note:** VoiceKhata is currently a **demo/MVP**. The project is intended to demonstrate voice-based Khata management and is not a production accounting system.
+VoiceKhata is a simple voice-based **Khata management demo** for recording customer credit and payment transactions using Hindi/English voice input.
 
 ---
 
@@ -122,6 +153,18 @@
 
 ---
 
+## 🛠️ Tech Stack
+
+- **Frontend:** React 18, TypeScript, Vite, Tailwind CSS, Radix UI, Chart.js, Recharts, DnD Kit
+- **Backend:** Node.js, Express, TypeScript, REST API
+- **Database & Storage:** Supabase (PostgreSQL), Row Level Security (RLS)
+- **Authentication:** Firebase Auth, Google OAuth 2.0
+- **Speech & AI:** Browser Web Speech API, Groq Cloud (Meta Llama 3.1 & 4 Scout), OpenAI GPT, Google Vision OCR
+- **APIs & Integrations:** Twelve Data API, Finnhub, Google Gmail API, Tavily Search
+- **DevOps & Tooling:** Vite PWA, Service Workers, ESLint
+
+---
+
 ## 🏗️ Architecture
 
 ```
@@ -138,7 +181,7 @@
 │  │               (Google OAuth · Email/Password)                 │   │
 │  └──────────────────────────┬───────────────────────────────────┘   │
 └─────────────────────────────┼───────────────────────────────────────┘
-                              │
+                               │
                     ┌─────────▼──────────┐
                     │   Express.js API    │
                     │   (Node.js + TS)    │
@@ -155,108 +198,21 @@
 
 ---
 
-## 🛠️ Tech Stack
+## 📊 Project Presentation
 
-VoiceKhata is built using a modern, scalable full-stack architecture separated into specialized layers:
-
-### 🎨 Frontend
-<p>
-  <img src="https://img.shields.io/badge/React_18-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" alt="React" />
-  <img src="https://img.shields.io/badge/TypeScript_5-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
-  <img src="https://img.shields.io/badge/Vite_6-646CFF?style=for-the-badge&logo=vite&logoColor=white" alt="Vite" />
-  <img src="https://img.shields.io/badge/Tailwind_CSS_4-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white" alt="Tailwind CSS" />
-  <img src="https://img.shields.io/badge/Radix_UI-161618?style=for-the-badge&logo=radix-ui&logoColor=white" alt="Radix UI" />
-  <img src="https://img.shields.io/badge/Chart.js-FF6384?style=for-the-badge&logo=chart.js&logoColor=white" alt="Chart.js" />
-  <img src="https://img.shields.io/badge/Recharts-22B5BF?style=for-the-badge&logo=recharts&logoColor=white" alt="Recharts" />
-</p>
-
-| Technology | Role & Purpose |
-|:---|:---|
-| **React 18** | Declarative component-based UI framework for dynamic rendering |
-| **TypeScript 5** | Strict type-safety and robust developer experience |
-| **Vite 6** | Next-generation frontend build tooling and rapid HMR |
-| **Tailwind CSS 4** | Modern utility-first styling with custom responsive design system |
-| **Radix UI & Tabler Icons** | Accessible headless UI primitives and iconography |
-| **Chart.js & Recharts** | Interactive data visualization for expense tracking and trends |
-| **DnD Kit** | Drag-and-drop support for dashboard customization |
+📄 **[View VoiceKhata Presentation (PDF)](docs/VoiceKhata-presentation.pdf)**
 
 ---
 
-### ⚙️ Backend
-<p>
-  <img src="https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=node.js&logoColor=white" alt="Node.js" />
-  <img src="https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white" alt="Express" />
-  <img src="https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
-  <img src="https://img.shields.io/badge/REST_API-009688?style=for-the-badge&logo=fastapi&logoColor=white" alt="REST API" />
-</p>
+## ⚠️ Important
 
-| Technology | Role & Purpose |
-|:---|:---|
-| **Node.js** | Asynchronous, event-driven JavaScript backend runtime |
-| **Express.js** | Minimalist web framework for REST API endpoints and routing |
-| **TypeScript** | End-to-end typed request handling, controllers, and data contracts |
-| **CORS & Middleware** | Request validation, rate limiting, and security policies |
+> **Note:** VoiceKhata is currently a **demo/MVP**. The project is intended to demonstrate voice-based Khata management and is not a production accounting system.
 
 ---
 
-### 🗄️ Database & Storage
-<p>
-  <img src="https://img.shields.io/badge/Supabase-3FCF8E?style=for-the-badge&logo=supabase&logoColor=white" alt="Supabase" />
-  <img src="https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white" alt="PostgreSQL" />
-</p>
+## 🌐 Live Demo
 
-| Technology | Role & Purpose |
-|:---|:---|
-| **Supabase** | Cloud platform providing managed PostgreSQL, real-time sync & storage |
-| **PostgreSQL** | Relational database with relational integrity and JSONB support |
-| **Row Level Security (RLS)** | Fine-grained multi-tenant security policies isolating user records |
-
----
-
-### 🔐 Authentication & Cloud
-<p>
-  <img src="https://img.shields.io/badge/Firebase_Auth-FFCA28?style=for-the-badge&logo=firebase&logoColor=black" alt="Firebase" />
-  <img src="https://img.shields.io/badge/Google_OAuth-4285F4?style=for-the-badge&logo=google&logoColor=white" alt="Google" />
-  <img src="https://img.shields.io/badge/Gmail_API-EA4335?style=for-the-badge&logo=gmail&logoColor=white" alt="Gmail" />
-</p>
-
-| Technology | Role & Purpose |
-|:---|:---|
-| **Firebase Auth** | User authentication with Email/Password and Google OAuth 2.0 |
-| **Google Gmail API** | OAuth 2.0 integration for automated bank transaction parsing |
-| **Vite PWA Plugin** | Service workers, offline caching, and native app installability |
-
----
-
-### 🤖 Artificial Intelligence & Machine Learning
-<p>
-  <img src="https://img.shields.io/badge/Groq_Cloud-F55036?style=for-the-badge&logo=groq&logoColor=white" alt="Groq" />
-  <img src="https://img.shields.io/badge/Meta_Llama_3.1-0467DF?style=for-the-badge&logo=meta&logoColor=white" alt="Llama 3.1" />
-  <img src="https://img.shields.io/badge/Llama_4_Scout-0467DF?style=for-the-badge&logo=meta&logoColor=white" alt="Llama 4" />
-  <img src="https://img.shields.io/badge/OpenRouter-6366F1?style=for-the-badge&logo=openai&logoColor=white" alt="OpenRouter" />
-</p>
-
-| Technology | Role & Purpose |
-|:---|:---|
-| **Groq Cloud Engine** | Ultra-low latency LPU inference for real-time financial AI |
-| **Meta Llama 3.1 & 4 Scout** | Context-aware transaction categorization and financial reasoning |
-| **GPT-OSS-120B** | Advanced synthesis for budget insights and savings planning |
-| **Vision AI / OCR** | Automated receipt scanning and transaction detail extraction |
-
----
-
-### 📈 Market Data & External APIs
-<p>
-  <img src="https://img.shields.io/badge/Twelve_Data-007AFF?style=for-the-badge&logo=tradingview&logoColor=white" alt="Twelve Data" />
-  <img src="https://img.shields.io/badge/Finnhub-1E3A8A?style=for-the-badge&logo=blockchaindotcom&logoColor=white" alt="Finnhub" />
-  <img src="https://img.shields.io/badge/Tavily_Search-7C3AED?style=for-the-badge&logo=google-chrome&logoColor=white" alt="Tavily" />
-</p>
-
-| Technology | Role & Purpose |
-|:---|:---|
-| **Twelve Data API** | Real-time and historical stock market quotes for investment tracking |
-| **Finnhub API** | Live market data feeds and stock price verification |
-| **Tavily Search API** | Web intelligence for real-time market search and news |
+🔗 **[Launch VoiceKhata Live Demo](https://voicekhata-frontend-jjtk.onrender.com)**
 
 ---
 
@@ -436,61 +392,6 @@ This project is open source and available under the [MIT License](LICENSE).
 
 <div align="center">
 
-## 👥 Team Details
-
-<p>
-  <strong>Team Name:</strong> Fin Fusion &nbsp;•&nbsp; 
-  <strong>Project Name:</strong> VoiceKhata &nbsp;•&nbsp; 
-  <strong>Track Name:</strong> Fintech + AI + NLP
-</p>
-
-<br/>
-
-<table>
-<tr>
-<th align="left">Name</th>
-<th align="center">Role</th>
-<th align="left">Email</th>
-<th align="left">Contributions</th>
-</tr>
-<tr>
-<td><strong>Harshika Dixit</strong></td>
-<td align="center"><img src="https://img.shields.io/badge/📋-Research-E11D48?style=flat-square" /> <img src="https://img.shields.io/badge/⭐_Team_Leader-FFD700?style=flat-square" /></td>
-<td><a href="mailto:harshikadixit9@gmail.com">harshikadixit9@gmail.com</a></td>
-<td>Govt. Guidelines Research · Architecture · Presentation · Testing</td>
-</tr>
-<tr>
-<td><strong>Vansh Raj</strong></td>
-<td align="center"><img src="https://img.shields.io/badge/🎨-Frontend-61DAFB?style=flat-square" /></td>
-<td>—</td>
-<td>Frontend Development</td>
-</tr>
-<tr>
-<td><strong>Vansh Gupta</strong></td>
-<td align="center"><img src="https://img.shields.io/badge/⚙️-Backend-339933?style=flat-square" /></td>
-<td><a href="mailto:vanshgupta26112005@gmail.com">vanshgupta26112005@gmail.com</a></td>
-<td>Backend Development</td>
-</tr>
-<tr>
-<td><strong>Vineet Singh Chandel</strong></td>
-<td align="center"><img src="https://img.shields.io/badge/🔮-Full_Stack-F97316?style=flat-square" /></td>
-<td><a href="mailto:vineetsinghk06@gmail.com">vineetsinghk06@gmail.com</a></td>
-<td>Frontend + Backend Development</td>
-</tr>
-<tr>
-<td><strong>Avika Srivastava</strong></td>
-<td align="center"><img src="https://img.shields.io/badge/✨-Design_%26_AI-8B5CF6?style=flat-square" /></td>
-<td><a href="mailto:Avika.srivastava.280@gmail.com">Avika.srivastava.280@gmail.com</a></td>
-<td>UI/UX Design · AI Training · Testing</td>
-</tr>
-</table>
-
-<br/>
-
----
-
-<br/>
-
 <strong>If you found this project helpful, consider giving it a ⭐</strong>
 
 <br/><br/>
@@ -498,7 +399,5 @@ This project is open source and available under the [MIT License](LICENSE).
 <p>
   <em>Built with 💖 for a simple voice-first Khata experience.</em>
 </p>
-
-<br/>
 
 </div>
