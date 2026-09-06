@@ -225,68 +225,106 @@
 
 ## 🛠️ Tech Stack
 
-<table>
-<tr>
-<th align="left">Layer</th>
-<th align="left">Technology</th>
-<th align="left">Purpose</th>
-</tr>
-<tr>
-<td><strong>Frontend</strong></td>
-<td>React 18 · TypeScript · Vite</td>
-<td>Fast, type-safe UI with HMR</td>
-</tr>
-<tr>
-<td><strong>Styling</strong></td>
-<td>Tailwind CSS 4 · Radix UI · Tabler Icons</td>
-<td>Utility-first CSS with accessible components</td>
-</tr>
-<tr>
-<td><strong>State & Data</strong></td>
-<td>React Context · TanStack Table · React Hook Form</td>
-<td>State management and data tables</td>
-</tr>
-<tr>
-<td><strong>Charts</strong></td>
-<td>Chart.js · Recharts</td>
-<td>Interactive data visualization</td>
-</tr>
-<tr>
-<td><strong>Backend</strong></td>
-<td>Node.js · Express · TypeScript</td>
-<td>RESTful API server</td>
-</tr>
-<tr>
-<td><strong>Database</strong></td>
-<td>Supabase (PostgreSQL) · Row Level Security</td>
-<td>Secure, scalable data persistence</td>
-</tr>
-<tr>
-<td><strong>Authentication</strong></td>
-<td>Firebase Auth · Google OAuth 2.0</td>
-<td>Secure user authentication</td>
-</tr>
-<tr>
-<td><strong>AI / ML</strong></td>
-<td>Groq (Llama 3.1 · Llama 4 Scout) · GPT-OSS-120B</td>
-<td>Financial insights & receipt scanning</td>
-</tr>
-<tr>
-<td><strong>Market Data</strong></td>
-<td>Twelve Data API · Tavily Search</td>
-<td>Live stock prices and financial search</td>
-</tr>
-<tr>
-<td><strong>Interactions</strong></td>
-<td>DnD Kit · Framer Motion · Canvas Confetti</td>
-<td>Drag-and-drop, animations & celebrations</td>
-</tr>
-<tr>
-<td><strong>PWA</strong></td>
-<td>Vite PWA Plugin · Service Workers</td>
-<td>Offline support and installability</td>
-</tr>
-</table>
+VoiceKhata is built using a modern, scalable full-stack architecture separated into specialized layers:
+
+### 🎨 Frontend
+<p>
+  <img src="https://img.shields.io/badge/React_18-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" alt="React" />
+  <img src="https://img.shields.io/badge/TypeScript_5-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
+  <img src="https://img.shields.io/badge/Vite_6-646CFF?style=for-the-badge&logo=vite&logoColor=white" alt="Vite" />
+  <img src="https://img.shields.io/badge/Tailwind_CSS_4-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white" alt="Tailwind CSS" />
+  <img src="https://img.shields.io/badge/Radix_UI-161618?style=for-the-badge&logo=radix-ui&logoColor=white" alt="Radix UI" />
+  <img src="https://img.shields.io/badge/Chart.js-FF6384?style=for-the-badge&logo=chart.js&logoColor=white" alt="Chart.js" />
+  <img src="https://img.shields.io/badge/Recharts-22B5BF?style=for-the-badge&logo=recharts&logoColor=white" alt="Recharts" />
+</p>
+
+| Technology | Role & Purpose |
+|:---|:---|
+| **React 18** | Declarative component-based UI framework for dynamic rendering |
+| **TypeScript 5** | Strict type-safety and robust developer experience |
+| **Vite 6** | Next-generation frontend build tooling and rapid HMR |
+| **Tailwind CSS 4** | Modern utility-first styling with custom responsive design system |
+| **Radix UI & Tabler Icons** | Accessible headless UI primitives and iconography |
+| **Chart.js & Recharts** | Interactive data visualization for expense tracking and trends |
+| **DnD Kit** | Drag-and-drop support for dashboard customization |
+
+---
+
+### ⚙️ Backend
+<p>
+  <img src="https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=node.js&logoColor=white" alt="Node.js" />
+  <img src="https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white" alt="Express" />
+  <img src="https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
+  <img src="https://img.shields.io/badge/REST_API-009688?style=for-the-badge&logo=fastapi&logoColor=white" alt="REST API" />
+</p>
+
+| Technology | Role & Purpose |
+|:---|:---|
+| **Node.js** | Asynchronous, event-driven JavaScript backend runtime |
+| **Express.js** | Minimalist web framework for REST API endpoints and routing |
+| **TypeScript** | End-to-end typed request handling, controllers, and data contracts |
+| **CORS & Middleware** | Request validation, rate limiting, and security policies |
+
+---
+
+### 🗄️ Database & Storage
+<p>
+  <img src="https://img.shields.io/badge/Supabase-3FCF8E?style=for-the-badge&logo=supabase&logoColor=white" alt="Supabase" />
+  <img src="https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white" alt="PostgreSQL" />
+</p>
+
+| Technology | Role & Purpose |
+|:---|:---|
+| **Supabase** | Cloud platform providing managed PostgreSQL, real-time sync & storage |
+| **PostgreSQL** | Relational database with relational integrity and JSONB support |
+| **Row Level Security (RLS)** | Fine-grained multi-tenant security policies isolating user records |
+
+---
+
+### 🔐 Authentication & Cloud
+<p>
+  <img src="https://img.shields.io/badge/Firebase_Auth-FFCA28?style=for-the-badge&logo=firebase&logoColor=black" alt="Firebase" />
+  <img src="https://img.shields.io/badge/Google_OAuth-4285F4?style=for-the-badge&logo=google&logoColor=white" alt="Google" />
+  <img src="https://img.shields.io/badge/Gmail_API-EA4335?style=for-the-badge&logo=gmail&logoColor=white" alt="Gmail" />
+</p>
+
+| Technology | Role & Purpose |
+|:---|:---|
+| **Firebase Auth** | User authentication with Email/Password and Google OAuth 2.0 |
+| **Google Gmail API** | OAuth 2.0 integration for automated bank transaction parsing |
+| **Vite PWA Plugin** | Service workers, offline caching, and native app installability |
+
+---
+
+### 🤖 Artificial Intelligence & Machine Learning
+<p>
+  <img src="https://img.shields.io/badge/Groq_Cloud-F55036?style=for-the-badge&logo=groq&logoColor=white" alt="Groq" />
+  <img src="https://img.shields.io/badge/Meta_Llama_3.1-0467DF?style=for-the-badge&logo=meta&logoColor=white" alt="Llama 3.1" />
+  <img src="https://img.shields.io/badge/Llama_4_Scout-0467DF?style=for-the-badge&logo=meta&logoColor=white" alt="Llama 4" />
+  <img src="https://img.shields.io/badge/OpenRouter-6366F1?style=for-the-badge&logo=openai&logoColor=white" alt="OpenRouter" />
+</p>
+
+| Technology | Role & Purpose |
+|:---|:---|
+| **Groq Cloud Engine** | Ultra-low latency LPU inference for real-time financial AI |
+| **Meta Llama 3.1 & 4 Scout** | Context-aware transaction categorization and financial reasoning |
+| **GPT-OSS-120B** | Advanced synthesis for budget insights and savings planning |
+| **Vision AI / OCR** | Automated receipt scanning and transaction detail extraction |
+
+---
+
+### 📈 Market Data & External APIs
+<p>
+  <img src="https://img.shields.io/badge/Twelve_Data-007AFF?style=for-the-badge&logo=tradingview&logoColor=white" alt="Twelve Data" />
+  <img src="https://img.shields.io/badge/Finnhub-1E3A8A?style=for-the-badge&logo=blockchaindotcom&logoColor=white" alt="Finnhub" />
+  <img src="https://img.shields.io/badge/Tavily_Search-7C3AED?style=for-the-badge&logo=google-chrome&logoColor=white" alt="Tavily" />
+</p>
+
+| Technology | Role & Purpose |
+|:---|:---|
+| **Twelve Data API** | Real-time and historical stock market quotes for investment tracking |
+| **Finnhub API** | Live market data feeds and stock price verification |
+| **Tavily Search API** | Web intelligence for real-time market search and news |
 
 ---
 
