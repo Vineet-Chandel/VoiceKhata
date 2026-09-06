@@ -1,7 +1,8 @@
 <div align="center">
 
-<!-- Header Banner -->
-<img src="https://capsule-render.vercel.app/api?type=waving&color=0:6366F1,50:8B5CF6,100:A78BFA&height=220&section=header&text=VoiceKhata&fontSize=72&fontColor=ffffff&animation=fadeIn&fontAlignY=35&desc=Your%20Ledger,%20Your%20Voice&descAlignY=55&descSize=20&descColor=E0E7FF" width="100%" />
+# 💸 VoiceKhata
+
+### *Your Ledger, Your Voice*
 
 <br/>
 
@@ -510,31 +511,37 @@ This project is open source and available under the [MIT License](LICENSE).
 <tr>
 <th align="left">Name</th>
 <th align="center">Role</th>
+<th align="left">Email</th>
 <th align="left">Contributions</th>
 </tr>
 <tr>
 <td><strong>Harshika Dixit</strong></td>
 <td align="center"><img src="https://img.shields.io/badge/📋-Research-E11D48?style=flat-square" /> <img src="https://img.shields.io/badge/⭐_Team_Leader-FFD700?style=flat-square" /></td>
+<td><a href="mailto:harshikadixit9@gmail.com">harshikadixit9@gmail.com</a></td>
 <td>Govt. Guidelines Research · Architecture · Presentation · Testing</td>
 </tr>
 <tr>
 <td><strong>Vansh Raj</strong></td>
 <td align="center"><img src="https://img.shields.io/badge/🎨-Frontend-61DAFB?style=flat-square" /></td>
+<td>—</td>
 <td>Frontend Development</td>
 </tr>
 <tr>
 <td><strong>Vansh Gupta</strong></td>
 <td align="center"><img src="https://img.shields.io/badge/⚙️-Backend-339933?style=flat-square" /></td>
+<td><a href="mailto:vanshgupta26112005@gmail.com">vanshgupta26112005@gmail.com</a></td>
 <td>Backend Development</td>
 </tr>
 <tr>
 <td><strong>Vineet Singh Chandel</strong></td>
 <td align="center"><img src="https://img.shields.io/badge/🔮-Full_Stack-F97316?style=flat-square" /></td>
+<td><a href="mailto:vineetsinghk06@gmail.com">vineetsinghk06@gmail.com</a></td>
 <td>Frontend + Backend Development</td>
 </tr>
 <tr>
 <td><strong>Avika Srivastava</strong></td>
 <td align="center"><img src="https://img.shields.io/badge/✨-Design_%26_AI-8B5CF6?style=flat-square" /></td>
+<td><a href="mailto:Avika.srivastava.280@gmail.com">Avika.srivastava.280@gmail.com</a></td>
 <td>UI/UX Design · AI Training · Testing</td>
 </tr>
 </table>
@@ -547,8 +554,6 @@ This project is open source and available under the [MIT License](LICENSE).
 
 <strong>If you found this project helpful, consider giving it a ⭐</strong>
 
-<br/>
-
-<img src="https://capsule-render.vercel.app/api?type=waving&color=0:6366F1,50:8B5CF6,100:A78BFA&height=120&section=footer" width="100%" />
+<br/><br/>
 
 </div>
