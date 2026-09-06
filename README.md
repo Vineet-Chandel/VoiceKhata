@@ -470,53 +470,34 @@ This project is open source and available under the [MIT License](LICENSE).
 
 <table>
 <tr>
-<td align="center" width="20%">
-<br/>
-<img src="https://img.shields.io/badge/🎨-Frontend-61DAFB?style=for-the-badge" />
-<br/><br/>
-<strong>Vansh Raj</strong>
-<br/>
-<sub>Frontend Development</sub>
-<br/><br/>
-</td>
-<td align="center" width="20%">
-<br/>
-<img src="https://img.shields.io/badge/⚙️-Backend-339933?style=for-the-badge" />
-<br/><br/>
-<strong>Vansh Gupta</strong>
-<br/>
-<sub>Backend Development</sub>
-<br/><br/>
-</td>
-<td align="center" width="20%">
-<br/>
-<img src="https://img.shields.io/badge/🔮-Full_Stack-F97316?style=for-the-badge" />
-<br/><br/>
-<strong>Vineet Singh Chandel</strong>
-<br/>
-<sub>Frontend + Backend Development</sub>
-<br/><br/>
-</td>
-<td align="center" width="20%">
-<br/>
-<img src="https://img.shields.io/badge/✨-Design_%26_AI-8B5CF6?style=for-the-badge" />
-<br/><br/>
-<strong>Avika Srivastava</strong>
-<br/>
-<sub>UI/UX Design · AI Training · Testing</sub>
-<br/><br/>
-</td>
-<td align="center" width="20%">
-<br/>
-<img src="https://img.shields.io/badge/📋-Research-E11D48?style=for-the-badge" />
-<br/>
-<img src="https://img.shields.io/badge/⭐_Team_Leader-FFD700?style=flat-square&logoColor=black" />
-<br/><br/>
-<strong>Harshika Dixit</strong>
-<br/>
-<sub>Govt. Guidelines Research · Architecture · Presentation · Testing</sub>
-<br/><br/>
-</td>
+<th align="left">Name</th>
+<th align="center">Role</th>
+<th align="left">Contributions</th>
+</tr>
+<tr>
+<td><strong>Harshika Dixit</strong></td>
+<td align="center"><img src="https://img.shields.io/badge/📋-Research-E11D48?style=flat-square" /> <img src="https://img.shields.io/badge/⭐_Team_Leader-FFD700?style=flat-square" /></td>
+<td>Govt. Guidelines Research · Architecture · Presentation · Testing</td>
+</tr>
+<tr>
+<td><strong>Vansh Raj</strong></td>
+<td align="center"><img src="https://img.shields.io/badge/🎨-Frontend-61DAFB?style=flat-square" /></td>
+<td>Frontend Development</td>
+</tr>
+<tr>
+<td><strong>Vansh Gupta</strong></td>
+<td align="center"><img src="https://img.shields.io/badge/⚙️-Backend-339933?style=flat-square" /></td>
+<td>Backend Development</td>
+</tr>
+<tr>
+<td><strong>Vineet Singh Chandel</strong></td>
+<td align="center"><img src="https://img.shields.io/badge/🔮-Full_Stack-F97316?style=flat-square" /></td>
+<td>Frontend + Backend Development</td>
+</tr>
+<tr>
+<td><strong>Avika Srivastava</strong></td>
+<td align="center"><img src="https://img.shields.io/badge/✨-Design_%26_AI-8B5CF6?style=flat-square" /></td>
+<td>UI/UX Design · AI Training · Testing</td>
 </tr>
 </table>
 
