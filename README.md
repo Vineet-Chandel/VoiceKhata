@@ -41,6 +41,12 @@
 
 ---
 
+## 📖 About
+
+> **VoiceKhata** is a voice-enabled khata management demo for recording customer credit and payment transactions using **Hindi/English voice input**. It allows users and merchants to maintain digital ledgers seamlessly through natural voice commands, automating transaction entry, credit tracking, and balance updates.
+
+---
+
 ## ⚡ Why VoiceKhata?
 
 > Traditional finance apps overwhelm you with spreadsheets. VoiceKhata replaces complexity with **AI intelligence** — automatically categorizing transactions, predicting spending patterns, and delivering actionable financial insights in real-time.
