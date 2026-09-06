@@ -470,7 +470,7 @@ This project is open source and available under the [MIT License](LICENSE).
 
 <table>
 <tr>
-<td align="center" width="25%">
+<td align="center" width="20%">
 <br/>
 <img src="https://img.shields.io/badge/🎨-Frontend-61DAFB?style=for-the-badge" />
 <br/><br/>
@@ -479,7 +479,7 @@ This project is open source and available under the [MIT License](LICENSE).
 <sub>Frontend Development</sub>
 <br/><br/>
 </td>
-<td align="center" width="25%">
+<td align="center" width="20%">
 <br/>
 <img src="https://img.shields.io/badge/⚙️-Backend-339933?style=for-the-badge" />
 <br/><br/>
@@ -488,7 +488,16 @@ This project is open source and available under the [MIT License](LICENSE).
 <sub>Backend Development</sub>
 <br/><br/>
 </td>
-<td align="center" width="25%">
+<td align="center" width="20%">
+<br/>
+<img src="https://img.shields.io/badge/🔮-Full_Stack-F97316?style=for-the-badge" />
+<br/><br/>
+<strong>Vineet Singh Chandel</strong>
+<br/>
+<sub>Frontend + Backend Development</sub>
+<br/><br/>
+</td>
+<td align="center" width="20%">
 <br/>
 <img src="https://img.shields.io/badge/✨-Design_%26_AI-8B5CF6?style=for-the-badge" />
 <br/><br/>
@@ -497,7 +506,7 @@ This project is open source and available under the [MIT License](LICENSE).
 <sub>UI/UX Design · AI Training · Testing</sub>
 <br/><br/>
 </td>
-<td align="center" width="25%">
+<td align="center" width="20%">
 <br/>
 <img src="https://img.shields.io/badge/📋-Research-E11D48?style=for-the-badge" />
 <br/>
