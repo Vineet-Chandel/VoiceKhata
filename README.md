@@ -1,8 +1,8 @@
 <div align="center">
 
-# 💸 VoiceKhata
+# 🎙️ **VoiceKhata**
 
-### *Your Ledger, Your Voice*
+### *"Your Ledger, Your Voice"*
 
 <br/>
 
