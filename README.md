@@ -466,9 +466,48 @@ This project is open source and available under the [MIT License](LICENSE).
 
 <div align="center">
 
-## 👤 Author
+## 👥 Team
 
-**Vansh Gupta**
+<table>
+<tr>
+<td align="center" width="25%">
+<br/>
+<img src="https://img.shields.io/badge/🎨-Frontend-61DAFB?style=for-the-badge" />
+<br/><br/>
+<strong>Vansh Raj</strong>
+<br/>
+<sub>Frontend Development</sub>
+<br/><br/>
+</td>
+<td align="center" width="25%">
+<br/>
+<img src="https://img.shields.io/badge/⚙️-Backend-339933?style=for-the-badge" />
+<br/><br/>
+<strong>Vansh Gupta</strong>
+<br/>
+<sub>Backend Development</sub>
+<br/><br/>
+</td>
+<td align="center" width="25%">
+<br/>
+<img src="https://img.shields.io/badge/✨-Design_%26_AI-8B5CF6?style=for-the-badge" />
+<br/><br/>
+<strong>Avika</strong>
+<br/>
+<sub>UI/UX Design · AI Training · Testing</sub>
+<br/><br/>
+</td>
+<td align="center" width="25%">
+<br/>
+<img src="https://img.shields.io/badge/📋-Research-E11D48?style=for-the-badge" />
+<br/><br/>
+<strong>Harshika</strong>
+<br/>
+<sub>Govt. Guidelines Research · Architecture · Presentation · Testing</sub>
+<br/><br/>
+</td>
+</tr>
+</table>
 
 <br/>
 
