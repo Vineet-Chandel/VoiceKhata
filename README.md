@@ -1,421 +1,485 @@
-# 🚀 VoiceKhata
+<div align="center">
 
-> AI-Powered Personal Finance Management Platform
+<!-- Header Banner -->
+<img src="https://capsule-render.vercel.app/api?type=waving&color=0:6366F1,50:8B5CF6,100:A78BFA&height=220&section=header&text=VoiceKhata&fontSize=72&fontColor=ffffff&animation=fadeIn&fontAlignY=35&desc=AI-Powered%20Personal%20Finance%20Intelligence&descAlignY=55&descSize=20&descColor=E0E7FF" width="100%" />
 
-VoiceKhata is a modern full-stack finance management platform focused on helping users track expenses, manage budgets, analyze spending habits, and generate AI-powered financial insights.
+<br/>
 
-Built with scalability and user experience in mind, the platform combines modern web technologies with AI integration to simplify personal finance management.
+<!-- Badges -->
+<p>
+  <img src="https://img.shields.io/badge/React-18-61DAFB?style=for-the-badge&logo=react&logoColor=white" alt="React" />
+  <img src="https://img.shields.io/badge/TypeScript-5-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
+  <img src="https://img.shields.io/badge/Vite-6-646CFF?style=for-the-badge&logo=vite&logoColor=white" alt="Vite" />
+  <img src="https://img.shields.io/badge/Tailwind_CSS-4-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white" alt="TailwindCSS" />
+  <img src="https://img.shields.io/badge/Node.js-Express-339933?style=for-the-badge&logo=node.js&logoColor=white" alt="Node.js" />
+  <img src="https://img.shields.io/badge/Supabase-PostgreSQL-3FCF8E?style=for-the-badge&logo=supabase&logoColor=white" alt="Supabase" />
+  <img src="https://img.shields.io/badge/Firebase-Auth-FFCA28?style=for-the-badge&logo=firebase&logoColor=black" alt="Firebase" />
+</p>
+
+<p>
+  <img src="https://img.shields.io/github/license/Vineet-Chandel/VoiceKhata?style=flat-square&color=6366F1" alt="License" />
+  <img src="https://img.shields.io/github/stars/Vineet-Chandel/VoiceKhata?style=flat-square&color=8B5CF6" alt="Stars" />
+  <img src="https://img.shields.io/github/forks/Vineet-Chandel/VoiceKhata?style=flat-square&color=A78BFA" alt="Forks" />
+  <img src="https://img.shields.io/github/last-commit/Vineet-Chandel/VoiceKhata?style=flat-square&color=C4B5FD" alt="Last Commit" />
+</p>
+
+<br/>
+
+<p>
+  <strong>VoiceKhata</strong> is a modern, AI-driven personal finance platform that helps you track expenses, manage budgets, scan receipts, monitor investments, and gain intelligent financial insights — all from a single, beautiful dashboard.
+</p>
+
+<br/>
+
+<!-- Hero Screenshot -->
+<img width="960" alt="VoiceKhata Dashboard" src="https://github.com/user-attachments/assets/8171d8d4-bdad-488f-aad2-dba2caa70d43" style="border-radius: 12px;" />
+
+<br/><br/>
+
+</div>
 
 ---
 
-<a href="https://voicekhata.tech/" target="_blank">
-  <img width="1900" height="966" alt="VoiceKhata Dashboard" src="https://github.com/user-attachments/assets/8171d8d4-bdad-488f-aad2-dba2caa70d43" />
-</a>
+## ⚡ Why VoiceKhata?
+
+> Traditional finance apps overwhelm you with spreadsheets. VoiceKhata replaces complexity with **AI intelligence** — automatically categorizing transactions, predicting spending patterns, and delivering actionable financial insights in real-time.
+
+<table>
+<tr>
+<td width="50%">
+
+### 🎯 The Problem
+- Manually tracking every expense is tedious
+- No single app connects budgets, investments & insights
+- Receipt data entry is time-consuming
+- Understanding spending patterns requires expert knowledge
+
+</td>
+<td width="50%">
+
+### 💡 Our Solution
+- **AI auto-categorization** of transactions
+- **Unified dashboard** for complete financial visibility
+- **Smart receipt scanner** powered by vision AI
+- **AI-generated insights** that explain your money habits
+
+</td>
+</tr>
+</table>
+
+---
 
 ## ✨ Features
 
-* 📊 Smart expense & income tracking
-* 🤖 AI-powered financial insights
-* 📈 Interactive analytics dashboard
-* 🧾 Smart receipt scanner
-* 💰 Budget monitoring system
-* 🎯 Savings & investment tracking
-* 🔔 AutoPay & recurring transaction tracking
-* ⚡ Fast and responsive modern UI
+<table>
+<tr>
+<td align="center" width="25%">
+<br/>
+<img src="https://img.icons8.com/fluency/48/transaction-list.png" width="40" />
+<br/><br/>
+<strong>Smart Transactions</strong>
+<br/>
+<sub>AI-powered expense & income tracking with auto-categorization</sub>
+<br/><br/>
+</td>
+<td align="center" width="25%">
+<br/>
+<img src="https://img.icons8.com/fluency/48/artificial-intelligence.png" width="40" />
+<br/><br/>
+<strong>AI Insights</strong>
+<br/>
+<sub>Personalized financial analysis powered by Llama & GPT models</sub>
+<br/><br/>
+</td>
+<td align="center" width="25%">
+<br/>
+<img src="https://img.icons8.com/fluency/48/receipt-dollar.png" width="40" />
+<br/><br/>
+<strong>Receipt Scanner</strong>
+<br/>
+<sub>Snap a photo and let vision AI extract transaction details</sub>
+<br/><br/>
+</td>
+<td align="center" width="25%">
+<br/>
+<img src="https://img.icons8.com/fluency/48/combo-chart.png" width="40" />
+<br/><br/>
+<strong>Analytics Dashboard</strong>
+<br/>
+<sub>Interactive charts and visual breakdowns of your finances</sub>
+<br/><br/>
+</td>
+</tr>
+<tr>
+<td align="center" width="25%">
+<br/>
+<img src="https://img.icons8.com/fluency/48/money-bag.png" width="40" />
+<br/><br/>
+<strong>Budget Manager</strong>
+<br/>
+<sub>Set category-wise budgets and track spending in real-time</sub>
+<br/><br/>
+</td>
+<td align="center" width="25%">
+<br/>
+<img src="https://img.icons8.com/fluency/48/goal.png" width="40" />
+<br/><br/>
+<strong>Savings Goals</strong>
+<br/>
+<sub>Create savings targets with visual progress tracking</sub>
+<br/><br/>
+</td>
+<td align="center" width="25%">
+<br/>
+<img src="https://img.icons8.com/fluency/48/stocks-growth.png" width="40" />
+<br/><br/>
+<strong>Investment Tracker</strong>
+<br/>
+<sub>Monitor stocks, SIPs & manual investments with live data</sub>
+<br/><br/>
+</td>
+<td align="center" width="25%">
+<br/>
+<img src="https://img.icons8.com/fluency/48/gmail.png" width="40" />
+<br/><br/>
+<strong>Gmail Sync</strong>
+<br/>
+<sub>Auto-import transactions from bank emails via OAuth</sub>
+<br/><br/>
+</td>
+</tr>
+<tr>
+<td align="center" width="25%">
+<br/>
+<img src="https://img.icons8.com/fluency/48/autopay.png" width="40" />
+<br/><br/>
+<strong>AutoPay Tracking</strong>
+<br/>
+<sub>Monitor recurring subscriptions and scheduled payments</sub>
+<br/><br/>
+</td>
+<td align="center" width="25%">
+<br/>
+<img src="https://img.icons8.com/fluency/48/alarm.png" width="40" />
+<br/><br/>
+<strong>Smart Alerts</strong>
+<br/>
+<sub>Custom alert rules for overspending, budget thresholds & more</sub>
+<br/><br/>
+</td>
+<td align="center" width="25%">
+<br/>
+<img src="https://img.icons8.com/fluency/48/drag-and-drop.png" width="40" />
+<br/><br/>
+<strong>Drag & Drop</strong>
+<br/>
+<sub>Reorder and organize dashboard widgets with drag-and-drop</sub>
+<br/><br/>
+</td>
+<td align="center" width="25%">
+<br/>
+<img src="https://img.icons8.com/fluency/48/installing-updates.png" width="40" />
+<br/><br/>
+<strong>PWA Ready</strong>
+<br/>
+<sub>Install as a native app on mobile and desktop devices</sub>
+<br/><br/>
+</td>
+</tr>
+</table>
 
 ---
 
-## 🛠 Tech Stack
+## 🏗️ Architecture
 
-### Frontend
-
-* Vite + React
-* TypeScript
-* Tailwind CSS
-
-### Backend
-
-* Node.js + Express
-
-### Database & Storage
-
-* Supabase (PostgreSQL)
-
-### Authentication & Hosting
-
-* Firebase
-
-### AI Models
-
-* Llama-3.1-8B-Instant
-* Llama-4-Scout-17B-16E-Instruct
-* GPT-OSS-120B
-
----
-
-## 🗄 Database Schema
-
-### Table: `alert_rules`
-
-| Field | Type |
-|---|---|
-| id | uuid |
-| firebase_uid | text |
-| name | text |
-| condition | text |
-| threshold | numeric |
-| category | text |
-| channel | text[] |
-| enabled | boolean |
-| created_at | timestamptz |
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                          CLIENT (Browser / PWA)                     │
+│  ┌───────────┐  ┌──────────────┐  ┌──────────┐  ┌──────────────┐  │
+│  │  React 18  │  │ Tailwind CSS │  │ Chart.js │  │  DnD Kit     │  │
+│  │ TypeScript │  │   Radix UI   │  │ Recharts │  │  Animations  │  │
+│  └─────┬─────┘  └──────────────┘  └──────────┘  └──────────────┘  │
+│        │                                                            │
+│        ▼                                                            │
+│  ┌──────────────────────────────────────────────────────────────┐   │
+│  │                    Firebase Authentication                    │   │
+│  │               (Google OAuth · Email/Password)                 │   │
+│  └──────────────────────────┬───────────────────────────────────┘   │
+└─────────────────────────────┼───────────────────────────────────────┘
+                              │
+                    ┌─────────▼──────────┐
+                    │   Express.js API    │
+                    │   (Node.js + TS)    │
+                    └──┬──────┬──────┬───┘
+                       │      │      │
+          ┌────────────┤      │      ├────────────┐
+          ▼            ▼      ▼      ▼            ▼
+  ┌──────────────┐ ┌──────┐ ┌────────────┐ ┌──────────────┐
+  │   Supabase   │ │ Groq │ │  Twelve    │ │   Google     │
+  │ (PostgreSQL) │ │  AI  │ │  Data API  │ │  Gmail API   │
+  │  Database    │ │ LLMs │ │  (Stocks)  │ │  (OAuth 2)   │
+  └──────────────┘ └──────┘ └────────────┘ └──────────────┘
+```
 
 ---
 
-### Table: `budgets`
+## 🛠️ Tech Stack
 
-| Field | Type |
-|---|---|
-| id | uuid |
-| firebase_uid | text |
-| category | text |
-| amount | numeric |
-| month | text |
-| created_at | timestamptz |
-| duration | text |
-
----
-
-### Table: `gmail_tokens`
-
-| Field | Type |
-|---|---|
-| id | uuid |
-| firebase_uid | text |
-| access_token | text |
-| refresh_token | text |
-| expiry_date | bigint |
-| created_at | timestamptz |
-
----
-
-### Table: `manual_investments`
-
-| Field | Type |
-|---|---|
-| id | uuid |
-| firebase_uid | text |
-| name | text |
-| type | text |
-| amount_invested | numeric |
-| expected_return | numeric |
-| added_at | timestamptz |
-| ticker | text |
-| quantity | numeric |
-| bought_price | numeric |
-| current_price | numeric |
-| bought_date | date |
-
----
-
-### Table: `merchant_memory`
-
-| Field | Type |
-|---|---|
-| id | uuid |
-| firebase_uid | text |
-| raw_input | text |
-| normalized_name | text |
-| merchant_type | text |
-| category | text |
-| tags | text[] |
-| confidence | numeric |
-| created_at | timestamptz |
-| updated_at | timestamptz |
-
----
-
-### Table: `notification_prefs`
-
-| Field | Type |
-|---|---|
-| firebase_uid | text |
-| in_app | boolean |
-| email | boolean |
-| budget_alerts | boolean |
-| transaction_alerts | boolean |
-| ai_insights | boolean |
-| system_alerts | boolean |
-| quiet_hours_start | integer |
-| quiet_hours_end | integer |
-| updated_at | timestamptz |
+<table>
+<tr>
+<th align="left">Layer</th>
+<th align="left">Technology</th>
+<th align="left">Purpose</th>
+</tr>
+<tr>
+<td><strong>Frontend</strong></td>
+<td>React 18 · TypeScript · Vite</td>
+<td>Fast, type-safe UI with HMR</td>
+</tr>
+<tr>
+<td><strong>Styling</strong></td>
+<td>Tailwind CSS 4 · Radix UI · Tabler Icons</td>
+<td>Utility-first CSS with accessible components</td>
+</tr>
+<tr>
+<td><strong>State & Data</strong></td>
+<td>React Context · TanStack Table · React Hook Form</td>
+<td>State management and data tables</td>
+</tr>
+<tr>
+<td><strong>Charts</strong></td>
+<td>Chart.js · Recharts</td>
+<td>Interactive data visualization</td>
+</tr>
+<tr>
+<td><strong>Backend</strong></td>
+<td>Node.js · Express · TypeScript</td>
+<td>RESTful API server</td>
+</tr>
+<tr>
+<td><strong>Database</strong></td>
+<td>Supabase (PostgreSQL) · Row Level Security</td>
+<td>Secure, scalable data persistence</td>
+</tr>
+<tr>
+<td><strong>Authentication</strong></td>
+<td>Firebase Auth · Google OAuth 2.0</td>
+<td>Secure user authentication</td>
+</tr>
+<tr>
+<td><strong>AI / ML</strong></td>
+<td>Groq (Llama 3.1 · Llama 4 Scout) · GPT-OSS-120B</td>
+<td>Financial insights & receipt scanning</td>
+</tr>
+<tr>
+<td><strong>Market Data</strong></td>
+<td>Twelve Data API · Tavily Search</td>
+<td>Live stock prices and financial search</td>
+</tr>
+<tr>
+<td><strong>Interactions</strong></td>
+<td>DnD Kit · Framer Motion · Canvas Confetti</td>
+<td>Drag-and-drop, animations & celebrations</td>
+</tr>
+<tr>
+<td><strong>PWA</strong></td>
+<td>Vite PWA Plugin · Service Workers</td>
+<td>Offline support and installability</td>
+</tr>
+</table>
 
 ---
 
-### Table: `notifications`
+## 📁 Project Structure
 
-| Field | Type |
-|---|---|
-| id | uuid |
-| firebase_uid | text |
-| type | text |
-| title | text |
-| message | text |
-| metadata | jsonb |
-| read | boolean |
-| created_at | timestamptz |
-
----
-
-### Table: `processed_emails`
-
-| Field | Type |
-|---|---|
-| id | uuid |
-| firebase_uid | text |
-| gmail_id | text |
-| processed_at | timestamptz |
-
----
-
-### Table: `recurring_savings`
-
-| Field | Type |
-|---|---|
-| id | uuid |
-| firebase_uid | text |
-| label | text |
-| amount | numeric |
-| frequency | text |
-| active | boolean |
-| created_at | timestamptz |
+```
+VoiceKhata/
+├── src/
+│   ├── assets/             # Static assets (images, icons)
+│   ├── components/         # Reusable UI components
+│   ├── context/            # React Context providers
+│   ├── firebase/           # Firebase configuration
+│   ├── hooks/              # Custom React hooks
+│   ├── layout/             # App layout components (sidebar, header)
+│   ├── lib/                # Utility functions & helpers
+│   ├── routes/             # Route components & protected routes
+│   ├── types/              # TypeScript type definitions
+│   ├── App.tsx             # Root application component
+│   ├── App.css             # Global app styles
+│   ├── main.tsx            # Application entry point
+│   └── index.css           # Tailwind & base styles
+│
+├── voicekhata-backend/
+│   ├── src/                # Backend source code
+│   ├── .env.example        # Environment variables template
+│   ├── package.json        # Backend dependencies
+│   └── tsconfig.json       # TypeScript config
+│
+├── supabase/               # Supabase config & migrations
+├── supabase_schema.sql     # Complete database schema
+├── firebase.json           # Firebase hosting config
+├── vite.config.ts          # Vite build configuration
+├── components.json         # shadcn/ui configuration
+└── package.json            # Frontend dependencies
+```
 
 ---
 
-### Table: `recurring_transactions`
+## 🗄️ Database Schema
 
-| Field | Type |
-|---|---|
-| id | uuid |
-| firebase_uid | text |
-| transaction | text |
-| category | text |
-| amount | numeric |
-| type | text |
-| method | text |
-| frequency | text |
-| start_date | date |
-| next_run | date |
-| active | boolean |
-| created_at | timestamptz |
-| end_date | date |
+VoiceKhata uses **Supabase (PostgreSQL)** with **Row Level Security (RLS)** enabled on all tables.
 
----
+<details>
+<summary><strong>📋 Click to expand full schema</strong></summary>
+<br/>
 
-### Table: `savings_goals`
+| Table | Description | Key Fields |
+|-------|-------------|------------|
+| `user_profiles` | User account details & preferences | `firebase_uid`, `full_name`, `currency`, `monthly_income`, `savings_goal` |
+| `transactions` | Income & expense records | `category`, `amount`, `date`, `type`, `method`, `status` |
+| `budgets` | Category-wise budget allocations | `category`, `amount`, `spent`, `month`, `duration` |
+| `savings_goals` | Target-based savings tracking | `name`, `target_amount`, `saved_amount`, `deadline`, `color` |
+| `sip_plans` | Systematic Investment Plans | `monthly_amount`, `duration_years`, `expected_return`, `active` |
+| `manual_investments` | Stock & asset investments | `name`, `type`, `amount_invested`, `ticker`, `quantity`, `current_price` |
+| `alert_rules` | Custom notification rules | `condition`, `threshold`, `category`, `channel`, `enabled` |
+| `merchant_memory` | AI merchant categorization memory | `firebase_uid`, merchant patterns |
+| `gmail_tokens` | OAuth tokens for Gmail sync | `access_token`, `refresh_token`, `expiry_date` |
 
-| Field | Type |
-|---|---|
-| id | uuid |
-| firebase_uid | text |
-| name | text |
-| target_amount | numeric |
-| saved_amount | numeric |
-| deadline | date |
-| color | text |
-| created_at | timestamptz |
-
----
-
-### Table: `sip_plans`
-
-| Field | Type |
-|---|---|
-| id | uuid |
-| firebase_uid | text |
-| monthly_amount | numeric |
-| duration_years | integer |
-| expected_return | numeric |
-| start_date | date |
-| active | boolean |
-| created_at | timestamptz |
-
----
-
-### Table: `transactions`
-
-| Field | Type |
-|---|---|
-| id | bigint |
-| firebase_uid | text |
-| transaction | text |
-| category | text |
-| amount | numeric |
-| date | date |
-| type | text |
-| method | text |
-| status | text |
-| created_at | timestamptz |
-
----
-
-### Table: `user_budget_caps`
-
-| Field | Type |
-|---|---|
-| id | uuid |
-| firebase_uid | text |
-| month | text |
-| total_cap | numeric |
-| created_at | timestamptz |
-
----
-
-### Table: `user_profiles`
-
-| Field | Type |
-|---|---|
-| id | uuid |
-| firebase_uid | text |
-| full_name | text |
-| country | text |
-| currency | text |
-| monthly_income | numeric |
-| income_source | text |
-| savings_goal | numeric |
-| financial_experience | text |
-| dob | date |
-| created_at | timestamptz |
-| profile_pic | text |
-| gmail_connected | boolean |
+</details>
 
 ---
 
 ## 🚀 Getting Started
 
-### 1️⃣ Clone Repository
+### Prerequisites
+
+- **Node.js** v18+ and **npm** v9+
+- A [Firebase](https://console.firebase.google.com/) project (for authentication)
+- A [Supabase](https://supabase.com/) project (for database)
+- A [Groq](https://console.groq.com/) API key (for AI features)
+
+### 1️⃣ Clone the Repository
 
 ```bash
-git clone https://github.com/Mayank-23-Dev/VoiceKhata.git
+git clone https://github.com/Vineet-Chandel/VoiceKhata.git
 cd VoiceKhata
 ```
 
----
-
-### 2️⃣ Create Frontend `.env`
-
-Create a `.env` file in the project root:
-
-```env
-# Firebase
-VITE_FIREBASE_API_KEY=""
-VITE_FIREBASE_AUTH_DOMAIN=""
-VITE_FIREBASE_PROJECT_ID=""
-VITE_FIREBASE_STORAGE_BUCKET=""
-VITE_FIREBASE_MESSAGING_SENDER_ID=""
-VITE_FIREBASE_APP_ID=""
-
-# Supabase
-VITE_SUPABASE_URL=""
-VITE_SUPABASE_ANON_KEY=""
-
-# AI APIs
-VITE_GEMINI_API_KEY=""
-VITE_OPENROUTER_API_KEY=""
-VITE_GROQ_API_KEY=""
-NVIDIA_API_KEY=""
-
-# Google Vision OCR
-VITE_GOOGLE_VISION_API_KEY=""
-VITE_GOOGLE_CLIENT_ID=""
-GOOGLE_CLIENT_SECRET=""
-
-# Backend URL
-VITE_BACKEND_URL=""
-VITE_MERCHANT_SEARCH_ENDPOINT=""
-```
-
-⚠️ Never commit your `.env` file publicly.
-
----
-
-### 3️⃣ Create Backend `.env`
-
-Create another `.env` file inside `voicekhata-backend/`
-
-```env
-GOOGLE_CLIENT_SECRET=""
-GOOGLE_REDIRECT_URI=""
-
-SUPABASE_URL=""
-SUPABASE_SERVICE_KEY=""
-
-GROQ_API_KEY=""
-TAVILY_API_KEY=""
-BRAVE_SEARCH_API_KEY=""
-PERPLEXITY_API_KEY=""
-
-PORT=3001
-
-FINNHUB_KEY=""
-TWELVE_DATA_KEY=""
-```
-
-⚠️ Never expose backend API keys publicly.
-
----
-
-### 4️⃣ Install Dependencies
+### 2️⃣ Setup Frontend
 
 ```bash
+# Install dependencies
 npm install
-```
 
----
-
-### 5️⃣ Start Development Server
-
-```bash
+# Start development server
 npm run dev
 ```
 
-Frontend:
-```txt
-http://localhost:5173
+### 3️⃣ Setup Backend
+
+```bash
+# Navigate to backend
+cd voicekhata-backend
+
+# Install dependencies
+npm install
+
+# Copy environment template
+cp .env.example .env
+
+# Fill in your API keys in .env, then start
+npm run dev
 ```
 
-Backend:
-```txt
-http://localhost:3001
-```
+### 4️⃣ Setup Database
+
+1. Create a new project in [Supabase](https://supabase.com/)
+2. Navigate to the SQL Editor
+3. Copy and run the contents of `supabase_schema.sql`
+4. RLS policies will be auto-configured
+
+### 5️⃣ Environment Variables
+
+<details>
+<summary><strong>🔐 Backend <code>.env</code> configuration</strong></summary>
+<br/>
+
+| Variable | Description |
+|----------|-------------|
+| `PORT` | Server port (default: `3001`) |
+| `GROQ_API_KEY` | Groq API key for AI features |
+| `GROQ_VISION_MODEL` | Vision model for receipt scanning |
+| `OPENROUTER_API_KEY` | Fallback AI provider key |
+| `SUPABASE_URL` | Your Supabase project URL |
+| `SUPABASE_SERVICE_ROLE_KEY` | Supabase service role key |
+| `TWELVE_DATA_KEY` | Stock market data API key |
+| `TAVILY_API_KEY` | Financial search API key |
+| `GOOGLE_CLIENT_ID` | Google OAuth client ID |
+| `GOOGLE_CLIENT_SECRET` | Google OAuth client secret |
+| `GMAIL_REDIRECT_URI` | OAuth callback URL |
+| `FRONTEND_URL` | Frontend origin for CORS |
+
+</details>
 
 ---
 
-## 📌 Roadmap
+## 📜 Available Scripts
 
-* Advanced AI financial analysis
-* Multi-account integrations
-* Investment portfolio analytics
-* Smart financial recommendations
-* Exportable reports
-* Mobile application support
-
----
-
-## 👨‍💻 Author
-
-**Mayank Dev**  
-BTech Student • Developer • Builder
-
-GitHub: https://github.com/Mayank-23-Dev
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start frontend development server |
+| `npm run build` | Build for production |
+| `npm run preview` | Preview production build |
+| `npm run lint` | Run ESLint |
+| `cd voicekhata-backend && npm run dev` | Start backend with hot-reload |
+| `cd voicekhata-backend && npm run build` | Build backend TypeScript |
+| `cd voicekhata-backend && npm start` | Start production backend |
 
 ---
 
-## 🌐 Live Project
+## 🤝 Contributing
 
-https://voicekhata.tech/
+Contributions are welcome! Here's how to get started:
+
+1. **Fork** the repository
+2. **Create** your feature branch
+   ```bash
+   git checkout -b feature/amazing-feature
+   ```
+3. **Commit** your changes
+   ```bash
+   git commit -m "feat: add amazing feature"
+   ```
+4. **Push** to the branch
+   ```bash
+   git push origin feature/amazing-feature
+   ```
+5. **Open** a Pull Request
 
 ---
 
 ## 📄 License
 
-This project is currently under active development.
+This project is open source and available under the [MIT License](LICENSE).
+
+---
+
+<div align="center">
+
+## 👤 Author
+
+**Vansh Gupta**
+
+<br/>
+
+---
+
+<br/>
+
+<strong>If you found this project helpful, consider giving it a ⭐</strong>
+
+<br/>
+
+<img src="https://capsule-render.vercel.app/api?type=waving&color=0:6366F1,50:8B5CF6,100:A78BFA&height=120&section=footer" width="100%" />
+
+</div>
