@@ -1,0 +1,136 @@
+/* src/components/ui/FloatingAssistant/floating-assistant.css */
+
+/* ── Command bar entrance ───────────────────────────────────────────── */
+@keyframes cmdbar-entrance {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(16px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+}
+
+.cmdbar-enter {
+  animation: cmdbar-entrance 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* ── Suggestion pills entrance ──────────────────────────────────────── */
+@keyframes suggest-entrance {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.suggest-enter {
+  animation: suggest-entrance 0.25s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* Stagger */
+.suggest-enter:nth-child(1) { animation-delay: 0.05s; opacity: 0; }
+.suggest-enter:nth-child(2) { animation-delay: 0.1s; opacity: 0; }
+.suggest-enter:nth-child(3) { animation-delay: 0.15s; opacity: 0; }
+
+/* ── Quick-actions menu ─────────────────────────────────────────────── */
+@keyframes menu-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes menu-slide-down {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(8px) scale(0.97);
+  }
+}
+
+.menu-enter {
+  animation: menu-slide-up 0.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.menu-exit {
+  animation: menu-slide-down 0.15s cubic-bezier(0.55, 0, 1, 0.45) forwards;
+}
+
+/* ── Pulse ring for listening ───────────────────────────────────────── */
+@keyframes listening-pulse {
+  0%   { transform: scale(1);   opacity: 0.4; }
+  50%  { transform: scale(1.08); opacity: 0; }
+  100% { transform: scale(1);   opacity: 0; }
+}
+
+.listening-pulse-ring {
+  animation: listening-pulse 2s ease-in-out infinite;
+}
+
+/* ── Spinner ────────────────────────────────────────────────────────── */
+@keyframes cmdbar-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+.cmdbar-spinner {
+  animation: cmdbar-spin 0.8s linear infinite;
+}
+
+/* ── Reduced motion ─────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .cmdbar-enter,
+  .suggest-enter,
+  .menu-enter,
+  .menu-exit,
+  .listening-pulse-ring,
+  .workspace-enter,
+  .workspace-exit {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+/* ── Workspace expansion ────────────────────────────────────────────── */
+@keyframes workspace-entrance {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(24px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+}
+
+@keyframes workspace-exit {
+  from {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(-50%) translateY(24px) scale(0.95);
+  }
+}
+
+.workspace-enter {
+  animation: workspace-entrance 0.35s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.workspace-exit {
+  animation: workspace-exit 0.25s cubic-bezier(0.55, 0, 1, 0.45) forwards;
+}

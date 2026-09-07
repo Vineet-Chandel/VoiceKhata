@@ -17,7 +17,8 @@ interface Props {
   onCancelReply?: () => void
   onStartGuided:  () => void
   onStartBudgetGuided?: () => void
-  onCancelGuided: () => void
+  onCancelGuided?: () => void
+  variant?: "light" | "dark"
 }
 
 const GUIDED_STEPS: GuidedStep[] = ["name", "amount", "category", "type", "method", "confirm"]
@@ -44,14 +45,24 @@ const COMING_SOON = [
 ]
 
 
-
+const stripMarkdown = (text: string) => {
+  return text
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // links
+    .replace(/\*\*(.*?)\*\*/g, '$1')         // bold
+    .replace(/\*(.*?)\*/g, '$1')             // italic
+    .replace(/#{1,6}\s+/g, '')               // headings
+    .replace(/---+/g, '')                    // horizontal rules
+    .replace(/`([^`]+)`/g, '$1')             // inline code
+    .replace(/\n+/g, ' ')                    // newlines to space
+    .trim()
+}
 
 type ScanState =
   | { status: "idle" }
   | { status: "scanning"; current: number; total: number }
   | { status: "error";    message: string }
 
-export function ChatInput({ onSend, loading, guidedStep, replyingTo, onCancelReply, onStartGuided, onStartBudgetGuided, onCancelGuided }: Props) {
+export function ChatInput({ onSend, loading, guidedStep, replyingTo, onCancelReply, onStartGuided, onStartBudgetGuided, onCancelGuided, variant = "dark" }: Props) {
   const [value,      setValue]      = React.useState("")
   const [focused,    setFocused]    = React.useState(false)
   const [popOpen,    setPopOpen]    = React.useState(false)
@@ -225,7 +236,7 @@ export function ChatInput({ onSend, loading, guidedStep, replyingTo, onCancelRep
               Replying to {replyingTo.role === "user" ? "You" : "VoiceKhata AI"}
             </div>
             <p className="text-[13px] text-text-muted line-clamp-1 break-words">
-              {replyingTo.content.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')}
+              {stripMarkdown(replyingTo.content)}
             </p>
           </div>
           {onCancelReply && (
@@ -343,9 +354,9 @@ export function ChatInput({ onSend, loading, guidedStep, replyingTo, onCancelRep
       <div
         className={[
           "flex items-end gap-2 rounded-2xl border px-3 py-2.5 transition-all duration-150",
-          focused
-            ? "border-border-secondary bg-surface-secondary"
-            : "border-border bg-surface-secondary",
+          variant === "light"
+            ? (focused ? "border-black/[0.12] bg-white shadow-sm" : "border-black/[0.08] bg-white hover:bg-black/[0.02]")
+            : (focused ? "border-border-secondary bg-surface-secondary" : "border-border bg-surface-secondary"),
         ].join(" ")}
       >
         {/* Popover trigger */}
@@ -357,9 +368,9 @@ export function ChatInput({ onSend, loading, guidedStep, replyingTo, onCancelRep
                 title="Add"
                 className={[
                   "mb-0.5 size-7 shrink-0 rounded-lg flex items-center justify-center transition-all duration-150 cursor-pointer",
-                  "border border-border bg-surface-secondary text-text-muted",
-                  "hover:bg-surface-secondary hover:text-text-secondary hover:border-border-secondary",
-                  "data-[state=open]:bg-surface-secondary data-[state=open]:text-text-secondary data-[state=open]:border-border-secondary",
+                  variant === "light"
+                    ? "border border-black/[0.06] bg-black/[0.04] text-black hover:bg-black/[0.08] data-[state=open]:bg-black/[0.08] data-[state=open]:border-black/[0.1]"
+                    : "border border-border bg-surface-secondary text-text-muted hover:bg-surface-secondary hover:text-text-secondary hover:border-border-secondary data-[state=open]:bg-surface-secondary data-[state=open]:text-text-secondary data-[state=open]:border-border-secondary",
                   "disabled:pointer-events-none disabled:opacity-30",
                 ].join(" ")}
               >
@@ -374,7 +385,7 @@ export function ChatInput({ onSend, loading, guidedStep, replyingTo, onCancelRep
               side="top"
               align="start"
               sideOffset={10}
-              className="w-52 p-1.5 bg-[#161616] border border-border rounded-2xl shadow-2xl"
+              className={`w-52 p-1.5 border rounded-2xl shadow-2xl ${variant === "light" ? "bg-white border-black/[0.06]" : "bg-[#161616] border-border"}`}
             >
               {MENU_ITEMS.map(({ icon: Icon, label, action }) => (
                 <button
@@ -385,10 +396,10 @@ export function ChatInput({ onSend, loading, guidedStep, replyingTo, onCancelRep
                     action === "receipt" ? "md:hidden" : "",
                   ].join(" ")}
                 >
-                  <div className="size-[28px] rounded-lg bg-surface-secondary border border-border flex items-center justify-center flex-shrink-0 group-hover:bg-white/[0.1] transition-colors">
-                    <Icon size={13} className="text-text-secondary group-hover:text-text-primary transition-colors" />
+                  <div className={`size-[28px] rounded-lg border flex items-center justify-center flex-shrink-0 transition-colors ${variant === "light" ? "bg-black/[0.02] border-black/[0.06] group-hover:bg-black/[0.04]" : "bg-surface-secondary border-border group-hover:bg-white/[0.1]"}`}>
+                    <Icon size={13} className={`transition-colors ${variant === "light" ? "text-black/60 group-hover:text-black" : "text-text-secondary group-hover:text-text-primary"}`} />
                   </div>
-                  <span className="text-[13px] text-text-secondary group-hover:text-text-primary transition-colors">{label}</span>
+                  <span className={`text-[13px] transition-colors ${variant === "light" ? "text-black/70 group-hover:text-black" : "text-text-secondary group-hover:text-text-primary"}`}>{label}</span>
                 </button>
               ))}
 
@@ -427,7 +438,7 @@ export function ChatInput({ onSend, loading, guidedStep, replyingTo, onCancelRep
           }
           rows={1}
           disabled={isScanning || voiceState === "processing"}
-          className="flex-1 resize-none bg-transparent py-1 text-sm text-text-primary placeholder:text-text-muted focus:outline-none min-h-[32px] max-h-[120px] leading-relaxed disabled:opacity-40"
+          className={`flex-1 resize-none bg-transparent py-1 text-sm focus:outline-none min-h-[32px] max-h-[120px] leading-relaxed disabled:opacity-40 ${variant === "light" ? "text-black/90 placeholder:text-black/40" : "text-text-primary placeholder:text-text-muted"}`}
         />
 
         {/* Send or Mic button */}
@@ -437,7 +448,10 @@ export function ChatInput({ onSend, loading, guidedStep, replyingTo, onCancelRep
             disabled={!canSend}
             className={[
               "mb-0.5 size-8 shrink-0 rounded-xl flex items-center justify-center transition-all duration-150",
-              "bg-white text-black hover:bg-white/90 cursor-pointer",
+              variant === "light"
+                ? "bg-black text-white hover:bg-black/90"
+                : "bg-white text-black hover:bg-white/90",
+              "cursor-pointer disabled:pointer-events-none disabled:opacity-30 active:scale-95",
             ].join(" ")}
           >
             {loading || isScanning ? (
@@ -453,8 +467,10 @@ export function ChatInput({ onSend, loading, guidedStep, replyingTo, onCancelRep
             onClick={startListening}
             disabled={isScanning || loading || voiceState === "processing"}
             className={[
-              "mb-0.5 size-8 shrink-0 rounded-xl flex items-center justify-center transition-all duration-150",
-              "bg-surface-secondary text-text-muted hover:text-text-primary hover:bg-white/5 cursor-pointer disabled:opacity-40 disabled:pointer-events-none",
+              "mb-0.5 size-8 shrink-0 rounded-xl flex items-center justify-center transition-all duration-150 cursor-pointer disabled:opacity-40 disabled:pointer-events-none",
+              variant === "light"
+                ? "bg-black/[0.04] text-black hover:bg-black/[0.08]"
+                : "bg-surface-secondary text-text-muted hover:text-text-primary hover:bg-white/5",
             ].join(" ")}
           >
             {voiceState === "processing" ? (

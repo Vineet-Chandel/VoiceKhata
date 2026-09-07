@@ -4,9 +4,11 @@ import React, { useRef, useEffect } from "react"
 interface VoiceWaveformProps {
   analyserRef: React.MutableRefObject<AnalyserNode | null>
   isListening: boolean
+  /** Bar color — defaults to white for dark backgrounds */
+  color?: string
 }
 
-export function VoiceWaveform({ analyserRef, isListening }: VoiceWaveformProps) {
+export function VoiceWaveform({ analyserRef, isListening, color = "rgba(255, 255, 255, 1)" }: VoiceWaveformProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {
@@ -70,7 +72,7 @@ export function VoiceWaveform({ analyserRef, isListening }: VoiceWaveformProps) 
       const startX = (width - totalWidth) / 2
       const centerY = height / 2
 
-      ctx.fillStyle = "rgba(255, 255, 255, 1)"
+      ctx.fillStyle = color
 
       for (let i = 0; i < numBars; i++) {
         // Apply a pill-shaped window envelope: taller in the middle, shorter on the edges

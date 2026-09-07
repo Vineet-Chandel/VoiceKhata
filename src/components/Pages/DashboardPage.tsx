@@ -5,6 +5,7 @@ import { Outlet } from "react-router-dom"
 
 import { AppSidebar } from "@/components/ui/Dashboard_UI/app-sidebar"
 import { SiteHeader } from "@/components/ui/Dashboard_UI/site-header"
+import { FloatingAssistant } from "@/components/ui/FloatingAssistant/floating-assistant"
 
 import {
   SidebarInset,
@@ -32,6 +33,8 @@ export default function DashboardPage() {
         </div>
 
       </SidebarInset>
+
+      <FloatingAssistant />
 
     </SidebarProvider>
   )

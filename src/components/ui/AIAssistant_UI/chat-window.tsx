@@ -194,6 +194,7 @@ export function ChatWindow({
   onReply,
   onConfirmAll,
   onCancel,
+  variant = "dark",
 }: {
   messages:      Message[]
   loading:       boolean
@@ -203,6 +204,7 @@ export function ChatWindow({
   onReply?:      (msg: Message) => void
   onConfirmAll?: () => void
   onCancel?:     () => void
+  variant?:      "light" | "dark"
 }) {
   const bottomRef = React.useRef<HTMLDivElement>(null)
 
@@ -245,8 +247,8 @@ export function ChatWindow({
             <div
               className={`rounded-2xl px-4 py-3 text-sm flex flex-col gap-2 min-w-0 max-w-full overflow-hidden break-words ${
                 m.role === "user"
-                  ? "bg-white/[0.1] border border-border-secondary text-text-primary rounded-br-sm"
-                  : "bg-surface-secondary border border-border text-text-secondary rounded-bl-sm"
+                  ? (variant === "light" ? "bg-black/[0.04] border border-black/10 text-black/90 rounded-br-sm" : "bg-white/[0.1] border border-border-secondary text-text-primary rounded-br-sm")
+                  : (variant === "light" ? "bg-white border border-black/10 text-black/80 rounded-bl-sm shadow-sm" : "bg-surface-secondary border border-border text-text-secondary rounded-bl-sm")
               }`}
             >
               {/* Quoted Reply */}
@@ -286,14 +288,16 @@ export function ChatWindow({
           <div className="size-7 rounded-full bg-surface-secondary border border-white/[0.1] flex items-center justify-center shrink-0">
             <Bot size={13} className="text-text-secondary" />
           </div>
-          <div className="bg-surface-secondary border border-border rounded-2xl rounded-bl-sm px-4 py-3.5 flex gap-1.5 items-center">
-            {[0, 1, 2].map((i) => (
-              <span
-                key={i}
-                className="size-1.5 rounded-full bg-white/30 animate-bounce"
-                style={{ animationDelay: `${i * 0.15}s` }}
-              />
-            ))}
+          <div className={`rounded-2xl px-5 py-3.5 text-sm w-fit ${variant === "light" ? "bg-white border border-black/10 shadow-sm rounded-bl-sm" : "bg-surface-secondary border border-border text-text-secondary rounded-bl-sm"}`}>
+            <div className="flex gap-1.5 items-center h-5">
+              {[0, 1, 2].map((i) => (
+                <span
+                  key={i}
+                  className={`size-1.5 rounded-full animate-bounce ${variant === "light" ? "bg-black/30" : "bg-white/30"}`}
+                  style={{ animationDelay: `${i * 0.15}s` }}
+                />
+              ))}
+            </div>
           </div>
         </div>
       )}
