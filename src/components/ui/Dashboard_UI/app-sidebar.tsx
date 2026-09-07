@@ -8,7 +8,7 @@ import { Link } from "react-router-dom"
 import { NavMain } from "@/components/ui/Dashboard_UI/nav-main"
 import { NavSecondary } from "@/components/ui/Dashboard_UI/nav-secondary"
 import { NavUser } from "@/components/ui/Dashboard_UI/nav-user"
-import logo from "@/assets/Logo_white.png"
+import logo from "@/assets/logo_white.png"
 import {
   Sidebar, SidebarContent, SidebarFooter,
   SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem,
