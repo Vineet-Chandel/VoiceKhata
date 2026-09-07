@@ -2,7 +2,7 @@
 "use client"
 
 import * as React from "react"
-import { Bot } from "lucide-react"
+import { Bot, CheckCircle2, ChevronRight, AlertTriangle, ListChecks, Reply } from "lucide-react"
 import type { Message } from "@/components/hooks/use-ai-chat"
 import { BulkTransactionCard } from "./bulk-transaction-card"
 
@@ -86,6 +86,61 @@ function renderMarkdown(text: string): React.ReactNode[] {
       continue
     }
 
+    if (line.trim().startsWith("|")) {
+      const tableLines: string[] = []
+      while (i < lines.length && lines[i].trim().startsWith("|")) {
+        tableLines.push(lines[i].trim())
+        i++
+      }
+
+      if (tableLines.length > 0) {
+        // Parse table
+        const rows = tableLines.map(l => {
+          // Remove leading and trailing pipe
+          const content = l.replace(/^\|/, "").replace(/\|$/, "")
+          return content.split("|").map(cell => cell.trim())
+        })
+
+        // Filter out the separator row (e.g., |---|---|)
+        const isSeparator = (row: string[]) => row.every(cell => cell.match(/^[-:]+$/))
+        
+        let headerRow = rows[0]
+        let dataRows = rows.slice(1)
+        
+        if (dataRows.length > 0 && isSeparator(dataRows[0])) {
+          dataRows = dataRows.slice(1)
+        }
+
+        nodes.push(
+          <div key={`table-${i}`} className="my-3 overflow-x-auto rounded-xl border border-border bg-surface-secondary/50">
+            <table className="w-full text-left text-xs sm:text-sm whitespace-nowrap">
+              <thead className="bg-surface-elevated text-text-secondary border-b border-border">
+                <tr>
+                  {headerRow.map((cell, idx) => (
+                    <th key={idx} className="px-3 py-2 font-medium">
+                      {parseInline(cell)}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border/50">
+                {dataRows.map((row, rIdx) => (
+                  <tr key={rIdx} className="hover:bg-white/[0.02] transition-colors">
+                    {row.map((cell, cIdx) => (
+                      <td key={cIdx} className="px-3 py-2 text-text-primary">
+                        {parseInline(cell)}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )
+      }
+      continue
+    }
+
     nodes.push(
       <p key={i} className="text-sm leading-relaxed">{parseInline(line)}</p>
     )
@@ -118,6 +173,7 @@ export function ChatWindow({
   userAvatar,
   userInitials = "U",
   onSend,
+  onReply,
   onConfirmAll,
   onCancel,
 }: {
@@ -126,6 +182,7 @@ export function ChatWindow({
   userAvatar?:   string | null
   userInitials?: string
   onSend?:       (msg: string) => void
+  onReply?:      (msg: Message) => void
   onConfirmAll?: () => void
   onCancel?:     () => void
 }) {
@@ -152,18 +209,45 @@ export function ChatWindow({
             </div>
           )}
 
-          {/* Bubble */}
-          <div
-            className={`max-w-[78%] rounded-2xl px-4 py-3 text-sm ${
-              m.role === "user"
-                ? "bg-white/[0.1] border border-border-secondary text-text-primary rounded-br-sm"
-                : "bg-surface-secondary border border-border text-text-secondary rounded-bl-sm"
-            }`}
-          >
-            {m.role === "assistant"
-              ? <div className="flex flex-col gap-0.5">{renderMarkdown(m.content)}</div>
-              : <p className="leading-relaxed whitespace-pre-wrap">{m.content}</p>
-            }
+          <div className={`flex flex-col gap-1 ${m.role === "user" ? "items-end" : "items-start"} max-w-[78%] group`}>
+            {/* Reply Button (visible on hover) */}
+            <div className={`flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity ${m.role === "user" ? "flex-row-reverse" : "flex-row"}`}>
+              {onReply && (
+                <button
+                  onClick={() => onReply(m)}
+                  className="p-1 rounded hover:bg-white/10 text-text-muted hover:text-text-primary transition-colors"
+                  title="Reply to message"
+                >
+                  <Reply size={14} className={m.role === "user" ? "" : "-scale-x-100"} />
+                </button>
+              )}
+            </div>
+
+            {/* Bubble */}
+            <div
+              className={`rounded-2xl px-4 py-3 text-sm flex flex-col gap-2 ${
+                m.role === "user"
+                  ? "bg-white/[0.1] border border-border-secondary text-text-primary rounded-br-sm"
+                  : "bg-surface-secondary border border-border text-text-secondary rounded-bl-sm"
+              }`}
+            >
+              {/* Quoted Reply */}
+              {m.replyTo && (
+                <div className={`flex flex-col gap-1 pl-3 pr-4 py-2 border-l-4 rounded-r-md text-xs bg-black/20 ${m.replyTo.role === "user" ? "border-violet-500" : "border-emerald-500"}`}>
+                  <span className={`font-semibold ${m.replyTo.role === "user" ? "text-violet-400" : "text-emerald-400"}`}>
+                    {m.replyTo.role === "user" ? "You" : "VoiceKhata AI"}
+                  </span>
+                  <p className="line-clamp-2 text-text-muted break-words">
+                    {m.replyTo.content.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')} {/* Strip raw markdown links for preview */}
+                  </p>
+                </div>
+              )}
+
+              {m.role === "assistant"
+                ? <div className="flex flex-col gap-0.5 w-full overflow-hidden">{renderMarkdown(m.content)}</div>
+                : <p className="leading-relaxed whitespace-pre-wrap">{m.content}</p>
+              }
+            </div>
           </div>
 
           {/* User avatar */}

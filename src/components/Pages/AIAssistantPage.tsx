@@ -1,7 +1,7 @@
 // src/components/Pages/AIAssistantPage.tsx
 "use client"
 
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useLocation } from "react-router-dom"
 import { ChatWindow } from "@/components/ui/AIAssistant_UI/chat-window"
 import { ChatInput } from "@/components/ui/AIAssistant_UI/chat-input"
@@ -14,6 +14,7 @@ import { useAuth } from "@/components/hooks/use-auth"
 import { Bot } from "lucide-react"
 import { createChat, saveMessages, generateChatTitle } from "@/lib/api-chat"
 import { ChatHistoryModal } from "@/components/ui/AIAssistant_UI/chat-history-modal"
+import type { Message } from "@/components/hooks/use-ai-chat"
 
 export default function AIAssistantPage() {
   const { transactions, addTransaction } = useTransactions()
@@ -22,6 +23,7 @@ export default function AIAssistantPage() {
   const location = useLocation()
   // Ref guard so the seed fires exactly once even in React StrictMode double-invoke
   const seedFiredRef = useRef(false)
+  const [replyingTo, setReplyingTo] = useState<Message | null>(null)
 
   const {
     messages, setMessages,
@@ -182,7 +184,7 @@ export default function AIAssistantPage() {
                   to log it instantly.
                 </p>
               </div>
-              <SuggestedPrompts onSelect={sendMessage} />
+              <SuggestedPrompts onSelect={(msg) => sendMessage(msg, replyingTo ? { id: replyingTo.id, role: replyingTo.role, content: replyingTo.content } : undefined)} />
             </div>
           ) : (
             <ChatWindow
@@ -190,7 +192,11 @@ export default function AIAssistantPage() {
               loading={loading}
               userAvatar={userAvatar}
               userInitials={userInitials}
-              onSend={sendMessage}
+              onSend={(msg) => {
+                sendMessage(msg, replyingTo ? { id: replyingTo.id, role: replyingTo.role, content: replyingTo.content } : undefined)
+                setReplyingTo(null)
+              }}
+              onReply={(msg) => setReplyingTo(msg)}
               onConfirmAll={confirmMultiTransactions}
               onCancel={cancelMultiTransactions}
             />
@@ -199,9 +205,14 @@ export default function AIAssistantPage() {
           {/* Input */}
           <div className="px-4 lg:px-6 py-3 border-t border-border shrink-0">
             <ChatInput
-              onSend={sendMessage}
+              onSend={(msg) => {
+                sendMessage(msg, replyingTo ? { id: replyingTo.id, role: replyingTo.role, content: replyingTo.content } : undefined)
+                setReplyingTo(null)
+              }}
               loading={loading}
               guidedStep={guidedStep}
+              replyingTo={replyingTo}
+              onCancelReply={() => setReplyingTo(null)}
               onStartGuided={startGuidedFlow}
               onStartBudgetGuided={() => startBudgetFlow()}
               onCancelGuided={cancelGuidedFlow}

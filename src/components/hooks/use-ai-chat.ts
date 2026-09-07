@@ -25,11 +25,13 @@ import {
   type AssistantMode,
   type LanguageMode,
 } from "@/lib/chat-language"
+import { MONEY_GROWTH_ENGINE_PROMPT } from "@/lib/prompts/money-growth-engine"
 
 export type Message = {
   id: string
   role: "user" | "assistant"
   content: string
+  replyTo?: { id: string; role: "user" | "assistant"; content: string }
 }
 
 type TransactionDraft = {
@@ -1153,6 +1155,8 @@ ${recentLines}
 Monthly Totals (full history, JSON):
 ${JSON.stringify(monthlyTotals)}
 
+${MONEY_GROWTH_ENGINE_PROMPT}
+
 Rules:
 1. Use only provided data for numbers.
 2. Keep replies concise and practical.
@@ -1479,7 +1483,7 @@ export function useAIChat({
     setLoading(false)
   }
 
-  const sendMessage = async (content: string) => {
+  const sendMessage = async (content: string, replyTo?: Message["replyTo"]) => {
     if (!content.trim() || loading) return
 
     const trimmedContent = content.trim()
@@ -1502,7 +1506,7 @@ export function useAIChat({
     // --- Bulk Transaction Processing (Interceptor) ---
     if (multiState) {
       const reply = content.toLowerCase().trim()
-      setMessages((prev) => [...prev, { id: `u-${Date.now()}`, role: "user", content: trimmedContent }])
+      setMessages((prev) => [...prev, { id: `u-${Date.now()}`, role: "user", content: trimmedContent, replyTo }])
       
       // NLP Overrides
       const changeAmountMatch = reply.match(/change(?: the)?(?: rs\.?| inr| rupees?| ₹)?\s*(\d+).* to(?: rs\.?| inr| rupees?| ₹)?\s*(\d+)/)
@@ -1762,7 +1766,7 @@ export function useAIChat({
       return
     }
 
-    const userMsg: Message = { id: `u-${Date.now()}`, role: "user", content: trimmedContent }
+    const userMsg: Message = { id: `u-${Date.now()}`, role: "user", content: trimmedContent, replyTo }
     setMessages((prev) => [...prev, userMsg])
     setLoading(true)
 

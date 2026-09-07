@@ -7,7 +7,7 @@ import {
   signIn,
   signInWithGoogle,
   sendPasswordReset,
-  sendVerification,
+  resendVerificationEmailWithCredentials,
 } from "@/firebase/auth"
 import { useAuth } from "@/components/hooks/use-auth"
 
@@ -144,11 +144,17 @@ export function LoginPage() {
   }
 
   const handleResendVerification = async () => {
-    if (!email.trim()) return
+    if (!email.trim() || !password) {
+      setError("Please enter your email and password to resend the verification link.")
+      return
+    }
     setResending(true)
+    setError("")
+    setInfoMsg("")
     try {
-      // Prompt user or inform them
-      setInfoMsg("If you recently registered, please check your inbox/spam or log in after clicking the verification link.")
+      await resendVerificationEmailWithCredentials(email.trim(), password)
+      setInfoMsg("A new verification email has been sent. Please check your inbox and spam folder.")
+      setShowResendVerification(false)
     } catch (e: any) {
       setError(e.message || "Could not resend verification email.")
     } finally {

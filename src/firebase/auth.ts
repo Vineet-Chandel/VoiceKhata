@@ -74,6 +74,16 @@ export const sendVerification = async (user?: User | null): Promise<void> => {
 }
 
 /**
+ * Resend verification email by temporarily signing in using credentials
+ */
+export const resendVerificationEmailWithCredentials = async (email: string, password: string): Promise<void> => {
+  const userCredential = await signInWithEmailAndPassword(auth, email, password)
+  const user = userCredential.user
+  await sendEmailVerification(user)
+  await signOut(auth)
+}
+
+/**
  * Send password reset email
  */
 export const sendPasswordReset = async (email: string): Promise<void> => {

@@ -5,18 +5,16 @@ import * as React from "react"
 import { Plus, X, ArrowUp, Receipt, CreditCard, Upload, FileText, Images, Mic, Square, Check } from "lucide-react"
 import { useVoiceInput } from "@/components/hooks/use-voice-input"
 import { VoiceWaveform } from "@/components/ui/AIAssistant_UI/voice-waveform"
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { scanReceiptMulti } from "@/lib/scan-receipt"
-import type { GuidedStep } from "@/components/hooks/use-ai-chat"
+import type { GuidedStep, Message } from "@/components/hooks/use-ai-chat"
 
 interface Props {
   onSend:         (msg: string) => void
   loading:        boolean
   guidedStep:     GuidedStep
+  replyingTo?:    Message | null
+  onCancelReply?: () => void
   onStartGuided:  () => void
   onStartBudgetGuided?: () => void
   onCancelGuided: () => void
@@ -53,7 +51,7 @@ type ScanState =
   | { status: "scanning"; current: number; total: number }
   | { status: "error";    message: string }
 
-export function ChatInput({ onSend, loading, guidedStep, onStartGuided, onStartBudgetGuided, onCancelGuided }: Props) {
+export function ChatInput({ onSend, loading, guidedStep, replyingTo, onCancelReply, onStartGuided, onStartBudgetGuided, onCancelGuided }: Props) {
   const [value,      setValue]      = React.useState("")
   const [focused,    setFocused]    = React.useState(false)
   const [popOpen,    setPopOpen]    = React.useState(false)
@@ -216,7 +214,31 @@ export function ChatInput({ onSend, loading, guidedStep, onStartGuided, onStartB
   }
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-2 relative">
+
+      {/* Replying To Preview */}
+      {replyingTo && (
+        <div className="absolute bottom-[calc(100%+8px)] left-0 right-0 mx-auto max-w-[96%] bg-surface-secondary/95 backdrop-blur border border-border rounded-xl p-3 shadow-lg flex items-start gap-3 z-10 animate-in fade-in slide-in-from-bottom-2">
+          <div className={`w-1 self-stretch rounded-full ${replyingTo.role === "user" ? "bg-violet-500" : "bg-emerald-500"}`} />
+          <div className="flex-1 min-w-0">
+            <div className={`text-[11px] font-semibold mb-0.5 ${replyingTo.role === "user" ? "text-violet-400" : "text-emerald-400"}`}>
+              Replying to {replyingTo.role === "user" ? "You" : "VoiceKhata AI"}
+            </div>
+            <p className="text-[13px] text-text-muted line-clamp-1 break-words">
+              {replyingTo.content.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')}
+            </p>
+          </div>
+          {onCancelReply && (
+            <button
+              onClick={onCancelReply}
+              className="p-1 rounded hover:bg-white/10 text-text-muted transition-colors shrink-0 cursor-pointer"
+              title="Cancel reply"
+            >
+              <X size={14} />
+            </button>
+          )}
+        </div>
+      )}
 
       {/* Camera input — Scan Receipt: capture="environment" opens camera */}
       <input
