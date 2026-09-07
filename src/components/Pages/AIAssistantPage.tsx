@@ -142,8 +142,8 @@ export default function AIAssistantPage() {
     .split(" ").map((w) => w[0]).slice(0, 2).join("").toUpperCase()
 
   return (
-    <div className="@container/main flex flex-1 flex-col h-full overflow-hidden">
-      <div className="flex flex-col h-full max-h-[calc(100vh-var(--header-height))]">
+    <div className="@container/main flex flex-1 flex-col h-full overflow-hidden w-full min-w-0">
+      <div className="flex flex-col h-full max-h-[calc(100vh-var(--header-height))] w-full min-w-0">
 
         {/* Header */}
         <div className="flex items-center justify-between px-4 lg:px-6 py-3.5 border-b border-border shrink-0">
@@ -171,7 +171,7 @@ export default function AIAssistantPage() {
         </div>
 
         {/* Body */}
-        <div className="flex flex-col flex-1 overflow-hidden">
+        <div className="flex flex-col flex-1 overflow-hidden w-full min-w-0">
           {messages.length === 0 ? (
             <div className="flex flex-col items-center justify-center flex-1 gap-7 px-4 py-8">
               <div className="text-center">

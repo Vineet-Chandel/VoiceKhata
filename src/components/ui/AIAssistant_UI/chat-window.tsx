@@ -22,7 +22,7 @@ function renderMarkdown(text: string): React.ReactNode[] {
 
     if (line.startsWith("### ")) {
       nodes.push(
-        <p key={i} className="font-semibold text-text-primary mt-2 mb-0.5">
+        <p key={i} className="font-semibold text-text-primary mt-2 mb-0.5 break-words">
           {parseInline(line.slice(4))}
         </p>
       )
@@ -32,7 +32,7 @@ function renderMarkdown(text: string): React.ReactNode[] {
 
     if (line.startsWith("## ")) {
       nodes.push(
-        <p key={i} className="font-semibold text-text-primary mt-3 mb-1">
+        <p key={i} className="font-semibold text-text-primary mt-3 mb-1 break-words">
           {parseInline(line.slice(3))}
         </p>
       )
@@ -42,7 +42,7 @@ function renderMarkdown(text: string): React.ReactNode[] {
 
     if (line.startsWith("> ")) {
       nodes.push(
-        <div key={i} className="border-l-2 border-border-secondary pl-3 my-1.5 text-text-muted italic text-xs">
+        <div key={i} className="border-l-2 border-border-secondary pl-3 my-1.5 text-text-muted italic text-xs break-words">
           {parseInline(line.slice(2))}
         </div>
       )
@@ -54,15 +54,15 @@ function renderMarkdown(text: string): React.ReactNode[] {
       const bullets: React.ReactNode[] = []
       while (i < lines.length && lines[i].match(/^[-•]\s/)) {
         bullets.push(
-          <li key={i} className="flex gap-2 items-start">
+          <li key={i} className="flex gap-2 items-start min-w-0">
             <span className="text-text-muted mt-1 shrink-0 text-[8px]">●</span>
-            <span>{parseInline(lines[i].slice(2))}</span>
+            <span className="break-words min-w-0 flex-1">{parseInline(lines[i].slice(2))}</span>
           </li>
         )
         i++
       }
       nodes.push(
-        <ul key={`ul-${i}`} className="flex flex-col gap-1.5 my-1.5 text-sm">{bullets}</ul>
+        <ul key={`ul-${i}`} className="flex flex-col gap-1.5 my-1.5 text-sm min-w-0 w-full">{bullets}</ul>
       )
       continue
     }
@@ -72,16 +72,16 @@ function renderMarkdown(text: string): React.ReactNode[] {
       let num = 1
       while (i < lines.length && lines[i].match(/^\d+\.\s/)) {
         items.push(
-          <li key={i} className="flex gap-2 items-start">
+          <li key={i} className="flex gap-2 items-start min-w-0">
             <span className="text-text-secondary font-medium shrink-0 min-w-[1rem] text-xs mt-0.5">{num}.</span>
-            <span>{parseInline(lines[i].replace(/^\d+\.\s/, ""))}</span>
+            <span className="break-words min-w-0 flex-1">{parseInline(lines[i].replace(/^\d+\.\s/, ""))}</span>
           </li>
         )
         i++
         num++
       }
       nodes.push(
-        <ol key={`ol-${i}`} className="flex flex-col gap-1.5 my-1.5 text-sm">{items}</ol>
+        <ol key={`ol-${i}`} className="flex flex-col gap-1.5 my-1.5 text-sm min-w-0 w-full">{items}</ol>
       )
       continue
     }
@@ -112,12 +112,12 @@ function renderMarkdown(text: string): React.ReactNode[] {
         }
 
         nodes.push(
-          <div key={`table-${i}`} className="my-3 overflow-x-auto rounded-xl border border-border bg-surface-secondary/50">
-            <table className="w-full text-left text-xs sm:text-sm whitespace-nowrap">
+          <div key={`table-${i}`} className="my-3 w-full max-w-full overflow-x-auto rounded-xl border border-border bg-surface-secondary/50">
+            <table className="w-full min-w-full text-left text-xs sm:text-sm border-collapse">
               <thead className="bg-surface-elevated text-text-secondary border-b border-border">
                 <tr>
                   {headerRow.map((cell, idx) => (
-                    <th key={idx} className="px-3 py-2 font-medium">
+                    <th key={idx} className="px-3.5 py-2.5 font-medium whitespace-nowrap">
                       {parseInline(cell)}
                     </th>
                   ))}
@@ -127,7 +127,7 @@ function renderMarkdown(text: string): React.ReactNode[] {
                 {dataRows.map((row, rIdx) => (
                   <tr key={rIdx} className="hover:bg-white/[0.02] transition-colors">
                     {row.map((cell, cIdx) => (
-                      <td key={cIdx} className="px-3 py-2 text-text-primary">
+                      <td key={cIdx} className="px-3.5 py-2.5 text-text-primary break-words max-w-[260px] min-w-[110px]">
                         {parseInline(cell)}
                       </td>
                     ))}
@@ -142,7 +142,7 @@ function renderMarkdown(text: string): React.ReactNode[] {
     }
 
     nodes.push(
-      <p key={i} className="text-sm leading-relaxed">{parseInline(line)}</p>
+      <p key={i} className="text-sm leading-relaxed break-words">{parseInline(line)}</p>
     )
     i++
   }
@@ -151,18 +151,36 @@ function renderMarkdown(text: string): React.ReactNode[] {
 }
 
 function parseInline(text: string): React.ReactNode {
-  const parts = text.split(/(\*\*[^*]+\*\*|\*[^*]+\*|`[^`]+`)/g)
+  const parts = text.split(/(<br\s*\/?>|\*\*[^*]+\*\*|\*[^*]+\*|`[^`]+`|\[[^\]]+\]\([^)]+\))/gi)
   return parts.map((part, idx) => {
+    if (!part) return null
+    if (part.match(/^<br\s*\/?>$/i)) {
+      return <br key={idx} />
+    }
     if (part.startsWith("**") && part.endsWith("**"))
-      return <strong key={idx} className="font-medium text-text-primary">{part.slice(2, -2)}</strong>
+      return <strong key={idx} className="font-semibold text-text-primary">{part.slice(2, -2)}</strong>
     if (part.startsWith("*") && part.endsWith("*"))
       return <em key={idx} className="italic text-text-secondary">{part.slice(1, -1)}</em>
     if (part.startsWith("`") && part.endsWith("`"))
       return (
-        <code key={idx} className="bg-surface-secondary rounded px-1.5 py-0.5 text-[11px] font-mono text-text-secondary">
+        <code key={idx} className="bg-surface-secondary border border-border/40 rounded px-1.5 py-0.5 text-[11px] font-mono text-text-secondary break-all">
           {part.slice(1, -1)}
         </code>
       )
+    const linkMatch = part.match(/^\[([^\]]+)\]\(([^)]+)\)$/)
+    if (linkMatch) {
+      return (
+        <a
+          key={idx}
+          href={linkMatch[2]}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-violet-400 hover:underline break-all"
+        >
+          {linkMatch[1]}
+        </a>
+      )
+    }
     return part
   })
 }
@@ -194,13 +212,13 @@ export function ChatWindow({
 
   return (
     <div
-      className="flex-1 overflow-y-auto px-4 lg:px-6 py-5 flex flex-col gap-5"
+      className="flex-1 overflow-y-auto px-4 lg:px-6 py-5 flex flex-col gap-5 w-full min-w-0"
       style={{ scrollbarWidth: "none" }}
     >
       {messages.map((m) => (
         <div
           key={m.id}
-          className={`flex gap-2.5 ${m.role === "user" ? "justify-end" : "justify-start"}`}
+          className={`flex gap-2.5 ${m.role === "user" ? "justify-end" : "justify-start"} w-full min-w-0`}
         >
           {/* AI avatar */}
           {m.role === "assistant" && (
@@ -209,7 +227,7 @@ export function ChatWindow({
             </div>
           )}
 
-          <div className={`flex flex-col gap-1 ${m.role === "user" ? "items-end" : "items-start"} max-w-[78%] group`}>
+          <div className={`flex flex-col gap-1 ${m.role === "user" ? "items-end" : "items-start"} max-w-[88%] sm:max-w-[80%] min-w-0 group`}>
             {/* Reply Button (visible on hover) */}
             <div className={`flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity ${m.role === "user" ? "flex-row-reverse" : "flex-row"}`}>
               {onReply && (
@@ -225,7 +243,7 @@ export function ChatWindow({
 
             {/* Bubble */}
             <div
-              className={`rounded-2xl px-4 py-3 text-sm flex flex-col gap-2 ${
+              className={`rounded-2xl px-4 py-3 text-sm flex flex-col gap-2 min-w-0 max-w-full overflow-hidden break-words ${
                 m.role === "user"
                   ? "bg-white/[0.1] border border-border-secondary text-text-primary rounded-br-sm"
                   : "bg-surface-secondary border border-border text-text-secondary rounded-bl-sm"
@@ -244,8 +262,8 @@ export function ChatWindow({
               )}
 
               {m.role === "assistant"
-                ? <div className="flex flex-col gap-0.5 w-full overflow-hidden">{renderMarkdown(m.content)}</div>
-                : <p className="leading-relaxed whitespace-pre-wrap">{m.content}</p>
+                ? <div className="flex flex-col gap-0.5 w-full min-w-0 overflow-hidden break-words">{renderMarkdown(m.content)}</div>
+                : <p className="leading-relaxed whitespace-pre-wrap break-words">{m.content}</p>
               }
             </div>
           </div>
