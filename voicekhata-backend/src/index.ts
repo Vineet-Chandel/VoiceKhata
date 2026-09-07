@@ -51,6 +51,11 @@ function isOriginAllowed(origin: string): boolean {
     return true
   }
 
+  // Allow any *.onrender.com subdomain (e.g. Render-hosted frontend)
+  if (/^https:\/\/([a-zA-Z0-9-]+\.)*onrender\.com(:[0-9]+)?$/.test(normalized)) {
+    return true
+  }
+
   // Allow localhost / 127.0.0.1 on any port in development
   if (process.env.NODE_ENV !== "production" && /^http:\/\/(localhost|127\.0\.0\.1)(:[0-9]+)?$/.test(normalized)) {
     return true

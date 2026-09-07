@@ -287,8 +287,9 @@ type WebSearchResult = {
 
 export async function merchantWebFallback(rawInput: string): Promise<MerchantResolution | null> {
   const endpoint = import.meta.env.VITE_MERCHANT_SEARCH_ENDPOINT as string | undefined
-  const backendUrl = import.meta.env.VITE_BACKEND_URL as string | undefined
-  const resolvedEndpoint = endpoint || (backendUrl ? `${backendUrl.replace(/\/$/, "")}/merchant/search` : "")
+  const rawBackendUrl = (import.meta.env.VITE_BACKEND_URL as string | undefined)?.trim() || "https://voicekhata-tif3.onrender.com"
+  const backendUrl = rawBackendUrl.replace(/\/+$/, "").replace(/\/api$/, "")
+  const resolvedEndpoint = endpoint || `${backendUrl}/merchant/search`
 
   if (!resolvedEndpoint || !rawInput.trim()) return null
 

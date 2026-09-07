@@ -1,6 +1,7 @@
 import { auth } from "@/firebase/firebase"
 
-const BACKEND_URL = (import.meta.env.VITE_BACKEND_URL || "https://voicekhata-tif3.onrender.com/api").replace(/\/+$/, "")
+const rawBackendUrl = (import.meta.env.VITE_BACKEND_URL as string | undefined)?.trim() || "https://voicekhata-tif3.onrender.com"
+const BACKEND_URL = rawBackendUrl.replace(/\/+$/, "").replace(/\/api$/, "")
 
 export interface ApiFetchOptions extends Omit<RequestInit, "body"> {
   body?: any
