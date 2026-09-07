@@ -2,7 +2,9 @@
 "use client"
 
 import * as React from "react"
-import { Plus, X, ArrowUp, Receipt, CreditCard, Upload, FileText, Images } from "lucide-react"
+import { Plus, X, ArrowUp, Receipt, CreditCard, Upload, FileText, Images, Mic, Square, Check } from "lucide-react"
+import { useVoiceInput } from "@/components/hooks/use-voice-input"
+import { VoiceWaveform } from "@/components/ui/AIAssistant_UI/voice-waveform"
 import {
   Popover,
   PopoverContent,
@@ -57,6 +59,27 @@ export function ChatInput({ onSend, loading, guidedStep, onStartGuided, onStartB
   const [popOpen,    setPopOpen]    = React.useState(false)
   const [scanState,  setScanState]  = React.useState<ScanState>({ status: "idle" })
   const textareaRef                 = React.useRef<HTMLTextAreaElement>(null)
+
+  const {
+    voiceState,
+    transcript,
+    errorMessage,
+    startListening,
+    stopListening,
+    reset: resetVoice,
+    analyserRef,
+  } = useVoiceInput()
+
+  React.useEffect(() => {
+    if (voiceState === "processing" && transcript) {
+      setValue((prev) => (prev ? prev + " " + transcript : transcript))
+      if (textareaRef.current) autoResize(textareaRef.current)
+      resetVoice()
+    } else if (voiceState === "error" && errorMessage) {
+      console.error(errorMessage)
+      resetVoice()
+    }
+  }, [voiceState, transcript, errorMessage, resetVoice])
 
   // Camera input — capture="environment" opens camera directly (Scan Receipt)
   const cameraInputRef = React.useRef<HTMLInputElement>(null)
@@ -269,7 +292,32 @@ export function ChatInput({ onSend, loading, guidedStep, onStartGuided, onStartB
         </div>
       )}
 
-      {/* Input box */}
+      {/* Input or Voice Pill */}
+      {voiceState === "listening" ? (
+        <div className="flex items-center justify-between gap-4 rounded-full border border-border-secondary bg-surface-secondary px-2 py-2 max-w-[280px] mx-auto w-full animate-in fade-in zoom-in-95 duration-200">
+          <button
+            onClick={() => {
+              // Cancel: stop and clear
+              stopListening()
+              setTimeout(resetVoice, 50)
+            }}
+            className="size-9 rounded-full bg-surface-elevated border border-border flex items-center justify-center text-text-muted hover:text-text-primary transition-colors shrink-0 cursor-pointer"
+          >
+            <X size={18} />
+          </button>
+          
+          <div className="flex-1 h-8 flex items-center justify-center overflow-hidden">
+            <VoiceWaveform analyserRef={analyserRef} isListening={true} />
+          </div>
+          
+          <button
+            onClick={stopListening}
+            className="size-9 rounded-full bg-white flex items-center justify-center text-black hover:bg-white/90 transition-colors shrink-0 cursor-pointer"
+          >
+            <Check size={18} strokeWidth={3} />
+          </button>
+        </div>
+      ) : (
       <div
         className={[
           "flex items-end gap-2 rounded-2xl border px-3 py-2.5 transition-all duration-150",
@@ -356,30 +404,48 @@ export function ChatInput({ onSend, loading, guidedStep, onStartGuided, onStartB
               : "Ask anything or say what you spent…"
           }
           rows={1}
-          disabled={isScanning}
+          disabled={isScanning || voiceState === "processing"}
           className="flex-1 resize-none bg-transparent py-1 text-sm text-text-primary placeholder:text-text-muted focus:outline-none min-h-[32px] max-h-[120px] leading-relaxed disabled:opacity-40"
         />
 
-        {/* Send button */}
-        <button
-          onClick={handleSend}
-          disabled={!canSend}
-          className={[
-            "mb-0.5 size-8 shrink-0 rounded-xl flex items-center justify-center transition-all duration-150",
-            canSend
-              ? "bg-white text-black hover:bg-white/90 cursor-pointer"
-              : "bg-surface-secondary text-text-muted cursor-not-allowed",
-          ].join(" ")}
-        >
-          {loading || isScanning ? (
-            <svg className="size-3.5 animate-spin" viewBox="0 0 24 24" fill="none">
-              <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" strokeDasharray="32" strokeDashoffset="12" />
-            </svg>
-          ) : (
-            <ArrowUp size={14} />
-          )}
-        </button>
+        {/* Send or Mic button */}
+        {canSend ? (
+          <button
+            onClick={handleSend}
+            disabled={!canSend}
+            className={[
+              "mb-0.5 size-8 shrink-0 rounded-xl flex items-center justify-center transition-all duration-150",
+              "bg-white text-black hover:bg-white/90 cursor-pointer",
+            ].join(" ")}
+          >
+            {loading || isScanning ? (
+              <svg className="size-3.5 animate-spin" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" strokeDasharray="32" strokeDashoffset="12" />
+              </svg>
+            ) : (
+              <ArrowUp size={14} />
+            )}
+          </button>
+        ) : (
+          <button
+            onClick={startListening}
+            disabled={isScanning || loading || voiceState === "processing"}
+            className={[
+              "mb-0.5 size-8 shrink-0 rounded-xl flex items-center justify-center transition-all duration-150",
+              "bg-surface-secondary text-text-muted hover:text-text-primary hover:bg-white/5 cursor-pointer disabled:opacity-40 disabled:pointer-events-none",
+            ].join(" ")}
+          >
+            {voiceState === "processing" ? (
+              <svg className="size-3.5 animate-spin" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" strokeDasharray="32" strokeDashoffset="12" />
+              </svg>
+            ) : (
+              <Mic size={15} />
+            )}
+          </button>
+        )}
       </div>
+      )}
 
       {/* Keyboard hint */}
       {!isGuidedActive && !focused && !isScanning && (

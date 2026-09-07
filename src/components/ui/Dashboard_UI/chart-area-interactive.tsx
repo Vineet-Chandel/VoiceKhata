@@ -25,7 +25,7 @@ type ChartData = {
 const chartConfig = {
   balance: {
     label: "Balance",
-    color: "#ffffff",
+    color: "var(--color-primary)",
   },
 } satisfies ChartConfig
 
@@ -55,8 +55,8 @@ export function ChartAreaInteractive({ data }: { data: ChartData[] }) {
             <defs>
 
               <linearGradient id="fillBalance" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#ffffff" stopOpacity={0.5} />
-                <stop offset="95%" stopColor="#ffffff" stopOpacity={0.05} />
+                <stop offset="5%" stopColor="var(--color-balance)" stopOpacity={0.5} />
+                <stop offset="95%" stopColor="var(--color-balance)" stopOpacity={0.05} />
               </linearGradient>
 
             </defs>
@@ -99,7 +99,7 @@ export function ChartAreaInteractive({ data }: { data: ChartData[] }) {
             <Area
               dataKey="balance"
               type="monotone"
-              stroke="#ffffff"
+              stroke="var(--color-balance)"
               strokeWidth={2}
               fill="url(#fillBalance)"
             />

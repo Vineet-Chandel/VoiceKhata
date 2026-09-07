@@ -45,7 +45,8 @@ create table if not exists public.budgets (
   spent        numeric default 0,
   month        text not null,
   duration     text default 'Monthly',
-  created_at   timestamptz default now()
+  created_at   timestamptz default now(),
+  unique(firebase_uid, category, month)
 );
 
 -- 5. Savings Goals Table
@@ -160,7 +161,8 @@ create table if not exists public.yearly_budget_summary (
   category     text not null,
   budgeted     numeric default 0,
   spent        numeric default 0,
-  created_at   timestamptz default now()
+  created_at   timestamptz default now(),
+  unique(firebase_uid, year, category)
 );
 
 -- 14. Gmail Sync & Backend Tables
@@ -209,6 +211,10 @@ create index if not exists idx_recurring_uid on public.recurring_transactions(fi
 create index if not exists idx_merchant_memory_uid on public.merchant_memory(firebase_uid);
 create index if not exists idx_chat_sessions_uid on public.chat_sessions(firebase_uid, updated_at desc);
 create index if not exists idx_chat_messages_chat_id on public.chat_messages(chat_id, created_at asc);
+
+-- Create unique indexes explicitly for existing tables where constraints might be missing
+create unique index if not exists idx_budgets_unique on public.budgets(firebase_uid, category, month);
+create unique index if not exists idx_yearly_budget_summary_unique on public.yearly_budget_summary(firebase_uid, year, category);
 
 -- 18. RPC Stored Functions
 create or replace function public.set_uid(uid text)
@@ -441,3 +447,41 @@ begin
     execute format('create policy "Auto allow all on %I" on public.%I for all to anon, authenticated, service_role using (true) with check (true);', t, t);
   end loop;
 end $$;
+
+-- 23. User Budget Caps Table
+create table if not exists public.user_budget_caps (
+  firebase_uid text not null references public.user_profiles(firebase_uid) on delete cascade,
+  month        text not null,
+  total_cap    numeric not null,
+  created_at   timestamptz default now(),
+  primary key (firebase_uid, month)
+);
+
+alter table if exists public.user_budget_caps enable row level security;
+drop policy if exists "Allow all access to user_budget_caps" on public.user_budget_caps;
+create policy "Allow all access to user_budget_caps"
+  on public.user_budget_caps for all
+  to anon, authenticated, service_role
+  using (true) with check (true);
+
+-- 24. Notification Preferences Table
+create table if not exists public.notification_prefs (
+  firebase_uid       text primary key references public.user_profiles(firebase_uid) on delete cascade,
+  in_app             boolean default true,
+  email              boolean default false,
+  budget_alerts      boolean default true,
+  transaction_alerts boolean default true,
+  ai_insights        boolean default true,
+  system_alerts      boolean default true,
+  quiet_hours_start  integer,
+  quiet_hours_end    integer,
+  created_at         timestamptz default now(),
+  updated_at         timestamptz default now()
+);
+
+alter table if exists public.notification_prefs enable row level security;
+drop policy if exists "Allow all access to notification_prefs" on public.notification_prefs;
+create policy "Allow all access to notification_prefs"
+  on public.notification_prefs for all
+  to anon, authenticated, service_role
+  using (true) with check (true);

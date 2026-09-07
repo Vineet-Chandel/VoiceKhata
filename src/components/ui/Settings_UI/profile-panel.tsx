@@ -96,7 +96,7 @@ export function ProfilePanel({
                                     <Camera className="size-5 text-text-muted" />
                                 </div>
                             ) : avatarPreview ? (
-                                <img src={avatarPreview} className="size-full object-cover" />
+                                <img src={avatarPreview} className="size-full object-cover" referrerPolicy="no-referrer" />
                             ) : (
                                 <div className="size-full bg-surface flex items-center justify-center text-2xl font-black text-text-muted">
                                     {initials}
