@@ -40,7 +40,7 @@ export function WhatIfSimulator() {
 
 function PathCard({ title, subtitle, impact, risk, color }: any) {
   return (
-    <div className={\`p-4 rounded-xl border \${color} flex flex-col h-full\`}>
+    <div className={`p-4 rounded-xl border \${color} flex flex-col h-full`}>
       <h3 className="text-sm font-bold text-text-primary mb-1">{title}</h3>
       <p className="text-xs text-text-muted mb-4">{subtitle}</p>
       

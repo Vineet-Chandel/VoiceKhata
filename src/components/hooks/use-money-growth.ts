@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react"
 import { useAuth } from "@/components/hooks/use-auth"
-import { useTransactionStore } from "@/components/hooks/use-transaction-store"
-import { useBudgetStore } from "@/components/hooks/use-budget-store"
+import { useTransactions } from "@/components/hooks/use-transactions"
+import { useBudgets } from "@/components/hooks/use-budgets"
 import { createFinancialMetrics } from "@/lib/financial-metrics"
 import { MONEY_GROWTH_ENGINE_PROMPT } from "@/lib/prompts/money-growth-engine"
 
@@ -84,13 +84,13 @@ async function callGroqJSON(apiKey: string, systemPrompt: string, prompt: string
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: \`Bearer \${apiKey}\`,
+      Authorization: `Bearer \${apiKey}`,
     },
     body: JSON.stringify(payload),
   })
 
   if (!res.ok) {
-    throw new Error(\`Groq API error: \${res.status}\`)
+    throw new Error(`Groq API error: \${res.status}`)
   }
 
   const data = await res.json()
@@ -104,8 +104,8 @@ export function useMoneyGrowth() {
   const [error, setError] = useState<string | null>(null)
   
   const { user } = useAuth()
-  const { transactions } = useTransactionStore()
-  const { budgets } = useBudgetStore()
+  const { transactions } = useTransactions()
+  const { budgets } = useBudgets()
 
   const generateIntelligence = async () => {
     if (!user) return
@@ -135,14 +135,14 @@ export function useMoneyGrowth() {
       const recentLines = [...transactions]
         .sort((a, b) => b.date.localeCompare(a.date))
         .slice(0, 100)
-        .map((t) => \`- \${t.date} | \${t.transaction} | \${t.type === "Credit" ? "+" : "-"}\${t.amount} | \${t.category} | \${t.method}\`)
+        .map((t) => `- \${t.date} | \${t.transaction} | \${t.type === "Credit" ? "+" : "-"}\${t.amount} | \${t.category} | \${t.method}`)
         .join("\\n")
 
-      const systemPrompt = \`\${MONEY_GROWTH_ENGINE_PROMPT}
+      const systemPrompt = `\${MONEY_GROWTH_ENGINE_PROMPT}
 
-IMPORTANT: You must respond in STRICT JSON format matching the schema requested by the user. Do NOT include markdown blocks. DO NOT output anything except the raw JSON.\`
+IMPORTANT: You must respond in STRICT JSON format matching the schema requested by the user. Do NOT include markdown blocks. DO NOT output anything except the raw JSON.`
 
-      const userPrompt = \`Analyze the user's financial data and return the comprehensive Money Growth Engine state.
+      const userPrompt = `Analyze the user's financial data and return the comprehensive Money Growth Engine state.
 
 Monthly Totals:
 \${JSON.stringify(monthlyTotals)}
@@ -159,7 +159,7 @@ type MoneyGrowthData = {
   rupeeRouter: { estimatedDeployableSurplus: number, allocations: Array<{ category: string, amount: number, rationale: string }> },
   businessCommandCenter: { isBusinessDetected: boolean, todaySales: number, inventoryLocked: number, supplierPaymentsDue: number, estimatedBusinessSurplus: number, businessMoments: Array<string> }
 }
-\`
+`
       const result = await callGroqJSON(apiKey, systemPrompt, userPrompt)
       setData(result)
     } catch (err: any) {

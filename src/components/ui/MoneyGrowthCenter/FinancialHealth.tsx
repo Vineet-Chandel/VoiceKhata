@@ -20,7 +20,7 @@ export function FinancialHealth({ health }: { health: any }) {
           </div>
           <div className="w-px h-10 bg-border/50"></div>
           <div className="flex flex-col">
-            <div className={\`flex items-center gap-1 text-sm font-medium \${isImproving ? 'text-emerald-400' : 'text-rose-400'}\`}>
+            <div className={`flex items-center gap-1 text-sm font-medium \${isImproving ? 'text-emerald-400' : 'text-rose-400'}`}>
               <TrendIcon size={14} />
               {health.trendValue}
             </div>
@@ -64,8 +64,8 @@ function HealthMetric({ label, value, icon: Icon }: { label: string, value: numb
       <div className="flex items-center gap-2">
         <div className="flex-1 h-1.5 bg-surface-secondary rounded-full overflow-hidden">
           <div 
-            className={\`h-full rounded-full \${isHealthy ? 'bg-emerald-500' : isWarning ? 'bg-amber-500' : 'bg-rose-500'}\`} 
-            style={{ width: \`\${value}%\` }}
+            className={`h-full rounded-full \${isHealthy ? 'bg-emerald-500' : isWarning ? 'bg-amber-500' : 'bg-rose-500'}`} 
+            style={{ width: `\${value}%` }}
           />
         </div>
         <span className="text-sm font-medium text-text-primary w-6 text-right">{value}</span>

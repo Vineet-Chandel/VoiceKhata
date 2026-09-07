@@ -16,10 +16,10 @@ export function MoneyFlow({ flow }: { flow: any }) {
         <FlowBar label="Income" amount={flow.income} color="bg-emerald-500" width="100%" />
         
         <div className="pl-6 border-l-2 border-border ml-3 flex flex-col gap-4">
-          <FlowBar label="Essentials" amount={flow.essentials} color="bg-blue-500" width={\`\${widthPct(flow.essentials)}%\`} />
-          <FlowBar label="Fixed Commitments" amount={flow.fixedCommitments} color="bg-indigo-500" width={\`\${widthPct(flow.fixedCommitments)}%\`} />
-          <FlowBar label="Debt" amount={flow.debt} color="bg-amber-500" width={\`\${widthPct(flow.debt)}%\`} />
-          <FlowBar label="Savings & Investments" amount={flow.savings + flow.investments} color="bg-violet-500" width={\`\${widthPct(flow.savings + flow.investments)}%\`} />
+          <FlowBar label="Essentials" amount={flow.essentials} color="bg-blue-500" width={`\${widthPct(flow.essentials)}%`} />
+          <FlowBar label="Fixed Commitments" amount={flow.fixedCommitments} color="bg-indigo-500" width={`\${widthPct(flow.fixedCommitments)}%`} />
+          <FlowBar label="Debt" amount={flow.debt} color="bg-amber-500" width={`\${widthPct(flow.debt)}%`} />
+          <FlowBar label="Savings & Investments" amount={flow.savings + flow.investments} color="bg-violet-500" width={`\${widthPct(flow.savings + flow.investments)}%`} />
           
           <div className="mt-2 bg-rose-500/10 border border-rose-500/20 rounded-xl p-3 flex justify-between items-center">
             <div>
@@ -50,7 +50,7 @@ function FlowBar({ label, amount, color, width }: { label: string, amount: numbe
         <span className="text-sm font-semibold text-text-primary">₹{amount.toLocaleString("en-IN")}</span>
       </div>
       <div className="h-2.5 bg-surface-elevated rounded-full overflow-hidden">
-        <div className={\`h-full rounded-full \${color}\`} style={{ width }} />
+        <div className={`h-full rounded-full \${color}`} style={{ width }} />
       </div>
     </div>
   )

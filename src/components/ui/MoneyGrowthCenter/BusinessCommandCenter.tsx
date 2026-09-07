@@ -41,7 +41,7 @@ function BusinessMetric({ label, value, isPositive, isWarning }: { label: string
   return (
     <div className="bg-surface-elevated border border-border rounded-xl p-4 flex flex-col justify-between">
       <span className="text-xs font-semibold uppercase tracking-wider text-text-muted mb-2">{label}</span>
-      <span className={\`text-lg font-bold \${isPositive ? 'text-emerald-400' : (isWarning ? 'text-amber-400' : 'text-text-primary')}\`}>
+      <span className={`text-lg font-bold \${isPositive ? 'text-emerald-400' : (isWarning ? 'text-amber-400' : 'text-text-primary')}`}>
         ₹{value.toLocaleString("en-IN")}
       </span>
     </div>

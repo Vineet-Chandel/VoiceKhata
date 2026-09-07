@@ -30,7 +30,7 @@ function MomentCard({ moment }: { moment: any }) {
 
   return (
     <div className="bg-surface-secondary border border-border rounded-xl p-4 flex gap-4 group cursor-pointer hover:border-border-secondary transition-colors">
-      <div className={\`size-10 rounded-full \${bgColor} flex items-center justify-center shrink-0\`}>
+      <div className={`size-10 rounded-full \${bgColor} flex items-center justify-center shrink-0`}>
         <Icon size={18} className={iconColor} />
       </div>
       <div className="flex-1 min-w-0">
@@ -47,7 +47,7 @@ function MomentCard({ moment }: { moment: any }) {
           </div>
           <div>
             <span className="text-[10px] font-bold uppercase tracking-wider text-text-muted block mb-0.5">Impact</span>
-            <span className={\`text-xs font-medium \${isWarn ? 'text-rose-400' : 'text-emerald-400'}\`}>{moment.financialImpact}</span>
+            <span className={`text-xs font-medium \${isWarn ? 'text-rose-400' : 'text-emerald-400'}`}>{moment.financialImpact}</span>
           </div>
         </div>
         <div className="flex items-center gap-2 text-xs font-medium text-violet-400 group-hover:text-violet-300 transition-colors">
