@@ -14,7 +14,7 @@ import { supabase } from "@/lib/supabase"
 import React from "react"
 
 const COUNTRIES = ["India", "United States", "United Kingdom", "Canada", "Australia", "Germany", "France", "Japan", "Other"]
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3001"
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "https://voicekhata-tif3.onrender.com/api"
 
 interface FinancialPanelProps {
   form: ProfileForm

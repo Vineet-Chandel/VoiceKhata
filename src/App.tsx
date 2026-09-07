@@ -9,7 +9,7 @@ import VerifyEmail from "@/components/ui/SignUp/verifyEmail";
 import { LoginPage } from "@/components/ui/SignUp/Login-page";
 import SettingsPage from "@/components/Pages/Settings";
 import DashboardHome from "@/components/Pages/DashboardHome";
-import { MoneyGrowthCenterPage } from "@/components/Pages/MoneyGrowthCenterPage";
+import BusinessGrowthHubPage from "@/components/Pages/BusinessGrowthHubPage";
 import TransactionsPage from "@/components/Pages/TransactionsPage";
 import BudgetPage from "@/components/Pages/BudgetPage";
 import ReportsPage from "@/components/Pages/ReportsPage";
@@ -71,7 +71,7 @@ export default function App() {
               }
             >
               <Route index               element={<DashboardHome />}     />
-              <Route path="growth"       element={<MoneyGrowthCenterPage />} />
+              <Route path="growth"       element={<BusinessGrowthHubPage />} />
               <Route path="transactions" element={<TransactionsPage />}  />
               <Route path="budget"       element={<BudgetPage />}        />
               <Route path="reports"      element={<ReportsPage />}       />
