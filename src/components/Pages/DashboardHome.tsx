@@ -11,6 +11,7 @@ import { useAuth } from "@/components/hooks/use-auth"
 import { createFinancialMetrics, type FinancialMetrics } from "@/lib/financial-metrics"
 import { getScopedSupabase, supabase } from "@/lib/supabase"
 import { Link } from "react-router-dom"
+import { Sparkles, ArrowRight } from "lucide-react"
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -231,6 +232,33 @@ export default function DashboardHome() {
   return (
     <div className="@container/main flex flex-1 flex-col gap-2">
       <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
+
+        {/* Money Growth Engine Spotlight Card */}
+        <div className="px-4 lg:px-6">
+          <Link
+            to="/dashboard/growth"
+            className="group relative overflow-hidden rounded-2xl border border-violet-500/30 bg-gradient-to-r from-violet-500/10 via-emerald-500/5 to-surface-secondary/40 p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 hover:border-violet-500/50 transition-all shadow-sm"
+          >
+            <div className="flex items-center gap-3.5">
+              <div className="size-10 rounded-xl bg-violet-500/20 border border-violet-500/30 flex items-center justify-center shrink-0">
+                <Sparkles className="text-violet-400" size={20} />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <h3 className="text-sm font-semibold text-text-primary">AI Money Growth Center</h3>
+                  <span className="text-[10px] font-semibold uppercase tracking-wider bg-violet-500/20 text-violet-300 px-2 py-0.5 rounded-full">New Engine</span>
+                </div>
+                <p className="text-xs text-text-muted mt-0.5">
+                  View your Financial Digital Twin, Next Best Move, Rupee Router, and What-If Simulator.
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-1.5 text-xs font-semibold text-violet-400 group-hover:text-violet-300 transition-colors shrink-0">
+              <span>Launch Growth Center</span>
+              <ArrowRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
+            </div>
+          </Link>
+        </div>
 
         <SectionCards
           income={metrics.totalIncome}

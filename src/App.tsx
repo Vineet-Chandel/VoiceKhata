@@ -70,8 +70,8 @@ export default function App() {
                 </ProtectedRoute>
               }
             >
-              <Route index               element={<MoneyGrowthCenterPage />} />
-              <Route path="classic"      element={<DashboardHome />}     />
+              <Route index               element={<DashboardHome />}     />
+              <Route path="growth"       element={<MoneyGrowthCenterPage />} />
               <Route path="transactions" element={<TransactionsPage />}  />
               <Route path="budget"       element={<BudgetPage />}        />
               <Route path="reports"      element={<ReportsPage />}       />

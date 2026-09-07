@@ -20,7 +20,7 @@ export function MoneyGrowthCenterPage() {
     refresh()
   }, [])
 
-  if (loading && !data) {
+  if (!data && loading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
         <div className="relative">
@@ -31,21 +31,6 @@ export function MoneyGrowthCenterPage() {
         <p className="text-text-muted text-sm text-center max-w-sm">
           Detecting money leaks, evaluating opportunity costs, and calculating your next best move.
         </p>
-      </div>
-    )
-  }
-
-  if (error) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
-        <div className="text-rose-500 bg-rose-500/10 p-4 rounded-full">
-          <Zap size={32} />
-        </div>
-        <h2 className="text-xl font-semibold text-text-primary">Intelligence Error</h2>
-        <p className="text-text-muted text-sm text-center max-w-sm">{error}</p>
-        <button onClick={refresh} className="mt-4 px-6 py-2 bg-surface-elevated border border-border hover:bg-surface-secondary rounded-xl font-medium">
-          Try Again
-        </button>
       </div>
     )
   }

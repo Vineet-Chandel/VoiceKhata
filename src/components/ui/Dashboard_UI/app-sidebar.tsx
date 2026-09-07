@@ -2,7 +2,7 @@
 import * as React from "react"
 import {
   IconChartPie, IconDashboard, IconWallet,
-  IconReport, IconSettings, IconRobot, IconRepeat, IconPigMoney, IconBell
+  IconReport, IconSettings, IconRobot, IconRepeat, IconPigMoney, IconBell, IconFlame
 } from "@tabler/icons-react"
 import { Link } from "react-router-dom"
 import { NavMain } from "@/components/ui/Dashboard_UI/nav-main"
@@ -83,6 +83,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     },
     navMain: [
       { title: "Dashboard", url: "/dashboard", icon: IconDashboard },
+      { title: "Money Growth", url: "/dashboard/growth", icon: IconFlame },
       { title: "Transaction", url: "/dashboard/transactions", icon: IconWallet },
       { title: "Budget", url: "/dashboard/budget", icon: IconChartPie },
       { title: "Reports", url: "/dashboard/reports", icon: IconReport },
