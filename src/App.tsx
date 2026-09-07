@@ -8,8 +8,9 @@ import ProtectedRoute from "@/routes/ProtectedRoute";
 import VerifyEmail from "@/components/ui/SignUp/verifyEmail";
 import { LoginPage } from "@/components/ui/SignUp/Login-page";
 import SettingsPage from "@/components/Pages/Settings";
-import DashboardHome from "@/components/Pages/DashboardHome";
-import TransactionsPage from "@/components/Pages/TransactionsPage";
+import { DashboardHome } from "@/components/Pages/DashboardHome"
+import { MoneyGrowthCenterPage } from "@/components/Pages/MoneyGrowthCenterPage"
+import { TransactionsPage } from "@/components/Pages/TransactionsPage";
 import BudgetPage from "@/components/Pages/BudgetPage";
 import ReportsPage from "@/components/Pages/ReportsPage";
 import AIAssistantPage from "@/components/Pages/AIAssistantPage";
@@ -69,7 +70,8 @@ export default function App() {
                 </ProtectedRoute>
               }
             >
-              <Route index               element={<DashboardHome />}     />
+              <Route index               element={<MoneyGrowthCenterPage />} />
+              <Route path="classic"      element={<DashboardHome />}     />
               <Route path="transactions" element={<TransactionsPage />}  />
               <Route path="budget"       element={<BudgetPage />}        />
               <Route path="reports"      element={<ReportsPage />}       />
