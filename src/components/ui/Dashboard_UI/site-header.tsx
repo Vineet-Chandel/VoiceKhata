@@ -21,8 +21,6 @@ export function SiteHeader() {
     "/dashboard/transactions":  "Transaction",
     "/dashboard/budget":       "Budget",
     "/dashboard/reports":      "Reports",
-    "/dashboard/finvault":     "FinVault",
-    "/dashboard/autopay":      "AutoFlow",
     "/dashboard/ai-assistant": "AI Assistant",
     "/dashboard/notifications":"Notifications",
   }

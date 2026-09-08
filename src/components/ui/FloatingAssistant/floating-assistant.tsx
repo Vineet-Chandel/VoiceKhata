@@ -596,7 +596,7 @@ export function FloatingAssistant() {
               <button
                 key={text}
                 onClick={(e) => { e.stopPropagation(); handleSuggestionClick(text) }}
-                className="suggest-enter pointer-events-auto px-3 py-1.5 rounded-full text-[11px] bg-white/[0.06] text-black/50 border border-black/[0.08] hover:bg-black/[0.04] hover:text-black/70 hover:border-black/[0.15] transition-all duration-150 cursor-pointer backdrop-blur-sm active:scale-95 shadow-sm"
+                className="suggest-enter pointer-events-auto px-3 py-1.5 rounded-full text-[11px] bg-white text-black/70 border border-black/10 hover:bg-black/5 hover:text-black/90 transition-all duration-150 cursor-pointer shadow-sm active:scale-95"
               >
                 {text}
               </button>

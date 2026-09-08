@@ -16,8 +16,6 @@ import ReportsPage from "@/components/Pages/ReportsPage";
 import AIAssistantPage from "@/components/Pages/AIAssistantPage";
 import Features from "@/components/ui/Footer_pages/features";
 import { ChatStoreProvider } from "@/components/hooks/use-chat-store"
-import RecurringPage from "@/components/Pages/RecurringPage"
-import SavingsPage from "@/components/Pages/SavingsPage";
 import { NotificationsPage } from "@/components/Pages/NotificationsPage";
 import { ComingSoon } from "@/components/ui/Page_Not_Found/coming_soon";
 import FAQsPage from "@/components/ui/Footer_pages/faqs";
@@ -77,8 +75,6 @@ export default function App() {
               <Route path="reports"      element={<ReportsPage />}       />
               <Route path="ai-assistant" element={<AIAssistantPage />}   />
               <Route path="settings"     element={<SettingsPage />}      />
-              <Route path="autopay"      element={<RecurringPage />}     />
-              <Route path="finvault"     element={<SavingsPage />}       />
               <Route path="notifications" element={<NotificationsPage />} />
             </Route>
 

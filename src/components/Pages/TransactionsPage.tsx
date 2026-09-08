@@ -8,6 +8,10 @@ import { TransactionFiltersBar, type TransactionFilters } from "@/components/ui/
 import { AddTransactionDialog } from "@/components/ui/Transaction_UI/add-transaction-dialog"
 import { useTransactions, type Transaction } from "@/components/hooks/use-transactions"
 import { useBudgets } from "@/components/hooks/use-budgets"
+import { useRecurring } from "@/components/hooks/use-recurring"
+import { RecurringOverview } from "@/components/ui/Recurring_UI/recurring-overview"
+import { RecurringTable } from "@/components/ui/Recurring_UI/recurring-table"
+import { AddRecurringDialog } from "@/components/ui/Recurring_UI/add-recurring-dialog"
 
 type TransactionInput = Omit<Transaction, "id" | "firebase_uid" | "created_at">
 type TransactionUpdate = Omit<Transaction, "id" | "firebase_uid" | "created_at">
@@ -18,6 +22,11 @@ export default function TransactionsPage() {
 
   const { budgets, addBudget } = useBudgets()
   const budgetCategories = budgets.map((b) => b.category)
+
+  const {
+    recurring, loading: recurringLoading,
+    addRecurring, updateRecurring, toggleRecurring, deleteRecurring,
+  } = useRecurring(addTransaction)
 
   const navigate = useNavigate()
 
@@ -108,6 +117,37 @@ export default function TransactionsPage() {
             budgetRows={budgets}
           />
         )}
+
+        {/* AutoFlow Section */}
+        <div className="flex flex-col gap-4 pt-6 md:gap-6 md:pt-8 border-t border-border mt-4">
+          <div className="flex items-center justify-between px-4 lg:px-6">
+            <div>
+              <h2 className="text-2xl font-semibold tracking-tight">AutoFlow</h2>
+              <p className="text-sm text-muted-foreground mt-0.5">
+                {recurringLoading
+                  ? "Loading..."
+                  : `${recurring.length} recurring rule${recurring.length !== 1 ? "s" : ""}`}
+              </p>
+            </div>
+            <AddRecurringDialog onAdd={addRecurring} />
+          </div>
+
+          {recurringLoading ? (
+            <div className="flex items-center justify-center py-20 text-muted-foreground text-sm">
+              Loading autopay rules…
+            </div>
+          ) : (
+            <>
+              <RecurringOverview recurring={recurring} />
+              <RecurringTable
+                data={recurring}
+                onToggle={toggleRecurring}
+                onEdit={updateRecurring}
+                onDelete={deleteRecurring}
+              />
+            </>
+          )}
+        </div>
       </div>
     </div>
   )
