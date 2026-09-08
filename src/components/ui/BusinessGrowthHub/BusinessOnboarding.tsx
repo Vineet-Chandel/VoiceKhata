@@ -19,6 +19,7 @@ export function BusinessOnboarding({ onComplete }: { onComplete: () => void }) {
     try {
       await BusinessProfileService.upsertProfile({
         ...profile,
+        business_name: profile.business_name || profile.business_type || "My Business",
         firebase_uid: user.uid,
       });
       toast.success("Business profile saved!");
@@ -39,15 +40,37 @@ export function BusinessOnboarding({ onComplete }: { onComplete: () => void }) {
           <label className="block text-sm font-medium text-text-secondary">What kind of business do you run?</label>
           <input
             type="text"
-            placeholder="e.g. Grocery Store, Clothing Shop, Freelancer"
-            className="w-full bg-background border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-violet-500"
+            placeholder="Type your business type or select below..."
+            className="w-full bg-background border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-violet-500 transition-all"
             value={profile.business_type || ""}
             onChange={(e) => setProfile({ ...profile, business_type: e.target.value })}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && profile.business_type?.trim()) {
+                e.preventDefault();
+                handleNext();
+              }
+            }}
           />
+          <div className="flex flex-wrap gap-2 pt-1">
+            {["Grocery Store", "Clothing Shop", "Freelancer", "Cafe / Food", "Services", "Wholesale"].map((cat) => (
+              <button
+                key={cat}
+                type="button"
+                onClick={() => setProfile({ ...profile, business_type: cat })}
+                className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
+                  profile.business_type === cat
+                    ? "bg-violet-600/30 border-violet-500 text-violet-200 font-medium shadow-sm"
+                    : "bg-white/5 border-white/10 text-text-secondary hover:border-white/20 hover:text-white"
+                }`}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
           <button
             onClick={handleNext}
-            disabled={!profile.business_type}
-            className="w-full flex items-center justify-center gap-2 bg-violet-600 hover:bg-violet-700 disabled:opacity-50 text-white rounded-xl py-3 font-medium transition-all"
+            disabled={!profile.business_type?.trim()}
+            className="w-full flex items-center justify-center gap-2 bg-violet-600 hover:bg-violet-700 disabled:opacity-40 disabled:cursor-not-allowed text-white rounded-xl py-3 font-medium transition-all shadow-md"
           >
             Next <ArrowRight size={18} />
           </button>
