@@ -9,6 +9,8 @@ import {
 } from "lucide-react"
 import { IconPlus } from "@tabler/icons-react"
 import { cn } from "@/lib/utils"
+import { useAppMode } from "@/context/AppModeContext"
+import { getCategories } from "@/lib/categories"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -32,10 +34,7 @@ import { isBudgetValidForTransaction } from "@/lib/budget-utils"
 
 type TransactionInput = Omit<Transaction, "id" | "firebase_uid" | "created_at">
 
-const BASE_CATEGORIES = [
-  "Income", "Subscription", "Food", "Shopping",
-  "Utilities", "Transport", "Health", "Entertainment", "Other",
-]
+
 const METHODS = [
   "Bank Transfer", "Credit Card", "Debit Card", "UPI", "Cash", "Net Banking",
 ]
@@ -65,6 +64,8 @@ export function AddTransactionDialog({
   onAddBudget,
   onNavigateToAI,
 }: Props) {
+  const { appMode } = useAppMode()
+  const BASE_CATEGORIES = getCategories(appMode)
   const [open, setOpen] = React.useState(false)
   const [form, setForm] = React.useState(emptyForm)
   const [errors, setErrors] = React.useState<Record<string, string>>({})

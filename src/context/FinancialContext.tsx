@@ -9,6 +9,7 @@ import {
 } from "react"
 import { supabase } from "@/lib/supabase"
 import { useAuth } from "@/context/AuthContext"
+import { useAppMode } from "@/context/AppModeContext"
 import {
   computeBudgetSpent,
   isBudgetActiveForMonth,
@@ -25,6 +26,7 @@ import type {
 
 type FinancialContextValue = {
   transactions: Transaction[]
+  allTransactions: Transaction[]
   transactionsLoading: boolean
   transactionsError: string | null
   addTransaction: (t: TransactionInput) => Promise<{ error?: string; data?: Transaction } | undefined>
@@ -33,6 +35,7 @@ type FinancialContextValue = {
   refetchTransactions: (options?: { silent?: boolean }) => Promise<void>
 
   budgets: Budget[]
+  allBudgets: Budget[]
   budgetsLoading: boolean
   budgetsError: string | null
   addBudget: (input: BudgetInput) => Promise<{ error?: string; data?: Budget } | undefined>
@@ -217,8 +220,9 @@ async function createTransactionNotification(
 
 export function FinancialProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth()
+  const { appMode } = useAppMode()
 
-  const [transactions, setTransactions] = useState<Transaction[]>([])
+  const [allTransactions, setAllTransactions] = useState<Transaction[]>([])
   const [transactionsLoading, setTransactionsLoading] = useState(true)
   const [transactionsError, setTransactionsError] = useState<string | null>(null)
 
@@ -262,7 +266,7 @@ export function FinancialProvider({ children }: { children: ReactNode }) {
           .order("date", { ascending: false })
 
         if (error) throw error
-        setTransactions((data as Transaction[]) ?? [])
+        setAllTransactions((data as Transaction[]) ?? [])
       } catch (err: any) {
         if (!options?.silent) {
           setTransactionsError(err.message || "Failed to load transactions")
@@ -350,7 +354,7 @@ export function FinancialProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (!user) {
-      setTransactions([])
+      setAllTransactions([])
       setAllBudgetRows([])
       setTotalCapByMonth({})
       setTransactionsLoading(false)
@@ -361,8 +365,17 @@ export function FinancialProvider({ children }: { children: ReactNode }) {
     void Promise.all([refetchTransactions(), refetchBudgets(), refetchMonthCap()])
   }, [user, refetchTransactions, refetchBudgets, refetchMonthCap])
 
+  const transactions = useMemo(() => {
+    if (appMode === "COMBO") return allTransactions
+    return allTransactions.filter(t => (t.app_mode || "BUSINESS") === appMode)
+  }, [allTransactions, appMode])
+
   const budgets = useMemo(() => {
-    const activeRows = allBudgetRows.filter((budget) =>
+    const modeRows = appMode === "COMBO" 
+      ? allBudgetRows 
+      : allBudgetRows.filter(b => (b.app_mode || "BUSINESS") === appMode)
+
+    const activeRows = modeRows.filter((budget) =>
       isBudgetActiveForMonth(budget, selectedMonth)
     )
 
@@ -381,7 +394,28 @@ export function FinancialProvider({ children }: { children: ReactNode }) {
       ...budget,
       spent: spentByBudgetId.get(budget.id) ?? 0,
     }))
-  }, [allBudgetRows, transactions, selectedMonth])
+  }, [allBudgetRows, transactions, selectedMonth, appMode])
+
+  const allBudgets = useMemo(() => {
+    // For AI Context: active budgets across all modes
+    const activeRows = allBudgetRows.filter((budget) =>
+      isBudgetActiveForMonth(budget, selectedMonth)
+    )
+    const dedupedByModeAndCategory = new Map<string, Budget>()
+    for (const row of activeRows) {
+      const key = `${row.app_mode}-${row.category}`
+      const existing = dedupedByModeAndCategory.get(key)
+      if (!existing || row.month >= existing.month) {
+        dedupedByModeAndCategory.set(key, row)
+      }
+    }
+    const visibleAll = Array.from(dedupedByModeAndCategory.values())
+    const spentByBudgetId = computeBudgetSpent(visibleAll, allTransactions, selectedMonth)
+    return visibleAll.map((budget) => ({
+      ...budget,
+      spent: spentByBudgetId.get(budget.id) ?? 0,
+    }))
+  }, [allBudgetRows, allTransactions, selectedMonth])
 
   const totalCap = totalCapByMonth[selectedMonth] ?? null
 
@@ -427,47 +461,48 @@ export function FinancialProvider({ children }: { children: ReactNode }) {
       window.removeEventListener("focus", handleFocus)
       clearInterval(interval)
     }
-  }, [user?.uid, refetchTransactions, refetchBudgets, refetchMonthCap])
+  }, [user?.uid, refetchTransactions, refetchBudgets, refetchMonthCap, appMode])
 
   const addTransaction = useCallback(
     async (t: TransactionInput) => {
       if (!user?.uid) return { error: "Please log in to add transactions." }
-
       try {
+        const payload = {
+          ...t,
+          firebase_uid: user.uid,
+          app_mode: t.app_mode || (appMode === "COMBO" ? "BUSINESS" : appMode),
+          transaction: t.transaction.trim(),
+          category: t.category.trim(),
+          amount: Number(t.amount),
+          date: t.date.trim(),
+          type: t.type === "Credit" ? "Credit" : "Debit",
+          method: (t.method || "UPI").trim(),
+          status: (t.status || "Completed").trim(),
+        }
+        
         const { data, error } = await supabase
           .from("transactions")
-          .insert([
-            {
-              firebase_uid: user.uid,
-              transaction: t.transaction.trim(),
-              category: t.category.trim(),
-              amount: Number(t.amount),
-              date: t.date.trim(),
-              type: t.type === "Credit" ? "Credit" : "Debit",
-              method: (t.method || "UPI").trim(),
-              status: (t.status || "Completed").trim(),
-            },
-          ])
+          .insert(payload)
           .select()
           .single()
 
         if (error) throw error
 
-        const created = data as Transaction
-        setTransactions((prev) => {
-          const exists = prev.some((row) => row.id === created.id)
-          return exists ? prev : [created, ...prev]
+        const newTx = data as Transaction
+        setAllTransactions((prev) => {
+          const exists = prev.some((row) => row.id === newTx.id)
+          return exists ? prev : [newTx, ...prev]
         })
-
-        void createTransactionNotification(user.uid, created).catch(() => undefined)
-        return { data: created }
+        void createTransactionNotification(user.uid, newTx).catch(() => undefined)
+        return { data: newTx }
       } catch (err: any) {
+        console.error("addTransaction error:", err)
         const message = err.message || "Failed to add transaction"
         setTransactionsError(message)
         return { error: message }
       }
     },
-    [user?.uid]
+    [user?.uid, appMode]
   )
 
   const updateTransaction = useCallback(
@@ -486,7 +521,7 @@ export function FinancialProvider({ children }: { children: ReactNode }) {
         if (error) throw error
 
         const updated = data as Transaction
-        setTransactions((prev) =>
+        setAllTransactions((prev) =>
           prev.map((row) => (row.id === id ? { ...row, ...updated } : row))
         )
 
@@ -513,7 +548,7 @@ export function FinancialProvider({ children }: { children: ReactNode }) {
 
         if (error) throw error
 
-        setTransactions((prev) => prev.filter((row) => row.id !== id))
+        setAllTransactions((prev) => prev.filter((row) => row.id !== id))
       } catch (err: any) {
         setTransactionsError(err.message || "Failed to delete transaction")
       }
@@ -528,16 +563,22 @@ export function FinancialProvider({ children }: { children: ReactNode }) {
       const normalizedDuration = normalizeBudgetDuration(input.duration)
 
       try {
+        const payload = {
+          ...input,
+          firebase_uid: user.uid,
+          app_mode: input.app_mode || (appMode === "COMBO" ? "BUSINESS" : appMode),
+        }
         const { data, error } = await supabase
           .from("budgets")
           .upsert(
             [
               {
                 firebase_uid: user.uid,
-                category: input.category.trim(),
-                amount: Number(input.amount),
+                category: payload.category.trim(),
+                amount: Number(payload.amount),
                 month: selectedMonth,
                 duration: normalizedDuration,
+                app_mode: payload.app_mode,
               },
             ],
             { onConflict: "firebase_uid,category,month" }
@@ -569,7 +610,7 @@ export function FinancialProvider({ children }: { children: ReactNode }) {
         return { error: message }
       }
     },
-    [user?.uid, selectedMonth]
+    [user?.uid, selectedMonth, appMode]
   )
 
   const updateBudget = useCallback(
@@ -667,6 +708,7 @@ export function FinancialProvider({ children }: { children: ReactNode }) {
   const value = useMemo<FinancialContextValue>(
     () => ({
       transactions,
+      allTransactions,
       transactionsLoading,
       transactionsError,
       addTransaction,
@@ -675,6 +717,7 @@ export function FinancialProvider({ children }: { children: ReactNode }) {
       refetchTransactions,
 
       budgets,
+      allBudgets,
       budgetsLoading,
       budgetsError,
       addBudget,
@@ -689,6 +732,7 @@ export function FinancialProvider({ children }: { children: ReactNode }) {
     }),
     [
       transactions,
+      allTransactions,
       transactionsLoading,
       transactionsError,
       addTransaction,
@@ -696,6 +740,7 @@ export function FinancialProvider({ children }: { children: ReactNode }) {
       deleteTransaction,
       refetchTransactions,
       budgets,
+      allBudgets,
       budgetsLoading,
       budgetsError,
       addBudget,

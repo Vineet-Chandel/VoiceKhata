@@ -6,6 +6,7 @@ export type { Budget, BudgetInput, BudgetUpdateInput }
 export function useBudgets() {
   const {
     budgets,
+    allBudgets,
     budgetsLoading,
     budgetsError,
     addBudget,
@@ -20,6 +21,7 @@ export function useBudgets() {
 
   return {
     budgets,
+    allBudgets,
     loading: budgetsLoading,
     error: budgetsError,
     addBudget: (input: BudgetInput) => addBudget(input),

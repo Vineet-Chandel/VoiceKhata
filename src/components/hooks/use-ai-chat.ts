@@ -43,9 +43,9 @@ type TransactionDraft = {
   method: string
   status: string
   merchantRawInput?: string
-  merchantType?: string
   merchantTags?: string[]
   merchantConfidence?: number
+  app_mode?: "BUSINESS" | "PERSONAL"
 }
 
 export type GuidedStep = "idle" | "name" | "amount" | "category" | "type" | "method" | "confirm" | "done"
@@ -61,6 +61,7 @@ type BulkState = {
 type LookupResolveState = {
   query: string
   candidateNames: string[]
+  isNotFoundAddPrompt?: boolean
 }
 
 type LookupResolution =
@@ -376,6 +377,7 @@ function cleanLookupQuery(raw: string): string {
     .replace(/^(?:with|for|of|about|on)\s+/i, "")
     .replace(/^(?:name\s+)?(?:similar\s+to|same\s+as|like)\s+/i, "")
     .replace(/^name(?:d)?\s+/i, "")
+    .replace(/\b(?:transactions?|txns?)\s+(?:of|for|with|about)\b/gi, "")
     .replace(/\b(?:transaction|transactions|txn|txns)\b/gi, " ")
     .replace(/\s+/g, " ")
     .trim()
@@ -393,6 +395,7 @@ function extractLookupQuery(input: string): string | null {
     /(?:did|do|have)\s+i\s+(?:do|did|make|made|have|done)?\s*(?:any\s*)?(?:transactions?|txns?)\s+(?:with|for|of|named|name|about|on)\s+(.+)$/i,
     /(?:anyone|any\s+one|any\s+person|whom).*(?:any\s*)?(?:transactions?|txns?).*(?:with|for|named|name)\s+(.+)$/i,
     /(?:transactions?|txns?)\s+(?:with|for|of|named|name|about|on)\s+(.+)$/i,
+    /(?:transactions?|txns?)\s+(?:of|for|with|about)\s+(?:rs\.?|inr|₹|rupees?)?\s*(\d[\d,.]*)/i,
     /(?:show|list|give|find|get|search)(?:\s+me)?\s+(.+?)\s+(?:transactions?|txns?)$/i,
     /(?:expense|payment|bill)\s+(?:with|for|of|named|name|about|on)\s+(.+)$/i,
     /(?:transactions?|txns?).*?(?:similar\s+to|like)\s+(.+)$/i,
@@ -1362,22 +1365,36 @@ export function useAIChat({
     await rememberMerchant(user?.uid, payload).catch(() => undefined)
   }
 
-  const startGuidedFlow = (seedAmount?: number) => {
+  const startGuidedFlow = (seedAmount?: number, seedName?: string) => {
     if (loading) return
     const activeLanguage = languageMode ?? "english"
     setBudgetDraft(null)
     setBudgetStep("idle")
-    setPendingDraft(seedAmount ? { amount: seedAmount } : {})
+    
+    const initialDraft: Partial<TransactionDraft> = {}
+    if (seedAmount) initialDraft.amount = seedAmount
+    if (seedName) initialDraft.transaction = seedName
+    setPendingDraft(initialDraft)
+    
     setGuidedStep("name")
     setAssistantMode("expense_logging")
     
     const englishMsg = seedAmount 
       ? `Sure. Let's log a transaction of Rs.${seedAmount.toLocaleString("en-IN")}.\n\nWhat did you spend on, or what did you receive?`
-      : "Sure. Let's log a transaction.\n\nWhat did you spend on, or what did you receive?"
+      : seedName
+        ? `Sure. Let's log a transaction for "${seedName}".\n\nHow much was it?`
+        : "Sure. Let's log a transaction.\n\nWhat did you spend on, or what did you receive?"
       
     const hinglishMsg = seedAmount
       ? `Sure. Rs.${seedAmount.toLocaleString("en-IN")} ka transaction log karte hain.\n\nKis cheez par spend kiya tha, ya kya receive hua?`
-      : "Sure. Chalo transaction log karte hain.\n\nKis cheez par spend kiya tha, ya kya receive hua?"
+      : seedName
+        ? `Sure. "${seedName}" ke liye transaction log karte hain.\n\nKitne ka tha?`
+        : "Sure. Chalo transaction log karte hain.\n\nKis cheez par spend kiya tha, ya kya receive hua?"
+
+    // If we seeded the name, we skip the name question and go to amount.
+    if (seedName) {
+      setGuidedStep("amount")
+    }
 
     addMessage({
       role: "assistant",
@@ -2079,10 +2096,10 @@ export function useAIChat({
               type,
               date,
               status: "Completed",
-              merchantRawInput: merchantInput,
               merchantType: merchant.merchantType,
               merchantTags: merchant.tags,
               merchantConfidence: merchant.confidence,
+              app_mode: aiResult.app_mode,
               ...(amount !== undefined ? { amount } : {}),
               ...(method ? { method } : {}),
             }
@@ -2262,6 +2279,7 @@ export function useAIChat({
                 type: draft.type,
                 method: safeMethod(draft.method),
                 status: "Completed",
+                app_mode: draft.app_mode as any,
               })
 
               if (!result?.error) {
@@ -2422,9 +2440,28 @@ export function useAIChat({
       }
 
       if (lookupState) {
+        if (lookupState.isNotFoundAddPrompt && /\b(add|yes|yeah|yep|sure|ok)\b/i.test(content)) {
+          setLookupState(null)
+          const seedAmount = Number(lookupState.query.replace(/,/g, ""))
+          if (!Number.isNaN(seedAmount) && seedAmount > 0) {
+             startGuidedFlow(seedAmount)
+          } else {
+             startGuidedFlow(undefined, lookupState.query)
+          }
+          setLoading(false)
+          return
+        }
+
         const selectedNames = resolveLookupSelection(content, lookupState)
         if (selectedNames.length === 0) {
-          addMessage({ role: "assistant", content: 'Please reply with number(s) or say "all these".' })
+          if (lookupState.isNotFoundAddPrompt && /\b(no|nope|cancel)\b/i.test(content)) {
+             setLookupState(null)
+             addMessage({ role: "assistant", content: "Okay. Anything else I can help with?" })
+             setLoading(false)
+             return
+          }
+
+          addMessage({ role: "assistant", content: lookupState.isNotFoundAddPrompt ? 'Please reply with "add" to log it, or say "no" to cancel.' : 'Please reply with number(s) or say "all these".' })
           setLoading(false)
           return
         }
@@ -2463,12 +2500,11 @@ export function useAIChat({
             content: buildLookupDisambiguationMessage(lookup.query, lookup.candidateNames, transactions),
           })
         } else {
-          if (lookup.suggestions.length > 0) {
-            setLookupState({ query: lookup.query, candidateNames: lookup.suggestions })
-          }
+          setLookupState({ query: lookup.query, candidateNames: lookup.suggestions, isNotFoundAddPrompt: true })
+          const notFoundMsg = buildLookupNotFoundMessage(lookup.query, lookup.suggestions)
           addMessage({
             role: "assistant",
-            content: buildLookupNotFoundMessage(lookup.query, lookup.suggestions),
+            content: `${notFoundMsg}\n\nDo you want to add this transaction, or do you want anything else? (Reply "add" or "no")`,
           })
         }
         setLoading(false)

@@ -8,6 +8,7 @@ export type Transaction = {
   type: string
   method: string
   status: string
+  app_mode?: "BUSINESS" | "PERSONAL"
   created_at?: string
 }
 

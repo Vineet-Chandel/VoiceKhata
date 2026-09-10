@@ -10,6 +10,7 @@ export type { Transaction, TransactionInput, TransactionUpdateInput }
 export function useTransactions() {
   const {
     transactions,
+    allTransactions,
     transactionsLoading,
     transactionsError,
     addTransaction,
@@ -20,6 +21,7 @@ export function useTransactions() {
 
   return {
     transactions,
+    allTransactions,
     loading: transactionsLoading,
     error: transactionsError,
     addTransaction: (t: TransactionInput) => addTransaction(t),

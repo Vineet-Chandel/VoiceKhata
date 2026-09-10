@@ -12,6 +12,7 @@ export type AITransactionResult = {
   reasoning: string
   merchant_type?: string
   tags?: string[]
+  app_mode?: "BUSINESS" | "PERSONAL"
 }
 
 const GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
@@ -30,7 +31,8 @@ Return ONLY valid JSON with this shape:
   "confidence": 0.92,
   "reasoning": "short reason",
   "merchant_type": "saas | streaming | ecommerce | utility | food | transfer | salary | other",
-  "tags": ["subscription", "ai-tool"]
+  "tags": ["subscription", "ai-tool"],
+  "app_mode": "BUSINESS"
 }
 
 Rules:
@@ -43,6 +45,7 @@ Rules:
 - date must be yyyy-MM-dd if present.
 - category must be one of: Food, Shopping, Transport, Utilities, Health, Entertainment, Subscription, Income, Other.
 - method must be one of: Cash, UPI, Bank Transfer, Credit Card, Debit Card, Net Banking, or null.
+- app_mode must be "BUSINESS" or "PERSONAL". If the user mentions "personal" or the context is clearly personal, use "PERSONAL". Otherwise default to "BUSINESS".
 - confidence must be between 0 and 1.
 - reasoning must be short and factual.
 - Never output markdown.`
@@ -163,6 +166,7 @@ export function useAITransaction() {
         reasoning: typeof parsed.reasoning === "string" ? parsed.reasoning : "",
         merchant_type: typeof parsed.merchant_type === "string" ? parsed.merchant_type.trim() : undefined,
         tags: Array.isArray(parsed.tags) ? parsed.tags.filter((tag: unknown) => typeof tag === "string") : undefined,
+        app_mode: parsed.app_mode === "PERSONAL" ? "PERSONAL" : "BUSINESS",
       }
     } catch (err) {
       console.error("[useAITransaction] Fetch error:", err)

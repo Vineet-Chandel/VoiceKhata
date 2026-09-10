@@ -228,6 +228,10 @@ export function DataTable({
   const [data, setData] = React.useState(() =>
     limit ? initialData.slice(0, limit) : initialData
   )
+
+  React.useEffect(() => {
+    setData(limit ? initialData.slice(0, limit) : initialData)
+  }, [initialData, limit])
   const [rowSelection, setRowSelection] = React.useState({})
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({})

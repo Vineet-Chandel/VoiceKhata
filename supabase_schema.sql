@@ -33,8 +33,12 @@ create table if not exists public.transactions (
   type         text not null,
   method       text default 'UPI',
   status       text default 'Completed',
+  app_mode     text default 'BUSINESS',
   created_at   timestamptz default now()
 );
+
+-- Ensure app_mode exists on existing tables
+ALTER TABLE public.transactions ADD COLUMN IF NOT EXISTS app_mode text DEFAULT 'BUSINESS';
 
 -- 4. Budgets Table
 create table if not exists public.budgets (
@@ -45,9 +49,13 @@ create table if not exists public.budgets (
   spent        numeric default 0,
   month        text not null,
   duration     text default 'Monthly',
+  app_mode     text default 'BUSINESS',
   created_at   timestamptz default now(),
-  unique(firebase_uid, category, month)
+  unique(firebase_uid, category, month, app_mode)
 );
+
+-- Ensure app_mode exists on existing tables
+ALTER TABLE public.budgets ADD COLUMN IF NOT EXISTS app_mode text DEFAULT 'BUSINESS';
 
 -- 5. Savings Goals Table
 create table if not exists public.savings_goals (

@@ -17,8 +17,8 @@ import { ChatHistoryModal } from "@/components/ui/AIAssistant_UI/chat-history-mo
 import type { Message } from "@/components/hooks/use-ai-chat"
 
 export default function AIAssistantPage() {
-  const { transactions, addTransaction } = useTransactions()
-  const { budgets, addBudget } = useBudgets()
+  const { allTransactions, addTransaction } = useTransactions()
+  const { allBudgets, addBudget } = useBudgets()
   const { user } = useAuth()
   const location = useLocation()
   // Ref guard so the seed fires exactly once even in React StrictMode double-invoke
@@ -40,8 +40,8 @@ export default function AIAssistantPage() {
   const isCreatingChatRef = useRef(false)
 
   const { loading, sendMessage, clearChat, startGuidedFlow, startBudgetFlow, cancelGuidedFlow, confirmMultiTransactions, cancelMultiTransactions } = useAIChat({
-    transactions,
-    budgets,
+    transactions: allTransactions,
+    budgets: allBudgets,
     onAddTransaction: addTransaction,
     onAddBudget: addBudget,
     messages,

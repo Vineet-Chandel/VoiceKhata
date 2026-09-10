@@ -14,11 +14,10 @@ import {
   Select, SelectContent, SelectItem, SelectSeparator,
   SelectTrigger, SelectValue,
 } from "@/components/ui/Dashboard_UI/select"
+import { useAppMode } from "@/context/AppModeContext"
+import { getCategories } from "@/lib/categories"
 
-const BASE_CATEGORIES = [
-  "Food", "Shopping", "Transport", "Utilities",
-  "Health", "Entertainment", "Subscription", "Other",
-]
+
 
 const DURATIONS = [
   { value: "monthly",  label: "Monthly"            },
@@ -34,6 +33,8 @@ interface Props {
 }
 
 export function AddBudgetDialog({ onAdd, existingCategories = [] }: Props) {
+  const { appMode } = useAppMode()
+  const BASE_CATEGORIES = getCategories(appMode)
   const [open,       setOpen]       = React.useState(false)
   const [category,   setCategory]   = React.useState("")
   const [customName, setCustomName] = React.useState("")

@@ -3,11 +3,12 @@
 import { useLocation } from "react-router-dom"
 import { Separator } from "@/components/ui/Dashboard_UI/separator"
 import { SidebarTrigger } from "@/components/ui/Dashboard_UI/sidebar"
-import { NotificationBell } from "@/components/ui/Notifications_UI/notification-bell"
+import { HeaderUserNav } from "@/components/ui/Dashboard_UI/header-user-nav"
 import { useAuth } from "@/components/hooks/use-auth"
 import { useChatStore } from "@/components/hooks/use-chat-store"
 import { useNavigate } from "react-router-dom"
 import { History } from "lucide-react"
+import { AppModeToggle } from "@/components/ui/AppModeToggle"
 
 export function SiteHeader() {
   const location = useLocation()
@@ -64,7 +65,8 @@ export function SiteHeader() {
               <Separator orientation="vertical" className="h-4 hidden sm:block mx-1" />
             </>
           )}
-          <NotificationBell firebase_uid={user?.uid ?? ''} />
+          <AppModeToggle />
+          <HeaderUserNav />
         </div>
 
       </div>

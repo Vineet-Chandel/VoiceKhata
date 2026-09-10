@@ -31,6 +31,7 @@ import Brand from "@/components/ui/Footer_pages/brand";
 import Help from "@/components/ui/Footer_pages/help";
 import { AuthProvider } from "@/context/AuthContext";
 import { FinancialProvider } from "@/context/FinancialContext";
+import { AppModeProvider } from "@/context/AppModeContext";
 
 export default function App() {
   return (
@@ -60,11 +61,13 @@ export default function App() {
               path="/dashboard"
               element={
                 <ProtectedRoute>
-                  <FinancialProvider>
-                    <ChatStoreProvider>
-                      <DashboardPage />
-                    </ChatStoreProvider>
-                  </FinancialProvider>
+                  <AppModeProvider>
+                    <FinancialProvider>
+                      <ChatStoreProvider>
+                        <DashboardPage />
+                      </ChatStoreProvider>
+                    </FinancialProvider>
+                  </AppModeProvider>
                 </ProtectedRoute>
               }
             >
