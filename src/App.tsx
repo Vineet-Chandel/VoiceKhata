@@ -1,4 +1,5 @@
 import Landing from "./components/Pages/Landing";
+import SkeletonLanding from "./components/Pages/SkeletonLanding";
 import { AuthPage } from "@/components/ui/SignUp/auth-page";
 import { Particles } from "@/components/ui/background-particles";
 import { Routes, Route } from "react-router-dom";
@@ -52,6 +53,7 @@ export default function App() {
           <Routes>
 
             <Route path="/" element={<Landing />} />
+            <Route path="/skeleton" element={<SkeletonLanding />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<AuthPage />} />
             <Route path="/verify" element={<VerifyEmail />} />

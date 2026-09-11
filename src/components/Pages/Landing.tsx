@@ -12,6 +12,8 @@ import { CircularTestimonialsDemo } from "@/components/ui/Testimonials/testomoni
 import GetStarted from "@/components/ui/Get Started/getstarted";
 import { FaqsSection } from "@/components/ui/FAQS/faqs";
 
+import { FloatingVoiceBadgesPhysics } from "@/components/ui/Hero/FloatingVoiceBadgesPhysics";
+
 export default function Page() {
   const [authChecked, setAuthChecked] = useState(false)
   const [isLoggedIn,  setIsLoggedIn]  = useState(false)
@@ -36,6 +38,12 @@ export default function Page() {
         {/* HERO */}
         <section id="home">
           <HeroSection />
+          
+          {/* Interactive Matter.js Floating Voice-Ledger Badges */}
+          <div className="mx-auto max-w-5xl px-4 py-8">
+            <FloatingVoiceBadgesPhysics />
+          </div>
+
           <LogosSection />
         </section>
 
@@ -47,17 +55,22 @@ export default function Page() {
           </div>
         </section>
 
+        {/* TESTIMONIALS */}
+        <section id="testimonials" className="py-4">
+          <CircularTestimonialsDemo />
+        </section>
+
         {/* GET STARTED */}
-        <section id="getstarted" className="py-1">
+        <section id="getstarted" className="py-6">
           <GetStarted />
         </section>
 
-        {/* FAQS — FIX: py-10 → pt-10 pb-4 so footer sits closer */}
+        {/* FAQS */}
         <section id="FAQS" className="pt-8 pb-8">
           <FaqsSection />
         </section>
 
-        {/* ABOUT US — FIX: py-10 → pt-4 so gap between FAQs and footer is tight */}
+        {/* ABOUT US / FOOTER */}
         <section id="about" className="pt-4 pb-10">
           <Footer />
         </section>
