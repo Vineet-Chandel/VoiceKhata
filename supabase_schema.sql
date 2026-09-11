@@ -668,3 +668,62 @@ create policy "Allow all access to business_products" on public.business_product
 create policy "Allow all access to business_receivables" on public.business_receivables for all to anon, authenticated, service_role using (true) with check (true);
 create policy "Allow all access to business_payables" on public.business_payables for all to anon, authenticated, service_role using (true) with check (true);
 create policy "Allow all access to business_recurring_commitments" on public.business_recurring_commitments for all to anon, authenticated, service_role using (true) with check (true);
+
+-- ==============================================================================
+-- 25. Feedbacks & Reviews Tables
+-- ==============================================================================
+
+create table if not exists public.feedbacks (
+  id uuid primary key default gen_random_uuid(),
+  type text not null,
+  rating integer,
+  focus_area text,
+  title text not null,
+  description text not null,
+  name text,
+  email text not null,
+  source text,
+  has_attachment boolean default false,
+  status text default 'open',
+  created_at timestamptz default now()
+);
+
+alter table if exists public.feedbacks enable row level security;
+drop policy if exists "Allow insert for everyone on feedbacks" on public.feedbacks;
+create policy "Allow insert for everyone on feedbacks"
+  on public.feedbacks for insert
+  to anon, authenticated, service_role
+  with check (true);
+
+drop policy if exists "Allow read for authenticated on feedbacks" on public.feedbacks;
+create policy "Allow read for authenticated on feedbacks"
+  on public.feedbacks for select
+  to authenticated, service_role
+  using (true);
+
+create table if not exists public.reviews (
+  id uuid primary key default gen_random_uuid(),
+  rating integer not null,
+  headline text not null,
+  review_text text not null,
+  persona text,
+  city text,
+  favorite_feature text,
+  allow_publish boolean default true,
+  display_name text,
+  email text,
+  created_at timestamptz default now()
+);
+
+alter table if exists public.reviews enable row level security;
+drop policy if exists "Allow insert for everyone on reviews" on public.reviews;
+create policy "Allow insert for everyone on reviews"
+  on public.reviews for insert
+  to anon, authenticated, service_role
+  with check (true);
+
+drop policy if exists "Allow read for everyone on reviews" on public.reviews;
+create policy "Allow read for everyone on reviews"
+  on public.reviews for select
+  to anon, authenticated, service_role
+  using (true);

@@ -12,7 +12,7 @@ import {
   UserCheck
 } from "lucide-react"
 import Logo from "@/components/ui/Navbar/logo"
-
+import { supabase } from "@/lib/supabase"
 const personas = [
   "College Student",
   "Freelancer / Creator",
@@ -79,28 +79,27 @@ export default function ReviewPage() {
     setErrorMsg("")
 
     try {
-      const reviewEntry = {
-        id: "rev_" + Date.now(),
+      const { error } = await supabase.from('reviews').insert([{
         rating,
         headline,
-        reviewText,
-        persona,
-        city,
-        favoriteFeature,
-        allowPublish,
-        displayName: displayName.trim() || "Anonymous User",
-        email,
-        createdAt: new Date().toISOString()
-      }
-      const existing = JSON.parse(localStorage.getItem("voicekhata_reviews") || "[]")
-      existing.unshift(reviewEntry)
-      localStorage.setItem("voicekhata_reviews", JSON.stringify(existing))
+        review_text: reviewText,
+        persona: persona || null,
+        city: city || null,
+        favorite_feature: favoriteFeature || null,
+        allow_publish: allowPublish,
+        display_name: displayName.trim() || "Anonymous User",
+        email: email || null
+      }]);
 
-      await new Promise((r) => setTimeout(r, 900))
+      if (error) {
+        console.error("Supabase review error:", error);
+        throw new Error(error.message);
+      }
+
       setIsSubmitted(true)
       window.scrollTo({ top: 0, behavior: "smooth" })
-    } catch {
-      setErrorMsg("Failed to submit review. Please try again.")
+    } catch (err: any) {
+      setErrorMsg("Failed to submit review. " + (err.message || "Please try again."))
     } finally {
       setIsSubmitting(false)
     }

@@ -18,7 +18,7 @@ import {
   ChevronLeft
 } from "lucide-react"
 import Logo from "@/components/ui/Navbar/logo"
-
+import { supabase } from "@/lib/supabase"
 interface FeedbackType {
   id: string
   label: string
@@ -131,30 +131,27 @@ export default function FeedbackPage() {
     setErrorMsg("")
 
     try {
-      // Store submission in localStorage for persistence
-      const feedbackEntry = {
-        id: "fb_" + Date.now(),
+      const { error } = await supabase.from('feedbacks').insert([{
         type,
-        rating,
-        focusArea,
+        rating: rating || null,
+        focus_area: focusArea || null,
         title,
         description,
-        hasAttachment: !!screenshot,
-        name,
+        name: name.trim() || null,
         email,
-        source,
-        createdAt: new Date().toISOString()
-      }
-      const existing = JSON.parse(localStorage.getItem("voicekhata_feedbacks") || "[]")
-      existing.unshift(feedbackEntry)
-      localStorage.setItem("voicekhata_feedbacks", JSON.stringify(existing))
+        source: source || null,
+        has_attachment: !!screenshot
+      }]);
 
-      // Simulate smooth network dispatch
-      await new Promise((r) => setTimeout(r, 900))
+      if (error) {
+        console.error("Supabase feedback error:", error);
+        throw new Error(error.message);
+      }
+
       setIsSubmitted(true)
       window.scrollTo({ top: 0, behavior: "smooth" })
-    } catch {
-      setErrorMsg("Failed to submit feedback. Please try again.")
+    } catch (err: any) {
+      setErrorMsg("Failed to submit feedback. " + (err.message || "Please try again."))
     } finally {
       setIsSubmitting(false)
     }
