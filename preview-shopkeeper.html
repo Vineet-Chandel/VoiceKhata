@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="hi" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VoiceKhata (Voiceखाता) — बोलो और हिसाब हो गया!</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: '#10b981',
+            dark: '#070709',
+            card: '#0f0f14'
+          }
+        }
+      }
+    }
+  </script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    body {
+      background-color: #070709;
+      color: #ffffff;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      overflow-x: hidden;
+    }
+    .pulse-green {
+      box-shadow: 0 0 35px rgba(16, 185, 129, 0.4);
+    }
+    .pulse-red {
+      box-shadow: 0 0 35px rgba(225, 29, 72, 0.5);
+    }
+  </style>
+</head>
+<body class="min-h-screen pb-20 md:pb-0">
+
+  <!-- Top Trust Banner -->
+  <div class="bg-gradient-to-r from-emerald-950 via-emerald-900/60 to-neutral-950 px-4 py-1.5 text-center text-xs text-emerald-300 font-medium border-b border-emerald-800/30 flex items-center justify-center gap-2">
+    <span>🇮🇳 <strong>100% मेड इन भारत</strong> — 5 लाख+ भारतीय दुकानदारों का भरोसेमंद साथी</span>
+    <span class="hidden md:inline text-emerald-400">• सुरक्षित एवं 100% मुफ़्त</span>
+  </div>
+
+  <!-- Header -->
+  <header class="sticky top-0 z-50 w-full border-b border-emerald-900/20 bg-neutral-950/95 backdrop-blur-md">
+    <div class="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
+      <div class="flex items-center gap-2.5">
+        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-700 shadow-md shadow-emerald-500/30">
+          <i data-lucide="mic" class="w-5 h-5 text-black font-bold"></i>
+        </div>
+        <div class="flex flex-col">
+          <span class="text-xl font-black tracking-tight text-white leading-none">
+            Voice<span class="text-emerald-400">खाता</span>
+          </span>
+          <span class="text-[10px] font-semibold text-emerald-400/90 tracking-wider uppercase mt-0.5">
+            बोलकर हिसाब लिखें
+          </span>
+        </div>
+      </div>
+
+      <nav class="hidden md:flex items-center gap-6 text-sm font-medium text-neutral-300">
+        <a href="#demo" class="hover:text-emerald-400 transition-colors">लाइव बोलकर देखें</a>
+        <a href="#comparison" class="hover:text-emerald-400 transition-colors">फायदे</a>
+        <a href="#dukandar" class="hover:text-emerald-400 transition-colors">किन दुकानों के लिए</a>
+        <a href="#reviews" class="hover:text-emerald-400 transition-colors">समीक्षाएं</a>
+      </nav>
+
+      <div class="flex items-center gap-3">
+        <a href="#demo" class="hidden sm:inline-flex items-center gap-1.5 rounded-full border border-emerald-500/40 bg-emerald-500/10 px-3.5 py-1.5 text-xs font-semibold text-emerald-400">
+          <i data-lucide="mic" class="w-3.5 h-3.5"></i>
+          फ्री डेमो
+        </a>
+        <button class="flex items-center gap-1.5 rounded-full bg-emerald-500 px-4 py-2 text-xs sm:text-sm font-bold text-black shadow-lg shadow-emerald-500/20 hover:bg-emerald-400 transition-all">
+          <span>शुरू करें (फ्री)</span>
+          <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="relative overflow-hidden pt-8 pb-12 sm:pt-12 sm:pb-16">
+    <div class="pointer-events-none absolute inset-0 z-0">
+      <div class="absolute top-0 left-1/2 -translate-x-1/2 h-[450px] w-full max-w-4xl rounded-full bg-emerald-600/15 blur-[120px]"></div>
+    </div>
+
+    <div class="relative z-10 mx-auto max-w-6xl px-4 sm:px-6 text-center">
+      <div class="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-950/60 px-4 py-1.5 text-xs sm:text-sm font-semibold text-emerald-400 backdrop-blur-md mb-6">
+        <span class="flex h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span>भारत का पहला बोलकर हिसाब लिखने वाला खाता ऐप</span>
+      </div>
+
+      <h1 class="text-3xl font-black tracking-tight text-white sm:text-5xl md:text-6xl leading-[1.15]">
+        बोलो और हिसाब हो गया! <br />
+        <span class="bg-gradient-to-r from-emerald-400 via-teal-300 to-emerald-200 bg-clip-text text-transparent">
+          Zero Typing Khata
+        </span>
+      </h1>
+
+      <p class="mt-4 text-sm sm:text-base md:text-lg text-neutral-300 max-w-2xl mx-auto leading-relaxed">
+        किराना, हार्डवेयर, मेडिकल और रिटेल स्टोर के लिए। जब दुकान पर ग्राहकों की भीड़ हो, 
+        तो डायरी में लिखने या टाइप करने का झंझट छोड़ें — <strong>बस बोलें और खाता तुरंत दर्ज हो जाए!</strong>
+      </p>
+
+      <!-- Mobile Number SMS Box -->
+      <div class="mx-auto max-w-md mt-6">
+        <div class="flex flex-col sm:flex-row items-center gap-2 rounded-2xl border border-emerald-500/30 bg-neutral-900/90 p-2 shadow-xl">
+          <div class="flex items-center gap-2 w-full px-3 py-2 text-neutral-400">
+            <span class="text-sm font-bold text-white border-r border-white/20 pr-2">🇮🇳 +91</span>
+            <input
+              id="heroPhone"
+              type="tel"
+              placeholder="अपना मोबाइल नंबर डालें"
+              class="w-full bg-transparent text-sm text-white placeholder-neutral-500 focus:outline-none"
+            />
+          </div>
+          <button
+            onclick="sendLink()"
+            class="w-full sm:w-auto shrink-0 flex items-center justify-center gap-1.5 rounded-xl bg-emerald-500 px-5 py-3 text-xs sm:text-sm font-bold text-black shadow-lg shadow-emerald-500/25 hover:bg-emerald-400 transition-all"
+          >
+            <span>ऐप लिंक पाएं</span>
+            <i data-lucide="send" class="w-3.5 h-3.5"></i>
+          </button>
+        </div>
+        <p id="linkMsg" class="hidden mt-2 text-xs font-semibold text-emerald-400">
+          ✅ लिंक आपके मोबाइल नंबर पर SMS द्वारा भेज दिया गया है!
+        </p>
+        <p class="mt-2 text-[11px] text-neutral-400">
+          ⚡ 100% फ्री • कोई क्रेडिट कार्ड नहीं चाहिए • 1 मिनट में शुरू करें
+        </p>
+      </div>
+
+      <!-- Sample Voice Chips -->
+      <div class="mt-8">
+        <p class="text-xs uppercase tracking-widest text-neutral-400 font-semibold mb-3">
+          दुकानदार ऐसे बोलते हैं और खाता तुरंत लिख जाता है:
+        </p>
+
+        <div class="flex flex-wrap items-center justify-center gap-3">
+          <div class="flex items-center gap-2 rounded-full border border-rose-500/40 bg-rose-950/40 px-4 py-2 text-xs font-semibold text-rose-200">
+            <i data-lucide="mic" class="w-3 h-3 text-rose-400 animate-pulse"></i>
+            <span>"रमेश ₹200 उधार"</span>
+            <span class="rounded bg-rose-500/30 px-2 py-0.5 text-[10px] text-rose-300 font-mono font-bold">लाल खाता (Udhar)</span>
+          </div>
+
+          <div class="flex items-center gap-2 rounded-full border border-emerald-500/40 bg-emerald-950/40 px-4 py-2 text-xs font-semibold text-emerald-200">
+            <i data-lucide="mic" class="w-3 h-3 text-emerald-400 animate-pulse"></i>
+            <span>"सुनील ₹500 जमा"</span>
+            <span class="rounded bg-emerald-500/30 px-2 py-0.5 text-[10px] text-emerald-300 font-mono font-bold">हरा खाता (Jama)</span>
+          </div>
+
+          <div class="flex items-center gap-2 rounded-full border border-amber-500/40 bg-amber-950/40 px-4 py-2 text-xs font-semibold text-amber-200">
+            <i data-lucide="mic" class="w-3 h-3 text-amber-400 animate-pulse"></i>
+            <span>"शर्मा जी किराना ₹1,450 जमा"</span>
+            <span class="rounded bg-amber-500/30 px-2 py-0.5 text-[10px] text-amber-300 font-mono font-bold">UPI Received</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Interactive Voice & Khatabook Ledger Demo -->
+  <section id="demo" class="py-12 sm:py-16 bg-neutral-950/90 border-y border-emerald-950/40">
+    <div class="mx-auto max-w-6xl px-4 sm:px-6">
+      
+      <div class="text-center max-w-2xl mx-auto mb-10">
+        <span class="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-950/50 px-3.5 py-1 text-xs font-semibold text-emerald-400 mb-3">
+          <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+          खुद बोलकर आज़माएँ (Interactive Demo)
+        </span>
+        <h2 class="text-2xl sm:text-4xl font-black tracking-tight text-white">
+          माइक दबाएँ या नीचे किसी भी आवाज़ पर क्लिक करें
+        </h2>
+        <p class="mt-2 text-xs sm:text-sm text-neutral-400">
+          देखें कैसे आपकी आवाज़ 1 सेकंड में ग्राहक के खाते में उधार (लाल) या जमा (हरा) दर्ज कर देती है।
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        
+        <!-- Left: Mic Widget -->
+        <div class="lg:col-span-5 space-y-6 rounded-3xl border border-emerald-500/30 bg-gradient-to-b from-neutral-900 to-neutral-950 p-6 sm:p-8 shadow-2xl">
+          <div class="flex flex-col items-center justify-center text-center">
+            <button
+              id="micBtn"
+              onclick="toggleMic()"
+              class="relative flex h-24 w-24 sm:h-28 sm:w-28 items-center justify-center rounded-full bg-gradient-to-tr from-emerald-600 to-emerald-400 hover:scale-105 pulse-green transition-all"
+            >
+              <i data-lucide="mic" id="micIcon" class="w-10 h-10 text-black"></i>
+            </button>
+
+            <p id="micStatus" class="mt-4 text-sm font-bold text-white">
+              माइक दबाकर बोलें (Tap to Speak)
+            </p>
+            <p class="text-[11px] text-neutral-400 mt-0.5">
+              हिंदी, हिंग्लिश या अपनी बोली में बोलें
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-white/10 bg-neutral-950 p-3.5 text-center min-h-[50px] flex items-center justify-center">
+            <p id="transcriptText" class="text-xs font-mono text-emerald-300">
+              💡 ऊपर माइक दबाएँ या नीचे दिए गए उदाहरणों पर क्लिक करें:
+            </p>
+          </div>
+
+          <div class="space-y-2">
+            <p class="text-xs font-bold text-neutral-400 uppercase tracking-wider">
+              दुकान पर सबसे ज़्यादा बोले जाने वाले वाक्य:
+            </p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <button onclick="runSample('रमेश 200 रुपये उधार लिखो', 'रमेश कुमार', 200, 'udhar', 1400)" class="flex items-center justify-between rounded-xl border border-white/10 bg-white/5 p-2.5 px-3 text-left text-xs text-white hover:border-emerald-500/40 hover:bg-emerald-500/10 transition-all">
+                <span class="font-semibold">🎙️ 'रमेश ₹200 उधार'</span>
+                <i data-lucide="volume-2" class="w-3.5 h-3.5 text-emerald-400"></i>
+              </button>
+              <button onclick="runSample('सुनील ने 500 रुपये जमा किए', 'सुनील वर्मा', 500, 'jama', 350)" class="flex items-center justify-between rounded-xl border border-white/10 bg-white/5 p-2.5 px-3 text-left text-xs text-white hover:border-emerald-500/40 hover:bg-emerald-500/10 transition-all">
+                <span class="font-semibold">🎙️ 'सुनील ₹500 जमा'</span>
+                <i data-lucide="volume-2" class="w-3.5 h-3.5 text-emerald-400"></i>
+              </button>
+              <button onclick="runSample('गुप्ता किराना 1250 का सामान उधार ले गए', 'गुप्ता किराना', 1250, 'udhar', 2450)" class="flex items-center justify-between rounded-xl border border-white/10 bg-white/5 p-2.5 px-3 text-left text-xs text-white hover:border-emerald-500/40 hover:bg-emerald-500/10 transition-all">
+                <span class="font-semibold">🎙️ 'गुप्ता जी ₹1250 उधार'</span>
+                <i data-lucide="volume-2" class="w-3.5 h-3.5 text-emerald-400"></i>
+              </button>
+              <button onclick="runSample('वर्मा मेडिकल से 800 रुपये नकद मिले', 'डॉ. वर्मा मेडिकल', 800, 'jama', 0)" class="flex items-center justify-between rounded-xl border border-white/10 bg-white/5 p-2.5 px-3 text-left text-xs text-white hover:border-emerald-500/40 hover:bg-emerald-500/10 transition-all">
+                <span class="font-semibold">🎙️ 'वर्मा जी ₹800 जमा'</span>
+                <i data-lucide="volume-2" class="w-3.5 h-3.5 text-emerald-400"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Live Khatabook Ledger -->
+        <div class="lg:col-span-7 rounded-3xl border border-white/15 bg-[#0e0e12] p-6 sm:p-8 shadow-2xl">
+          <div class="flex items-center justify-between border-b border-white/10 pb-4 mb-4">
+            <div>
+              <span class="text-[10px] font-bold uppercase tracking-widest text-emerald-400">लाइव बही-खाता</span>
+              <h3 class="text-lg font-bold text-white">दुकान का लेन-देन रजिस्टर</h3>
+            </div>
+            <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-400 bg-emerald-950/60 px-2.5 py-1 rounded-full border border-emerald-800/40">
+              <span class="size-1.5 rounded-full bg-emerald-400 animate-ping"></span>
+              ऑटो-अपडेट
+            </span>
+          </div>
+
+          <!-- Balance Cards -->
+          <div class="grid grid-cols-2 gap-3 mb-6">
+            <div class="rounded-2xl border border-rose-900/30 bg-rose-950/20 p-3.5 text-center">
+              <p class="text-[11px] font-semibold text-rose-300">आप देंगे (You Will Give)</p>
+              <p class="text-2xl font-black text-rose-400 mt-1">₹850</p>
+              <p class="text-[10px] text-neutral-400">सप्लायर का बकाया</p>
+            </div>
+            <div class="rounded-2xl border border-emerald-900/30 bg-emerald-950/20 p-3.5 text-center">
+              <p class="text-[11px] font-semibold text-emerald-300">आपको मिलेगा (You Will Get)</p>
+              <p id="totalGet" class="text-2xl font-black text-emerald-400 mt-1">₹4,200</p>
+              <p class="text-[10px] text-neutral-400">ग्राहकों का कुल उधार</p>
+            </div>
+          </div>
+
+          <!-- Entries Container -->
+          <div id="entriesList" class="space-y-3">
+            <div class="flex items-center justify-between gap-3 rounded-2xl border border-rose-500/30 bg-rose-950/10 p-4">
+              <div class="flex items-center gap-3">
+                <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-rose-500/20 text-rose-300 font-bold">R</div>
+                <div>
+                  <div class="flex items-center gap-2">
+                    <p class="text-sm font-bold text-white">रमेश कुमार (Ramesh Kumar)</p>
+                    <span class="rounded bg-rose-500/20 px-1.5 py-0.5 text-[10px] font-bold text-rose-300 border border-rose-500/30">उधार दिया</span>
+                  </div>
+                  <p class="text-[11px] text-neutral-400 mt-0.5">अभी-अभी • "रमेश 200 रुपये उधार लिखो"</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-3">
+                <div class="text-right">
+                  <p class="text-lg font-black font-mono text-rose-400">- ₹200</p>
+                  <p class="text-[10px] text-neutral-400">बकाया: ₹1,400</p>
+                </div>
+                <button onclick="toastWhatsApp('रमेश कुमार', 1400)" class="rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-1.5 text-xs font-semibold text-emerald-300 hover:bg-emerald-500/20">
+                  तगादा भेजें
+                </button>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between gap-3 rounded-2xl border border-emerald-500/30 bg-emerald-950/10 p-4">
+              <div class="flex items-center gap-3">
+                <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500/20 text-emerald-300 font-bold">S</div>
+                <div>
+                  <div class="flex items-center gap-2">
+                    <p class="text-sm font-bold text-white">सुनील वर्मा (Sunil Verma)</p>
+                    <span class="rounded bg-emerald-500/20 px-1.5 py-0.5 text-[10px] font-bold text-emerald-300 border border-emerald-500/30">जमा मिला</span>
+                  </div>
+                  <p class="text-[11px] text-neutral-400 mt-0.5">10 मिनट पहले • "सुनील ने 500 रुपये जमा किए"</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-3">
+                <div class="text-right">
+                  <p class="text-lg font-black font-mono text-emerald-400">+ ₹500</p>
+                  <p class="text-[10px] text-neutral-400">बकाया: ₹350</p>
+                </div>
+                <button onclick="toastWhatsApp('सुनील वर्मा', 350)" class="rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-1.5 text-xs font-semibold text-emerald-300 hover:bg-emerald-500/20">
+                  तगादा भेजें
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div id="whatsappToast" class="hidden mt-4 p-3 rounded-xl border border-emerald-500/40 bg-emerald-950/60 text-xs text-emerald-200 flex items-center gap-2">
+            <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400 shrink-0"></i>
+            <span id="toastMsg">WhatsApp संदेश भेजा गया!</span>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Comparison Section: Old vs VoiceKhata -->
+  <section id="comparison" class="py-14 sm:py-20 bg-[#070709]">
+    <div class="mx-auto max-w-6xl px-4 sm:px-6">
+      <div class="text-center max-w-3xl mx-auto mb-12">
+        <span class="text-xs font-bold uppercase tracking-widest text-emerald-400">पुरानी परेशानियाँ vs नया आसान तरीका</span>
+        <h2 class="mt-2 text-2xl sm:text-4xl font-black text-white tracking-tight">कागज़ी डायरी और धीमी टाइपिंग को कहें अलविदा</h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="rounded-3xl border border-rose-900/30 bg-rose-950/10 p-6 sm:p-8 space-y-4">
+          <div class="flex items-center gap-3 border-b border-rose-900/30 pb-4">
+            <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-rose-500/20 text-rose-400 font-bold">✕</div>
+            <div>
+              <h3 class="text-lg font-bold text-rose-300">पुराना तरीका: लाल डायरी या टाइपिंग ऐप्स</h3>
+              <p class="text-xs text-rose-400/80">समय की बर्बादी और हिसाब छूटने का जोखिम</p>
+            </div>
+          </div>
+          <p class="text-xs sm:text-sm text-neutral-400 leading-relaxed">• दुकान पर ग्राहकों की भीड़ में डायरी में लिखने का समय नहीं मिलता — हिसाब छूट जाता है।</p>
+          <p class="text-xs sm:text-sm text-neutral-400 leading-relaxed">• मोबाइल ऐप्स में नाम ढूँढना और कीबोर्ड से टाइप करना बहुत धीमा और झंझट भरा है।</p>
+          <p class="text-xs sm:text-sm text-neutral-400 leading-relaxed">• उधार के पैसे माँगने में संकोच और शर्म आती है — रिश्ते खराब होने का डर।</p>
+          <p class="text-xs sm:text-sm text-neutral-400 leading-relaxed">• कागज़ की डायरी फटने, पानी गिरने या खो जाने पर भारी नुक़सान।</p>
+          <p class="text-xs sm:text-sm text-neutral-400 leading-relaxed">• दुकान में इंटरनेट बंद होने पर अन्य ऐप्स बंद हो जाते हैं।</p>
+        </div>
+
+        <div class="relative rounded-3xl border border-emerald-500/40 bg-gradient-to-b from-emerald-950/25 to-neutral-950 p-6 sm:p-8 space-y-4 shadow-2xl">
+          <div class="absolute -top-3 right-6 rounded-full bg-emerald-500 px-3 py-0.5 text-[10px] font-black uppercase tracking-wider text-black">आधुनिक व्यापारियों की पसंद</div>
+          <div class="flex items-center gap-3 border-b border-emerald-800/30 pb-4">
+            <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500/20 text-emerald-400 font-bold">✔</div>
+            <div>
+              <h3 class="text-lg font-bold text-emerald-300">नया तरीका: VoiceKhata (बोलकर हिसाब)</h3>
+              <p class="text-xs text-emerald-400/80">3 सेकंड में एंट्री, 0% गलती, 3x तेज़ वसूली</p>
+            </div>
+          </div>
+          <p class="text-xs sm:text-sm text-white font-medium">• <strong>केवल 3 सेकंड में बोलें</strong> — 'रमेश ₹200 उधार'। ग्राहक के सामने ही बिना पेन छुए एंट्री!</p>
+          <p class="text-xs sm:text-sm text-white font-medium">• <strong>Zero Typing!</strong> AI अपने आप ग्राहक और रकम सही खाते में दर्ज कर देता है।</p>
+          <p class="text-xs sm:text-sm text-white font-medium">• <strong>WhatsApp पेमेंट लिंक:</strong> एक क्लिक में विनम्र संदेश, सीधा UPI लिंक के साथ।</p>
+          <p class="text-xs sm:text-sm text-white font-medium">• <strong>100% क्लाउड बैकअप:</strong> मोबाइल बदलें या खो जाए, हिसाब 1 मिनट में वापस।</p>
+          <p class="text-xs sm:text-sm text-white font-medium">• <strong>ऑफलाइन मोड:</strong> बिना इंटरनेट के भी बोलकर हिसाब लिखें।</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Verticals / Categories -->
+  <section id="dukandar" class="py-14 sm:py-20 bg-neutral-950/60 border-t border-white/5">
+    <div class="mx-auto max-w-6xl px-4 sm:px-6">
+      <div class="text-center max-w-2xl mx-auto mb-12">
+        <span class="text-xs font-bold uppercase tracking-widest text-emerald-400">हर दुकान के लिए उपयुक्त</span>
+        <h2 class="mt-2 text-2xl sm:text-4xl font-black text-white tracking-tight">आपकी दुकान चाहे जो भी हो, VoiceKhata है सबसे मुफ़ीद</h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="rounded-3xl border border-white/10 bg-neutral-900/60 p-6">
+          <div class="flex items-center gap-2 mb-3"><span class="text-2xl">🛒</span><h3 class="text-lg font-bold text-white">किराना & जनरल स्टोर</h3></div>
+          <p class="text-xs text-neutral-400 mb-3">दाल, तेल, मसाले और रोज़मर्रा के सामान का उधार-जमा बिना पेन छुए लिखें।</p>
+          <div class="text-[11px] text-emerald-300 font-mono bg-emerald-950/30 p-2 rounded-xl border border-emerald-500/20">🎙️ "शर्मा जी 5 किलो आटा उधार दिया"</div>
+        </div>
+
+        <div class="rounded-3xl border border-white/10 bg-neutral-900/60 p-6">
+          <div class="flex items-center gap-2 mb-3"><span class="text-2xl">🔧</span><h3 class="text-lg font-bold text-white">हार्डवेयर & सेनेटरी</h3></div>
+          <p class="text-xs text-neutral-400 mb-3">पाइप, सीमेंट, पेंट और टूल्स का बड़ा हिसाब। ठेकेदारों और मिस्त्रियों का अलग खाता।</p>
+          <div class="text-[11px] text-cyan-300 font-mono bg-cyan-950/30 p-2 rounded-xl border border-cyan-500/20">🎙️ "वर्मा प्लंबर ₹4,500 का सामान उधार"</div>
+        </div>
+
+        <div class="rounded-3xl border border-white/10 bg-neutral-900/60 p-6">
+          <div class="flex items-center gap-2 mb-3"><span class="text-2xl">💊</span><h3 class="text-lg font-bold text-white">मेडिकल & केमिस्ट</h3></div>
+          <p class="text-xs text-neutral-400 mb-3">मरीजों और नियमित ग्राहकों की दवाओं का बिल और पेंडिंग पेमेंट ट्रैक करें।</p>
+          <div class="text-[11px] text-rose-300 font-mono bg-rose-950/30 p-2 rounded-xl border border-rose-500/20">🎙️ "अनिल जी शुगर की दवा ₹320 उधार"</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonials -->
+  <section id="reviews" class="py-14 sm:py-20 bg-[#070709]">
+    <div class="mx-auto max-w-6xl px-4 sm:px-6">
+      <div class="text-center max-w-2xl mx-auto mb-12">
+        <span class="text-xs font-bold uppercase tracking-widest text-emerald-400">सच्चे व्यापारियों के अनुभव</span>
+        <h2 class="mt-2 text-2xl sm:text-4xl font-black text-white tracking-tight">दुकानदारों ने बदली अपनी दुकान की किस्मत</h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="rounded-3xl border border-white/10 bg-neutral-900/50 p-6">
+          <div class="text-amber-400 mb-2">★★★★★</div>
+          <p class="text-xs sm:text-sm text-neutral-300 italic mb-4">"शाम को जब दुकान पर 10 ग्राहक खड़े होते हैं, पेन से लिखना नामुमकिन था। अब मैं सीधे बोल देता हूँ — शाम को एक भी रुपये का हिसाब नहीं छूटता!"</p>
+          <p class="text-xs font-bold text-white">राकेश गुप्ता — गुप्ता किराना, कानपुर</p>
+          <p class="text-[10px] text-emerald-400 mt-1">✨ हर महीने ₹8,000+ का हिसाब नुकसान बचा</p>
+        </div>
+
+        <div class="rounded-3xl border border-white/10 bg-neutral-900/50 p-6">
+          <div class="text-amber-400 mb-2">★★★★★</div>
+          <p class="text-xs sm:text-sm text-neutral-300 italic mb-4">"ठेकेदारों से उधार माँगने में बहुत शर्म आती थी। VoiceKhata से एक क्लिक में WhatsApp पर पेमेंट लिंक चला जाता है। 3 दिन में पैसे आ जाते हैं!"</p>
+          <p class="text-xs font-bold text-white">संजय पटेल — पटेल हार्डवेयर, अहमदाबाद</p>
+          <p class="text-[10px] text-emerald-400 mt-1">✨ 3 गुना तेज़ उधार वसूली</p>
+        </div>
+
+        <div class="rounded-3xl border border-white/10 bg-neutral-900/50 p-6">
+          <div class="text-amber-400 mb-2">★★★★★</div>
+          <p class="text-xs sm:text-sm text-neutral-300 italic mb-4">"दवा देते वक्त हाथ व्यस्त रहता है, टाइप करना बहुत मुश्किल था। बोलकर खाता लिखना सबसे आसान क्रांति है। 100% सटीक।"</p>
+          <p class="text-xs font-bold text-white">डॉ. अनीश अहमद — न्यू लाइफ मेडिकल, लखनऊ</p>
+          <p class="text-[10px] text-emerald-400 mt-1">✨ रोज़ाना 45 मिनट का कीमती समय बचा</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Mobile Sticky Bottom CTA -->
+  <div class="fixed bottom-0 left-0 right-0 z-50 md:hidden border-t border-emerald-500/30 bg-neutral-950/95 p-3 backdrop-blur-xl">
+    <div class="flex items-center justify-between gap-3 max-w-md mx-auto">
+      <div class="flex flex-col">
+        <span class="text-xs font-bold text-white">Voiceखाता</span>
+        <span class="text-[10px] text-emerald-400 font-semibold">100% फ्री • बोलकर हिसाब</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <a href="#demo" class="flex items-center gap-1 rounded-full border border-emerald-500/40 bg-emerald-500/10 px-3 py-2 text-xs font-bold text-emerald-300">
+          <i data-lucide="mic" class="w-3.5 h-3.5"></i>
+          <span>डेमो</span>
+        </a>
+        <button class="flex items-center gap-1.5 rounded-full bg-emerald-500 px-4 py-2 text-xs font-extrabold text-black shadow-lg shadow-emerald-500/25">
+          <span>शुरू करें</span>
+          <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    lucide.createIcons();
+
+    function sendLink() {
+      const p = document.getElementById("heroPhone").value.trim();
+      if (p.length >= 10) {
+        const msg = document.getElementById("linkMsg");
+        msg.classList.remove("hidden");
+        setTimeout(() => msg.classList.add("hidden"), 4000);
+      } else {
+        alert("कृपया 10 अंकों का वैध मोबाइल नंबर दर्ज करें!");
+      }
+    }
+
+    let isRecording = false;
+    function toggleMic() {
+      isRecording = !isRecording;
+      const btn = document.getElementById("micBtn");
+      const status = document.getElementById("micStatus");
+      const transcript = document.getElementById("transcriptText");
+
+      if (isRecording) {
+        btn.classList.add("pulse-red", "bg-rose-600");
+        btn.classList.remove("pulse-green", "bg-gradient-to-tr", "from-emerald-600", "to-emerald-400");
+        status.innerHTML = "<span class='text-rose-400 animate-pulse'>🔴 सुन रहा हूँ... बोलिए!</span>";
+        transcript.textContent = "सुन रहे हैं: 'रमेश 200 रुपये उधार'...";
+
+        setTimeout(() => {
+          toggleMic();
+          runSample("रमेश 200 रुपये उधार लिखो", "रमेश कुमार", 200, "udhar", 1400);
+        }, 2200);
+      } else {
+        btn.classList.remove("pulse-red", "bg-rose-600");
+        btn.classList.add("pulse-green", "bg-gradient-to-tr", "from-emerald-600", "to-emerald-400");
+        status.textContent = "माइक दबाकर बोलें (Tap to Speak)";
+      }
+    }
+
+    function runSample(phrase, customer, amount, type, balance) {
+      const transcript = document.getElementById("transcriptText");
+      transcript.textContent = `AI द्वारा पहचाना गया: "${phrase}"`;
+
+      if ("speechSynthesis" in window) {
+        try {
+          window.speechSynthesis.cancel();
+          const u = new SpeechSynthesisUtterance(phrase);
+          u.rate = 1.0;
+          window.speechSynthesis.speak(u);
+        } catch(e) {}
+      }
+
+      const list = document.getElementById("entriesList");
+      const isUdhar = type === "udhar";
+      const div = document.createElement("div");
+      div.className = `flex items-center justify-between gap-3 rounded-2xl border p-4 transition-all duration-300 animate-in slide-in-from-top-2 ${
+        isUdhar ? "border-rose-500/30 bg-rose-950/10" : "border-emerald-500/30 bg-emerald-950/10"
+      }`;
+
+      div.innerHTML = `
+        <div class="flex items-center gap-3">
+          <div class="flex h-10 w-10 items-center justify-center rounded-xl font-bold ${
+            isUdhar ? "bg-rose-500/20 text-rose-300" : "bg-emerald-500/20 text-emerald-300"
+          }">${customer.charAt(0)}</div>
+          <div>
+            <div class="flex items-center gap-2">
+              <p class="text-sm font-bold text-white">${customer}</p>
+              <span class="rounded px-1.5 py-0.5 text-[10px] font-bold ${
+                isUdhar ? "bg-rose-500/20 text-rose-300 border border-rose-500/30" : "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"
+              }">${isUdhar ? "उधार दिया" : "जमा मिला"}</span>
+            </div>
+            <p class="text-[11px] text-neutral-400 mt-0.5">अभी-अभी • "${phrase}"</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-3">
+          <div class="text-right">
+            <p class="text-lg font-black font-mono ${isUdhar ? "text-rose-400" : "text-emerald-400"}">
+              ${isUdhar ? "- ₹" + amount : "+ ₹" + amount}
+            </p>
+            <p class="text-[10px] text-neutral-400">बकाया: ₹${balance}</p>
+          </div>
+          <button onclick="toastWhatsApp('${customer}', ${balance})" class="rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-1.5 text-xs font-semibold text-emerald-300 hover:bg-emerald-500/20">
+            तगादा भेजें
+          </button>
+        </div>
+      `;
+
+      list.insertBefore(div, list.firstChild);
+    }
+
+    function toastWhatsApp(customer, balance) {
+      const toast = document.getElementById("whatsappToast");
+      const msg = document.getElementById("toastMsg");
+      msg.textContent = `WhatsApp संदेश तैयार: "नमस्ते ${customer} जी, आपकी दुकान का ₹${balance} का बकाया है। कृपया UPI लिंक से भुगतान करें।"`;
+      toast.classList.remove("hidden");
+      setTimeout(() => toast.classList.add("hidden"), 4500);
+    }
+  </script>
+</body>
+</html>
