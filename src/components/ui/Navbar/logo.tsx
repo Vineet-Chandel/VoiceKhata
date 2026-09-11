@@ -35,7 +35,7 @@ const Logo = ({
         <span
           className={`font-bold tracking-[-0.03em] text-black dark:text-text-primary ${textSizeClasses[size]}`}
         >
-          Fin<span className="font-semibold opacity-60">Ease</span>
+          Voice<span className="font-semibold opacity-60">Khata</span>
         </span>
       )}
     </div>
