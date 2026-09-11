@@ -5,11 +5,12 @@ import { useScroll } from "@/components/hooks/use-scroll";
 import { Button } from "@/components/ui/button";
 import { MobileNav } from "@/components/ui/Navbar/mobile-nav";
 import { Link } from "react-router-dom";
-import { User } from "lucide-react";
+import { User, MessageSquare, Star } from "lucide-react";
 
 export const navLinks = [
   { label: "Features", href: "#features" },
-  // { label: "Testimonials", href: "#testimonials" },
+  { label: "Feedback", href: "/feedback" },
+  { label: "Review", href: "/review" },
   { label: "FAQs", href: "#FAQS" },
   { label: "About Us", href: "#about" },
 ];
@@ -29,21 +30,30 @@ export function Header() {
       )}
     >
       <nav className="mx-auto flex h-14 w-full max-w-5xl items-center justify-between px-4 sm:px-6">
-        {/* FIX: removed p-2 (8px padding) → p-0 so logo sits flush left */}
-        <a
+        <Link
           className="rounded-md hover:bg-muted dark:hover:bg-muted/50"
-          href="#"
+          to="/"
         >
-          {/* FIX: custom h-8 — between sm(h-5) and md(h-10), ~2px smaller than md */}
           <Logo className="h-8" size="md" />
-        </a>
+        </Link>
 
-        <div className="hidden items-center gap-2 md:flex">
-          {navLinks.map((link) => (
-            <Button asChild key={link.label} size="sm" variant="ghost">
-              <a href={link.href}>{link.label}</a>
-            </Button>
-          ))}
+        <div className="hidden items-center gap-1 md:flex">
+          {navLinks.map((link) => {
+            const isRouterLink = link.href.startsWith("/");
+            return (
+              <Button asChild key={link.label} size="sm" variant="ghost">
+                {isRouterLink ? (
+                  <Link to={link.href} className="flex items-center gap-1.5 font-medium">
+                    {link.label === "Feedback" && <MessageSquare className="size-3.5 text-emerald-400" />}
+                    {link.label === "Review" && <Star className="size-3.5 text-amber-400 fill-amber-400" />}
+                    {link.label}
+                  </Link>
+                ) : (
+                  <a href={link.href}>{link.label}</a>
+                )}
+              </Button>
+            );
+          })}
           <Button asChild size="sm" variant="ghost">
             <Link to="/login" className="flex items-center gap-1">
               <User size={16} />

@@ -29,6 +29,8 @@ import Blog from "@/components/ui/Footer_pages/Blog";
 import Changelog from "@/components/ui/Footer_pages/changelog";
 import Brand from "@/components/ui/Footer_pages/brand";
 import Help from "@/components/ui/Footer_pages/help";
+import FeedbackPage from "@/components/Pages/FeedbackPage";
+import ReviewPage from "@/components/Pages/ReviewPage";
 import { AuthProvider } from "@/context/AuthContext";
 import { FinancialProvider } from "@/context/FinancialContext";
 import { AppModeProvider } from "@/context/AppModeContext";
@@ -84,6 +86,8 @@ export default function App() {
             <Route path="*"             element={<NotFound />} />
             <Route path="/soon"         element={<ComingSoon />} />
             <Route path="/features"     element={<Features />} />
+            <Route path="/feedback"     element={<FeedbackPage />} />
+            <Route path="/review"       element={<ReviewPage />} />
             <Route path="/pricing"      element={<Pricing />} />
             <Route path="/testimonials" element={<Testimonials />} />
             <Route path="/integration"  element={<Integration />} />

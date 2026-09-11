@@ -50,17 +50,26 @@ export function MobileNav() {
             data-slot={open ? "open" : "closed"}
           >
             <div className="grid gap-y-1">
-              {navLinks.map((link) => (
-                <Button
-                  asChild
-                  className="justify-start text-base"
-                  key={link.label}
-                  variant="ghost"
-                  onClick={handleLinkClick}
-                >
-                  <a href={link.href}>{link.label}</a>
-                </Button>
-              ))}
+              {navLinks.map((link) => {
+                const isRouterLink = link.href.startsWith("/");
+                return (
+                  <Button
+                    asChild
+                    className="justify-start text-base"
+                    key={link.label}
+                    variant="ghost"
+                    onClick={handleLinkClick}
+                  >
+                    {isRouterLink ? (
+                      <Link to={link.href} className="w-full text-left">
+                        {link.label}
+                      </Link>
+                    ) : (
+                      <a href={link.href}>{link.label}</a>
+                    )}
+                  </Button>
+                );
+              })}
             </div>
             <div className="mt-6 flex flex-col gap-2">
               <Button asChild className="w-full" variant="outline">

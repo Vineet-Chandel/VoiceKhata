@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { ArrowRightIcon } from "lucide-react";
+import { ArrowRightIcon, Star, MessageSquare } from "lucide-react";
 import { Link } from "react-router-dom";
 import VoiceKhata_Dashboard from "@/assets/VoiceKhata_Dashboard.png"
 export function HeroSection() {
@@ -37,13 +37,25 @@ export function HeroSection() {
 					The modern financial workspace for students and professionals. Track expenses, automate budgets, and get personalized advice — all in one place.
 				</p>
 
-				<div className="fade-in slide-in-from-bottom-10 flex w-fit animate-in items-center justify-center gap-3 fill-mode-backwards pt-2 delay-300 duration-500 ease-out">
-
+				<div className="fade-in slide-in-from-bottom-10 flex flex-wrap items-center gap-3 fill-mode-backwards pt-2 delay-300 duration-500 ease-out">
 					<Button asChild>
 						<Link to="/signup">Get started{" "}
 						<ArrowRightIcon data-icon="inline-start" /></Link>
 					</Button>
 					
+					<Button asChild variant="outline" className="border-border/60 hover:bg-muted/50">
+						<Link to="/review" className="flex items-center gap-1.5 text-xs sm:text-sm">
+							<Star className="size-4 text-amber-400 fill-amber-400" />
+							Reviews (4.9★)
+						</Link>
+					</Button>
+
+					<Button asChild variant="ghost" className="text-muted-foreground hover:text-foreground">
+						<Link to="/feedback" className="flex items-center gap-1.5 text-xs sm:text-sm">
+							<MessageSquare className="size-4 text-emerald-400" />
+							Feedback
+						</Link>
+					</Button>
 				</div>
 			</div>
 			<div className="relative">
