@@ -36,7 +36,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     navMain: [
       { title: "Dashboard", url: "/dashboard", icon: IconDashboard },
       { title: "Transaction", url: "/dashboard/transactions", icon: IconWallet },
-      { title: "Budget", url: "/dashboard/budget", icon: IconChartPie },
+      { title: "Budget & Investment", url: "/dashboard/budget", icon: IconChartPie },
       { title: "Reports", url: "/dashboard/reports", icon: IconReport },
       { title: "AI Assistant", url: "/dashboard/ai-assistant", icon: IconRobot },
       { title: "Money Growth", url: "/dashboard/growth", icon: IconFlame },
