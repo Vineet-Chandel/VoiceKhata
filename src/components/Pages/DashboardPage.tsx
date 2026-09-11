@@ -15,7 +15,7 @@ import {
 export default function DashboardPage() {
   return (
     <SidebarProvider
-      className="h-screen w-full overflow-hidden pt-2 lg:pt-4"
+      className="h-screen w-full overflow-hidden pt-2 "
       style={
         {
           "--sidebar-width": "calc(var(--spacing) * 72)",
