@@ -16,8 +16,26 @@ type AuthContextType = {
   loading: boolean
   loggingOut: boolean
   supabaseReady: boolean
+  isDemoMode: boolean
+  enableDemoMode: () => void
   refreshProfile: () => Promise<void>
   logOut: () => Promise<void>
+}
+
+const DEMO_USER: any = {
+  uid: "demo-shopkeeper-uid",
+  email: "sharma.store@voicekhata.in",
+  displayName: "Sharma Kirana Store",
+  emailVerified: true,
+  isAnonymous: true,
+  providerData: [{ providerId: "password" }],
+}
+
+const DEMO_PROFILE: UserProfile = {
+  firebase_uid: "demo-shopkeeper-uid",
+  business_name: "Sharma Kirana Store",
+  email: "sharma.store@voicekhata.in",
+  display_name: "Sharma Kirana Store",
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -26,16 +44,54 @@ const AuthContext = createContext<AuthContextType>({
   loading: true,
   loggingOut: false,
   supabaseReady: false,
+  isDemoMode: false,
+  enableDemoMode: () => {},
   refreshProfile: async () => {},
   logOut: async () => {},
 })
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(() => auth.currentUser)
-  const [profile, setProfile] = useState<UserProfile | null>(null)
-  const [loading, setLoading] = useState(true)
+  const [isDemo, setIsDemo] = useState<boolean>(() => {
+    try {
+      return (
+        typeof window !== "undefined" &&
+        (localStorage.getItem("voicekhata_demo_user") === "true" ||
+          new URLSearchParams(window.location.search).get("demo") === "true")
+      )
+    } catch {
+      return false
+    }
+  })
+
+  const [user, setUser] = useState<User | null>(() => {
+    if (auth.currentUser) return auth.currentUser
+    if (typeof window !== "undefined" && (localStorage.getItem("voicekhata_demo_user") === "true" || new URLSearchParams(window.location.search).get("demo") === "true")) {
+      return DEMO_USER
+    }
+    return null
+  })
+
+  const [profile, setProfile] = useState<UserProfile | null>(() => {
+    if (typeof window !== "undefined" && (localStorage.getItem("voicekhata_demo_user") === "true" || new URLSearchParams(window.location.search).get("demo") === "true")) {
+      return DEMO_PROFILE
+    }
+    return null
+  })
+
+  const [loading, setLoading] = useState(false)
   const [loggingOut, setLoggingOut] = useState(false)
-  const [supabaseReady, setSupabaseReady] = useState(false)
+  const [supabaseReady, setSupabaseReady] = useState(() => isDemo)
+
+  const enableDemoMode = useCallback(() => {
+    try {
+      localStorage.setItem("voicekhata_demo_user", "true")
+    } catch {}
+    setIsDemo(true)
+    setUser(DEMO_USER)
+    setProfile(DEMO_PROFILE)
+    setSupabaseReady(true)
+    setLoading(false)
+  }, [])
 
   const syncUserData = useCallback(async (firebaseUser: User) => {
     try {
@@ -64,29 +120,55 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [])
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-      if (firebaseUser) {
-        setUser(firebaseUser)
-        setSupabaseReady(false)
-        await syncUserData(firebaseUser)
+    let unsubscribe = () => {}
+    try {
+      if (auth && typeof onAuthStateChanged === "function") {
+        unsubscribe = onAuthStateChanged(
+          auth,
+          async (firebaseUser) => {
+            if (firebaseUser) {
+              setUser(firebaseUser)
+              setSupabaseReady(false)
+              await syncUserData(firebaseUser)
+            } else {
+              clearScopedSupabase()
+              setUser(null)
+              setProfile(null)
+              setSupabaseReady(false)
+            }
+
+            setLoading(false)
+            setLoggingOut(false)
+          },
+          (error) => {
+            console.warn("Auth state observer error:", error)
+            setLoading(false)
+            setLoggingOut(false)
+          }
+        )
       } else {
-        clearScopedSupabase()
-        setUser(null)
-        setProfile(null)
-        setSupabaseReady(false)
+        setLoading(false)
       }
-
+    } catch (err) {
+      console.warn("Auth initialization error caught:", err)
       setLoading(false)
-      setLoggingOut(false)
-    })
+    }
 
-    return () => unsubscribe()
+    return () => {
+      try {
+        unsubscribe()
+      } catch (e) {}
+    }
   }, [syncUserData])
 
   const logOut = async () => {
     setLoggingOut(true)
     setSupabaseReady(false)
     try {
+      try {
+        localStorage.removeItem("voicekhata_demo_user")
+      } catch {}
+      setIsDemo(false)
       clearScopedSupabase()
       await signOut(auth)
       setUser(null)
@@ -104,6 +186,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         loading,
         loggingOut,
         supabaseReady,
+        isDemoMode: isDemo,
+        enableDemoMode,
         refreshProfile,
         logOut,
       }}

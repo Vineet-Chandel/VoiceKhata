@@ -48,6 +48,107 @@ type FinancialContextValue = {
 
 const FinancialContext = createContext<FinancialContextValue | null>(null)
 
+const DEMO_TRANSACTIONS: Transaction[] = [
+  {
+    id: 101,
+    transaction: "Ramesh Kumar - Groceries Udhar",
+    amount: 1200,
+    date: new Date().toISOString().split("T")[0],
+    category: "Groceries",
+    type: "Credit",
+    payment_method: "UPI",
+    notes: "Monthly ration credit",
+    tags: ["Ramesh Kumar", "Udhar", "Customer"],
+    user_id: 1,
+    firebase_uid: "demo-shopkeeper-uid",
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: 102,
+    transaction: "Daily Kirana Cash Sales",
+    amount: 4850,
+    date: new Date().toISOString().split("T")[0],
+    category: "Sales",
+    type: "Credit",
+    payment_method: "Cash",
+    notes: "Counter counter cash",
+    tags: ["Daily Sales", "Counter Cash"],
+    user_id: 1,
+    firebase_uid: "demo-shopkeeper-uid",
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: 103,
+    transaction: "Gupta Traders - Mustard Oil Stock",
+    amount: 500,
+    date: new Date(Date.now() - 86400000).toISOString().split("T")[0],
+    category: "Inventory",
+    type: "Debit",
+    payment_method: "Cash",
+    notes: "Oil carton deposit",
+    tags: ["Gupta Traders", "Supplier"],
+    user_id: 1,
+    firebase_uid: "demo-shopkeeper-uid",
+    created_at: new Date(Date.now() - 86400000).toISOString(),
+  },
+  {
+    id: 104,
+    transaction: "Sunil Verma - Cement & Hardware",
+    amount: 1500,
+    date: new Date(Date.now() - 86400000 * 2).toISOString().split("T")[0],
+    category: "Hardware",
+    type: "Credit",
+    payment_method: "Credit",
+    notes: "2 bags cement udhar",
+    tags: ["Sunil Verma", "Customer", "Udhar"],
+    user_id: 1,
+    firebase_uid: "demo-shopkeeper-uid",
+    created_at: new Date(Date.now() - 86400000 * 2).toISOString(),
+  },
+  {
+    id: 105,
+    transaction: "Sharma Ji Wholesale - Atta & Dal Stock",
+    amount: 4200,
+    date: new Date(Date.now() - 86400000 * 3).toISOString().split("T")[0],
+    category: "Wholesale",
+    type: "Debit",
+    payment_method: "UPI",
+    notes: "Weekly wholesale re-stock",
+    tags: ["Sharma Ji Wholesale", "Supplier"],
+    user_id: 1,
+    firebase_uid: "demo-shopkeeper-uid",
+    created_at: new Date(Date.now() - 86400000 * 3).toISOString(),
+  },
+  {
+    id: 106,
+    transaction: "Anita Dairy - Milk Token Advance",
+    amount: 650,
+    date: new Date(Date.now() - 86400000 * 5).toISOString().split("T")[0],
+    category: "Dairy",
+    type: "Credit",
+    payment_method: "UPI",
+    notes: "Pending settlement",
+    tags: ["Anita Dairy", "Customer", "Overdue"],
+    user_id: 1,
+    firebase_uid: "demo-shopkeeper-uid",
+    created_at: new Date(Date.now() - 86400000 * 5).toISOString(),
+  },
+  {
+    id: 107,
+    transaction: "Priya General Store - Cold Drinks",
+    amount: 850,
+    date: new Date(Date.now() - 86400000 * 6).toISOString().split("T")[0],
+    category: "Beverages",
+    type: "Credit",
+    payment_method: "UPI",
+    notes: "Full payment via PhonePe",
+    tags: ["Priya General Store", "Settled"],
+    user_id: 1,
+    firebase_uid: "demo-shopkeeper-uid",
+    created_at: new Date(Date.now() - 86400000 * 6).toISOString(),
+  },
+]
+
 function getCurrentMonth(): string {
   const now = new Date()
   return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`
@@ -249,6 +350,22 @@ export function FinancialProvider({ children }: { children: ReactNode }) {
     async (options?: { silent?: boolean }) => {
       if (!user?.uid) return
 
+      if (user.uid === "demo-shopkeeper-uid") {
+        try {
+          const stored = localStorage.getItem("voicekhata_demo_txs")
+          if (stored) {
+            setTransactions(JSON.parse(stored))
+          } else {
+            localStorage.setItem("voicekhata_demo_txs", JSON.stringify(DEMO_TRANSACTIONS))
+            setTransactions(DEMO_TRANSACTIONS)
+          }
+        } catch {
+          setTransactions(DEMO_TRANSACTIONS)
+        }
+        setTransactionsLoading(false)
+        return
+      }
+
       if (!options?.silent) {
         setTransactionsLoading(true)
         setTransactionsError(null)
@@ -281,6 +398,16 @@ export function FinancialProvider({ children }: { children: ReactNode }) {
   const refetchBudgets = useCallback(
     async (options?: { silent?: boolean }) => {
       if (!user?.uid) return
+
+      if (user.uid === "demo-shopkeeper-uid") {
+        setAllBudgetRows([
+          { id: "b1", category: "Groceries", amount: 15000, spent: 4500, duration: "monthly", month: selectedMonth, firebase_uid: "demo-shopkeeper-uid" },
+          { id: "b2", category: "Inventory", amount: 35000, spent: 18200, duration: "monthly", month: selectedMonth, firebase_uid: "demo-shopkeeper-uid" },
+          { id: "b3", category: "Utilities", amount: 5000, spent: 2100, duration: "monthly", month: selectedMonth, firebase_uid: "demo-shopkeeper-uid" },
+        ])
+        setBudgetsLoading(false)
+        return
+      }
 
       if (!options?.silent) {
         setBudgetsLoading(true)
@@ -433,6 +560,31 @@ export function FinancialProvider({ children }: { children: ReactNode }) {
     async (t: TransactionInput) => {
       if (!user?.uid) return { error: "Please log in to add transactions." }
 
+      if (user.uid === "demo-shopkeeper-uid") {
+        const newTx: Transaction = {
+          id: Date.now(),
+          transaction: t.transaction.trim(),
+          category: t.category.trim(),
+          amount: Number(t.amount),
+          date: t.date.trim(),
+          type: t.type === "Credit" ? "Credit" : "Debit",
+          payment_method: (t.method || "UPI").trim() as any,
+          notes: t.notes || "",
+          tags: t.tags || [t.category.trim()],
+          user_id: 1,
+          firebase_uid: "demo-shopkeeper-uid",
+          created_at: new Date().toISOString(),
+        }
+        setTransactions((prev) => {
+          const updated = [newTx, ...prev]
+          try {
+            localStorage.setItem("voicekhata_demo_txs", JSON.stringify(updated))
+          } catch {}
+          return updated
+        })
+        return { data: newTx }
+      }
+
       try {
         const { data, error } = await supabase
           .from("transactions")
@@ -474,6 +626,24 @@ export function FinancialProvider({ children }: { children: ReactNode }) {
     async (id: number, updates: TransactionUpdateInput) => {
       if (!user?.uid) return { error: "Please log in to update transactions." }
 
+      if (user.uid === "demo-shopkeeper-uid") {
+        let updatedTx: Transaction | undefined
+        setTransactions((prev) => {
+          const updated = prev.map((row) => {
+            if (row.id === id) {
+              updatedTx = { ...row, ...updates } as Transaction
+              return updatedTx
+            }
+            return row
+          })
+          try {
+            localStorage.setItem("voicekhata_demo_txs", JSON.stringify(updated))
+          } catch {}
+          return updated
+        })
+        return { data: updatedTx }
+      }
+
       try {
         const { data, error } = await supabase
           .from("transactions")
@@ -503,6 +673,17 @@ export function FinancialProvider({ children }: { children: ReactNode }) {
   const deleteTransaction = useCallback(
     async (id: number) => {
       if (!user?.uid) return
+
+      if (user.uid === "demo-shopkeeper-uid") {
+        setTransactions((prev) => {
+          const updated = prev.filter((row) => row.id !== id)
+          try {
+            localStorage.setItem("voicekhata_demo_txs", JSON.stringify(updated))
+          } catch {}
+          return updated
+        })
+        return
+      }
 
       try {
         const { error } = await supabase

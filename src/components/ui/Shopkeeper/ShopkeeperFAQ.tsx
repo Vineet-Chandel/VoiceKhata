@@ -1,3 +1,4 @@
+// src/components/ui/Shopkeeper/ShopkeeperFAQ.tsx
 import React, { useState } from "react";
 import { ChevronDown, HelpCircle } from "lucide-react";
 
@@ -6,65 +7,68 @@ export function ShopkeeperFAQ() {
 
   const faqs = [
     {
-      q: "क्या VoiceKhata सच में 100% मुफ़्त है?",
-      a: "हाँ, बुनियादी खाता, बोलकर एंट्री, अनलिमिटेड ग्राहक जोड़ना और ऑटोमैटिक बैकअप भारतीय व्यापारियों के लिए 100% मुफ़्त है। कोई छुपा हुआ चार्ज नहीं है।"
+      q: "Does VoiceKhata understand Indian accents and Hinglish?",
+      a: "Yes. Our speech parser is trained on real Indian retail phrasing. Whether you say 'Ramesh ne ₹1,200 UPI se diye' or 'Received 1200 rupees from Ramesh', it extracts the party, amount, and payment method accurately."
     },
     {
-      q: "अगर मैं अपनी स्थानीय बोली या टूटी-फूटी हिंदी में बोलूँ तो क्या यह समझेगा?",
-      a: "बिल्कुल! हमारा AI भारतीय दुकानदारों की बोलचाल (हिंदी, हिंग्लिश और क्षेत्रीय लहजे) को समझने के लिए ही तैयार किया गया है। आप चाहे 'रमेश ₹200 उधार' कहें या 'रमेश को 200 देना है' — यह अपने आप सही नाम और रकम पहचान लेता है।"
+      q: "Does VoiceKhata verify with me before saving transactions?",
+      a: "Always. Every spoken phrase is presented in a clear review card ('I understood: Person, Amount, Method, Date'). You can confirm or adjust details before anything is written to your ledger. Plus, a 6-second undo button is provided for peace of mind."
     },
     {
-      q: "क्या दुकान में इंटरनेट बंद होने पर भी यह काम करेगा?",
-      a: "जी हाँ, VoiceKhata में ऑफलाइन मोड है। इंटरनेट न होने पर भी आप बोलकर हिसाब दर्ज कर सकते हैं। जब भी आपका फोन इंटरनेट से जुड़ेगा, सारा डेटा अपने आप सुरक्षित क्लाउड पर सिंक हो जाएगा।"
+      q: "How does the WhatsApp payment reminder work?",
+      a: "Instead of making awkward collection phone calls, VoiceKhata creates a polite payment summary with direct UPI links (PhonePe, Google Pay, Paytm). Customers can settle in one click from their phones."
     },
     {
-      q: "अगर मेरा मोबाइल खो जाए या चोरी हो जाए तो क्या मेरा हिसाब चला जाएगा?",
-      a: "कतई नहीं! आपका सारा हिसाब बैंक-ग्रेड 256-बिट सुरक्षित क्लाउड बैकअप में स्टोर रहता है। आप नए फोन में अपना मोबाइल नंबर और OTP डालेंगे, और 1 मिनट में आपका पूरा पुराना बही-खाता वापस आ जाएगा।"
+      q: "Can I use VoiceKhata on both my phone and desktop?",
+      a: "Yes. VoiceKhata is fully responsive. Open it on your phone's browser for quick counter entries, and log into your desktop for weekly reports, supplier reconciliations, and cashflow analysis."
     },
     {
-      q: "WhatsApp पर पेमेंट रिमाइंडर भेजने से क्या फायदा होता है?",
-      a: "ग्राहक को सीधे उसके WhatsApp पर विनम्र संदेश और सुरक्षित UPI (PhonePe, Google Pay, Paytm) लिंक जाता है। ग्राहक घर बैठे 1 क्लिक में पैसे भेज देता है, जिससे आपको तगादा करने की शर्मिंदगी नहीं होती और वसूली 3 गुना तेज़ होती है।"
+      q: "What happens if I change or lose my phone?",
+      a: "All your data is securely stored and encrypted in the cloud. Simply log in with your email or Google account on any device, and your entire digital ledger is restored immediately."
     }
   ];
 
   return (
-    <section id="faqs" className="py-14 sm:py-20 bg-neutral-950/60 border-t border-white/5">
+    <section id="faqs" className="py-16 sm:py-20 bg-[#07090E] border-b border-[#1E2638]">
       <div className="mx-auto max-w-4xl px-4 sm:px-6">
         
         <div className="text-center max-w-2xl mx-auto mb-10">
-          <span className="text-xs font-bold uppercase tracking-widest text-emerald-400">
-            दुकानदारों के सामान्य प्रश्न
+          <span className="text-xs font-semibold uppercase tracking-wider text-[#818CF8] bg-[#1E2337] border border-[#5C6BC0]/30 px-3 py-1 rounded-full">
+            Frequently Asked Questions
           </span>
-          <h2 className="mt-2 text-2xl sm:text-4xl font-black text-white tracking-tight">
-            अक्सर पूछे जाने वाले सवाल (FAQs)
+          <h2 className="mt-3 text-2xl sm:text-4xl font-bold text-[#F1F5F9] tracking-tight">
+            Everything You Need to Know
           </h2>
+          <p className="mt-2 text-xs sm:text-sm text-[#94A3B8]">
+            Clear answers about voice recording, privacy, and khata management.
+          </p>
         </div>
 
-        <div className="space-y-3">
+        <div className="space-y-2.5">
           {faqs.map((faq, idx) => {
             const isOpen = openIdx === idx;
             return (
               <div
                 key={idx}
-                className="rounded-2xl border border-white/10 bg-neutral-900/70 overflow-hidden transition-colors"
+                className="rounded-[10px] border border-[#1E2638] bg-[#0F131C] overflow-hidden shadow-xs transition-all"
               >
                 <button
                   onClick={() => setOpenIdx(isOpen ? null : idx)}
-                  className="flex w-full items-center justify-between p-4 sm:p-5 text-left text-sm sm:text-base font-bold text-white hover:text-emerald-400 transition-colors"
+                  className="flex w-full items-center justify-between p-4 sm:p-4.5 text-left text-xs sm:text-sm font-semibold text-[#F1F5F9] hover:text-[#818CF8] transition-colors cursor-pointer"
                 >
-                  <span className="flex items-center gap-2">
-                    <HelpCircle className="size-4 text-emerald-400 shrink-0" />
+                  <span className="flex items-center gap-2.5">
+                    <HelpCircle className="size-4 text-[#818CF8] shrink-0" />
                     {faq.q}
                   </span>
                   <ChevronDown
-                    className={`size-4 text-neutral-400 transition-transform duration-200 shrink-0 ml-2 ${
-                      isOpen ? "rotate-180 text-emerald-400" : ""
+                    className={`size-4 text-[#94A3B8] transition-transform duration-200 shrink-0 ml-2 ${
+                      isOpen ? "rotate-180 text-[#818CF8]" : ""
                     }`}
                   />
                 </button>
 
                 {isOpen && (
-                  <div className="border-t border-white/5 p-4 sm:p-5 text-xs sm:text-sm text-neutral-300 leading-relaxed bg-neutral-950/40">
+                  <div className="border-t border-[#1E2638] p-4 text-xs sm:text-sm text-[#94A3B8] leading-relaxed bg-[#07090E]">
                     {faq.a}
                   </div>
                 )}

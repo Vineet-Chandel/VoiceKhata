@@ -1,133 +1,121 @@
+// src/components/ui/Shopkeeper/ShopkeeperPainPoints.tsx
 import React from "react";
 import { 
-  XCircle, 
-  CheckCircle2, 
+  X, 
+  Check, 
   Zap, 
   Globe2, 
   MessageSquare, 
   WifiOff, 
   Clock, 
-  ShieldCheck,
-  TrendingUp,
-  FileSpreadsheet
+  ShieldCheck 
 } from "lucide-react";
 
 export function ShopkeeperPainPoints() {
   const comparisonItems = [
     {
-      pain: "दुकान पर ग्राहकों की भीड़ में डायरी में लिखने का समय नहीं मिलता — हिसाब छूट जाता है।",
-      solution: "केवल 3 सेकंड में बोलें — 'रमेश ₹200 उधार'। ग्राहक के सामने ही बिना पेन छुए एंट्री हो जाएगी।",
-      icon: <Clock className="size-5 text-emerald-400" />,
-      tag: "भीड़ में सुपरफ़ास्ट"
+      pain: "During rush hours with customers waiting, you have no time to write in a paper diary — transactions get missed.",
+      solution: "Log in 3 seconds flat: Just say 'Ramesh ne ₹200 diye'. Your ledger updates in front of the customer without touching a pen.",
+      icon: <Clock className="size-4 text-[#3949AB]" />,
+      tag: "Rush Hour Speed"
     },
     {
-      pain: "मोबाइल ऐप्स में नाम ढूँढना और कीबोर्ड से टाइप करना बहुत धीमा और झंझट भरा है।",
-      solution: "Zero Typing! बस ग्राहक का नाम और रुपये बोलें। AI अपने आप सही खाते में दर्ज कर देता है।",
-      icon: <Zap className="size-5 text-emerald-400" />,
-      tag: "शून्य टाइपिंग"
+      pain: "Searching customer names on small phone keyboards is slow, clumsy, and frustrating with shop-dusted hands.",
+      solution: "Zero Typing! Just speak the customer name and amount. VoiceKhata matches the account and logs the entry.",
+      icon: <Zap className="size-4 text-[#3949AB]" />,
+      tag: "Zero Typing"
     },
     {
-      pain: "उधार के पैसे माँगने में संकोच और शर्म आती है — रिश्ते खराब होने का डर रहता है।",
-      solution: "ऑटोमैटिक और विनम्र WhatsApp पेमेंट रिमाइंडर, सीधा UPI लिंक के साथ। 3x तेज़ वसूली!",
-      icon: <MessageSquare className="size-5 text-emerald-400" />,
-      tag: "WhatsApp तगादा"
+      pain: "Calling customers repeatedly to collect pending credit feels awkward and risks damaging personal relationships.",
+      solution: "Automated polite WhatsApp payment reminders with direct UPI links (GPay, PhonePe, Paytm).",
+      icon: <MessageSquare className="size-4 text-[#16856A]" />,
+      tag: "WhatsApp Collection"
     },
     {
-      pain: "कागज़ की लाल बही-खाता डायरी फटने, पानी गिरने या खो जाने पर भारी नुक़सान।",
-      solution: "100% सुरक्षित ऑटोमैटिक क्लाउड बैकअप। मोबाइल बदलें या खो जाए, हिसाब 1 मिनट में वापस।",
-      icon: <ShieldCheck className="size-5 text-emerald-400" />,
-      tag: "100% सुरक्षित"
+      pain: "Physical red paper bahi-khata books get torn, water-damaged, or lost, causing unrecoverable losses.",
+      solution: "100% automated secure cloud backup. Switch or lose your phone, your entire ledger is restored in 60 seconds.",
+      icon: <ShieldCheck className="size-4 text-[#3949AB]" />,
+      tag: "Bank-Grade Backup"
     },
     {
-      pain: "दुकान में कम नेटवर्क या इंटरनेट बंद होने पर ऑनलाइन ऐप्स बंद हो जाते हैं।",
-      solution: "ऑफलाइन मोड — बिना इंटरनेट के भी बोलकर हिसाब लिखें। नेटवर्क आने पर अपने आप सिंक होगा।",
-      icon: <WifiOff className="size-5 text-emerald-400" />,
-      tag: "बिना इंटरनेट भी चालू"
+      pain: "Poor mobile network or internet blackouts freeze conventional accounting apps.",
+      solution: "Offline-first capability: Keep speaking and recording entries even without internet. Everything auto-syncs when online.",
+      icon: <WifiOff className="size-4 text-[#3949AB]" />,
+      tag: "Works Offline"
     },
     {
-      pain: "अंग्रेज़ी ऐप्स समझना मुश्किल — स्थानीय भाषा और लहजे में टाइपिंग नहीं हो पाती।",
-      solution: "हिंदी, हिंग्लिश और अपनी स्थानीय बोली में स्वाभाविक रूप से बोलें — जैसा आप बोलते हैं, वैसा समझेगा।",
-      icon: <Globe2 className="size-5 text-emerald-400" />,
-      tag: "अपनी भाषा"
+      pain: "Complicated English financial apps are confusing to operate and don't understand Indian accent nuances.",
+      solution: "Engineered specifically for Indian English, Hinglish, and retail speech patterns. Speaks and understands like you do.",
+      icon: <Globe2 className="size-4 text-[#3949AB]" />,
+      tag: "Natural Dialects"
     }
   ];
 
   return (
-    <section id="comparison" className="py-14 sm:py-20 bg-[#070709]">
+    <section id="benefits" className="py-16 sm:py-20 bg-[#07090E] border-b border-[#1E2638]">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto mb-12">
-          <span className="text-xs font-bold uppercase tracking-widest text-emerald-400">
-            पुरानी परेशानियाँ vs नया आसान तरीका
+          <span className="text-xs font-semibold uppercase tracking-wider text-[#818CF8] bg-[#1E2337] border border-[#5C6BC0]/30 px-3 py-1 rounded-full">
+            Why VoiceKhata
           </span>
-          <h2 className="mt-2 text-2xl sm:text-4xl font-black text-white tracking-tight">
-            कागज़ी डायरी और धीमी टाइपिंग को कहें अलविदा
+          <h2 className="mt-3 text-2xl sm:text-4xl font-bold text-[#F1F5F9] tracking-tight">
+            Say Goodbye to Slow Paper Diaries & Manual Typing
           </h2>
-          <p className="mt-3 text-sm text-neutral-400">
-            जानें क्यों हज़ारों दुकानदार पुरानी लाल डायरी और जटिल ऐप्स छोड़कर VoiceKhata अपना रहे हैं।
+          <p className="mt-2 text-xs sm:text-sm text-[#94A3B8]">
+            See why modern shopkeepers and business owners are switching from manual notebooks to hands-free voice accounting.
           </p>
         </div>
 
-        {/* Comparison Table / Grid */}
+        {/* Comparison Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           
-          {/* Old Way Column (Red Alert Style) */}
-          <div className="rounded-3xl border border-rose-900/30 bg-rose-950/10 p-6 sm:p-8 space-y-6">
-            <div className="flex items-center gap-3 border-b border-rose-900/30 pb-4">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-rose-500/20 text-rose-400">
-                <XCircle className="size-6" />
+          {/* Old Way Column */}
+          <div className="rounded-[12px] border border-[#1E2638] bg-[#0F131C] p-6 sm:p-7 space-y-5 shadow-xs">
+            <div className="flex items-center gap-3 border-b border-[#1E2638] pb-4">
+              <div className="flex size-9 items-center justify-center rounded-[8px] bg-[#7F1D1D]/30 text-[#F87171]">
+                <X className="size-5" />
               </div>
               <div>
-                <h3 className="text-lg font-bold text-rose-300">पुराना तरीका: लाल डायरी या टाइपिंग ऐप्स</h3>
-                <p className="text-xs text-rose-400/80">समय की बर्बादी और हिसाब छूटने का जोखिम</p>
+                <h3 className="text-base font-bold text-[#F1F5F9]">The Old Way: Paper Registers & Clunky Apps</h3>
+                <p className="text-xs text-[#64748B]">Time wasted, missed credit, awkward collection calls</p>
               </div>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-3.5">
               {comparisonItems.map((item, idx) => (
-                <div key={idx} className="flex items-start gap-3 text-xs sm:text-sm text-neutral-300">
-                  <span className="text-rose-500 text-base font-bold shrink-0 mt-0.5">✕</span>
-                  <p className="leading-relaxed text-neutral-400">{item.pain}</p>
+                <div key={idx} className="flex items-start gap-3 text-xs text-[#94A3B8]">
+                  <span className="text-[#F87171] font-bold text-sm shrink-0">✕</span>
+                  <p className="leading-relaxed">{item.pain}</p>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* New Way Column (Emerald Khatabook Green Style) */}
-          <div className="relative rounded-3xl border border-emerald-500/40 bg-gradient-to-b from-emerald-950/25 to-neutral-950 p-6 sm:p-8 space-y-6 shadow-2xl">
-            {/* Recommended pill */}
-            <div className="absolute -top-3 right-6 rounded-full bg-emerald-500 px-3 py-0.5 text-[10px] font-black uppercase tracking-wider text-black shadow-md">
-              आधुनिक व्यापारियों की पसंद
-            </div>
-
-            <div className="flex items-center gap-3 border-b border-emerald-800/30 pb-4">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500/20 text-emerald-400">
-                <CheckCircle2 className="size-6" />
+          {/* New Way Column */}
+          <div className="rounded-[12px] border border-[#5C6BC0]/40 bg-[#0F131C] p-6 sm:p-7 space-y-5 shadow-xs relative">
+            <div className="flex items-center gap-3 border-b border-[#1E2638] pb-4">
+              <div className="flex size-9 items-center justify-center rounded-[8px] bg-[#1E2337] text-[#818CF8]">
+                <Check className="size-5" />
               </div>
               <div>
-                <h3 className="text-lg font-bold text-emerald-300">नया तरीका: VoiceKhata (बोलकर हिसाब)</h3>
-                <p className="text-xs text-emerald-400/80">3 सेकंड में एंट्री, 0% गलती, 3x तेज़ वसूली</p>
+                <h3 className="text-base font-bold text-[#F1F5F9]">The VoiceKhata Way: Speak & Settle</h3>
+                <p className="text-xs text-[#34D399] font-medium">Fast, verified by voice, polite automated collections</p>
               </div>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-3.5">
               {comparisonItems.map((item, idx) => (
-                <div key={idx} className="flex items-start gap-3 text-xs sm:text-sm">
-                  <div className="mt-0.5 shrink-0">{item.icon}</div>
-                  <div>
-                    <span className="inline-block rounded bg-emerald-500/15 text-emerald-300 px-1.5 py-0.2 text-[10px] font-bold uppercase tracking-wider mb-1">
-                      {item.tag}
-                    </span>
-                    <p className="leading-relaxed text-white font-medium">{item.solution}</p>
-                  </div>
+                <div key={idx} className="flex items-start gap-3 text-xs text-[#F1F5F9]">
+                  <span className="text-[#34D399] font-bold text-sm shrink-0">✓</span>
+                  <p className="leading-relaxed">{item.solution}</p>
                 </div>
               ))}
             </div>
           </div>
 
         </div>
-
       </div>
     </section>
   );

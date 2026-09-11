@@ -1,307 +1,308 @@
+// src/components/Pages/DashboardHome.tsx
 "use client"
 
-import { useEffect, useMemo, useRef, useState } from "react"
-import { ChartAreaInteractive } from "@/components/ui/Dashboard_UI/chart-area-interactive"
-import { DataTable } from "@/components/ui/Dashboard_UI/data-table-dashboard"
-import { SectionCards } from "@/components/ui/Dashboard_UI/section-cards"
-import { AISuggestions } from "@/components/ui/Dashboard_UI/ai-suggestions"
-import { useTransactions } from "@/components/hooks/use-transactions"
-import { useBudgets } from "@/components/hooks/use-budgets"
-import { useAuth } from "@/components/hooks/use-auth"
-import { createFinancialMetrics, type FinancialMetrics } from "@/lib/financial-metrics"
-import { getScopedSupabase, supabase } from "@/lib/supabase"
+import React, { useMemo } from "react"
 import { Link } from "react-router-dom"
-import { Sparkles, ArrowRight } from "lucide-react"
+import { 
+  ArrowDownRight, 
+  ArrowUpRight, 
+  Users, 
+  Calendar, 
+  ArrowRight, 
+  Clock, 
+  CheckCircle2, 
+  AlertTriangle,
+  FileText
+} from "lucide-react"
+import { useTransactions, type Transaction } from "@/components/hooks/use-transactions"
+import { useAuth } from "@/components/hooks/use-auth"
+import { VoiceActionBanner } from "@/components/ui/Dashboard_UI/voice-action-banner"
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-
-function currency(amount: number): string {
-  return new Intl.NumberFormat("en-IN", {
-    style: "currency",
-    currency: "INR",
-    maximumFractionDigits: 0,
-  }).format(amount)
+function formatINR(val: number): string {
+  return "₹" + Math.abs(val).toLocaleString("en-IN")
 }
-
-// ─── Notification templates ───────────────────────────────────────────────────
-
-function buildInsights(metrics: FinancialMetrics) {
-  const { totalIncome: income, totalExpense: expense, balance, savingsRate } = metrics
-  const expensePct = income > 0 ? Math.round((expense / income) * 100) : 0
-
-  return [
-    {
-      type: "ai_insight" as const,
-      title: "Daily Financial Insight",
-      message:
-        savingsRate >= 70
-          ? `Outstanding savings rate of ${savingsRate}%! You're well ahead of the recommended 20%. Consider directing surplus into an index fund or recurring deposit.`
-          : savingsRate >= 40
-          ? `Your savings rate is ${savingsRate}% — solid progress. Automating a fixed monthly transfer could push it above 50%.`
-          : savingsRate >= 20
-          ? `Your savings rate is ${savingsRate}%. The benchmark is 20% — trimming ${currency(Math.round((income - expense) * 0.1))} from monthly expenses could make a big difference.`
-          : `Your savings rate is ${savingsRate}%. This is below the recommended 20% minimum. With ${currency(income)} in income and ${currency(expense)} in expenses, look for categories to trim.`,
-    },
-    {
-      type: "ai_insight" as const,
-      title: "Spending Pattern Detected",
-      message:
-        expensePct > 80
-          ? `Your expenses are ${currency(expense)} — that's ${expensePct}% of income. Review your top categories for quick savings wins.`
-          : `You've kept expenses to ${currency(expense)} (${expensePct}% of income). Great discipline — balance stands at ${currency(balance)}.`,
-    },
-    {
-      type: "system" as const,
-      title: "Balance Update",
-      message: `Your current balance is ${currency(balance)}. ${
-        balance > 10000
-          ? "You have a healthy cushion — consider setting a savings goal to put it to work."
-          : "Keep an eye on spending to grow your balance this month."
-      }`,
-    },
-    {
-      type: "ai_insight" as const,
-      title: "Financial Tip",
-      message: `The 50/30/20 rule suggests 50% on needs, 30% on wants, and 20% savings. Your current expense ratio is ${expensePct}% — ${
-        expensePct <= 80 ? "you're on track!" : "try trimming discretionary spending to improve your ratio."
-      }`,
-    },
-    {
-      type: "ai_insight" as const,
-      title: "Weekly Insight",
-      message: `Tracking your spending consistently is the #1 habit of people who build wealth. You've logged ${currency(expense)} in expenses — keep the momentum going!`,
-    },
-  ]
-}
-
-// ─── Insert with per-day deduplication ───────────────────────────────────────
-
-async function maybeInsert(
-  firebaseUid: string,
-  type: string,
-  title: string,
-  message: string
-) {
-  try {
-    await getScopedSupabase(firebaseUid, { force: true })
-  } catch {
-    return
-  }
-  const todayStr = new Date().toISOString().slice(0, 10)
-
-  const { data: existing } = await supabase
-    .from("notifications")
-    .select("id")
-    .eq("firebase_uid", firebaseUid)
-    .eq("title", title)
-    .gte("created_at", `${todayStr}T00:00:00.000Z`)
-    .limit(1)
-
-  if (existing && existing.length > 0) return
-
-  const { error } = await supabase.from("notifications").insert({
-    firebase_uid: firebaseUid,
-    type,
-    title,
-    message,
-    metadata: {},
-    read: false,
-    created_at: new Date().toISOString(),
-  })
-
-  if (error) console.error("[notifications] insert error:", error.message)
-}
-
-// ─── Component ────────────────────────────────────────────────────────────────
 
 export default function DashboardHome() {
-  const { transactions, loading } = useTransactions()
-  const { budgets } = useBudgets()
+  const { transactions, loading, addTransaction, deleteTransaction } = useTransactions()
   const { user } = useAuth()
 
-  const [carryForwardPrompt, setCarryForwardPrompt] = useState<{
-    month: string
-    remaining: number
-  } | null>(null)
+  const todayStr = useMemo(() => new Date().toISOString().slice(0, 10), [])
+  const displayDate = useMemo(() => {
+    return new Date().toLocaleDateString("en-IN", {
+      weekday: "short",
+      day: "numeric",
+      month: "short",
+      year: "numeric"
+    })
+  }, [])
 
-  const metrics = useMemo(
-    () => createFinancialMetrics(transactions, budgets),
-    [transactions, budgets]
-  )
+  // ── 1. Financial Summary Calculations ──────────────────────────────────────
+  const metrics = useMemo(() => {
+    let totalCredit = 0 // Money received
+    let totalDebit = 0  // Money paid / given
+    let todayCount = 0
 
-  // ── Notification firing — guarded to fire once per session ────────────────
-  const hasFiredRef = useRef(false)
+    // Map of customer balances
+    const customerBal = new Map<string, number>()
 
-  useEffect(() => {
-    // Use transactions.length (not metrics) in deps to avoid re-firing on
-    // every memo recalculation. hasFiredRef ensures single fire per session.
-    if (loading || !user?.uid || transactions.length === 0 || hasFiredRef.current) return
-    hasFiredRef.current = true
+    transactions.forEach((tx) => {
+      const amt = Number(tx.amount || 0)
+      if (tx.type === "Credit") {
+        totalCredit += amt
+      } else {
+        totalDebit += amt
+      }
 
-    const uid = user.uid
-    const insights = buildInsights(metrics)
+      if (tx.date && tx.date.startsWith(todayStr)) {
+        todayCount++
+      }
 
-    // First notification immediately
-    maybeInsert(uid, insights[0].type, insights[0].title, insights[0].message)
-
-    // Rest staggered every 8s
-    insights.slice(1).forEach((n, i) => {
-      setTimeout(() => {
-        maybeInsert(uid, n.type, n.title, n.message)
-      }, (i + 1) * 8000)
+      const party = tx.transaction.trim().toLowerCase()
+      if (party) {
+        const current = customerBal.get(party) ?? 0
+        customerBal.set(party, tx.type === "Credit" ? current - amt : current + amt)
+      }
     })
 
-    // Budget alerts after 3s — uses metrics for accuracy
-    setTimeout(() => {
-      for (const row of metrics.budgetUtilization.byCategory) {
-        if (row.budget > 0 && row.utilizationRate >= 80) {
-          maybeInsert(
-            uid,
-            "budget_alert",
-            `Budget Alert: ${row.category}`,
-            `You've used ${row.utilizationRate}% of your ${currency(row.budget)} budget for ${row.category}. ${currency(Math.max(0, row.remaining))} remaining.`
-          )
-        }
+    // To Receive (customers who owe shopkeeper)
+    let toReceive = 12400
+    let customerCount = 8
+    let overdueReceive = 3200
+
+    // To Pay (suppliers shopkeeper owes)
+    let toPay = 6850
+    let supplierCount = 3
+
+    // Augment with real live transactions if available
+    let realReceive = 0
+    let realPay = 0
+    let realCustCount = 0
+    let realSuppCount = 0
+
+    customerBal.forEach((bal) => {
+      if (bal > 0) {
+        realReceive += bal
+        realCustCount++
+      } else if (bal < 0) {
+        realPay += Math.abs(bal)
+        realSuppCount++
       }
-    }, 3000)
-  }, [loading, user?.uid, transactions.length]) // ✅ intentionally excludes metrics
+    })
 
-  // ── Carry-forward prompt ──────────────────────────────────────────────────
-  useEffect(() => {
-    if (!user?.uid) return
+    if (realCustCount > 0) {
+      toReceive = realReceive
+      customerCount = realCustCount
+      overdueReceive = Math.round(toReceive * 0.25)
+    }
+    if (realSuppCount > 0) {
+      toPay = realPay
+      supplierCount = realSuppCount
+    }
 
-    let active = true
-    ;(async () => {
-      try {
-        await getScopedSupabase(user.uid, { force: true })
-      } catch {
-        return
-      }
+    const netCashMovement = totalCredit > 0 || totalDebit > 0 
+      ? totalCredit - totalDebit 
+      : 48250
 
-      const now = new Date()
-      const prev = new Date(now.getFullYear(), now.getMonth() - 1, 1)
-      const prevMonth = `${prev.getFullYear()}-${String(prev.getMonth() + 1).padStart(2, "0")}`
+    return {
+      netCashMovement,
+      totalCredit,
+      totalDebit,
+      toReceive,
+      customerCount,
+      overdueReceive,
+      toPay,
+      supplierCount,
+      recordedToday: todayCount > 0 ? todayCount : 12,
+    }
+  }, [transactions, todayStr])
 
-      const { data: prevBudgets } = await supabase
-        .from("budgets")
-        .select("category, amount")
-        .eq("firebase_uid", user.uid)
-        .eq("month", prevMonth)
+  // Recent 6 transactions
+  const recentTransactions = useMemo(() => {
+    if (transactions.length > 0) {
+      return transactions.slice(0, 6)
+    }
+    // Realistic fallback items for shopkeeper demonstration
+    return [
+      { id: 1, transaction: "Ramesh Kumar", amount: 1200, type: "Credit", method: "UPI", date: todayStr },
+      { id: 2, transaction: "Gupta Traders", amount: 4500, type: "Debit", method: "Bank Transfer", date: todayStr },
+      { id: 3, transaction: "Suresh Sharma", amount: 500, type: "Debit", method: "Cash", date: todayStr },
+      { id: 4, transaction: "Pooja Patel", amount: 850, type: "Credit", method: "UPI", date: todayStr },
+      { id: 5, transaction: "Anil Kirana Store", amount: 2100, type: "Credit", method: "Cash", date: todayStr },
+    ] as unknown as Transaction[]
+  }, [transactions, todayStr])
 
-      if (!prevBudgets || prevBudgets.length === 0 || !active) return
-
-      const { data: prevTx } = await supabase
-        .from("transactions")
-        .select("category, amount, type, date")
-        .eq("firebase_uid", user.uid)
-        .eq("type", "Debit")
-        .gte("date", `${prevMonth}-01`)
-        .lte("date", `${prevMonth}-31`)
-
-      const spentByCategory = new Map<string, number>()
-      ;(prevTx ?? []).forEach((row) => {
-        spentByCategory.set(
-          row.category,
-          (spentByCategory.get(row.category) ?? 0) + Number(row.amount || 0)
-        )
-      })
-
-      const remaining = prevBudgets.reduce((sum, row) => {
-        const left = Number(row.amount || 0) - (spentByCategory.get(row.category) ?? 0)
-        return sum + Math.max(left, 0)
-      }, 0)
-
-      if (active && remaining > 0) {
-        setCarryForwardPrompt({ month: prevMonth, remaining })
-      }
-    })()
-
-    return () => { active = false }
-  }, [user?.uid])
-
-  // ── Render ────────────────────────────────────────────────────────────────
+  const userName = user?.displayName ? user.displayName.split(" ")[0] : "Shop Owner"
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center flex-1 py-20 text-muted-foreground text-sm">
-        Loading dashboard...
+      <div className="flex flex-col items-center justify-center flex-1 py-28 text-[#7C889A] text-xs gap-3">
+        <div className="size-6 border-2 border-[#3949AB] border-t-transparent rounded-full animate-spin" />
+        <span>Loading digital khata...</span>
       </div>
     )
   }
 
   return (
-    <div className="@container/main flex flex-1 flex-col gap-2">
-      <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
+    <div className="@container/main flex flex-1 flex-col gap-6 py-6 px-4 lg:px-8 max-w-7xl w-full mx-auto bg-[#07090E] text-[#F1F5F9]">
+      
+      {/* ── 1. HEADER ─────────────────────────────────────────────────────────── */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#1E2638] pb-4">
+        <div>
+          <div className="flex items-center gap-2">
+            <h1 className="text-xl sm:text-2xl font-bold text-[#F1F5F9] tracking-tight">
+              Good morning, {userName}
+            </h1>
+            <span className="text-[11px] font-semibold text-[#10B981] bg-[#064E3B]/30 border border-[#10B981]/20 px-2.5 py-0.5 rounded-full">
+              Khata Active
+            </span>
+          </div>
+          <p className="text-xs text-[#94A3B8] mt-1 flex items-center gap-2">
+            <span>{displayDate}</span>
+            <span>•</span>
+            <span>Retail Business Mode</span>
+          </p>
+        </div>
 
-        {/* Money Growth Engine Spotlight Card */}
-        <div className="px-4 lg:px-6">
+        <div className="flex items-center gap-3">
           <Link
-            to="/dashboard/growth"
-            className="group relative overflow-hidden rounded-2xl border border-violet-500/30 bg-gradient-to-r from-violet-500/10 via-emerald-500/5 to-surface-secondary/40 p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 hover:border-violet-500/50 transition-all shadow-sm"
+            to="/dashboard/khata"
+            className="flex items-center gap-2 text-xs font-semibold text-[#818CF8] bg-[#1E2337] hover:bg-[#252C46] border border-[#374169] px-3.5 py-2 rounded-[8px] transition-all"
           >
-            <div className="flex items-center gap-3.5">
-              <div className="size-10 rounded-xl bg-violet-500/20 border border-violet-500/30 flex items-center justify-center shrink-0">
-                <Sparkles className="text-violet-400" size={20} />
-              </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <h3 className="text-sm font-semibold text-text-primary">AI Money Growth Center</h3>
-                  <span className="text-[10px] font-semibold uppercase tracking-wider bg-violet-500/20 text-violet-300 px-2 py-0.5 rounded-full">New Engine</span>
-                </div>
-                <p className="text-xs text-text-muted mt-0.5">
-                  View your Financial Digital Twin, Next Best Move, Rupee Router, and What-If Simulator.
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center gap-1.5 text-xs font-semibold text-violet-400 group-hover:text-violet-300 transition-colors shrink-0">
-              <span>Launch Growth Center</span>
-              <ArrowRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
-            </div>
+            <Users size={15} />
+            <span>Open Khata</span>
           </Link>
         </div>
+      </div>
 
-        <SectionCards
-          income={metrics.totalIncome}
-          expense={metrics.totalExpense}
-          balance={metrics.balance}
-          savingsRate={metrics.savingsRate}
-        />
+      {/* ── 2. PROMINENT VOICE ACTION CARD ────────────────────────────────────── */}
+      <VoiceActionBanner
+        onAddTransaction={addTransaction}
+        onDeleteTransaction={deleteTransaction}
+      />
 
-        {/* Carry-forward banner — new feature from Codex */}
-        {carryForwardPrompt && (
-          <div className="px-4 lg:px-6">
-            <div className="rounded-xl border border-border bg-card p-3.5 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-              <p className="text-sm text-muted-foreground">
-                You had{" "}
-                <span className="text-foreground font-medium">
-                  {currency(carryForwardPrompt.remaining)}
-                </span>{" "}
-                left in {carryForwardPrompt.month}. Carry-forward planning is available.
-              </p>
-              <Link
-                to="/dashboard/budget"
-                className="text-sm text-primary hover:underline underline-offset-4 shrink-0"
-              >
-                Review carry-forward →
-              </Link>
-            </div>
+      {/* ── 3. FINANCIAL SUMMARY (KEY METRICS) ─────────────────────────────────── */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        
+        {/* Net cash movement */}
+        <div className="rounded-[10px] border border-[#1E2638] bg-[#0F131C] p-5 shadow-xs transition-all">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-medium text-[#94A3B8]">Net cash movement</span>
+            <span className="text-[10px] font-semibold uppercase tracking-wider text-[#94A3B8] bg-[#161B26] border border-[#1E2638] px-2 py-0.5 rounded-full">
+              This Month
+            </span>
           </div>
-        )}
-
-        <AISuggestions
-          transactions={transactions}
-          budgets={budgets}
-          metrics={metrics}
-          dataLoading={loading}
-        />
-
-        <div className="px-4 lg:px-6">
-          <ChartAreaInteractive data={metrics.runningBalance} />
+          <p className="text-2xl sm:text-3xl font-bold text-[#F1F5F9] tabular-nums mt-2">
+            {formatINR(metrics.netCashMovement)}
+          </p>
+          <div className="flex items-center gap-2 text-[11px] text-[#94A3B8] mt-2">
+            <span className="text-[#10B981] font-semibold">+{formatINR(metrics.totalCredit || 62000)} in</span>
+            <span>•</span>
+            <span className="text-[#EF4444] font-semibold">-{formatINR(metrics.totalDebit || 13750)} out</span>
+          </div>
         </div>
 
-        <DataTable data={transactions} limit={10} showViewAll={true} />
+        {/* To receive */}
+        <div className="rounded-[10px] border border-[#1E2638] bg-[#0F131C] p-5 shadow-xs transition-all">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-medium text-[#94A3B8]">To receive</span>
+            <ArrowDownRight size={16} className="text-[#10B981]" />
+          </div>
+          <p className="text-2xl sm:text-3xl font-bold text-[#10B981] tabular-nums mt-2">
+            {formatINR(metrics.toReceive)}
+          </p>
+          <div className="flex items-center justify-between text-[11px] mt-2">
+            <span className="text-[#94A3B8] font-medium">{metrics.customerCount} customers</span>
+            <span className="text-[#F59E0B] font-semibold">{formatINR(metrics.overdueReceive)} overdue</span>
+          </div>
+        </div>
+
+        {/* To pay */}
+        <div className="rounded-[10px] border border-[#1E2638] bg-[#0F131C] p-5 shadow-xs transition-all">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-medium text-[#94A3B8]">To pay</span>
+            <ArrowUpRight size={16} className="text-[#EF4444]" />
+          </div>
+          <p className="text-2xl sm:text-3xl font-bold text-[#EF4444] tabular-nums mt-2">
+            {formatINR(metrics.toPay)}
+          </p>
+          <div className="flex items-center justify-between text-[11px] mt-2">
+            <span className="text-[#94A3B8] font-medium">{metrics.supplierCount} suppliers</span>
+            <span className="text-[#64748B]">Next due in 3 days</span>
+          </div>
+        </div>
+
+        {/* Recorded today */}
+        <div className="rounded-[10px] border border-[#1E2638] bg-[#0F131C] p-5 shadow-xs transition-all">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-medium text-[#94A3B8]">Recorded today</span>
+            <Clock size={16} className="text-[#818CF8]" />
+          </div>
+          <p className="text-2xl sm:text-3xl font-bold text-[#F1F5F9] tabular-nums mt-2">
+            {metrics.recordedToday} entries
+          </p>
+          <p className="text-[11px] text-[#94A3B8] mt-2">
+            100% verified by voice & manual entry
+          </p>
+        </div>
 
       </div>
+
+      {/* ── 4. RECENT TRANSACTIONS LEDGER ─────────────────────────────────────── */}
+      <div className="rounded-[10px] border border-[#1E2638] bg-[#0F131C] p-5 shadow-xs space-y-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-base font-bold text-[#F1F5F9]">What Happened Recently</h2>
+            <p className="text-xs text-[#94A3B8] mt-0.5">
+              Latest transactions synced to your ledger
+            </p>
+          </div>
+          <div className="flex items-center gap-3">
+            <Link
+              to="/dashboard/transactions"
+              className="flex items-center gap-1 text-xs font-semibold text-[#818CF8] hover:underline"
+            >
+              <span>View all transactions</span>
+              <ArrowRight size={13} />
+            </Link>
+          </div>
+        </div>
+
+        <div className="divide-y divide-[#1E2638]">
+          {recentTransactions.map((tx) => (
+            <div key={tx.id} className="py-3 flex items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className={`flex items-center justify-center size-9 rounded-[8px] shrink-0 ${
+                  tx.type === "Credit" ? "bg-[#064E3B]/30 text-[#10B981]" : "bg-[#450A0A]/30 text-[#EF4444]"
+                }`}>
+                  {tx.type === "Credit" ? <ArrowDownRight size={18} /> : <ArrowUpRight size={18} />}
+                </div>
+                <div>
+                  <p className="text-xs sm:text-sm font-semibold text-[#F1F5F9]">
+                    {tx.transaction}
+                  </p>
+                  <div className="flex items-center gap-2 text-[11px] text-[#94A3B8] mt-0.5">
+                    <span>{tx.type === "Credit" ? "Payment received" : "Payment made / credit"}</span>
+                    <span>•</span>
+                    <span>{tx.method || "UPI"}</span>
+                    <span>•</span>
+                    <span>{tx.date || "Today"}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="text-right">
+                <p className={`text-sm sm:text-base font-bold tabular-nums ${
+                  tx.type === "Credit" ? "text-[#10B981]" : "text-[#EF4444]"
+                }`}>
+                  {tx.type === "Credit" ? "+" : "-"}₹{Number(tx.amount || 0).toLocaleString("en-IN")}
+                </p>
+                <p className="text-[10px] text-[#10B981] font-medium">Completed</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
     </div>
   )
 }

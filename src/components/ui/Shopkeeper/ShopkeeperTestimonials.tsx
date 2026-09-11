@@ -1,33 +1,33 @@
 import React from "react";
-import { Star, Quote, CheckCircle2 } from "lucide-react";
+import { Star, CheckCircle2 } from "lucide-react";
 
 export function ShopkeeperTestimonials() {
   const reviews = [
     {
-      name: "राकेश गुप्ता",
-      shop: "गुप्ता किराना & प्रोविजन स्टोर",
-      city: "कानपुर, उत्तर प्रदेश",
+      name: "Rakesh Gupta",
+      shop: "Gupta Kirana & Provisions",
+      city: "Kanpur, Uttar Pradesh",
       quote:
-        "शाम को जब दुकान पर 10 ग्राहक एक साथ खड़े होते हैं, तो डायरी में पेन से लिखना नामुमकिन होता था। अब मैं सीधे बोल देता हूँ — 'बबलू 2 किलो चीनी 90 उधार'। शाम को एक भी रुपये का हिसाब नहीं छूटता!",
-      savings: "हर महीने ₹8,000+ का हिसाब नुकसान बचा",
+        "During evening rush hours with 10 customers standing at the counter, writing in a physical diary was impossible. Now I simply speak into my phone — not a single rupee of credit gets missed!",
+      savings: "Saved ₹8,000+ in missed credit every month",
       rating: 5
     },
     {
-      name: "संजय पटेल",
-      shop: "पटेल हार्डवेयर & सैनिटरी वेयर",
-      city: "अहमदाबाद, गुजरात",
+      name: "Sanjay Patel",
+      shop: "Patel Hardware & Sanitary Ware",
+      city: "Ahmedabad, Gujarat",
       quote:
-        "मिस्त्री और ठेकेदारों को बार-बार फोन करके उधार माँगने में बहुत शर्म आती थी। VoiceKhata से एक क्लिक में WhatsApp पर पेमेंट लिंक चला जाता है। अब 3 दिन के अंदर पैसे खाते में आ जाते हैं!",
-      savings: "3 गुना तेज़ उधार वसूली",
+        "Calling contractors repeatedly to ask for payment felt embarrassing. With VoiceKhata, an automated WhatsApp reminder with a direct UPI payment link goes out in one click. Dues clear within 3 days!",
+      savings: "3x faster customer payment recovery",
       rating: 5
     },
     {
-      name: "डॉ. अनीश अहमद",
-      shop: "न्यू लाइफ मेडिकल & केमिस्ट",
-      city: "लखनऊ, उत्तर प्रदेश",
+      name: "Dr. Anees Ahmed",
+      shop: "New Life Medical & Chemist",
+      city: "Lucknow, Uttar Pradesh",
       quote:
-        "दवा देते वक्त हाथ में अक्सर सैनिटाइज़र या दवा की पत्ती होती है, मोबाइल स्क्रीन पर टाइप करना बहुत मुश्किल था। बोलकर खाता लिखना सबसे आसान क्रांति है। 100% सटीक काम करता है।",
-      savings: "रोज़ाना 45 मिनट का कीमती समय बचा",
+        "While dispensing medicines, my hands are often sanitized or occupied. Typing on a phone screen was too tedious. Speaking the ledger entry is the most natural innovation for counter retail.",
+      savings: "Saves 45 minutes of daily ledger balancing",
       rating: 5
     }
   ];
@@ -37,14 +37,14 @@ export function ShopkeeperTestimonials() {
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         
         <div className="text-center max-w-2xl mx-auto mb-12">
-          <span className="text-xs font-bold uppercase tracking-widest text-emerald-400">
-            सच्चे व्यापारियों के अनुभव
+          <span className="text-xs font-bold uppercase tracking-widest text-indigo-400">
+            Real Merchant Stories
           </span>
           <h2 className="mt-2 text-2xl sm:text-4xl font-black text-white tracking-tight">
-            दुकानदारों ने बदली अपनी दुकान की किस्मत
+            How Retailers Transformed Their Daily Cash Flow
           </h2>
           <p className="mt-3 text-sm text-neutral-400">
-            देखें भारत के व्यापारी VoiceKhata के बारे में क्या कह रहे हैं।
+            Hear directly from small business owners using VoiceKhata across India.
           </p>
         </div>
 
@@ -52,7 +52,7 @@ export function ShopkeeperTestimonials() {
           {reviews.map((rev, idx) => (
             <div
               key={idx}
-              className="relative flex flex-col justify-between rounded-3xl border border-white/10 bg-neutral-900/50 p-6 sm:p-8 hover:border-emerald-500/40 transition-colors"
+              className="relative flex flex-col justify-between rounded-3xl border border-white/10 bg-neutral-900/50 p-6 sm:p-8 hover:border-indigo-500/40 transition-colors"
             >
               <div>
                 {/* Stars */}
@@ -72,14 +72,14 @@ export function ShopkeeperTestimonials() {
                   <div>
                     <h4 className="text-sm font-bold text-white flex items-center gap-1.5">
                       {rev.name}
-                      <CheckCircle2 className="size-3.5 text-emerald-400" />
+                      <CheckCircle2 className="size-3.5 text-cyan-400" />
                     </h4>
                     <p className="text-xs text-neutral-400">{rev.shop}</p>
-                    <p className="text-[11px] text-emerald-400/90 font-medium">{rev.city}</p>
+                    <p className="text-[11px] text-indigo-400 font-medium">{rev.city}</p>
                   </div>
                 </div>
 
-                <div className="mt-3 rounded-xl bg-emerald-950/40 border border-emerald-800/30 p-2 text-center text-[11px] font-bold text-emerald-300">
+                <div className="mt-3 rounded-xl bg-indigo-950/40 border border-indigo-800/30 p-2 text-center text-[11px] font-bold text-cyan-300">
                   ✨ {rev.savings}
                 </div>
               </div>

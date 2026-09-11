@@ -1,164 +1,457 @@
-import React, { useState } from "react";
+// src/components/ui/Shopkeeper/ShopkeeperHero.tsx
+"use client"
+
+import React, { useState, useRef } from "react";
 import { Link } from "react-router-dom";
+import { 
+  motion, 
+  useMotionValue, 
+  useSpring, 
+  useTransform 
+} from "framer-motion";
 import { 
   Mic, 
   ArrowRight, 
-  CheckCircle2, 
-  ShieldCheck, 
-  Smartphone, 
-  Send, 
-  Sparkles,
+  Check, 
+  ArrowDownRight, 
+  ArrowUpRight, 
+  MessageSquare,
+  ShieldCheck,
+  Zap,
   Volume2,
-  Lock,
-  MessageSquare
+  Sliders,
+  Sparkles,
+  Store
 } from "lucide-react";
+import logoImg from "@/assets/logo.png";
+import shopkeeperCounterImg from "@/assets/shopkeeper_counter.jpg";
 
 export function ShopkeeperHero() {
-  const [phoneNumber, setPhoneNumber] = useState("");
-  const [linkSent, setLinkSent] = useState(false);
+  const [activeTab, setActiveTab] = useState<"simulator" | "visual">("simulator");
+  const [activePhrase, setActivePhrase] = useState("Ramesh ne ₹1,200 UPI se diye");
+  const [demoState, setDemoState] = useState<"idle" | "listening" | "review" | "saved">("idle");
+  const [activeCustomer, setActiveCustomer] = useState("Ramesh Kumar");
+  const [activeAmount, setActiveAmount] = useState(1200);
+  const [activeType, setActiveType] = useState<"Credit" | "Debit">("Credit");
+  const [activeMethod, setActiveMethod] = useState("UPI");
+  const [customerBalance, setCustomerBalance] = useState(2450);
 
-  const handleSendLink = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (phoneNumber.trim().length >= 10) {
-      setLinkSent(true);
-      setTimeout(() => setLinkSent(false), 4000);
-      setPhoneNumber("");
+  // 3D Perspective Tilt Physics via Framer Motion
+  const cardRef = useRef<HTMLDivElement>(null);
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+
+  const springConfig = { stiffness: 220, damping: 24 };
+  const smoothX = useSpring(mouseX, springConfig);
+  const smoothY = useSpring(mouseY, springConfig);
+
+  const rotateX = useTransform(smoothY, [-0.5, 0.5], ["9deg", "-9deg"]);
+  const rotateY = useTransform(smoothX, [-0.5, 0.5], ["-9deg", "9deg"]);
+
+  const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!cardRef.current) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    const xPos = (e.clientX - rect.left) / rect.width - 0.5;
+    const yPos = (e.clientY - rect.top) / rect.height - 0.5;
+    mouseX.set(xPos);
+    mouseY.set(yPos);
+  };
+
+  const handlePointerLeave = () => {
+    mouseX.set(0);
+    mouseY.set(0);
+  };
+
+  const samplePhrases = [
+    { text: "Ramesh ne ₹1,200 UPI se diye", person: "Ramesh Kumar", amount: 1200, type: "Credit" as const, method: "UPI" },
+    { text: "Gupta ji ko ₹500 diye nagad", person: "Gupta Traders", amount: 500, type: "Debit" as const, method: "Cash" },
+    { text: "Suresh ne ₹800 jama kiye", person: "Suresh Sharma", amount: 800, type: "Credit" as const, method: "UPI" },
+  ];
+
+  const handleTriggerDemo = (phrase: typeof samplePhrases[0]) => {
+    setActivePhrase(phrase.text);
+    setActiveCustomer(phrase.person);
+    setActiveAmount(phrase.amount);
+    setActiveType(phrase.type);
+    setActiveMethod(phrase.method);
+    setDemoState("listening");
+
+    // Speech audio simulation
+    if ("speechSynthesis" in window) {
+      try {
+        window.speechSynthesis.cancel();
+        const u = new SpeechSynthesisUtterance(phrase.text);
+        u.lang = "hi-IN";
+        u.rate = 1.0;
+        window.speechSynthesis.speak(u);
+      } catch (e) {
+        // speech error fallback
+      }
     }
+
+    setTimeout(() => {
+      setDemoState("review");
+    }, 700);
+  };
+
+  const handleConfirmSave = () => {
+    setDemoState("saved");
+    if (activeType === "Credit") {
+      setCustomerBalance((prev) => Math.max(0, prev - activeAmount));
+    } else {
+      setCustomerBalance((prev) => prev + activeAmount);
+    }
+    setTimeout(() => {
+      setDemoState("idle");
+    }, 4000);
   };
 
   return (
-    <section className="relative overflow-hidden pt-8 pb-12 sm:pt-12 sm:pb-16 lg:pt-16">
-      {/* Background glow effects */}
-      <div className="pointer-events-none absolute inset-0 z-0">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 h-[450px] w-full max-w-4xl rounded-full bg-emerald-600/15 blur-[120px]" />
-        <div className="absolute top-1/2 right-[-10%] h-[350px] w-[400px] rounded-full bg-emerald-500/10 blur-[130px]" />
-      </div>
+    <section className="relative pt-12 pb-16 lg:pt-20 lg:pb-24 bg-[#07090E] border-b border-[#1E2638] overflow-hidden">
+      {/* Ambient background glow */}
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[350px] bg-[#5C6BC0]/10 blur-[130px] pointer-events-none rounded-full" />
 
-      <div className="relative z-10 mx-auto max-w-6xl px-4 sm:px-6">
-        <div className="text-center max-w-3xl mx-auto space-y-6">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           
-          {/* Trust Badge */}
-          <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-950/60 px-4 py-1.5 text-xs sm:text-sm font-semibold text-emerald-400 backdrop-blur-md shadow-sm">
-            <span className="flex h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-            <span>भारत का पहला बोलकर हिसाब लिखने वाला खाता ऐप</span>
-          </div>
+          {/* Left Column: Heading & Value Proposition */}
+          <div className="lg:col-span-6 space-y-6 text-center lg:text-left">
+            
+            {/* Tag badge */}
+            <div className="inline-flex items-center gap-2 rounded-full border border-[#5C6BC0]/30 bg-[#1E2337] px-3.5 py-1 text-xs font-semibold text-[#818CF8]">
+              <span className="size-2 rounded-full bg-[#818CF8] animate-pulse" />
+              <span>Digital Khata for Indian Businesses</span>
+            </div>
 
-          {/* Main Headline */}
-          <h1 className="text-3xl font-black tracking-tight text-white sm:text-5xl md:text-6xl leading-[1.15]">
-            बोलो और हिसाब हो गया! <br />
-            <span className="bg-gradient-to-r from-emerald-400 via-teal-300 to-emerald-200 bg-clip-text text-transparent">
-              Zero Typing Khata
-            </span>
-          </h1>
+            {/* Core Manus Positioning */}
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-[#F1F5F9] leading-[1.1]">
+              Khata likhna. <br />
+              <span className="text-[#818CF8]">Ab bas bolkar.</span>
+            </h1>
 
-          {/* Subheading */}
-          <p className="text-sm sm:text-base md:text-lg text-neutral-300 max-w-2xl mx-auto leading-relaxed">
-            किराना, हार्डवेयर, मेडिकल और रिटेल स्टोर के लिए। जब दुकान पर ग्राहकों की भीड़ हो, 
-            तो डायरी में लिखने या टाइप करने का झंझट छोड़ें — <strong>बस बोलें और खाता तुरंत दर्ज हो जाए!</strong>
-          </p>
+            {/* Subtitle */}
+            <p className="text-base sm:text-lg text-[#94A3B8] max-w-xl mx-auto lg:mx-0 leading-relaxed">
+              Speak naturally in Hindi or English. VoiceKhata understands the customer, amount, and payment method in 3 seconds — keeping customer balances, receivables, and store cashflow 100% accurate without typing.
+            </p>
 
-          {/* Get App Link Mobile Box / CTA */}
-          <div className="mx-auto max-w-md pt-2">
-            <form onSubmit={handleSendLink} className="flex flex-col sm:flex-row items-center gap-2 rounded-2xl border border-emerald-500/30 bg-neutral-900/90 p-2 shadow-xl backdrop-blur-md">
-              <div className="flex items-center gap-2 w-full px-3 py-2 text-neutral-400">
-                <span className="text-sm font-bold text-white border-r border-white/20 pr-2">🇮🇳 +91</span>
-                <input
-                  type="tel"
-                  maxLength={10}
-                  value={phoneNumber}
-                  onChange={(e) => setPhoneNumber(e.target.value.replace(/\D/g, ""))}
-                  placeholder="अपना मोबाइल नंबर डालें"
-                  className="w-full bg-transparent text-sm text-white placeholder-neutral-500 focus:outline-none"
-                  required
-                />
-              </div>
-              <button
-                type="submit"
-                className="w-full sm:w-auto shrink-0 flex items-center justify-center gap-1.5 rounded-xl bg-emerald-500 px-5 py-3 text-xs sm:text-sm font-bold text-black shadow-lg shadow-emerald-500/25 hover:bg-emerald-400 active:scale-95 transition-all"
+            {/* Action CTA Buttons */}
+            <div className="pt-2 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3.5">
+              <Link
+                to="/dashboard"
+                className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-[8px] bg-[#5C6BC0] hover:bg-[#4F5B93] active:scale-[0.98] px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-[#5C6BC0]/20 transition-all cursor-pointer"
               >
-                <span>ऐप लिंक पाएं</span>
-                <Send className="size-3.5" />
+                <span>Launch Digital Khata</span>
+                <ArrowRight className="size-4" />
+              </Link>
+
+              <button
+                onClick={() => {
+                  setActiveTab("simulator");
+                  handleTriggerDemo(samplePhrases[0]);
+                }}
+                className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-[8px] border border-[#1E2638] bg-[#0F131C] hover:bg-[#161B26] active:scale-[0.98] px-6 py-3.5 text-sm font-semibold text-[#F1F5F9] shadow-xs transition-all cursor-pointer"
+              >
+                <Mic className="size-4 text-[#818CF8]" />
+                <span>Try Voice Demo</span>
               </button>
-            </form>
+            </div>
 
-            {linkSent && (
-              <p className="mt-2 text-xs font-semibold text-emerald-400 animate-in fade-in">
-                ✅ लिंक आपके मोबाइल नंबर पर SMS द्वारा भेज दिया गया है!
+            {/* Micro value pillars */}
+            <div className="pt-2 flex flex-wrap items-center justify-center lg:justify-start gap-6 text-xs text-[#94A3B8]">
+              <div className="flex items-center gap-1.5 font-medium text-[#F1F5F9]">
+                <Check className="size-4 text-[#34D399]" />
+                <span>Zero Typing Needed</span>
+              </div>
+              <div className="flex items-center gap-1.5 font-medium text-[#F1F5F9]">
+                <Check className="size-4 text-[#34D399]" />
+                <span>Review Before Save</span>
+              </div>
+              <div className="flex items-center gap-1.5 font-medium text-[#F1F5F9]">
+                <Check className="size-4 text-[#34D399]" />
+                <span>WhatsApp UPI Reminders</span>
+              </div>
+            </div>
+
+            {/* Merchant proof snippet */}
+            <div className="pt-3 flex items-center justify-center lg:justify-start gap-3">
+              <div className="flex -space-x-2 overflow-hidden">
+                <img className="inline-block size-7 rounded-full ring-2 ring-[#07090E] object-cover" src={shopkeeperCounterImg} alt="Shopkeeper" />
+                <div className="size-7 rounded-full bg-[#1E2337] border-2 border-[#07090E] flex items-center justify-center text-[10px] font-bold text-[#818CF8]">
+                  +5k
+                </div>
+              </div>
+              <p className="text-xs text-[#94A3B8]">
+                Used daily by kirana, wholesale & retail merchants across India
               </p>
-            )}
+            </div>
 
-            <p className="mt-2 text-[11px] text-neutral-400">
-              ⚡ 100% फ्री • कोई क्रेडिट कार्ड नहीं चाहिए • 1 मिनट में शुरू करें
-            </p>
           </div>
 
-          {/* Floating Sample Voice Entries (Visual Element) */}
-          <div className="pt-6">
-            <p className="text-xs uppercase tracking-widest text-neutral-400 font-semibold mb-3">
-              दुकानदार ऐसे बोलते हैं और खाता तुरंत लिख जाता है:
-            </p>
-
-            <div className="flex flex-wrap items-center justify-center gap-3">
-              {/* Voice Badge 1: Udhar */}
-              <div className="flex items-center gap-2 rounded-full border border-rose-500/40 bg-rose-950/40 px-4 py-2 text-xs font-semibold text-rose-200 shadow-lg shadow-rose-950/30 backdrop-blur-md hover:scale-105 transition-transform">
-                <div className="flex h-5 w-5 items-center justify-center rounded-full bg-rose-500/30 text-rose-300">
-                  <Mic className="size-3 animate-pulse" />
+          {/* Right Column: 3D Perspective Tilt Interactive Card with Tabs */}
+          <div className="lg:col-span-6 [perspective:1200px]">
+            <motion.div
+              ref={cardRef}
+              style={{
+                rotateX,
+                rotateY,
+                transformStyle: "preserve-3d",
+              }}
+              onPointerMove={handlePointerMove}
+              onPointerLeave={handlePointerLeave}
+              className="relative rounded-[16px] border border-[#1E2638] bg-[#0F131C] p-6 sm:p-7 shadow-2xl transition-shadow duration-300 hover:shadow-[#5C6BC0]/10 hover:border-[#5C6BC0]/50"
+            >
+              {/* Interactive Tab Switcher */}
+              <div className="flex items-center justify-between border-b border-[#1E2638] pb-3 mb-4">
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setActiveTab("simulator")}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-[7px] text-xs font-semibold transition-all cursor-pointer ${
+                      activeTab === "simulator"
+                        ? "bg-[#5C6BC0] text-white shadow-xs"
+                        : "text-[#94A3B8] hover:text-[#F1F5F9] hover:bg-[#161B26]"
+                    }`}
+                  >
+                    <Sparkles size={13} />
+                    <span>3D Live Simulator</span>
+                  </button>
+                  <button
+                    onClick={() => setActiveTab("visual")}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-[7px] text-xs font-semibold transition-all cursor-pointer ${
+                      activeTab === "visual"
+                        ? "bg-[#5C6BC0] text-white shadow-xs"
+                        : "text-[#94A3B8] hover:text-[#F1F5F9] hover:bg-[#161B26]"
+                    }`}
+                  >
+                    <Store size={13} />
+                    <span>Counter in Action</span>
+                  </button>
                 </div>
-                <span>"रमेश ₹200 उधार"</span>
-                <span className="rounded bg-rose-500/30 px-2 py-0.5 text-[10px] text-rose-300 font-mono font-bold">
-                  लाल खाता (Udhar)
+
+                <span className="text-[11px] font-semibold text-[#34D399] bg-[#064E3B]/30 border border-[#10B981]/30 px-2 py-0.5 rounded-full flex items-center gap-1.5">
+                  <span className="size-1.5 rounded-full bg-[#34D399] animate-ping" />
+                  Interactive
                 </span>
               </div>
 
-              {/* Voice Badge 2: Jama */}
-              <div className="flex items-center gap-2 rounded-full border border-emerald-500/40 bg-emerald-950/40 px-4 py-2 text-xs font-semibold text-emerald-200 shadow-lg shadow-emerald-950/30 backdrop-blur-md hover:scale-105 transition-transform">
-                <div className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500/30 text-emerald-300">
-                  <Mic className="size-3 animate-pulse" />
-                </div>
-                <span>"सुनील ₹500 जमा"</span>
-                <span className="rounded bg-emerald-500/30 px-2 py-0.5 text-[10px] text-emerald-300 font-mono font-bold">
-                  हरा खाता (Jama)
-                </span>
-              </div>
+              {/* ── VIEW 1: 3D INTERACTIVE SIMULATOR ── */}
+              {activeTab === "simulator" && (
+                <div className="space-y-4">
+                  {/* Header */}
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2.5">
+                      <div className="flex items-center justify-center size-8 rounded-[8px] bg-[#1E2337] border border-[#5C6BC0]/30 p-1.5 shadow-xs">
+                        <img src={logoImg} alt="VoiceKhata" className="w-full h-full object-contain invert brightness-125" />
+                      </div>
+                      <div>
+                        <h3 className="text-sm font-bold text-[#F1F5F9]">VoiceKhata Realtime Parser</h3>
+                        <p className="text-[11px] text-[#64748B]">Move mouse to tilt • Drag slider to adjust</p>
+                      </div>
+                    </div>
+                  </div>
 
-              {/* Voice Badge 3: Kirana store */}
-              <div className="flex items-center gap-2 rounded-full border border-amber-500/40 bg-amber-950/40 px-4 py-2 text-xs font-semibold text-amber-200 shadow-lg shadow-amber-950/30 backdrop-blur-md hover:scale-105 transition-transform">
-                <div className="flex h-5 w-5 items-center justify-center rounded-full bg-amber-500/30 text-amber-300">
-                  <Mic className="size-3 animate-pulse" />
-                </div>
-                <span>"शर्मा जी किराना ₹1,450 जमा"</span>
-                <span className="rounded bg-amber-500/30 px-2 py-0.5 text-[10px] text-amber-300 font-mono font-bold">
-                  UPI Received
-                </span>
-              </div>
+                  {/* Sample voice phrase selector */}
+                  <div className="space-y-1.5">
+                    <label className="text-[11px] font-semibold text-[#94A3B8] block">
+                      Tap a phrase to simulate speaking:
+                    </label>
+                    <div className="flex flex-col gap-2">
+                      {samplePhrases.map((phrase, idx) => (
+                        <motion.button
+                          key={idx}
+                          whileHover={{ scale: 1.01 }}
+                          whileTap={{ scale: 0.98 }}
+                          onClick={() => handleTriggerDemo(phrase)}
+                          className={`w-full text-left p-2.5 rounded-[8px] border text-xs font-medium transition-all flex items-center justify-between cursor-pointer ${
+                            activePhrase === phrase.text
+                              ? "border-[#5C6BC0] bg-[#1E2337] text-[#818CF8]"
+                              : "border-[#1E2638] bg-[#07090E] text-[#F1F5F9] hover:border-[#5C6BC0]/60"
+                          }`}
+                        >
+                          <span className="flex items-center gap-2">
+                            <Volume2 size={14} className="text-[#818CF8] shrink-0" />
+                            <span className="truncate">"{phrase.text}"</span>
+                          </span>
+                          <span className="text-[10px] uppercase font-bold text-[#64748B] shrink-0">Test</span>
+                        </motion.button>
+                      ))}
+                    </div>
+                  </div>
 
-              {/* Voice Badge 4: Hardware */}
-              <div className="hidden sm:flex items-center gap-2 rounded-full border border-cyan-500/40 bg-cyan-950/40 px-4 py-2 text-xs font-semibold text-cyan-200 shadow-lg shadow-cyan-950/30 backdrop-blur-md hover:scale-105 transition-transform">
-                <div className="flex h-5 w-5 items-center justify-center rounded-full bg-cyan-500/30 text-cyan-300">
-                  <Mic className="size-3 animate-pulse" />
-                </div>
-                <span>"गुप्ता हार्डवेयर ₹600 उधार"</span>
-                <span className="rounded bg-cyan-500/30 px-2 py-0.5 text-[10px] text-cyan-300 font-mono font-bold">
-                  Pending Due
-                </span>
-              </div>
-            </div>
-          </div>
+                  {/* Interactive Gesture: Amount Scrubber / Slider */}
+                  <div className="rounded-[8px] border border-[#1E2638] bg-[#07090E] p-3 space-y-2">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-[#94A3B8] flex items-center gap-1.5">
+                        <Sliders size={12} className="text-[#818CF8]" />
+                        <span>Tactile Amount Gesture:</span>
+                      </span>
+                      <span className="font-bold text-[#34D399] tabular-nums">
+                        ₹{activeAmount.toLocaleString("en-IN")}
+                      </span>
+                    </div>
+                    <input
+                      type="range"
+                      min={100}
+                      max={10000}
+                      step={100}
+                      value={activeAmount}
+                      onChange={(e) => setActiveAmount(Number(e.target.value))}
+                      className="w-full accent-[#5C6BC0] h-1.5 bg-[#1E2638] rounded-lg cursor-pointer"
+                    />
+                    <div className="flex justify-between text-[10px] text-[#64748B]">
+                      <span>₹100</span>
+                      <span>Drag to simulate ledger updates</span>
+                      <span>₹10,000</span>
+                    </div>
+                  </div>
 
-          {/* 3 Value Badges */}
-          <div className="pt-6 grid grid-cols-3 gap-2 sm:gap-4 max-w-lg mx-auto text-center border-t border-white/10">
-            <div className="p-2">
-              <p className="text-xl sm:text-2xl font-extrabold text-emerald-400">3 सेकंड</p>
-              <p className="text-[11px] sm:text-xs text-neutral-400">बोलकर एंट्री</p>
-            </div>
-            <div className="p-2 border-x border-white/10">
-              <p className="text-xl sm:text-2xl font-extrabold text-white">3x तेज़</p>
-              <p className="text-[11px] sm:text-xs text-neutral-400">उधार वसूली</p>
-            </div>
-            <div className="p-2">
-              <p className="text-xl sm:text-2xl font-extrabold text-emerald-400">100% सेफ</p>
-              <p className="text-[11px] sm:text-xs text-neutral-400">ऑटोमैटिक बैकअप</p>
-            </div>
+                  {/* Live Flow State Card */}
+                  <div className="rounded-[10px] border border-[#1E2638] bg-[#07090E] p-3.5 space-y-3">
+                    {demoState === "listening" && (
+                      <div className="flex items-center gap-3 py-2 text-xs font-medium text-[#F1F5F9]">
+                        <div className="size-3 rounded-full bg-[#34D399] animate-ping" />
+                        <span>Listening & understanding voice input...</span>
+                      </div>
+                    )}
+
+                    {demoState === "review" && (
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-bold text-[#34D399] bg-[#064E3B]/30 border border-[#10B981]/30 px-2 py-0.5 rounded-full">
+                            Parsed with 99.8% confidence
+                          </span>
+                          <span className="text-[11px] text-[#64748B]">Review before save</span>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-2 text-xs bg-[#0F131C] p-3 rounded-[8px] border border-[#1E2638]">
+                          <div>
+                            <span className="text-[#64748B] block text-[10px]">Customer / Party</span>
+                            <span className="font-bold text-[#F1F5F9]">{activeCustomer}</span>
+                          </div>
+                          <div>
+                            <span className="text-[#64748B] block text-[10px]">Amount</span>
+                            <span className="font-bold text-[#34D399]">₹{activeAmount.toLocaleString("en-IN")}</span>
+                          </div>
+                          <div>
+                            <span className="text-[#64748B] block text-[10px]">Direction</span>
+                            <span className="font-semibold text-[#F1F5F9]">
+                              {activeType === "Credit" ? "Money received" : "Money paid"}
+                            </span>
+                          </div>
+                          <div>
+                            <span className="text-[#64748B] block text-[10px]">Payment Method</span>
+                            <span className="font-semibold text-[#F1F5F9]">{activeMethod}</span>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center justify-end gap-2 pt-1">
+                          <motion.button
+                            whileHover={{ scale: 1.03 }}
+                            whileTap={{ scale: 0.96 }}
+                            onClick={handleConfirmSave}
+                            className="flex items-center gap-1.5 h-8 px-4 rounded-[6px] bg-[#5C6BC0] hover:bg-[#4F5B93] text-white text-xs font-semibold cursor-pointer shadow-xs"
+                          >
+                            <Check size={14} />
+                            <span>Save to Khata</span>
+                          </motion.button>
+                        </div>
+                      </div>
+                    )}
+
+                    {demoState === "saved" && (
+                      <div className="flex items-center justify-between bg-[#064E3B]/30 border border-[#10B981]/30 p-3 rounded-[8px]">
+                        <div className="flex items-center gap-2">
+                          <Check size={16} className="text-[#34D399]" />
+                          <span className="text-xs font-bold text-[#34D399]">
+                            Saved to {activeCustomer}'s Khata • ₹{activeAmount} recorded!
+                          </span>
+                        </div>
+                        <span className="text-[10px] font-semibold text-[#34D399]">Updated</span>
+                      </div>
+                    )}
+
+                    {demoState === "idle" && (
+                      <div className="flex items-center justify-between text-xs text-[#94A3B8]">
+                        <span>Ready for voice entry</span>
+                        <span className="text-[11px] text-[#818CF8] font-semibold">Tap a phrase above</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Customer Balance Preview */}
+                  <div className="flex items-center justify-between p-3.5 rounded-[10px] border border-[#1E2638] bg-[#0F131C]">
+                    <div>
+                      <p className="text-xs font-bold text-[#F1F5F9]">{activeCustomer}</p>
+                      <p className="text-[11px] text-[#64748B]">Customer Ledger Balance</p>
+                    </div>
+                    <div className="text-right">
+                      <div className="flex items-center justify-end gap-1 font-bold text-sm text-[#34D399] tabular-nums">
+                        <span>↑</span>
+                        <span>₹{customerBalance.toLocaleString("en-IN")}</span>
+                      </div>
+                      <p className="text-[10px] text-[#64748B]">You will receive</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* ── VIEW 2: DYNAMIC RETAIL IMAGE & SOUNDWAVE SHOWCASE ── */}
+              {activeTab === "visual" && (
+                <div className="space-y-3.5">
+                  <div className="relative rounded-[12px] overflow-hidden border border-[#1E2638] group">
+                    <img 
+                      src={shopkeeperCounterImg} 
+                      alt="Indian Shopkeeper using VoiceKhata" 
+                      className="w-full h-64 object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                    
+                    {/* Dark gradient overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#07090E] via-transparent to-black/30" />
+
+                    {/* Live waveform audio pulse badge */}
+                    <div className="absolute bottom-3 left-3 right-3 p-3 rounded-[10px] bg-[#07090E]/90 backdrop-blur-md border border-[#1E2638] flex items-center justify-between">
+                      <div className="flex items-center gap-2.5">
+                        <div className="size-8 rounded-full bg-[#5C6BC0]/30 border border-[#5C6BC0] flex items-center justify-center text-[#818CF8]">
+                          <Mic size={16} className="animate-pulse" />
+                        </div>
+                        <div>
+                          <p className="text-xs font-bold text-[#F1F5F9]">Ramesh Kirana Store • Dadar</p>
+                          <p className="text-[10px] text-[#34D399] flex items-center gap-1">
+                            <span className="size-1.5 rounded-full bg-[#34D399]" />
+                            Recording Hindi voice ledger entry
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Animated Soundwave bars */}
+                      <div className="flex items-center gap-1 h-5">
+                        {[40, 90, 60, 100, 75, 45].map((h, i) => (
+                          <motion.div
+                            key={i}
+                            animate={{ height: [`${h * 0.4}%`, `${h}%`, `${h * 0.3}%`] }}
+                            transition={{ repeat: Infinity, duration: 0.8 + i * 0.15, ease: "easeInOut" }}
+                            className="w-1 bg-[#818CF8] rounded-full"
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2 text-xs">
+                    <div className="p-3 rounded-[8px] bg-[#07090E] border border-[#1E2638]">
+                      <span className="text-[10px] text-[#64748B] block">Daily Transactions</span>
+                      <span className="font-bold text-[#F1F5F9] text-sm">140+ Entries</span>
+                      <p className="text-[10px] text-[#34D399] mt-0.5">Average 2.4s per khata entry</p>
+                    </div>
+                    <div className="p-3 rounded-[8px] bg-[#07090E] border border-[#1E2638]">
+                      <span className="text-[10px] text-[#64748B] block">Typing Eliminated</span>
+                      <span className="font-bold text-[#818CF8] text-sm">100% Voice</span>
+                      <p className="text-[10px] text-[#94A3B8] mt-0.5">Hindi, Hinglish & English</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+            </motion.div>
           </div>
 
         </div>

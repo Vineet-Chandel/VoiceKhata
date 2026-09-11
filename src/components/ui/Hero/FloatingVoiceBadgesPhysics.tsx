@@ -16,7 +16,7 @@ import {
 
 export interface VoiceBadgeData {
   id: string;
-  type: "expense" | "income" | "udhar" | "jama" | "ai" | "receipt";
+  type: "udhar" | "jama";
   spokenPhrase: string;
   title: string;
   amount?: string;
@@ -30,98 +30,99 @@ export interface VoiceBadgeData {
 const INITIAL_BADGES: VoiceBadgeData[] = [
   {
     id: "badge-1",
-    type: "expense",
-    spokenPhrase: '"Chai and bun maska 45 rupees"',
-    title: "Chai & Snacks",
-    amount: "₹45",
-    tag: "Food & Drinks",
-    colorClass: "bg-amber-500/10 text-amber-300",
-    borderClass: "border-amber-500/30",
-    glowClass: "shadow-amber-500/10",
-    icon: "coffee"
-  },
-  {
-    id: "badge-2",
     type: "udhar",
-    spokenPhrase: '"Ramesh ko 500 rupaye udhar diye"',
-    title: "Ramesh (Udhar / Credit)",
-    amount: "₹500",
-    tag: "Khata Ledger",
+    spokenPhrase: '"Ramesh 200 rupees udhar"',
+    title: "Ramesh (Given Credit)",
+    amount: "₹200",
+    tag: "Customer Udhar",
     colorClass: "bg-rose-500/10 text-rose-300",
     borderClass: "border-rose-500/30",
     glowClass: "shadow-rose-500/10",
     icon: "udhar"
   },
   {
-    id: "badge-3",
+    id: "badge-2",
     type: "jama",
-    spokenPhrase: '"Priya ne 1200 jama karwaye"',
-    title: "Priya Repayment (Jama)",
-    amount: "+₹1,200",
-    tag: "Received",
-    colorClass: "bg-emerald-500/10 text-emerald-300",
-    borderClass: "border-emerald-500/30",
-    glowClass: "shadow-emerald-500/10",
-    icon: "jama"
-  },
-  {
-    id: "badge-4",
-    type: "receipt",
-    spokenPhrase: '"Scanned Cafe bill with Vision AI"',
-    title: "Starbucks Receipt",
-    amount: "₹340",
-    tag: "OCR Extracted",
+    spokenPhrase: '"Sunil paid 500 rupees cash"',
+    title: "Sunil (Payment Received)",
+    amount: "+₹500",
+    tag: "Customer Jama",
     colorClass: "bg-cyan-500/10 text-cyan-300",
     borderClass: "border-cyan-500/30",
     glowClass: "shadow-cyan-500/10",
-    icon: "receipt"
+    icon: "jama"
+  },
+  {
+    id: "badge-3",
+    type: "udhar",
+    spokenPhrase: '"Sharmaji 1200 rupees udhar"',
+    title: "Sharmaji Kirana (Credit)",
+    amount: "₹1,200",
+    tag: "Customer Udhar",
+    colorClass: "bg-rose-500/10 text-rose-300",
+    borderClass: "border-rose-500/30",
+    glowClass: "shadow-rose-500/10",
+    icon: "udhar"
+  },
+  {
+    id: "badge-4",
+    type: "jama",
+    spokenPhrase: '"Priya paid 850 rupees online"',
+    title: "Priya Medical (Received)",
+    amount: "+₹850",
+    tag: "Customer Jama",
+    colorClass: "bg-cyan-500/10 text-cyan-300",
+    borderClass: "border-cyan-500/30",
+    glowClass: "shadow-cyan-500/10",
+    icon: "jama"
   },
   {
     id: "badge-5",
-    type: "income",
-    spokenPhrase: '"Freelance client payment received 15000"',
-    title: "UI Design Project",
-    amount: "+₹15,000",
-    tag: "Income",
-    colorClass: "bg-green-500/10 text-green-300",
-    borderClass: "border-green-500/30",
-    glowClass: "shadow-green-500/10",
-    icon: "income"
+    type: "udhar",
+    spokenPhrase: '"Vermaji 780 rupees udhar"',
+    title: "Vermaji Hardware (Udhar)",
+    amount: "₹780",
+    tag: "Customer Udhar",
+    colorClass: "bg-rose-500/10 text-rose-300",
+    borderClass: "border-rose-500/30",
+    glowClass: "shadow-rose-500/10",
+    icon: "udhar"
   },
   {
     id: "badge-6",
-    type: "expense",
-    spokenPhrase: '"Petrol tank full 450 rupees"',
-    title: "Shell Petrol",
-    amount: "₹450",
-    tag: "Transport",
-    colorClass: "bg-blue-500/10 text-blue-300",
-    borderClass: "border-blue-500/30",
-    glowClass: "shadow-blue-500/10",
-    icon: "fuel"
+    type: "jama",
+    spokenPhrase: '"Gupta paid 1500 rupees cash"',
+    title: "Gupta Traders (Received)",
+    amount: "+₹1,500",
+    tag: "Customer Jama",
+    colorClass: "bg-cyan-500/10 text-cyan-300",
+    borderClass: "border-cyan-500/30",
+    glowClass: "shadow-cyan-500/10",
+    icon: "jama"
   },
   {
     id: "badge-7",
-    type: "ai",
-    spokenPhrase: '"AI Health Score: 94/100"',
-    title: "🧠 Smart Budget on Track",
-    tag: "AI Copilot",
-    colorClass: "bg-purple-500/10 text-purple-300",
-    borderClass: "border-purple-500/30",
-    glowClass: "shadow-purple-500/10",
-    icon: "sparkle"
+    type: "udhar",
+    spokenPhrase: '"Mohan 420 rupees udhar"',
+    title: "Mohan Lal (Udhar)",
+    amount: "₹420",
+    tag: "Customer Udhar",
+    colorClass: "bg-rose-500/10 text-rose-300",
+    borderClass: "border-rose-500/30",
+    glowClass: "shadow-rose-500/10",
+    icon: "udhar"
   },
   {
     id: "badge-8",
-    type: "udhar",
-    spokenPhrase: '"Amit Kumar ko 1000 maal udhar"',
-    title: "Amit Kirana (Udhar)",
-    amount: "₹1,000",
-    tag: "Pending Due",
-    colorClass: "bg-orange-500/10 text-orange-300",
-    borderClass: "border-orange-500/30",
-    glowClass: "shadow-orange-500/10",
-    icon: "store"
+    type: "jama",
+    spokenPhrase: '"Anita paid 350 rupees GPay"',
+    title: "Anita Dairy (Settled)",
+    amount: "+₹350",
+    tag: "Customer Jama",
+    colorClass: "bg-cyan-500/10 text-cyan-300",
+    borderClass: "border-cyan-500/30",
+    glowClass: "shadow-cyan-500/10",
+    icon: "jama"
   }
 ];
 
@@ -158,6 +159,7 @@ export function FloatingVoiceBadgesPhysics() {
   const engineRef = useRef<any>(null);
   const runnerRef = useRef<any>(null);
   const matterRef = useRef<any>(null);
+  const cleanupPhysicsRef = useRef<(() => void) | null>(null);
 
   const [badges, setBadges] = useState<VoiceBadgeData[]>(INITIAL_BADGES);
   const [selectedBadge, setSelectedBadge] = useState<VoiceBadgeData | null>(null);
@@ -182,20 +184,21 @@ export function FloatingVoiceBadgesPhysics() {
     }
   };
 
-  // Add a new badge interactively
+  // Add a new badge interactively (Customer transaction only)
   const addNewBadge = (phrase?: string) => {
-    const text = phrase || customPhrase || "Milk and curd 60 rupees";
+    const text = phrase || customPhrase || "Ramesh 200 rupees udhar";
+    const isJama = text.toLowerCase().includes("jama") || text.toLowerCase().includes("paid") || text.toLowerCase().includes("received");
     const newBadge: VoiceBadgeData = {
       id: "badge-" + Date.now(),
-      type: text.toLowerCase().includes("udhar") ? "udhar" : text.toLowerCase().includes("jama") ? "jama" : "expense",
+      type: isJama ? "jama" : "udhar",
       spokenPhrase: `"${text}"`,
       title: text.length > 22 ? text.substring(0, 20) + "..." : text,
-      amount: "₹" + (Math.floor(Math.random() * 90) * 10 + 50),
-      tag: "Live Voice Entry",
-      colorClass: "bg-emerald-500/20 text-emerald-200",
-      borderClass: "border-emerald-400/50",
-      glowClass: "shadow-emerald-500/20",
-      icon: "mic"
+      amount: (isJama ? "+₹" : "₹") + (Math.floor(Math.random() * 90) * 10 + 50),
+      tag: isJama ? "Customer Jama" : "Customer Udhar",
+      colorClass: isJama ? "bg-cyan-500/20 text-cyan-200" : "bg-rose-500/20 text-rose-200",
+      borderClass: isJama ? "border-cyan-400/50" : "border-rose-400/50",
+      glowClass: isJama ? "shadow-cyan-500/20" : "shadow-rose-500/20",
+      icon: isJama ? "jama" : "udhar"
     };
 
     setBadges((prev) => [...prev, newBadge]);
@@ -325,8 +328,14 @@ export function FloatingVoiceBadgesPhysics() {
       Composite.add(engine.world, mouseConstraint);
 
       // Keep mouse in sync with scrolling/container bounds
-      mouse.element.removeEventListener("mousewheel", mouse.mousewheel);
-      mouse.element.removeEventListener("DOMMouseScroll", mouse.mousewheel);
+      try {
+        if (mouse && mouse.element && mouse.mousewheel) {
+          mouse.element.removeEventListener("mousewheel", mouse.mousewheel);
+          mouse.element.removeEventListener("DOMMouseScroll", mouse.mousewheel);
+        }
+      } catch (e) {
+        // ignore
+      }
 
       // 5. Update DOM badge positions on physics tick
       Events.on(engine, "afterUpdate", () => {
@@ -361,16 +370,23 @@ export function FloatingVoiceBadgesPhysics() {
       };
       window.addEventListener("resize", handleResize);
 
-      return () => {
+      cleanupPhysicsRef.current = () => {
         window.removeEventListener("resize", handleResize);
-        Runner.stop(runner);
-        Engine.clear(engine);
+        try {
+          Runner.stop(runner);
+          Engine.clear(engine);
+        } catch (e) {
+          // ignore cleanup errors
+        }
       };
     }).catch(console.error);
 
     return () => {
       isCancelled = true;
-      if (runnerRef.current) Runner.stop(runnerRef.current);
+      if (cleanupPhysicsRef.current) {
+        cleanupPhysicsRef.current();
+        cleanupPhysicsRef.current = null;
+      }
     };
   }, []);
 
@@ -378,9 +394,9 @@ export function FloatingVoiceBadgesPhysics() {
     switch (iconName) {
       case "coffee": return <Volume2 className="size-3.5 text-amber-400" />;
       case "udhar": return <ArrowDownLeft className="size-3.5 text-rose-400" />;
-      case "jama": return <ArrowUpRight className="size-3.5 text-emerald-400" />;
+      case "jama": return <ArrowUpRight className="size-3.5 text-cyan-400" />;
       case "receipt": return <Receipt className="size-3.5 text-cyan-400" />;
-      case "income": return <TrendingUp className="size-3.5 text-green-400" />;
+      case "income": return <TrendingUp className="size-3.5 text-sky-400" />;
       case "fuel": return <Sparkles className="size-3.5 text-blue-400" />;
       case "store": return <Store className="size-3.5 text-orange-400" />;
       default: return <Sparkles className="size-3.5 text-purple-400" />;
@@ -390,17 +406,17 @@ export function FloatingVoiceBadgesPhysics() {
   return (
     <div className="relative w-full overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-b from-neutral-950 via-neutral-900 to-black p-4 sm:p-6 shadow-2xl backdrop-blur-xl">
       {/* Background radial glow */}
-      <div className="pointer-events-none absolute -top-32 left-1/2 -translate-x-1/2 h-80 w-full max-w-2xl rounded-full bg-emerald-500/10 blur-[100px]" />
+      <div className="pointer-events-none absolute -top-32 left-1/2 -translate-x-1/2 h-80 w-full max-w-2xl rounded-full bg-rose-500/10 blur-[100px]" />
       <div className="pointer-events-none absolute -bottom-32 right-10 h-72 w-72 rounded-full bg-indigo-500/10 blur-[100px]" />
 
       {/* Header bar */}
       <div className="relative z-20 mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between border-b border-white/10 pb-4">
         <div>
           <div className="flex items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-3 py-0.5 text-xs font-medium text-emerald-400 border border-emerald-500/20">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-rose-500/10 px-3 py-0.5 text-xs font-medium text-rose-400 border border-rose-500/20">
               <span className="relative flex h-2 w-2">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500"></span>
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-rose-400 opacity-75"></span>
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-rose-500"></span>
               </span>
               Matter.js Interactive Physics
             </span>
@@ -467,8 +483,7 @@ export function FloatingVoiceBadgesPhysics() {
               backdrop-blur-md shadow-lg transition-colors duration-200 select-none
               ${b.colorClass} ${b.borderClass} ${b.glowClass} hover:brightness-125`}
             style={{
-              // Fallback initial placement before physics loop kicks in
-              transform: "translate3d(-200px, -200px, 0)"
+              transform: physicsReady ? undefined : `translate3d(${(badges.indexOf(b) % 4) * 190 + 20}px, ${Math.floor(badges.indexOf(b) / 4) * 75 + 20}px, 0)`
             }}
           >
             <div className="flex h-6 w-6 items-center justify-center rounded-full bg-black/40 border border-white/10 shrink-0">
@@ -478,7 +493,7 @@ export function FloatingVoiceBadgesPhysics() {
               <div className="flex items-center gap-1.5 leading-none">
                 <span className="font-semibold text-white tracking-tight">{b.title}</span>
                 {b.amount && (
-                  <span className="rounded bg-black/30 px-1 py-0.5 text-[11px] font-mono font-bold text-emerald-400">
+                  <span className="rounded bg-black/30 px-1 py-0.5 text-[11px] font-mono font-bold text-cyan-400">
                     {b.amount}
                   </span>
                 )}
@@ -495,7 +510,7 @@ export function FloatingVoiceBadgesPhysics() {
       <div className="relative z-20 mt-4 grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
         {/* Quick Voice Entry Input */}
         <div className="flex items-center gap-2 rounded-2xl border border-white/10 bg-neutral-900/90 p-1.5 px-3">
-          <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-500/20 text-emerald-400">
+          <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-rose-500/20 text-rose-400">
             <Mic className="size-4 animate-pulse" />
           </div>
           <input
@@ -508,7 +523,7 @@ export function FloatingVoiceBadgesPhysics() {
           />
           <button
             onClick={() => addNewBadge()}
-            className="flex items-center gap-1 shrink-0 rounded-xl bg-emerald-500 px-3 py-1.5 text-xs font-semibold text-black transition-all hover:bg-emerald-400 active:scale-95 shadow-md"
+            className="flex items-center gap-1 shrink-0 rounded-xl bg-rose-600 px-3 py-1.5 text-xs font-semibold text-white transition-all hover:bg-rose-500 active:scale-95 shadow-md"
           >
             <Plus className="size-3" />
             Drop In
@@ -519,10 +534,10 @@ export function FloatingVoiceBadgesPhysics() {
         <div className="flex items-center justify-between rounded-2xl border border-white/10 bg-neutral-900/90 p-2 px-4 text-xs">
           {selectedBadge ? (
             <div className="flex items-center gap-2.5 overflow-hidden">
-              <CheckCircle2 className="size-4 text-emerald-400 shrink-0" />
+              <CheckCircle2 className="size-4 text-cyan-400 shrink-0" />
               <div className="truncate">
                 <p className="font-medium text-white truncate">
-                  AI Parsed: <span className="text-emerald-300">{selectedBadge.spokenPhrase}</span>
+                  AI Parsed: <span className="text-cyan-300">{selectedBadge.spokenPhrase}</span>
                 </p>
                 <p className="text-[11px] text-neutral-400">
                   {selectedBadge.tag} • Recorded to VoiceKhata Ledger

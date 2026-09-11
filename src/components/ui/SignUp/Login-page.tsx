@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react"
 import { Navigate, Link, useNavigate, useSearchParams } from "react-router-dom"
 import Logo from "@/components/ui/Navbar/logo"
+import logoImg from "@/assets/logo.png"
 import { Button } from "@/components/ui/SignUp/button"
 import { ChevronLeft, Mail, Lock, AlertCircle, CheckCircle2, ArrowRight } from "lucide-react"
 import {
@@ -16,7 +17,7 @@ const REMEMBER_KEY = "voicekhata_remember"
 export function LoginPage() {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
-  const { user, loading } = useAuth()
+  const { user, loading, enableDemoMode } = useAuth()
 
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
@@ -163,32 +164,35 @@ export function LoginPage() {
   }
 
   return (
-    <div className="relative w-full min-h-screen flex items-center justify-center px-6 py-12">
-      <Button asChild className="absolute top-6 left-6" variant="ghost">
+    <div className="relative w-full min-h-screen flex items-center justify-center px-4 py-12 bg-[#07090E]">
+      <Button asChild className="absolute top-6 left-6 text-[#94A3B8] hover:text-[#F1F5F9]" variant="ghost">
         <Link to="/">
-          <ChevronLeft className="mr-2 h-4 w-4" />
+          <ChevronLeft className="mr-1.5 h-4 w-4" />
           Home
         </Link>
       </Button>
 
-      <div className="w-full max-w-sm space-y-6">
-        <div className="flex justify-center">
-          <Logo className="h-7" />
+      <div className="w-full max-w-sm rounded-[12px] border border-[#1E2638] bg-[#0F131C] p-7 sm:p-8 shadow-2xl space-y-5">
+        <div className="flex items-center justify-center gap-2">
+          <div className="flex size-9 items-center justify-center rounded-[8px] bg-[#1E2337] border border-[#5C6BC0]/30 p-1.5 shadow-xs">
+            <img src={logoImg} alt="VoiceKhata" className="w-full h-full object-contain invert brightness-125" />
+          </div>
+          <span className="text-lg font-bold text-[#F1F5F9]">Voice<span className="text-[#818CF8]">Khata</span></span>
         </div>
 
         <div className="space-y-1 text-center">
-          <h1 className="text-2xl font-bold tracking-tight text-foreground">
-            {showForgot ? "Reset Password" : "Welcome Back"}
+          <h1 className="text-xl font-bold tracking-tight text-[#F1F5F9]">
+            {showForgot ? "Reset Password" : "Your ledger is ready when you are."}
           </h1>
-          <p className="text-muted-foreground text-sm">
+          <p className="text-[#94A3B8] text-xs">
             {showForgot
               ? "Enter your email to receive a password reset link"
-              : "Sign in to your VoiceKhata account"}
+              : "Sign in to access your business khata"}
           </p>
         </div>
 
         {error && (
-          <div className="flex items-start gap-2.5 p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-xs leading-relaxed">
+          <div className="flex items-start gap-2.5 p-3 rounded-[8px] bg-[#7F1D1D]/30 border border-[#EF4444]/30 text-[#F87171] text-xs leading-relaxed">
             <AlertCircle className="size-4 shrink-0 mt-0.5" />
             <div className="flex-1 space-y-1">
               <p>{error}</p>
@@ -197,7 +201,7 @@ export function LoginPage() {
                   type="button"
                   onClick={handleResendVerification}
                   disabled={resending}
-                  className="font-medium underline hover:text-red-300 block pt-1 cursor-pointer"
+                  className="font-medium underline hover:text-[#F87171]/80 block pt-1 cursor-pointer"
                 >
                   {resending ? "Sending..." : "Resend verification instructions"}
                 </button>
@@ -207,23 +211,23 @@ export function LoginPage() {
         )}
 
         {infoMsg && (
-          <div className="flex items-center gap-2.5 p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs">
+          <div className="flex items-center gap-2.5 p-3 rounded-[8px] bg-[#064E3B]/30 border border-[#10B981]/30 text-[#34D399] text-xs">
             <CheckCircle2 className="size-4 shrink-0" />
             <p>{infoMsg}</p>
           </div>
         )}
 
         {showForgot ? (
-          <form onSubmit={handleForgotPassword} className="space-y-4">
+          <form onSubmit={handleForgotPassword} className="space-y-3.5">
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-muted-foreground">Email</label>
+              <label className="text-xs font-medium text-[#94A3B8]">Email</label>
               <div className="relative">
-                <Mail className="absolute left-3 top-2.5 size-4 text-muted-foreground" />
+                <Mail className="absolute left-3 top-2.5 size-4 text-[#64748B]" />
                 <input
                   type="email"
                   placeholder="name@example.com"
                   required
-                  className="w-full rounded-md border border-input bg-background/50 pl-9 pr-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+                  className="w-full rounded-[8px] border border-[#1E2638] bg-[#07090E] pl-9 pr-3 py-2 text-xs text-[#F1F5F9] placeholder:text-[#64748B] focus:outline-none focus:border-[#5C6BC0]"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                 />
@@ -231,7 +235,7 @@ export function LoginPage() {
             </div>
 
             <Button
-              className="w-full cursor-pointer hover:bg-primary/90"
+              className="w-full h-9 rounded-[8px] bg-[#5C6BC0] hover:bg-[#4F5B93] text-white text-xs font-semibold cursor-pointer shadow-xs"
               type="submit"
               disabled={isLoading}
             >
@@ -244,31 +248,31 @@ export function LoginPage() {
                 setShowForgot(false)
                 setError("")
               }}
-              className="w-full text-xs text-muted-foreground hover:text-foreground text-center pt-2 cursor-pointer"
+              className="w-full text-xs text-[#94A3B8] hover:text-[#F1F5F9] text-center pt-1 cursor-pointer"
             >
               Back to Login
             </button>
           </form>
         ) : (
           <form onSubmit={handleLogin} className="space-y-3.5">
-            <div className="space-y-1.5">
-              <label className="text-xs font-medium text-muted-foreground">Email</label>
+            <div className="space-y-1">
+              <label className="text-xs font-medium text-[#94A3B8]">Email</label>
               <div className="relative">
-                <Mail className="absolute left-3 top-2.5 size-4 text-muted-foreground" />
+                <Mail className="absolute left-3 top-2.5 size-4 text-[#64748B]" />
                 <input
                   type="email"
                   placeholder="name@example.com"
                   required
-                  className="w-full rounded-md border border-input bg-background/50 pl-9 pr-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+                  className="w-full rounded-[8px] border border-[#1E2638] bg-[#07090E] pl-9 pr-3 py-2 text-xs text-[#F1F5F9] placeholder:text-[#64748B] focus:outline-none focus:border-[#5C6BC0]"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                 />
               </div>
             </div>
 
-            <div className="space-y-1.5">
+            <div className="space-y-1">
               <div className="flex items-center justify-between">
-                <label className="text-xs font-medium text-muted-foreground">Password</label>
+                <label className="text-xs font-medium text-[#94A3B8]">Password</label>
                 <button
                   type="button"
                   onClick={() => {
@@ -276,18 +280,18 @@ export function LoginPage() {
                     setError("")
                     setInfoMsg("")
                   }}
-                  className="text-xs text-muted-foreground hover:text-primary underline cursor-pointer"
+                  className="text-xs text-[#818CF8] hover:underline cursor-pointer"
                 >
                   Forgot password?
                 </button>
               </div>
               <div className="relative">
-                <Lock className="absolute left-3 top-2.5 size-4 text-muted-foreground" />
+                <Lock className="absolute left-3 top-2.5 size-4 text-[#64748B]" />
                 <input
                   type="password"
                   placeholder="••••••••"
                   required
-                  className="w-full rounded-md border border-input bg-background/50 pl-9 pr-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+                  className="w-full rounded-[8px] border border-[#1E2638] bg-[#07090E] pl-9 pr-3 py-2 text-xs text-[#F1F5F9] placeholder:text-[#64748B] focus:outline-none focus:border-[#5C6BC0]"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
@@ -301,18 +305,18 @@ export function LoginPage() {
                 type="checkbox"
                 checked={rememberMe}
                 onChange={(e) => setRememberMe(e.target.checked)}
-                className="size-3.5 rounded border-border accent-primary cursor-pointer"
+                className="size-3.5 rounded border-[#1E2638] accent-[#5C6BC0] cursor-pointer"
               />
               <label
                 htmlFor="remember"
-                className="text-xs text-muted-foreground cursor-pointer select-none"
+                className="text-xs text-[#94A3B8] cursor-pointer select-none"
               >
                 Remember me on this device
               </label>
             </div>
 
             <Button
-              className="w-full cursor-pointer hover:bg-primary/90 mt-2"
+              className="w-full h-9 rounded-[8px] bg-[#5C6BC0] hover:bg-[#4F5B93] text-white text-xs font-semibold cursor-pointer mt-1 shadow-xs"
               type="submit"
               disabled={isLoading}
             >
@@ -323,28 +327,39 @@ export function LoginPage() {
 
         {!showForgot && (
           <>
-            <div className="flex items-center gap-3 my-4">
-              <div className="h-px flex-1 bg-border" />
-              <span className="text-xs text-muted-foreground">or continue with</span>
-              <div className="h-px flex-1 bg-border" />
+            <div className="flex items-center gap-3 my-3">
+              <div className="h-px flex-1 bg-[#1E2638]" />
+              <span className="text-[11px] text-[#64748B]">or continue with</span>
+              <div className="h-px flex-1 bg-[#1E2638]" />
             </div>
 
             <Button
-              className="w-full cursor-pointer border border-input bg-background/60 hover:bg-accent hover:text-accent-foreground text-foreground"
+              className="w-full h-9 rounded-[8px] border border-[#1E2638] bg-[#07090E] hover:bg-[#161B26] text-xs font-semibold text-[#F1F5F9] cursor-pointer transition-colors"
               variant="outline"
               type="button"
               onClick={handleGoogleLogin}
               disabled={isLoading}
             >
               <GoogleIcon className="mr-2 h-4 w-4" />
-              {isLoading ? "Please wait..." : "Google"}
+              {isLoading ? "Please wait..." : "Continue with Google"}
             </Button>
 
-            <p className="text-muted-foreground text-xs text-center pt-2">
+            <Button
+              className="w-full h-9 rounded-[8px] border border-[#5C6BC0]/30 bg-[#1E2337] hover:bg-[#252C45] text-xs font-semibold text-[#818CF8] cursor-pointer mt-2 transition-colors"
+              type="button"
+              onClick={() => {
+                enableDemoMode()
+                navigate("/dashboard", { replace: true })
+              }}
+            >
+              ⚡ Explore Live Demo Khata (1-Click)
+            </Button>
+
+            <p className="text-[#94A3B8] text-xs text-center pt-2">
               Don't have an account?{" "}
               <Link
                 to="/signup"
-                className="underline underline-offset-4 hover:text-primary font-medium text-foreground cursor-pointer inline-flex items-center gap-1"
+                className="text-[#818CF8] hover:underline font-semibold inline-flex items-center gap-1 ml-1"
               >
                 Create account
                 <ArrowRight className="size-3" />
