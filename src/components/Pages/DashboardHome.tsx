@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react"
 import { ChartAreaInteractive } from "@/components/ui/Dashboard_UI/chart-area-interactive"
 import { DataTable } from "@/components/ui/Dashboard_UI/data-table-dashboard"
 import { SectionCards } from "@/components/ui/Dashboard_UI/section-cards"
+import { QuickLinks } from "@/components/ui/Dashboard_UI/quick-links"
 import { AISuggestions } from "@/components/ui/Dashboard_UI/ai-suggestions"
 import { useTransactions } from "@/components/hooks/use-transactions"
 import { useBudgets } from "@/components/hooks/use-budgets"
@@ -377,6 +378,8 @@ export default function DashboardHome() {
           metrics={metrics}
           dataLoading={loading}
         />
+
+        <QuickLinks />
 
         <div className="px-4 lg:px-6">
           <ChartAreaInteractive data={metrics.runningBalance} />
