@@ -45,6 +45,7 @@ type TransactionDraft = {
   merchantRawInput?: string
   merchantTags?: string[]
   merchantConfidence?: number
+  merchantType?: string
   app_mode?: "BUSINESS" | "PERSONAL"
 }
 
