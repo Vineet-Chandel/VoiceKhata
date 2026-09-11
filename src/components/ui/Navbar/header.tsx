@@ -44,8 +44,8 @@ export function Header() {
               <Button asChild key={link.label} size="sm" variant="ghost">
                 {isRouterLink ? (
                   <Link to={link.href} className="flex items-center gap-1.5 font-medium">
-                    {link.label === "Feedback" && <MessageSquare className="size-3.5 text-emerald-400" />}
-                    {link.label === "Review" && <Star className="size-3.5 text-amber-400 fill-amber-400" />}
+                    {link.label === "Feedback" && <MessageSquare className="size-3.5 text-blue-400" />}
+                    {link.label === "Review" && <Star className="size-3.5 text-white fill-white drop-shadow-[0_0_4px_rgba(255,255,255,0.5)]" />}
                     {link.label}
                   </Link>
                 ) : (

@@ -39,8 +39,6 @@ const footerLinks: FooterSection[] = [
     {
         label: "Resources",
         links: [
-            { title: "Feedback", href: "/feedback" },
-            { title: "Review", href: "/review" },
             { title: "Blog", href: "/blog" },
             { title: "Changelog", href: "/changelog" },
             { title: "Help", href: "/help" },

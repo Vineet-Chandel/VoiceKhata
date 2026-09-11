@@ -45,14 +45,14 @@ export function HeroSection() {
 					
 					<Button asChild variant="outline" className="border-border/60 hover:bg-muted/50">
 						<Link to="/review" className="flex items-center gap-1.5 text-xs sm:text-sm">
-							<Star className="size-4 text-amber-400 fill-amber-400" />
+							<Star className="size-4 text-white fill-white drop-shadow-[0_0_6px_rgba(255,255,255,0.6)]" />
 							Reviews (4.9★)
 						</Link>
 					</Button>
 
 					<Button asChild variant="ghost" className="text-muted-foreground hover:text-foreground">
 						<Link to="/feedback" className="flex items-center gap-1.5 text-xs sm:text-sm">
-							<MessageSquare className="size-4 text-emerald-400" />
+							<MessageSquare className="size-4 text-blue-400" />
 							Feedback
 						</Link>
 					</Button>
