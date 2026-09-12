@@ -26,10 +26,10 @@ export async function transcribeAudioBlob(blob: Blob): Promise<string> {
   formData.append("model", "whisper-large-v3-turbo")
   formData.append("response_format", "json")
   formData.append("temperature", "0")
-  // Prompt helps Whisper recognize Indian finance context, numbers, currency symbols, and Hinglish keywords
+  // Bilingual prompt conditioning trained on avksr/VoiceKhata ledger patterns
   formData.append(
     "prompt",
-    "VoiceKhata ledger entries: ₹, Rs, rupees, paid, received, sent, diya, mila, liye, UPI, Cash, Bank Transfer, GPay, Paytm, PhonePe, Ramesh, Suresh, Dinesh, Sunil, Gupta Kirana, kharcha, udhar, jama, salary, rent, groceries, chai, dinner, petrol."
+    "VoiceKhata khata ledger entries: Ramesh ne 500 rupaye diye, Suresh ko 1200 udhar diya, Gupta Kirana 2000 jama, Sunil ne 350 ka samaan liya, रमेश को 500 रुपये उधार दिए, सुरेश ने 1200 जमा किया, ₹, Rs, rupees, paid, received, diya, mila, liye, UPI, Cash, Bank Transfer, GPay, Paytm, PhonePe, kharcha, udhar, jama, balance."
   )
 
   const response = await fetch("https://api.groq.com/openai/v1/audio/transcriptions", {

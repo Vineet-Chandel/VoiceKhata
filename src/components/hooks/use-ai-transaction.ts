@@ -17,38 +17,44 @@ export type AITransactionResult = {
 
 const GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
 
-const SYSTEM_PROMPT = `You are the transaction intelligence engine for VoiceKhata.
-Your job is to understand what the user likely spent money on (or received money from), then normalize it intelligently.
+const SYSTEM_PROMPT = `You are the transaction intelligence and Khata bookkeeping engine for VoiceKhata.
+Your job is to extract customer/party transactions from voice or text in Hindi (Devanagari), Hinglish, or English, and normalize it intelligently.
 
 Return ONLY valid JSON with this shape:
 {
-  "transaction": "normalized merchant/payee name",
+  "transaction": "normalized customer, merchant, or payee name",
   "amount": 500,
-  "category": "Subscription",
-  "type": "Debit",
-  "method": "UPI",
+  "category": "Income",
+  "type": "Credit",
+  "method": "Cash",
   "date": "2026-05-12",
-  "confidence": 0.92,
-  "reasoning": "short reason",
-  "merchant_type": "saas | streaming | ecommerce | utility | food | transfer | salary | other",
-  "tags": ["subscription", "ai-tool"],
+  "confidence": 0.95,
+  "reasoning": "Ramesh made a cash payment to settle ledger balance",
+  "merchant_type": "customer | retail | vendor | transfer | utility | other",
+  "tags": ["khata", "payment"],
   "app_mode": "BUSINESS"
 }
 
-Rules:
-- Understand Hinglish, slang, and misspellings.
-- Recognize technical finance terms in English and Hindi (e.g., "mutual fund", "SIP", "FD", "Fixed Deposit", "RD" -> Investment; "EMI", "loan", "udhaar", "karza" -> Debt; "byaaj", "vyaaj" -> Interest; "poonjigat labh" -> Capital Gains; "kiraya" -> Rent).
-- Normalize merchant names globally (not India-only).
-- Keep transaction as a clean proper name: e.g. "mxplayer pe kiye the" -> "MX Player".
-- Infer category and debit/credit from intent.
-- Do not reject unknown merchants. Make the best probable interpretation.
-- If amount/method/date are missing, use null.
-- date must be yyyy-MM-dd if present.
+Khata & Indian Bookkeeping Rules:
+- Credit (Inflow / Money Received):
+  * "jama", "payment mila", "ne diye", "chuka diya", "vasool hua", "received", "paid me", "aaye", "जमा", "दिए", "भुगतान", "चुकता", "मिला"
+  * Example: "Ramesh ne 500 rupaye diye" -> transaction: "Ramesh", amount: 500, type: "Credit", category: "Income", method: "Cash"
+  * Example: "सुरेश ने 1200 जमा किया" -> transaction: "Suresh", amount: 1200, type: "Credit", category: "Income"
+- Debit (Outflow / Udhaar Given / Expense):
+  * "udhaar", "udhar diya", "samaan liya", "karza", "borrowed", "credit given", "spent", "kharcha", "paid to", "उधार", "कर्ज", "खर्चा", "लिया"
+  * Example: "Suresh ko 1200 udhar diya" -> transaction: "Suresh", amount: 1200, type: "Debit", category: "Debt", method: "Cash"
+  * Example: "रमेश को 500 रुपये उधार दिए" -> transaction: "Ramesh", amount: 500, type: "Debit", category: "Debt"
+  * Example: "Gupta Kirana se 350 ka samaan liya" -> transaction: "Gupta Kirana", amount: 350, type: "Debit", category: "Shopping"
+
+General Rules:
+- Understand Devanagari Hindi, Hinglish, English, slang, and numbers in words ("do hazaar" -> 2000, "paanch sau" -> 500).
+- Extract customer/party name cleanly (remove 'ko', 'ne', 'se', 'bhai', 'ji' prefixes/suffixes from the name).
+- If method is mentioned ("UPI", "GPay", "Cash", "PhonePe", "Paytm", "nagad", "bank transfer"), populate method accordingly.
+- Never invent financial details. If amount is missing, use null.
+- date must be yyyy-MM-dd if present (default to today).
 - category must be one of: Food, Shopping, Transport, Utilities, Health, Entertainment, Subscription, Income, Investment, Debt, Interest, Rent, Capital Gains, Other.
 - method must be one of: Cash, UPI, Bank Transfer, Credit Card, Debit Card, Net Banking, or null.
-- app_mode must be "BUSINESS" or "PERSONAL". If the user mentions "personal" or the context is clearly personal, use "PERSONAL". Otherwise default to "BUSINESS".
 - confidence must be between 0 and 1.
-- reasoning must be short and factual.
 - Never output markdown.`
 
 function sanitizeCategory(input: unknown): string {
