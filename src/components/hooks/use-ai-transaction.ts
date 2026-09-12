@@ -1,5 +1,6 @@
 import { useState } from "react"
 import { format } from "date-fns"
+import { parseVoiceKhataInput } from "@/lib/voice-khata-parser"
 
 export type AITransactionResult = {
   transaction: string
@@ -111,14 +112,33 @@ export function useAITransaction() {
     if (!message.trim()) return null
     setLoading(true)
 
+    const today = format(new Date(), "yyyy-MM-dd")
+
     try {
-      const apiKey = import.meta.env.VITE_GROQ_API_KEY as string
+      const apiKey = (import.meta.env.VITE_GROQ_API_KEY as string | undefined)?.trim()
+      
+      // If Groq API key is not configured locally, immediately use local VoiceKhata parser
       if (!apiKey) {
-        console.error("[useAITransaction] VITE_GROQ_API_KEY not set")
+        console.log("[useAITransaction] No VITE_GROQ_API_KEY found, using local VoiceKhata ledger engine...")
+        const localParsed = parseVoiceKhataInput(message)
+        if (localParsed) {
+          const isParty = localParsed.person && localParsed.person !== "Customer / Party"
+          return {
+            transaction: isParty ? localParsed.person : (localParsed.item || message.trim()),
+            amount: localParsed.amount,
+            category: sanitizeCategory(localParsed.category),
+            type: localParsed.type || "Debit",
+            method: sanitizeMethod(localParsed.method) || "Cash",
+            date: localParsed.date || today,
+            confidence: localParsed.confidence === "high" ? 0.92 : localParsed.confidence === "medium" ? 0.78 : 0.6,
+            reasoning: "Parsed deterministically using VoiceKhata local ledger engine.",
+            merchant_type: isParty ? "customer" : "retail",
+            tags: ["khata", "local_engine"],
+            app_mode: "BUSINESS",
+          }
+        }
         return null
       }
-
-      const today = format(new Date(), "yyyy-MM-dd")
 
       const models = [
         "llama-3.3-70b-versatile",
@@ -161,7 +181,24 @@ export function useAITransaction() {
       }
 
       if (!data) {
-        console.error("[useAITransaction] All Groq models failed")
+        console.warn("[useAITransaction] All Groq models failed. Falling back to local VoiceKhata parser...")
+        const localParsed = parseVoiceKhataInput(message)
+        if (localParsed) {
+          const isParty = localParsed.person && localParsed.person !== "Customer / Party"
+          return {
+            transaction: isParty ? localParsed.person : (localParsed.item || message.trim()),
+            amount: localParsed.amount,
+            category: sanitizeCategory(localParsed.category),
+            type: localParsed.type || "Debit",
+            method: sanitizeMethod(localParsed.method) || "Cash",
+            date: localParsed.date || today,
+            confidence: 0.85,
+            reasoning: "Local VoiceKhata parser fallback.",
+            merchant_type: isParty ? "customer" : "retail",
+            tags: ["khata", "local_fallback"],
+            app_mode: "BUSINESS",
+          }
+        }
         return null
       }
       const content = data?.choices?.[0]?.message?.content ?? "{}"
@@ -183,7 +220,24 @@ export function useAITransaction() {
         app_mode: parsed.app_mode === "PERSONAL" ? "PERSONAL" : "BUSINESS",
       }
     } catch (err) {
-      console.error("[useAITransaction] Fetch error:", err)
+      console.error("[useAITransaction] Fetch error, attempting local parse:", err)
+      const localParsed = parseVoiceKhataInput(message)
+      if (localParsed) {
+        const isParty = localParsed.person && localParsed.person !== "Customer / Party"
+        return {
+          transaction: isParty ? localParsed.person : (localParsed.item || message.trim()),
+          amount: localParsed.amount,
+          category: sanitizeCategory(localParsed.category),
+          type: localParsed.type || "Debit",
+          method: sanitizeMethod(localParsed.method) || "Cash",
+          date: localParsed.date || today,
+          confidence: 0.8,
+          reasoning: "Local VoiceKhata parser fallback.",
+          merchant_type: isParty ? "customer" : "retail",
+          tags: ["khata", "local_fallback"],
+          app_mode: "BUSINESS",
+        }
+      }
       return null
     } finally {
       setLoading(false)

@@ -2052,11 +2052,6 @@ export function useAIChat({
       if (guidedStep !== "idle" && guidedStep !== "done") {
         switch (guidedStep) {
           case "name": {
-            if (!apiKey) {
-              addMessage({ role: "assistant", content: "AI is not configured yet. Please add VITE_GROQ_API_KEY in .env." })
-              break
-            }
-
             const aiResult = (await parseTransaction(content.trim())) ?? {
               transaction: content.trim(),
               amount: null,
@@ -2070,12 +2065,14 @@ export function useAIChat({
             const parseConfidence = aiResult.confidence
 
             const merchantInput = aiResult.transaction || content.trim()
-            const merchant = await resolveMerchantPipeline(
-              apiKey,
-              merchantInput,
-              content.trim(),
-              parseConfidence < 0.4 ? "force-web" : "auto"
-            )
+            const merchant = apiKey
+              ? await resolveMerchantPipeline(
+                  apiKey,
+                  merchantInput,
+                  content.trim(),
+                  parseConfidence < 0.4 ? "force-web" : "auto"
+                )
+              : fallbackMerchantResolution(merchantInput)
 
             const category = aiResult.category !== "Other" ? safeCategory(aiResult.category) : safeCategory(merchant.category)
             const inferredType =
@@ -2550,7 +2547,7 @@ if (isLikelyUnrelated(trimmedContent)) {
   return
 }
 
-      if (apiKey && nextAssistantMode === "expense_logging") {
+      if (nextAssistantMode === "expense_logging") {
         const aiTx = (await parseTransaction(trimmedContent)) ?? {
           transaction: trimmedContent,
           amount: null,
@@ -2564,12 +2561,14 @@ if (isLikelyUnrelated(trimmedContent)) {
 
         if (shouldTreatAsTransactionInput(trimmedContent, aiTx.confidence, aiTx.amount)) {
           const merchantInput = aiTx.transaction || trimmedContent
-          const merchant = await resolveMerchantPipeline(
-            apiKey,
-            merchantInput,
-            trimmedContent,
-            aiTx.confidence < 0.4 ? "force-web" : "auto"
-          )
+          const merchant = apiKey
+            ? await resolveMerchantPipeline(
+                apiKey,
+                merchantInput,
+                trimmedContent,
+                aiTx.confidence < 0.4 ? "force-web" : "auto"
+              )
+            : fallbackMerchantResolution(merchantInput)
 
           const category = aiTx.category !== "Other" ? safeCategory(aiTx.category) : safeCategory(merchant.category)
           const type = category === "Income" ? "Credit" : (aiTx.type ?? "Debit")
