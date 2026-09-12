@@ -1,5 +1,5 @@
 // src/components/hooks/use-voice-input.ts
-// Ported and aligned with avksr/VoiceKhata speech recognition pipeline
+// Aligned dual-pipeline speech recognition engine (WebSpeech + Groq Whisper fallback)
 import { useState, useRef, useCallback, useEffect } from "react"
 import { transcribeAudioBlob } from "@/lib/groq-whisper"
 
@@ -96,46 +96,33 @@ export function useVoiceInput(options?: UseVoiceInputOptions) {
     audioChunksRef.current = []
   }, [cleanupHardware])
 
-  // Finalize processing: only delivers text if genuine speech was heard
+  // Finalize processing: delivers speech text via WebSpeech or Whisper fallback
   const handleFinalSpeech = useCallback(async () => {
     setVoiceState("processing")
 
     let finalText = spokenTranscriptRef.current.trim()
 
-    // 1. If WebSpeech was active and not failed:
-    // If WebSpeech heard nothing, it means the user was silent or stopped speaking.
-    // We must NEVER send pure silence to Whisper, as Whisper decoders hallucinate on room hiss.
-    if (!webSpeechFailedRef.current) {
-      if (!finalText) {
-        console.log("[useVoiceInput] WebSpeech completed with no speech detected. Discarding cleanly.")
-        cleanupHardware()
-        setVoiceState("idle")
-        setTranscript("")
-        return
-      }
-    } else {
-      // 2. WebSpeech failed or was unsupported (e.g. Brave shields blocked Google Speech server).
-      // Use Whisper fallback ONLY if actual sound was recorded above ambient noise threshold (>= 18).
-      if (audioChunksRef.current.length > 0 && maxVolumeRef.current >= 18) {
-        try {
-          const mimeType = mediaRecorderRef.current?.mimeType || audioChunksRef.current[0]?.type || "audio/webm"
-          const audioBlob = new Blob(audioChunksRef.current, { type: mimeType })
+    // Dual pipeline: If WebSpeech produced no text OR failed, fall back to Whisper on recorded audio blob
+    if (!finalText && audioChunksRef.current.length > 0) {
+      try {
+        const mimeType = mediaRecorderRef.current?.mimeType || audioChunksRef.current[0]?.type || "audio/webm"
+        const audioBlob = new Blob(audioChunksRef.current, { type: mimeType })
 
-          if (audioBlob.size > 3500) {
-            const whisperResult = await transcribeAudioBlob(audioBlob)
-            if (whisperResult && whisperResult.trim()) {
-              finalText = whisperResult.trim()
-            }
+        if (audioBlob.size > 2000) {
+          console.log("[useVoiceInput] WebSpeech produced no text. Transcribing audio blob via Whisper...")
+          const whisperResult = await transcribeAudioBlob(audioBlob)
+          if (whisperResult && whisperResult.trim()) {
+            finalText = whisperResult.trim()
           }
-        } catch (err) {
-          console.warn("[useVoiceInput] Whisper fallback error:", err)
         }
+      } catch (err) {
+        console.warn("[useVoiceInput] Whisper fallback error:", err)
       }
     }
 
     cleanupHardware()
 
-    // 3. Filter out single-word stopword hallucinations (e.g. "The", "a", "you")
+    // Filter out single-word stopword hallucinations
     const cleaned = finalText.toLowerCase().replace(/[^\w\s]/g, "").trim()
     const silenceStopwords = new Set([
       "the", "a", "an", "you", "so", "and", "or", "it", "to", "in", "is", "of",
@@ -143,30 +130,34 @@ export function useVoiceInput(options?: UseVoiceInputOptions) {
       "thank you for watching", "please subscribe"
     ])
 
-    if (!finalText || silenceStopwords.has(cleaned) || cleaned.length <= 2) {
-      console.log("[useVoiceInput] Discarded silence or empty artifact:", finalText)
+    if (!finalText || silenceStopwords.has(cleaned) || cleaned.length <= 1) {
+      console.log("[useVoiceInput] Discarded silence or empty speech artifact:", finalText)
       setVoiceState("idle")
       setTranscript("")
       return
     }
 
-    console.log("[useVoiceInput] Final accepted speech:", finalText)
+    console.log("[useVoiceInput] Final accepted speech transcript:", finalText)
     setTranscript(finalText)
     setVoiceState("idle")
     optionsRef.current?.onTranscript?.(finalText)
   }, [cleanupHardware])
 
   const stopListening = useCallback(() => {
-    if (voiceState !== "listening") return
-
     if (recognitionRef.current) {
       try {
         recognitionRef.current.stop()
       } catch {}
     }
 
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state === "recording") {
+      try {
+        mediaRecorderRef.current.stop()
+      } catch {}
+    }
+
     handleFinalSpeech()
-  }, [voiceState, handleFinalSpeech])
+  }, [handleFinalSpeech])
 
   const startListening = useCallback(async () => {
     cleanupHardware()
@@ -192,7 +183,7 @@ export function useVoiceInput(options?: UseVoiceInputOptions) {
       })
       streamRef.current = stream
 
-      // 2. Setup Web Audio visualizer and real volume monitoring
+      // 2. Setup Web Audio visualizer
       try {
         const AudioCtx = window.AudioContext || (window as any).webkitAudioContext
         if (AudioCtx) {
@@ -221,7 +212,7 @@ export function useVoiceInput(options?: UseVoiceInputOptions) {
         console.warn("[useVoiceInput] AudioContext visualizer init failed:", e)
       }
 
-      // 3. Setup MediaRecorder for fallback
+      // 3. Setup MediaRecorder for continuous fallback capture
       let mimeType = ""
       if (typeof MediaRecorder !== "undefined") {
         if (MediaRecorder.isTypeSupported("audio/webm;codecs=opus")) {
@@ -242,16 +233,16 @@ export function useVoiceInput(options?: UseVoiceInputOptions) {
         }
       }
 
-      recorder.start() // Clean continuous capture
+      recorder.start(200) // Collect chunks every 200ms
       setVoiceState("listening")
 
-      // 4. Initialize Web Speech API — aligned with avksr/VoiceKhata
+      // 4. Initialize Web Speech API
       const SpeechRecognitionClass = window.SpeechRecognition || window.webkitSpeechRecognition
       if (SpeechRecognitionClass) {
         const recognition = new SpeechRecognitionClass()
         recognition.lang = "hi-IN" // Standard Indian Hindi/English recognizer
         recognition.interimResults = true
-        recognition.continuous = false // Browser detects natural end of speech
+        recognition.continuous = false // Browser stops on natural silence
 
         recognition.onresult = (event: any) => {
           let interim = ""

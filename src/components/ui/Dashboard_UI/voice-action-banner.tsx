@@ -5,6 +5,7 @@ import React, { useState, useEffect, useRef } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Mic, MicOff, Check, RotateCcw, AlertCircle, ArrowUpRight, ArrowDownRight, Edit2, Sparkles, Send } from "lucide-react"
 import { useVoiceInput } from "@/components/hooks/use-voice-input"
+import { useAITransaction } from "@/components/hooks/use-ai-transaction"
 import { parseVoiceKhataInput, type ParsedVoiceTransaction } from "@/lib/voice-khata-parser"
 import type { TransactionInput } from "@/types/finance"
 
@@ -23,6 +24,8 @@ export function VoiceActionBanner({
   onSuccessToast,
   existingCustomers,
 }: VoiceActionBannerProps) {
+  const { parseTransaction: parseAITransaction } = useAITransaction()
+
   const handleVoiceTranscript = (finalText: string) => {
     if (finalText.trim()) {
       processTranscript(finalText.trim())
@@ -64,34 +67,57 @@ export function VoiceActionBanner({
     }
   }, [voiceState])
 
-  const processTranscript = (text: string) => {
+  const processTranscript = async (text: string) => {
     setFlowState("processing")
-    setTimeout(() => {
-      const parsed = parseVoiceKhataInput(text, existingCustomers)
-      setParsedTx(parsed)
-      setEditPerson(parsed.person === "Customer / Party" ? "" : parsed.person)
-      setEditAmount(parsed.amount || "")
-      setEditType(parsed.type || "Credit")
-      setEditMethod(parsed.method || "UPI")
-      setEditDate(parsed.date)
+    
+    // 1. Run deterministic VoiceKhata parser (Hindi/Hinglish/English)
+    let parsed = parseVoiceKhataInput(text, existingCustomers)
 
-      if (parsed.amount && parsed.isAmbiguousPerson) {
-        setFlowState("ambiguous_person")
-      } else if (parsed.amount && parsed.isAmbiguousDirection) {
-        setFlowState("ambiguous_direction")
-      } else if (parsed.amount) {
-        setFlowState("review")
-      } else {
-        // Did not catch amount
-        setFlowState("review")
+    // 2. If amount is missing and AI parser is available, attempt AI extraction
+    if (!parsed.amount) {
+      try {
+        const aiResult = await parseAITransaction(text)
+        if (aiResult && aiResult.amount) {
+          parsed = {
+            rawTranscript: text,
+            person: aiResult.transaction || parsed.person,
+            amount: aiResult.amount,
+            type: aiResult.type,
+            directionLabel: aiResult.type === "Credit" ? "Money received" : "Money paid",
+            method: aiResult.method || parsed.method || "Cash",
+            date: aiResult.date || parsed.date,
+            displayDate: parsed.displayDate,
+            category: aiResult.category || parsed.category,
+            isAmbiguousPerson: !aiResult.transaction || aiResult.transaction === text,
+            isAmbiguousDirection: false,
+            confidence: aiResult.confidence > 0.7 ? "high" : "medium",
+          }
+        }
+      } catch (err) {
+        console.warn("[VoiceActionBanner] AI parsing error:", err)
       }
-    }, 300)
+    }
+
+    setParsedTx(parsed)
+    setEditPerson(parsed.person === "Customer / Party" ? "" : parsed.person)
+    setEditAmount(parsed.amount || "")
+    setEditType(parsed.type || "Credit")
+    setEditMethod(parsed.method || "UPI")
+    setEditDate(parsed.date)
+
+    if (parsed.amount && parsed.isAmbiguousPerson) {
+      setFlowState("ambiguous_person")
+    } else if (parsed.amount && parsed.isAmbiguousDirection) {
+      setFlowState("ambiguous_direction")
+    } else {
+      setFlowState("review")
+    }
   }
 
   const handleManualSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (!manualText.trim()) return
-    processTranscript(manualText)
+    processTranscript(manualText.trim())
     setManualText("")
   }
 
@@ -285,7 +311,7 @@ export function VoiceActionBanner({
         </div>
       )}
 
-      {/* ── 4. REVIEW STATE (MANDATORY TRUST STEP) ──────────────────────────────── */}
+      {/* ── 4. REVIEW STATE ──────────────────────────────── ──────── */}
       {flowState === "review" && (
         <div className="space-y-4">
           <div className="flex items-center justify-between border-b border-slate-700/40 pb-3">
@@ -497,7 +523,7 @@ export function VoiceActionBanner({
         </div>
       )}
 
-      {/* ── 7. SUCCESS + UNDO STATE (6 SECONDS WINDOW) ────────────────────────── */}
+      {/* ── 7. SUCCESS + UNDO STATE ────────────────────────────────────────── */}
       {flowState === "success" && (
         <div className="flex items-center justify-between bg-[#064E3B]/30 border border-[#10B981]/30 p-3.5 rounded-[10px] transition-all">
           <div className="flex items-center gap-2.5">
