@@ -21,7 +21,16 @@ export function VoiceActionBanner({
   onDeleteTransaction,
   onSuccessToast
 }: VoiceActionBannerProps) {
-  const { voiceState, transcript, startListening, stopListening, reset } = useVoiceInput()
+  const handleVoiceTranscript = (finalText: string) => {
+    if (finalText.trim()) {
+      processTranscript(finalText.trim())
+    }
+  }
+
+  const { voiceState, transcript, startListening, stopListening, reset } = useVoiceInput({
+    onTranscript: handleVoiceTranscript,
+    onError: () => setFlowState("error"),
+  })
   
   const [flowState, setFlowState] = useState<FlowState>("idle")
   const [parsedTx, setParsedTx] = useState<ParsedVoiceTransaction | null>(null)
@@ -48,15 +57,10 @@ export function VoiceActionBanner({
       setFlowState("listening")
     } else if (voiceState === "processing") {
       setFlowState("processing")
-      if (transcript.trim()) {
-        processTranscript(transcript)
-      } else {
-        setFlowState("idle")
-      }
     } else if (voiceState === "error") {
       setFlowState("error")
     }
-  }, [voiceState, transcript])
+  }, [voiceState])
 
   const processTranscript = (text: string) => {
     setFlowState("processing")

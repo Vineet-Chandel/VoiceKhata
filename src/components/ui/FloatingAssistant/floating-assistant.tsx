@@ -160,6 +160,15 @@ export function FloatingAssistant() {
     setMultiState,
   })
 
+  const handleVoiceTranscript = React.useCallback((text: string) => {
+    if (text.trim()) {
+      sendMessage(text.trim())
+      setIsExpandedWorkspace(true)
+      setIsCompact(false)
+      setShowSuggestions(false)
+    }
+  }, [sendMessage])
+
   // ── Voice input ────────────────────────────────────────────────────────────
   const {
     voiceState,
@@ -169,7 +178,13 @@ export function FloatingAssistant() {
     stopListening,
     reset: resetVoice,
     analyserRef,
-  } = useVoiceInput()
+  } = useVoiceInput({
+    onTranscript: handleVoiceTranscript,
+    onError: (err) => {
+      setMicError(err)
+      setTimeout(() => setMicError(""), 4000)
+    },
+  })
 
   // ── Local UI state ─────────────────────────────────────────────────────────
   const [inputValue, setInputValue] = React.useState("")
@@ -196,22 +211,13 @@ export function FloatingAssistant() {
   const isActive = isListening || isProcessing || loading || isFocused || menuOpen || isExpandedWorkspace
   const canSend = inputValue.trim().length > 0 && !loading
 
-  // ── Handle voice transcript completion ─────────────────────────────────────
+  // ── Handle voice errors ────────────────────────────────────────────────────
   React.useEffect(() => {
-    if (voiceState === "processing") {
-      if (transcript) {
-        sendMessage(transcript)
-        if (!isExpandedWorkspace) {
-          openWorkspace()
-        }
-      }
-      resetVoice()
-    } else if (voiceState === "error" && errorMessage) {
+    if (voiceState === "error" && errorMessage) {
       setMicError(errorMessage)
-      resetVoice()
       setTimeout(() => setMicError(""), 4000)
     }
-  }, [voiceState, transcript, errorMessage, resetVoice, isExpandedWorkspace, sendMessage])
+  }, [voiceState, errorMessage])
 
   // ── Scroll-aware shrink ────────────────────────────────────────────────────
   React.useEffect(() => {

@@ -1,5 +1,6 @@
 // src/components/hooks/use-voice-input.ts
 import { useState, useRef, useCallback, useEffect } from "react"
+import { transcribeAudioBlob } from "@/lib/groq-whisper"
 
 declare global {
   interface Window {
@@ -10,7 +11,12 @@ declare global {
 
 export type VoiceState = "idle" | "listening" | "processing" | "error"
 
-export function useVoiceInput() {
+export interface UseVoiceInputOptions {
+  onTranscript?: (transcript: string) => void
+  onError?: (errorMessage: string) => void
+}
+
+export function useVoiceInput(options?: UseVoiceInputOptions) {
   const [voiceState, setVoiceState] = useState<VoiceState>("idle")
   const [transcript, setTranscript] = useState("")
   const [errorMessage, setErrorMessage] = useState("")
@@ -18,184 +24,300 @@ export function useVoiceInput() {
   const audioContextRef = useRef<AudioContext | null>(null)
   const analyserRef = useRef<AnalyserNode | null>(null)
   const streamRef = useRef<MediaStream | null>(null)
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null)
+  const audioChunksRef = useRef<Blob[]>([])
   const recognitionRef = useRef<any>(null)
-  const hasResultRef = useRef(false)
-  // Track the current language to allow fallback
-  const langRef = useRef("hi-IN")
-  // Safety timeout to prevent infinite listening
+  const webSpeechFailedRef = useRef(false)
+  const webSpeechFinalTranscriptRef = useRef("")
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const optionsRef = useRef(options)
 
-  const cleanupStream = useCallback(() => {
-    // No-op: we no longer use a custom MediaStream to prevent hardware mic contention
-    // on mobile devices with SpeechRecognition.
-  }, [])
+  // Keep optionsRef up to date with latest props/callbacks
+  useEffect(() => {
+    optionsRef.current = options
+  }, [options])
 
-  const cleanup = useCallback(() => {
+  // Clean up all hardware streams and contexts
+  const cleanupHardware = useCallback(() => {
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current)
       timeoutRef.current = null
     }
+
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach((t) => {
+        try {
+          t.stop()
+        } catch {}
+      })
+      streamRef.current = null
+    }
+
+    if (audioContextRef.current && audioContextRef.current.state !== "closed") {
+      try {
+        audioContextRef.current.close()
+      } catch {}
+      audioContextRef.current = null
+    }
+    analyserRef.current = null
+
     if (recognitionRef.current) {
       try {
         recognitionRef.current.onresult = null
         recognitionRef.current.onerror = null
         recognitionRef.current.onend = null
         recognitionRef.current.abort()
-      } catch (e) {
-        // ignore
-      }
+      } catch {}
       recognitionRef.current = null
     }
-    cleanupStream()
-  }, [cleanupStream])
+
+    mediaRecorderRef.current = null
+  }, [])
+
+  const reset = useCallback(() => {
+    cleanupHardware()
+    setVoiceState("idle")
+    setTranscript("")
+    setErrorMessage("")
+    webSpeechFailedRef.current = false
+    webSpeechFinalTranscriptRef.current = ""
+    audioChunksRef.current = []
+  }, [cleanupHardware])
+
+  // Internal: Finalize transcription using Groq Whisper or WebSpeech
+  const finalizeTranscription = useCallback(async () => {
+    setVoiceState("processing")
+
+    let resultText = webSpeechFinalTranscriptRef.current.trim()
+
+    // If WebSpeech failed or produced no text, use Groq Whisper with the recorded audio
+    if (!resultText || webSpeechFailedRef.current) {
+      const chunks = audioChunksRef.current
+      if (chunks.length > 0) {
+        try {
+          const mimeType = mediaRecorderRef.current?.mimeType || chunks[0]?.type || "audio/webm"
+          const audioBlob = new Blob(chunks, { type: mimeType })
+
+          // Only call Whisper if we actually captured audio data (e.g. > 1KB)
+          if (audioBlob.size > 1200) {
+            const whisperText = await transcribeAudioBlob(audioBlob)
+            if (whisperText.trim()) {
+              resultText = whisperText.trim()
+            }
+          }
+        } catch (err: any) {
+          console.warn("[useVoiceInput] Whisper transcription fallback failed:", err)
+        }
+      }
+    }
+
+    cleanupHardware()
+
+    if (resultText) {
+      setTranscript(resultText)
+      setVoiceState("idle")
+      optionsRef.current?.onTranscript?.(resultText)
+    } else {
+      // Nothing heard or transcribed
+      setVoiceState("idle")
+    }
+  }, [cleanupHardware])
+
+  const stopListening = useCallback(() => {
+    if (voiceState !== "listening") return
+
+    setVoiceState("processing")
+
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current)
+      timeoutRef.current = null
+    }
+
+    // Stop WebSpeech if running
+    if (recognitionRef.current) {
+      try {
+        recognitionRef.current.stop()
+      } catch {}
+    }
+
+    // Stop MediaRecorder — this will trigger mediaRecorder.onstop
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state === "recording") {
+      try {
+        mediaRecorderRef.current.stop()
+      } catch {
+        finalizeTranscription()
+      }
+    } else {
+      finalizeTranscription()
+    }
+  }, [voiceState, finalizeTranscription])
 
   const startListening = useCallback(async () => {
-    cleanup()
+    cleanupHardware()
     setErrorMessage("")
     setTranscript("")
-    hasResultRef.current = false
-    setVoiceState("listening")
+    webSpeechFailedRef.current = false
+    webSpeechFinalTranscriptRef.current = ""
+    audioChunksRef.current = []
 
     try {
-      // 1. Check if browser supports SpeechRecognition at all before proceeding
+      // 1. Request microphone access
+      if (!navigator.mediaDevices?.getUserMedia) {
+        throw new Error("Microphone access is not supported by your browser.")
+      }
+
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true,
+        },
+      })
+      streamRef.current = stream
+
+      // 2. Setup Web Audio API for live visualizer
+      try {
+        const AudioCtx = window.AudioContext || (window as any).webkitAudioContext
+        if (AudioCtx) {
+          const ctx = new AudioCtx()
+          const analyser = ctx.createAnalyser()
+          analyser.fftSize = 64
+          const source = ctx.createMediaStreamSource(stream)
+          source.connect(analyser)
+          audioContextRef.current = ctx
+          analyserRef.current = analyser
+        }
+      } catch (e) {
+        console.warn("[useVoiceInput] AudioContext visualizer init failed, using simulated visualizer:", e)
+      }
+
+      // 3. Setup MediaRecorder to capture audio for Whisper
+      let mimeType = ""
+      if (typeof MediaRecorder !== "undefined") {
+        if (MediaRecorder.isTypeSupported("audio/webm;codecs=opus")) {
+          mimeType = "audio/webm;codecs=opus"
+        } else if (MediaRecorder.isTypeSupported("audio/webm")) {
+          mimeType = "audio/webm"
+        } else if (MediaRecorder.isTypeSupported("audio/mp4")) {
+          mimeType = "audio/mp4"
+        } else if (MediaRecorder.isTypeSupported("audio/ogg")) {
+          mimeType = "audio/ogg"
+        }
+      }
+
+      const recorder = mimeType ? new MediaRecorder(stream, { mimeType }) : new MediaRecorder(stream)
+      mediaRecorderRef.current = recorder
+
+      recorder.ondataavailable = (event) => {
+        if (event.data && event.data.size > 0) {
+          audioChunksRef.current.push(event.data)
+        }
+      }
+
+      recorder.onstop = () => {
+        finalizeTranscription()
+      }
+
+      recorder.start(100) // Collect 100ms chunks
+      setVoiceState("listening")
+
+      // 4. In parallel: Start WebSpeech for live interim preview IF available
       const SpeechRecognitionClass = window.SpeechRecognition || window.webkitSpeechRecognition
-      if (!SpeechRecognitionClass) {
-        throw new Error("Speech recognition is not supported in this browser.")
-      }
+      if (SpeechRecognitionClass) {
+        try {
+          const recognition = new SpeechRecognitionClass()
+          recognition.continuous = false
+          recognition.interimResults = true
+          recognition.lang = "en-IN"
+          recognition.maxAlternatives = 1
 
-      // 2. We no longer use custom getUserMedia here because it fights with 
-      // the native SpeechRecognition API for mic exclusivity on Android/Mobile,
-      // which causes silent failures (mic spins but takes no input).
+          let finalAcc = ""
 
-      const recognition = new SpeechRecognitionClass()
-      // Use continuous=false so recognition stops cleanly after a pause
-      // This prevents the engine from auto-restarting and causing phantom loops
-      recognition.continuous = false
-      recognition.interimResults = true
-      recognition.lang = langRef.current // Uses fallback if hi-IN failed
-      recognition.maxAlternatives = 1
+          recognition.onresult = (event: any) => {
+            let interim = ""
+            let newFinal = ""
 
-      let finalTranscriptAcc = ""
+            for (let i = event.resultIndex; i < event.results.length; i++) {
+              const segment = event.results[i][0]?.transcript || ""
+              if (event.results[i].isFinal) {
+                newFinal += segment
+              } else {
+                interim += segment
+              }
+            }
 
-      recognition.onresult = (event: any) => {
-        hasResultRef.current = true
-        let interimTranscript = ""
-        let newFinalTranscript = ""
+            if (newFinal) {
+              finalAcc = (finalAcc + " " + newFinal).trim()
+            }
 
-        for (let i = event.resultIndex; i < event.results.length; i++) {
-          const segment = event.results[i][0].transcript
-          if (event.results[i].isFinal) {
-            newFinalTranscript += segment
-          } else {
-            interimTranscript += segment
+            const current = (finalAcc + " " + interim).trim()
+            if (current) {
+              webSpeechFinalTranscriptRef.current = current
+              setTranscript(current)
+            }
           }
-        }
 
-        if (newFinalTranscript) {
-          finalTranscriptAcc += " " + newFinalTranscript.trim()
-        }
+          recognition.onerror = (event: any) => {
+            // Note: If WebSpeech fires 'network' error (e.g. Brave browser blocking Google speech servers),
+            // we intentionally DO NOT crash or stop recording!
+            // We flag it so that finalizeTranscription() will seamlessly use Groq Whisper instead!
+            console.warn("[useVoiceInput] WebSpeech interim preview warning:", event.error)
+            webSpeechFailedRef.current = true
 
-        const currentText = (finalTranscriptAcc + " " + interimTranscript).trim()
-        setTranscript(currentText)
-      }
-
-      recognition.onerror = (event: any) => {
-        console.warn("Speech recognition error:", event.error)
-
-        if (event.error === "not-allowed" || event.error === "service-not-allowed") {
-          setErrorMessage("Microphone access denied. Please allow microphone permission.")
-          setVoiceState("error")
-          cleanup()
-        } else if (event.error === "no-speech") {
-          // No speech detected — gracefully go to processing so the UI resets
-          // onend will fire after this and handle the state transition
-        } else if (event.error === "network") {
-          if (langRef.current === "hi-IN") {
-            console.warn("Network error with hi-IN, falling back to en-IN")
-            langRef.current = "en-IN"
-            setErrorMessage("Hindi voice not supported by your device. Switched to English fallback. Please click mic and try again.")
-          } else {
-            setErrorMessage("Network error. Speech recognition requires an internet connection.")
+            if (event.error === "not-allowed" || event.error === "service-not-allowed") {
+              setErrorMessage("Microphone access denied. Please allow microphone permission.")
+              setVoiceState("error")
+              cleanupHardware()
+              optionsRef.current?.onError?.("Microphone access denied.")
+            }
           }
-          setVoiceState("error")
-          cleanup()
-        } else if (event.error !== "aborted") {
-          // For any other unrecognized error, log but don't crash
-          console.error("Unexpected speech error:", event.error)
-        }
-      }
 
-      recognition.onend = () => {
-        // Clear safety timeout
-        if (timeoutRef.current) {
-          clearTimeout(timeoutRef.current)
-          timeoutRef.current = null
-        }
-
-        // Clean up audio stream
-        cleanupStream()
-
-        setVoiceState((prev) => {
-          if (prev === "listening") {
-            return "processing"
+          recognition.onend = () => {
+            // WebSpeech ended (e.g. user paused talking).
+            // If still in listening mode, we can finalize cleanly
+            if (recorder.state === "recording") {
+              try {
+                recorder.stop()
+              } catch {
+                finalizeTranscription()
+              }
+            }
           }
-          return prev
-        })
+
+          recognitionRef.current = recognition
+          recognition.start()
+        } catch (e) {
+          console.warn("[useVoiceInput] WebSpeech start failed, continuing with Whisper recorder:", e)
+          webSpeechFailedRef.current = true
+        }
+      } else {
+        webSpeechFailedRef.current = true
       }
 
-      recognitionRef.current = recognition
-      recognition.start()
-
-      // Safety timeout: if recognition hasn't ended after 15 seconds, force stop
+      // Safety timeout: 15 seconds max listening
       timeoutRef.current = setTimeout(() => {
-        if (recognitionRef.current) {
-          try {
-            recognitionRef.current.stop()
-          } catch (e) {
-            // If stop fails, force cleanup
-            cleanup()
-            setVoiceState("processing")
-          }
+        if (mediaRecorderRef.current && mediaRecorderRef.current.state === "recording") {
+          stopListening()
         }
       }, 15000)
 
     } catch (err: any) {
-      console.error("Voice input start error:", err)
-      setErrorMessage(err.message || "Could not start microphone")
+      console.error("[useVoiceInput] Start error:", err)
+      cleanupHardware()
+      const msg = err?.name === "NotAllowedError" || err?.message?.includes("denied")
+        ? "Microphone access denied. Please click the lock icon in your browser to allow microphone."
+        : (err?.message || "Could not start microphone.")
+      setErrorMessage(msg)
       setVoiceState("error")
-      cleanup()
+      optionsRef.current?.onError?.(msg)
     }
-  }, [cleanup, cleanupStream])
-
-  const stopListening = useCallback(() => {
-    if (voiceState === "listening") {
-      setVoiceState("processing")
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current)
-        timeoutRef.current = null
-      }
-      if (recognitionRef.current) {
-        try {
-          recognitionRef.current.stop()
-        } catch (e) {
-          // ignore
-        }
-      }
-      cleanupStream()
-    }
-  }, [voiceState, cleanupStream])
-
-  const reset = useCallback(() => {
-    cleanup()
-    setVoiceState("idle")
-    setTranscript("")
-    setErrorMessage("")
-    hasResultRef.current = false
-  }, [cleanup])
+  }, [cleanupHardware, stopListening, finalizeTranscription])
 
   useEffect(() => {
-    return cleanup
-  }, [cleanup])
+    return () => {
+      cleanupHardware()
+    }
+  }, [cleanupHardware])
 
   return {
     voiceState,

@@ -69,6 +69,15 @@ export function ChatInput({ onSend, loading, guidedStep, replyingTo, onCancelRep
   const [scanState,  setScanState]  = React.useState<ScanState>({ status: "idle" })
   const textareaRef                 = React.useRef<HTMLTextAreaElement>(null)
 
+  const handleVoiceTranscript = React.useCallback((finalText: string) => {
+    if (finalText.trim()) {
+      const fullMessage = (value ? value + " " + finalText : finalText).trim()
+      onSend(fullMessage)
+      setValue("")
+      if (textareaRef.current) textareaRef.current.style.height = "auto"
+    }
+  }, [value, onSend])
+
   const {
     voiceState,
     transcript,
@@ -77,22 +86,10 @@ export function ChatInput({ onSend, loading, guidedStep, replyingTo, onCancelRep
     stopListening,
     reset: resetVoice,
     analyserRef,
-  } = useVoiceInput()
-
-  React.useEffect(() => {
-    if (voiceState === "processing") {
-      if (transcript) {
-        const fullMessage = (value ? value + " " + transcript : transcript).trim()
-        onSend(fullMessage)
-        setValue("")
-        if (textareaRef.current) textareaRef.current.style.height = "auto"
-      }
-      resetVoice()
-    } else if (voiceState === "error" && errorMessage) {
-      console.error(errorMessage)
-      resetVoice()
-    }
-  }, [voiceState, transcript, errorMessage, resetVoice])
+  } = useVoiceInput({
+    onTranscript: handleVoiceTranscript,
+    onError: (err) => console.error("[ChatInput voice error]:", err),
+  })
 
   // Camera input — capture="environment" opens camera directly (Scan Receipt)
   const cameraInputRef = React.useRef<HTMLInputElement>(null)
