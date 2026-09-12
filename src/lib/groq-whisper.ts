@@ -25,10 +25,11 @@ export async function transcribeAudioBlob(blob: Blob): Promise<string> {
   formData.append("file", file)
   formData.append("model", "whisper-large-v3-turbo")
   formData.append("response_format", "json")
-  // Prompt helps Whisper recognize Indian finance context, names, and Hinglish slang
+  formData.append("temperature", "0")
+  // Prompt helps Whisper recognize Indian finance context, numbers, currency symbols, and Hinglish keywords
   formData.append(
     "prompt",
-    "VoiceKhata transactions: Ramesh, Suresh, UPI, Cash, Rs, rupees, udhar, jama, kharcha, Paytm, PhonePe, GPay, grocery, chai, rent."
+    "VoiceKhata ledger entries: ₹, Rs, rupees, paid, received, sent, diya, mila, liye, UPI, Cash, Bank Transfer, GPay, Paytm, PhonePe, Ramesh, Suresh, Dinesh, Sunil, Gupta Kirana, kharcha, udhar, jama, salary, rent, groceries, chai, dinner, petrol."
   )
 
   const response = await fetch("https://api.groq.com/openai/v1/audio/transcriptions", {
@@ -47,5 +48,6 @@ export async function transcribeAudioBlob(blob: Blob): Promise<string> {
 
   const data = await response.json()
   const text = (data?.text || "").trim()
+  console.log("[GroqWhisper] Transcribed text:", text)
   return text
 }

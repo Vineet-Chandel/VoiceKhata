@@ -84,30 +84,37 @@ export function useVoiceInput(options?: UseVoiceInputOptions) {
     audioChunksRef.current = []
   }, [cleanupHardware])
 
-  // Internal: Finalize transcription using Groq Whisper or WebSpeech
+  // Internal: Finalize transcription using Groq Whisper as PRIMARY engine
   const finalizeTranscription = useCallback(async () => {
     setVoiceState("processing")
 
-    let resultText = webSpeechFinalTranscriptRef.current.trim()
+    let resultText = ""
+    const chunks = audioChunksRef.current
 
-    // If WebSpeech failed or produced no text, use Groq Whisper with the recorded audio
-    if (!resultText || webSpeechFailedRef.current) {
-      const chunks = audioChunksRef.current
-      if (chunks.length > 0) {
-        try {
-          const mimeType = mediaRecorderRef.current?.mimeType || chunks[0]?.type || "audio/webm"
-          const audioBlob = new Blob(chunks, { type: mimeType })
+    // 1. ALWAYS prioritize Groq Whisper AI (whisper-large-v3-turbo) for highest accuracy
+    if (chunks.length > 0) {
+      try {
+        const mimeType = mediaRecorderRef.current?.mimeType || chunks[0]?.type || "audio/webm"
+        const audioBlob = new Blob(chunks, { type: mimeType })
 
-          // Only call Whisper if we actually captured audio data (e.g. > 1KB)
-          if (audioBlob.size > 1200) {
-            const whisperText = await transcribeAudioBlob(audioBlob)
-            if (whisperText.trim()) {
-              resultText = whisperText.trim()
-            }
+        if (audioBlob.size > 800) {
+          console.log("[useVoiceInput] Transcribing with Groq Whisper AI (blob size:", audioBlob.size, "bytes)...")
+          const whisperText = await transcribeAudioBlob(audioBlob)
+          if (whisperText && whisperText.trim()) {
+            resultText = whisperText.trim()
+            console.log("[useVoiceInput] Groq Whisper result:", resultText)
           }
-        } catch (err: any) {
-          console.warn("[useVoiceInput] Whisper transcription fallback failed:", err)
         }
+      } catch (err: any) {
+        console.warn("[useVoiceInput] Groq Whisper transcription error, falling back to WebSpeech:", err)
+      }
+    }
+
+    // 2. Fallback to WebSpeech only if Whisper didn't return a transcript
+    if (!resultText) {
+      resultText = webSpeechFinalTranscriptRef.current.trim()
+      if (resultText) {
+        console.log("[useVoiceInput] Fallback WebSpeech result:", resultText)
       }
     }
 
@@ -118,7 +125,6 @@ export function useVoiceInput(options?: UseVoiceInputOptions) {
       setVoiceState("idle")
       optionsRef.current?.onTranscript?.(resultText)
     } else {
-      // Nothing heard or transcribed
       setVoiceState("idle")
     }
   }, [cleanupHardware])
