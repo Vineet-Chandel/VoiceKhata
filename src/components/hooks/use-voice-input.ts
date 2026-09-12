@@ -76,7 +76,7 @@ export function useVoiceInput() {
       const recognition = new SpeechRecognitionClass()
       recognition.continuous = true
       recognition.interimResults = true
-      recognition.lang = "en-IN" // Can be configured later
+      recognition.lang = "hi-IN" // Handles both Hindi and English seamlessly
 
       let finalTranscriptAcc = ""
 
