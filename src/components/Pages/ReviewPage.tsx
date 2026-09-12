@@ -11,7 +11,7 @@ import {
   MessageSquareHeart,
   UserCheck
 } from "lucide-react"
-import Logo from "@/components/ui/Navbar/logo"
+import Logo from "@/components/ui/logo"
 import { supabase } from "@/lib/supabase"
 const personas = [
   "College Student",

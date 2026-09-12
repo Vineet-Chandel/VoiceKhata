@@ -55,10 +55,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       await getScopedSupabase(firebaseUser.uid, { force: true })
 
       try {
-        await ensureUserProfile({
-          displayName: firebaseUser.displayName || undefined,
-          photoURL: firebaseUser.photoURL || undefined,
-        })
+        await ensureUserProfile(
+          firebaseUser.uid,
+          firebaseUser.displayName || undefined,
+          firebaseUser.email || undefined
+        )
       } catch (err) {
         console.warn("Could not ensure profile:", err)
       }
