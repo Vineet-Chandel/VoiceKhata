@@ -56,14 +56,14 @@ export function ShopkeeperCategories() {
   ];
 
   return (
-    <section id="businesses" className="py-16 sm:py-20 bg-[#07090E] border-b border-[#1E2638]">
+    <section id="businesses" className="py-16 sm:py-20 bg-[#0F172A] border-b border-[#334155]">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         
         <div className="text-center max-w-2xl mx-auto mb-12">
-          <span className="text-xs font-semibold uppercase tracking-wider text-[#818CF8] bg-[#1E2337] border border-[#5C6BC0]/30 px-3 py-1 rounded-full">
+          <span className="text-xs font-semibold uppercase tracking-wider text-[#818CF8] bg-[#1E293B] border border-[#5C6BC0]/30 px-3 py-1 rounded-full">
             Who It's For
           </span>
-          <h2 className="mt-3 text-2xl sm:text-4xl font-bold text-[#F1F5F9] tracking-tight">
+          <h2 className="mt-3 text-2xl sm:text-4xl font-bold text-[#F8FAFC] tracking-tight">
             Tailored for Every Indian Retail Counter
           </h2>
           <p className="mt-2 text-xs sm:text-sm text-[#94A3B8]">
@@ -75,21 +75,21 @@ export function ShopkeeperCategories() {
           {categories.map((cat, idx) => (
             <div
               key={idx}
-              className="rounded-[12px] border border-[#1E2638] bg-[#0F131C] p-6 hover:border-[#5C6BC0]/60 hover:bg-[#161B26] transition-all shadow-xs"
+              className="rounded-[12px] border border-[#334155] bg-[#1E293B] p-6 hover:border-[#5C6BC0]/60 hover:bg-[#253349] transition-all shadow-xs"
             >
               <div className="flex items-center justify-between mb-3.5">
-                <div className="flex size-10 items-center justify-center rounded-[8px] bg-[#1E2337] text-[#818CF8]">
+                <div className="flex size-10 items-center justify-center rounded-[8px] bg-[#1E293B] text-[#818CF8]">
                   {cat.icon}
                 </div>
-                <span className="rounded-full bg-[#07090E] px-2.5 py-0.5 text-[11px] font-semibold text-[#94A3B8] border border-[#1E2638]">
+                <span className="rounded-full bg-[#0F172A] px-2.5 py-0.5 text-[11px] font-semibold text-[#94A3B8] border border-[#334155]">
                   {cat.badge}
                 </span>
               </div>
 
-              <h3 className="text-base font-bold text-[#F1F5F9] mb-1.5">{cat.title}</h3>
+              <h3 className="text-base font-bold text-[#F8FAFC] mb-1.5">{cat.title}</h3>
               <p className="text-xs text-[#94A3B8] leading-relaxed mb-4">{cat.desc}</p>
 
-              <div className="rounded-[8px] border border-[#1E2638] bg-[#07090E] p-2.5 text-[11px] text-[#F1F5F9]">
+              <div className="rounded-[8px] border border-[#334155] bg-[#0F172A] p-2.5 text-[11px] text-[#F8FAFC]">
                 <span className="text-[#818CF8] font-semibold">🎙️ Spoken:</span> {cat.example}
               </div>
             </div>

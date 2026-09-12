@@ -5,7 +5,7 @@ import * as React from "react"
 import { format, parse } from "date-fns"
 import {
   ChevronDownIcon, ScanIcon, Loader2Icon, ImageIcon,
-  AlertTriangleIcon, PlusIcon, Mic, Edit3, Camera, Check, ArrowDownRight, ArrowUpRight
+  AlertTriangleIcon, InfinityIcon, PlusIcon,
 } from "lucide-react"
 import { IconPlus } from "@tabler/icons-react"
 import { cn } from "@/lib/utils"
@@ -28,7 +28,7 @@ import {
 import type { Transaction } from "@/components/hooks/use-transactions"
 import type { Budget } from "@/components/hooks/use-budgets"
 import { scanReceipt, scanReceiptMulti } from "@/lib/scan-receipt"
-import { VoiceActionBanner } from "@/components/ui/Dashboard_UI/voice-action-banner"
+import { isBudgetValidForTransaction } from "@/lib/budget-utils"
 
 type TransactionInput = Omit<Transaction, "id" | "firebase_uid" | "created_at">
 
@@ -37,16 +37,16 @@ const BASE_CATEGORIES = [
   "Utilities", "Transport", "Health", "Entertainment", "Other",
 ]
 const METHODS = [
-  "UPI", "Cash", "Bank Transfer", "Credit Card", "Debit Card", "Net Banking",
+  "Bank Transfer", "Credit Card", "Debit Card", "UPI", "Cash", "Net Banking",
 ]
 
 const emptyForm = {
   transaction: "",
-  category: "Shopping",
+  category: "",
   amount: "",
-  date: new Date() as Date | undefined,
-  type: "Credit",
-  method: "UPI",
+  date: undefined as Date | undefined,
+  type: "",
+  method: "",
   status: "Completed",
 }
 
@@ -66,32 +66,56 @@ export function AddTransactionDialog({
   onNavigateToAI,
 }: Props) {
   const [open, setOpen] = React.useState(false)
-  const [mode, setMode] = React.useState<"voice" | "manual" | "scan">("voice")
-  const [showAdvanced, setShowAdvanced] = React.useState(false)
-
   const [form, setForm] = React.useState(emptyForm)
   const [errors, setErrors] = React.useState<Record<string, string>>({})
   const [saving, setSaving] = React.useState(false)
   const [scanning, setScanning] = React.useState(false)
   const [scanStatus, setScanStatus] = React.useState<"idle" | "success" | "error" | "low-confidence">("idle")
   const [scanErrorMsg, setScanErrorMsg] = React.useState<string>("")
-  const [ocrFoundData, setOcrFoundData] = React.useState<any>(null)
+  const [createBudget, setCreateBudget] = React.useState(false)
+  const [createTimelessBudget, setCreateTimelessBudget] = React.useState(true)
 
   const cameraInputRef = React.useRef<HTMLInputElement>(null)
   const mediaInputRef = React.useRef<HTMLInputElement>(null)
 
+  const budgetedInList = BASE_CATEGORIES.filter((c) => budgetCategories.includes(c))
+  const unbudgetedInList = BASE_CATEGORIES.filter((c) => !budgetCategories.includes(c))
+  const customBudgeted = budgetCategories.filter((c) => !BASE_CATEGORIES.includes(c))
+
+  const categoryBudgets = React.useMemo(
+    () => budgetRows.filter((b) => b.category === form.category),
+    [budgetRows, form.category]
+  )
+  const hasAnyBudgetForCategory = categoryBudgets.length > 0
+  const isUnlistedCategory = Boolean(form.category) && !hasAnyBudgetForCategory
+  const txDateForValidation = form.date ? format(form.date, "yyyy-MM-dd") : ""
+  const hasValidBudgetForDate =
+    !!txDateForValidation &&
+    categoryBudgets.some((budget) =>
+      isBudgetValidForTransaction(budget, txDateForValidation)
+    )
+
   const update = (key: keyof typeof emptyForm, value: string | Date | undefined) => {
     setForm((prev) => ({ ...prev, [key]: value }))
     setErrors((prev) => ({ ...prev, [key]: "", form: "" }))
+    if (key === "category") {
+      setCreateBudget(false)
+      setCreateTimelessBudget(true)
+    }
   }
 
   const validate = () => {
     const e: Record<string, string> = {}
-    if (!form.transaction.trim()) e.transaction = "Person / Description is required"
+    if (!form.transaction.trim()) e.transaction = "Required"
+    if (!form.category) e.category = "Required"
     if (!form.amount || isNaN(Number(form.amount)) || Number(form.amount) <= 0)
       e.amount = "Enter a valid amount"
-    if (!form.date) e.date = "Date is required"
-    if (!form.type) e.type = "Type is required"
+    if (!form.date) e.date = "Required"
+    if (!form.type) e.type = "Required"
+    if (!form.method) e.method = "Required"
+    if (hasAnyBudgetForCategory && form.date && !hasValidBudgetForDate) {
+      e.category = `No active ${form.category} budget for ${format(form.date, "MMM yyyy")}`
+    }
     return e
   }
 
@@ -103,12 +127,12 @@ export function AddTransactionDialog({
     try {
       const result = await onAdd({
         transaction: form.transaction.trim(),
-        category: form.category || (form.type === "Credit" ? "Income" : "Shopping"),
+        category: form.category,
         amount: Number(form.amount),
         date: format(form.date!, "yyyy-MM-dd"),
         type: form.type,
-        method: form.method || "UPI",
-        status: form.status || "Completed",
+        method: form.method,
+        status: form.status,
       })
 
       if (result?.error) {
@@ -116,11 +140,24 @@ export function AddTransactionDialog({
         return
       }
 
+      if (isUnlistedCategory && createBudget && onAddBudget) {
+        const budgetResult = await onAddBudget({
+          category: form.category,
+          amount: Number(form.amount),
+          duration: createTimelessBudget ? "timeless" : "monthly",
+        })
+        if (budgetResult?.error) {
+          setErrors((prev) => ({ ...prev, form: budgetResult.error as string }))
+          return
+        }
+      }
+
       setForm(emptyForm)
       setErrors({})
       setScanStatus("idle")
       setScanErrorMsg("")
-      setOcrFoundData(null)
+      setCreateBudget(false)
+      setCreateTimelessBudget(true)
       setOpen(false)
     } catch (err) {
       console.error("Failed to add transaction:", err)
@@ -136,7 +173,8 @@ export function AddTransactionDialog({
       setErrors({})
       setScanStatus("idle")
       setScanErrorMsg("")
-      setOcrFoundData(null)
+      setCreateBudget(false)
+      setCreateTimelessBudget(true)
     }
   }
 
@@ -165,13 +203,6 @@ export function AddTransactionDialog({
         method: result.method || prev.method,
         status: prev.status,
       }))
-      setOcrFoundData({
-        vendor: result.transaction || "Merchant",
-        amount: result.amount || 0,
-        date: result.date || "Today",
-        type: result.type || "Debit",
-        confidence: result.confidence
-      })
       setScanStatus(result.confidence === "low" ? "low-confidence" : "success")
     } catch (err: any) {
       console.error("Camera scan failed:", err)
@@ -190,11 +221,42 @@ export function AddTransactionDialog({
     setScanStatus("idle")
     setScanErrorMsg("")
     try {
+      if (files.length > 1) {
+        const allResults: Array<{ file: string; transactions: any[] }> = []
+        for (let i = 0; i < files.length; i++) {
+          try {
+            const result = await scanReceiptMulti(files[i])
+            if (result.transactions.length) {
+              allResults.push({ file: files[i].name, transactions: result.transactions })
+            }
+          } catch (err) {
+            console.error(`[import-media] Scan failed for ${files[i].name}:`, err)
+          }
+        }
+        setScanning(false)
+        if (!allResults.length) {
+          setScanErrorMsg("AI scan unavailable, please fill manually")
+          setScanStatus("error")
+          return
+        }
+        const seedMessage = buildBulkMessage(allResults)
+        setOpen(false)
+        onNavigateToAI?.(seedMessage)
+        return
+      }
+
       const result = await scanReceiptMulti(files[0])
       setScanning(false)
       if (!result.transactions.length) {
-        setScanErrorMsg("No transaction detected, please fill manually")
+        setScanErrorMsg("AI scan unavailable, please fill manually")
         setScanStatus("error")
+        return
+      }
+
+      if (result.transactions.length > 1) {
+        const seedMessage = buildBulkMessage([{ file: files[0].name, transactions: result.transactions }])
+        setOpen(false)
+        onNavigateToAI?.(seedMessage)
         return
       }
 
@@ -215,13 +277,6 @@ export function AddTransactionDialog({
         method: t.method || prev.method,
         status: prev.status,
       }))
-      setOcrFoundData({
-        vendor: t.transaction || "Merchant",
-        amount: t.amount || 0,
-        date: t.date || "Today",
-        type: t.type || "Debit",
-        confidence: result.confidence
-      })
       setScanStatus(result.confidence === "low" ? "low-confidence" : "success")
     } catch (err: any) {
       console.error("Media import scan failed:", err)
@@ -235,318 +290,360 @@ export function AddTransactionDialog({
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
-        <button className="flex items-center gap-1.5 h-9 px-3.5 rounded-[8px] bg-[#3949AB] hover:bg-[#29347F] text-white text-xs font-semibold shadow-xs transition-all cursor-pointer">
-          <PlusIcon className="size-4" />
-          <span>Record Entry</span>
-        </button>
+        <Button size="sm">
+          <IconPlus className="size-4 mr-1" />Add Transaction
+        </Button>
       </DialogTrigger>
 
-      <DialogContent className="sm:max-w-[540px] bg-[#0F131C] border border-[#1E2638] rounded-[14px] p-6 shadow-2xl text-[#F1F5F9]">
-        <DialogHeader className="space-y-1">
-          <DialogTitle className="text-lg font-bold text-[#F1F5F9]">
-            Record Transaction
-          </DialogTitle>
-          <DialogDescription className="text-xs text-[#94A3B8]">
-            Choose your preferred entry method: Voice, Manual, or Receipt OCR.
+      <DialogContent className="sm:max-w-[560px]">
+        <DialogHeader>
+          <DialogTitle>Add New Transaction</DialogTitle>
+          <DialogDescription>
+            Fill in the details or scan a receipt to auto-fill.
           </DialogDescription>
         </DialogHeader>
 
-        {/* ── 3-Mode Segmented Control per Section 20 ── */}
-        <div className="flex items-center bg-[#07090E] p-1 rounded-[10px] border border-[#1E2638] my-2">
-          <button
-            type="button"
-            onClick={() => setMode("voice")}
-            className={cn(
-              "flex-1 py-1.5 rounded-[8px] text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer",
-              mode === "voice"
-                ? "bg-[#1E2337] text-[#818CF8] shadow-xs"
-                : "text-[#94A3B8] hover:text-[#F1F5F9]"
-            )}
-          >
-            <Mic size={14} />
-            <span>Voice (Default)</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => setMode("manual")}
-            className={cn(
-              "flex-1 py-1.5 rounded-[8px] text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer",
-              mode === "manual"
-                ? "bg-[#1E2337] text-[#818CF8] shadow-xs"
-                : "text-[#94A3B8] hover:text-[#F1F5F9]"
-            )}
-          >
-            <Edit3 size={14} />
-            <span>Manual Entry</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => setMode("scan")}
-            className={cn(
-              "flex-1 py-1.5 rounded-[8px] text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer",
-              mode === "scan"
-                ? "bg-[#1E2337] text-[#818CF8] shadow-xs"
-                : "text-[#94A3B8] hover:text-[#F1F5F9]"
-            )}
-          >
-            <Camera size={14} />
-            <span>Scan Receipt</span>
-          </button>
-        </div>
+        <div className="flex flex-col gap-4 py-1">
 
-        {/* ── MODE 1: VOICE ──────────────────────────────────────────────────────── */}
-        {mode === "voice" && (
-          <div className="py-2">
-            <VoiceActionBanner
-              onAddTransaction={async (t) => {
-                const res = await onAdd(t)
-                setTimeout(() => setOpen(false), 2000)
-                return res
-              }}
-            />
-          </div>
-        )}
-
-        {/* ── MODE 2: MANUAL (MINIMUM FIELDS FIRST) ─────────────────────────────── */}
-        {mode === "manual" && (
-          <div className="space-y-4 py-1">
-            {/* Amount */}
-            <div className="flex flex-col gap-1">
-              <Label className="text-xs font-medium text-[#94A3B8]">Amount (₹)</Label>
-              <Input
-                type="number"
-                placeholder="e.g. 1200"
-                value={form.amount}
-                onChange={(e) => update("amount", e.target.value)}
-                className="h-10 text-base font-bold text-[#F1F5F9] bg-[#07090E] rounded-[8px] border-[#1E2638] focus:border-[#5C6BC0]"
-              />
-              {errors.amount && <p className="text-xs text-[#F87171]">{errors.amount}</p>}
-            </div>
-
-            {/* Direction (Money In / Money Out) */}
-            <div className="flex flex-col gap-1">
-              <Label className="text-xs font-medium text-[#94A3B8]">Money Direction</Label>
-              <div className="grid grid-cols-2 gap-2.5">
-                <button
-                  type="button"
-                  onClick={() => update("type", "Credit")}
-                  className={cn(
-                    "flex items-center justify-center gap-2 h-10 rounded-[8px] border text-xs font-semibold transition-all cursor-pointer",
-                    form.type === "Credit"
-                      ? "bg-[#064E3B]/40 border-[#10B981] text-[#34D399]"
-                      : "border-[#1E2638] bg-[#07090E] text-[#94A3B8] hover:bg-[#161B26]"
-                  )}
-                >
-                  <ArrowDownRight size={16} />
-                  <span>Money In (Received)</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => update("type", "Debit")}
-                  className={cn(
-                    "flex items-center justify-center gap-2 h-10 rounded-[8px] border text-xs font-semibold transition-all cursor-pointer",
-                    form.type === "Debit"
-                      ? "bg-[#7F1D1D]/40 border-[#EF4444] text-[#F87171]"
-                      : "border-[#1E2638] bg-[#07090E] text-[#94A3B8] hover:bg-[#161B26]"
-                  )}
-                >
-                  <ArrowUpRight size={16} />
-                  <span>Money Out (Paid)</span>
-                </button>
+          {/* ── Scan status banners ── */}
+          {scanStatus === "success" && (
+            <div className="flex items-center gap-2.5 rounded-lg bg-green-500/10 border border-green-500/20 px-3.5 py-2.5 text-xs text-green-400">
+              <div className="size-5 rounded-full bg-green-500/15 flex items-center justify-center shrink-0">
+                <svg viewBox="0 0 12 12" className="size-3 fill-green-400"><path d="M10 3L5 8.5 2 5.5" /><path d="M10 3L5 8.5 2 5.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none" /></svg>
               </div>
+              Receipt scanned successfully — please review all fields.
             </div>
-
-            {/* Person / Description */}
-            <div className="flex flex-col gap-1">
-              <Label className="text-xs font-medium text-[#94A3B8]">Person / Description</Label>
-              <Input
-                placeholder="e.g. Ramesh Kumar or Grocery Wholesale"
-                value={form.transaction}
-                onChange={(e) => update("transaction", e.target.value)}
-                className="h-9 text-xs rounded-[8px] bg-[#07090E] border-[#1E2638] text-[#F1F5F9] focus:border-[#5C6BC0]"
-              />
-              {errors.transaction && <p className="text-xs text-[#F87171]">{errors.transaction}</p>}
+          )}
+          {scanStatus === "low-confidence" && (
+            <div className="flex items-center gap-2.5 rounded-lg bg-amber-500/10 border border-amber-500/20 px-3.5 py-2.5 text-xs text-amber-400">
+              <AlertTriangleIcon className="size-3.5 shrink-0" />
+              Receipt scanned but some fields may be incorrect — please review carefully.
             </div>
-
-            {/* Date */}
-            <div className="flex flex-col gap-1">
-              <Label className="text-xs font-medium text-[#94A3B8]">Date</Label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <button
-                    type="button"
-                    className="flex h-9 w-full items-center justify-between rounded-[8px] border border-[#1E2638] bg-[#07090E] px-3 text-xs text-[#F1F5F9]"
-                  >
-                    {form.date ? format(form.date, "dd MMM yyyy") : "Today"}
-                    <ChevronDownIcon className="size-3.5 opacity-60" />
-                  </button>
-                </PopoverTrigger>
-                <PopoverContent side="bottom" align="start" className="w-auto p-0 z-50 bg-[#0F131C] border border-[#1E2638] text-[#F1F5F9]">
-                  <Calendar mode="single" selected={form.date} onSelect={(d) => update("date", d)} defaultMonth={form.date} />
-                </PopoverContent>
-              </Popover>
+          )}
+          {scanStatus === "error" && (
+            <div className="flex items-center gap-2.5 rounded-lg bg-red-500/10 border border-red-500/20 px-3.5 py-2.5 text-xs text-red-400">
+              <div className="size-5 rounded-full bg-red-500/15 flex items-center justify-center shrink-0 text-red-400 font-bold text-[10px]">✕</div>
+              {scanErrorMsg || "AI scan unavailable, please fill manually."}
             </div>
+          )}
 
-            {/* Collapsible Advanced Options Toggle */}
-            <div>
-              <button
-                type="button"
-                onClick={() => setShowAdvanced(!showAdvanced)}
-                className="text-xs font-semibold text-[#818CF8] hover:underline cursor-pointer"
-              >
-                {showAdvanced ? "— Hide additional options" : "+ Show additional options (Method, Category)"}
-              </button>
+          {/* ── Transaction Name ── */}
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="transaction">Transaction Name</Label>
+            <Input
+              id="transaction"
+              placeholder="e.g. Salary Credit"
+              value={form.transaction}
+              onChange={(e) => update("transaction", e.target.value)}
+            />
+            {errors.transaction && <p className="text-xs text-red-400">{errors.transaction}</p>}
+          </div>
 
-              {showAdvanced && (
-                <div className="grid grid-cols-2 gap-3 pt-3 mt-2 border-t border-[#1E2638]">
-                  <div className="space-y-1">
-                    <Label className="text-xs font-medium text-[#94A3B8]">Payment Method</Label>
-                    <Select value={form.method} onValueChange={(v) => update("method", v)}>
-                      <SelectTrigger className="h-9 text-xs bg-[#07090E] border-[#1E2638] text-[#F1F5F9]">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent className="bg-[#0F131C] border-[#1E2638] text-[#F1F5F9]">
-                        {METHODS.map((m) => <SelectItem key={m} value={m} className="text-[#F1F5F9] focus:bg-[#1E2337]">{m}</SelectItem>)}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-1">
-                    <Label className="text-xs font-medium text-[#94A3B8]">Category</Label>
-                    <Select value={form.category} onValueChange={(v) => update("category", v)}>
-                      <SelectTrigger className="h-9 text-xs bg-[#07090E] border-[#1E2638] text-[#F1F5F9]">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent className="bg-[#0F131C] border-[#1E2638] text-[#F1F5F9]">
-                        {BASE_CATEGORIES.map((c) => <SelectItem key={c} value={c} className="text-[#F1F5F9] focus:bg-[#1E2337]">{c}</SelectItem>)}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
+          {/* ── Category + Type ── */}
+          <div className="grid grid-cols-2 gap-3">
+
+            {/* Category */}
+            <div className="flex flex-col gap-1.5">
+              <Label>Category</Label>
+
+              <Select value={form.category} onValueChange={(v) => update("category", v)}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select category" />
+                </SelectTrigger>
+
+                <SelectContent position="popper" sideOffset={4}>
+                  {(budgetedInList.length > 0 || customBudgeted.length > 0) && (
+                    <>
+                      <div className="px-2 py-1 text-[10px] text-muted-foreground uppercase tracking-wide">
+                        Budgeted
+                      </div>
+
+                      {customBudgeted.map((c) => (
+                        <SelectItem key={c} value={c}>
+                          {c}
+                        </SelectItem>
+                      ))}
+
+                      {budgetedInList.map((c) => (
+                        <SelectItem key={c} value={c}>
+                          {c}
+                        </SelectItem>
+                      ))}
+
+                      <SelectSeparator />
+                    </>
+                  )}
+
+                  {unbudgetedInList.map((c) => (
+                    <SelectItem key={c} value={c}>
+                      {c}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              {errors.category && (
+                <p className="text-xs text-red-400">{errors.category}</p>
               )}
             </div>
 
-            <DialogFooter className="pt-3 border-t border-[#1E2638]">
-              <button
-                type="button"
-                onClick={() => setOpen(false)}
-                className="h-9 px-4 rounded-[8px] border border-[#1E2638] text-xs font-medium text-[#94A3B8] hover:bg-[#161B26] cursor-pointer"
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={handleSubmit}
-                disabled={saving}
-                className="h-9 px-5 rounded-[8px] bg-[#5C6BC0] hover:bg-[#4F5B93] text-white text-xs font-semibold shadow-xs cursor-pointer"
-              >
-                {saving ? "Saving..." : "Save Transaction"}
-              </button>
-            </DialogFooter>
+            {/* Type */}
+            <div className="flex flex-col gap-1.5">
+              <Label>Type</Label>
+
+              <Select value={form.type} onValueChange={(v) => update("type", v)}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Debit / Credit" />
+                </SelectTrigger>
+
+                <SelectContent position="popper" sideOffset={4}>
+                  <SelectItem value="Credit">Credit</SelectItem>
+                  <SelectItem value="Debit">Debit</SelectItem>
+                </SelectContent>
+              </Select>
+
+              {errors.type && (
+                <p className="text-xs text-red-400">{errors.type}</p>
+              )}
+            </div>
+
+            {/* Full Width Budget Card */}
+            {isUnlistedCategory && onAddBudget && (
+              <div className="col-span-2">
+                <div className="mt-1 rounded-xl border border-amber-500/25 bg-amber-500/[0.04] overflow-hidden animate-in fade-in slide-in-from-top-1 duration-200">
+
+                  {/* Header */}
+                  <div className="flex items-start gap-3 p-3">
+                    <div className="size-8 rounded-lg bg-amber-500/15 border border-amber-500/20 flex items-center justify-center shrink-0 mt-0.5">
+                      <AlertTriangleIcon className="size-4 text-amber-400" />
+                    </div>
+
+                    <div className="min-w-0">
+                      <p className="text-[13px] font-semibold text-amber-400/90 leading-tight">
+                        No budget for "{form.category}"
+                      </p>
+
+                      <p className="text-[11px] text-muted-foreground leading-relaxed mt-0.5">
+                        Track spending on{" "}
+                        <span className="text-amber-400/70 font-medium">
+                          "{form.category}"
+                        </span>{" "}
+                        by creating a budget below.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="h-px bg-amber-500/20 mx-3" />
+
+                  {/* Content */}
+                  <div className="p-3 flex flex-col gap-2">
+
+                    {/* Toggle */}
+                    <button
+                      type="button"
+                      onClick={() => setCreateBudget(!createBudget)}
+                      className={cn(
+                        "flex items-center justify-between w-full px-3 py-2 rounded-lg border transition-all duration-150 text-left",
+                        createBudget
+                          ? "border-amber-500/30 bg-amber-500/[0.06]"
+                          : "border-border bg-muted/40 hover:bg-muted/60"
+                      )}
+                    >
+                      <span className="flex items-center gap-2 text-[12px] text-muted-foreground">
+                        <PlusIcon className="size-3.5 shrink-0" />
+
+                        <span>
+                          Also create a budget for{" "}
+                          <span className="text-amber-400 font-medium">
+                            "{form.category}"
+                          </span>
+                        </span>
+                      </span>
+
+                      {/* Switch */}
+                      <div
+                        className={cn(
+                          "relative shrink-0 w-8 h-[18px] rounded-full border transition-all duration-200 ml-2",
+                          createBudget
+                            ? "bg-amber-400/20 border-amber-400/40"
+                            : "bg-muted border-border"
+                        )}
+                      >
+                        <div
+                          className={cn(
+                            "absolute top-[2px] size-3 rounded-full transition-all duration-200",
+                            createBudget
+                              ? "bg-amber-400 left-[16px]"
+                              : "bg-muted-foreground/50 left-[2px]"
+                          )}
+                        />
+                      </div>
+                    </button>
+
+                    {/* Budget Type */}
+                    {createBudget && (
+                      <div className="flex items-center justify-between gap-3 px-3 py-2 rounded-lg border border-amber-500/15 bg-amber-500/[0.03]">
+
+                        <span className="flex items-center gap-1.5 text-[12px] text-muted-foreground">
+                          <InfinityIcon className="size-3.5 shrink-0" />
+                          Budget type
+                        </span>
+
+                        <div className="flex gap-1.5 shrink-0">
+                          {(["Timeless", "Monthly"] as const).map((type) => {
+                            const isActive =
+                              (type === "Timeless") === createTimelessBudget
+
+                            return (
+                              <button
+                                key={type}
+                                type="button"
+                                onClick={() =>
+                                  setCreateTimelessBudget(type === "Timeless")
+                                }
+                                className={cn(
+                                  "px-2.5 py-[3px] rounded-full border text-[11px] font-medium transition-all duration-150",
+                                  isActive
+                                    ? "bg-amber-400/15 text-amber-400 border-amber-400/30"
+                                    : "bg-transparent text-muted-foreground border-border hover:border-border/80"
+                                )}
+                              >
+                                {type}
+                              </button>
+                            )
+                          })}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
-        )}
 
-        {/* ── MODE 3: SCAN RECEIPT (OCR REVIEW-BEFORE-SAVE) ────────────────────── */}
-        {mode === "scan" && (
-          <div className="space-y-4 py-2">
-            <input ref={cameraInputRef} type="file" accept="image/*" capture="environment" onChange={handleCameraScan} className="hidden" />
-            <input ref={mediaInputRef} type="file" accept="image/*" onChange={handleMediaImport} className="hidden" />
 
-            {!ocrFoundData && !scanning && (
-              <div className="flex flex-col items-center justify-center p-8 border-2 border-dashed border-[#1E2638] rounded-[10px] text-center space-y-3 bg-[#07090E]">
-                <Camera size={32} className="text-[#818CF8]" />
-                <div>
-                  <p className="text-xs font-bold text-[#F1F5F9]">Upload or Snap a Receipt</p>
-                  <p className="text-[11px] text-[#64748B] mt-0.5">Works on counter slips, thermal bills, and wholesale invoices</p>
-                </div>
-                <div className="flex items-center gap-2 pt-1">
-                  <button
-                    type="button"
-                    onClick={() => cameraInputRef.current?.click()}
-                    className="h-8 px-3.5 rounded-[8px] bg-[#5C6BC0] hover:bg-[#4F5B93] text-white text-xs font-semibold cursor-pointer shadow-xs"
-                  >
-                    Take Photo
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => mediaInputRef.current?.click()}
-                    className="h-8 px-3.5 rounded-[8px] border border-[#1E2638] bg-[#0F131C] text-xs font-medium text-[#F1F5F9] hover:bg-[#161B26] cursor-pointer"
-                  >
-                    Upload Image
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {scanning && (
-              <div className="py-12 flex flex-col items-center justify-center gap-3 text-xs text-[#94A3B8]">
-                <Loader2Icon size={24} className="text-[#818CF8] animate-spin" />
-                <p>Analyzing receipt with Vision OCR...</p>
-              </div>
-            )}
-
-            {/* OCR Extracted Review Card per Section 21 */}
-            {ocrFoundData && !scanning && (
-              <div className="space-y-3">
-                <div className="p-3.5 rounded-[10px] bg-[#07090E] border border-[#1E2638] space-y-2">
-                  <div className="flex items-center justify-between border-b border-[#1E2638] pb-2">
-                    <span className="text-xs font-bold text-[#F1F5F9]">I found from receipt:</span>
-                    <span className="text-[10px] font-semibold text-[#34D399] bg-[#064E3B]/30 border border-[#10B981]/30 px-2 py-0.5 rounded-full">
-                      Ready to review
-                    </span>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-2 text-xs">
-                    <div>
-                      <span className="text-[10px] text-[#64748B] block">Vendor / Person</span>
-                      <span className="font-semibold text-[#F1F5F9]">{form.transaction || "Merchant"}</span>
-                    </div>
-                    <div>
-                      <span className="text-[10px] text-[#64748B] block">Total Amount</span>
-                      <span className="font-bold text-[#34D399] text-sm">₹{Number(form.amount || 0).toLocaleString("en-IN")}</span>
-                    </div>
-                    <div>
-                      <span className="text-[10px] text-[#64748B] block">Date</span>
-                      <span className="text-[#F1F5F9]">{form.date ? format(form.date, "yyyy-MM-dd") : "Today"}</span>
-                    </div>
-                    <div>
-                      <span className="text-[10px] text-[#64748B] block">Type</span>
-                      <span className="text-[#F1F5F9] font-medium">{form.type === "Debit" ? "Money Out (Paid)" : "Money In"}</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Low Confidence Warning per Section 21 */}
-                {scanStatus === "low-confidence" && (
-                  <div className="flex items-center gap-2 p-2.5 rounded-[8px] bg-[#78350F]/30 border border-[#F59E0B]/30 text-xs text-[#FBBF24]">
-                    <AlertTriangleIcon size={14} className="shrink-0" />
-                    <span>Please check the total. The receipt image was slightly unclear.</span>
-                  </div>
-                )}
-
-                <div className="flex items-center justify-end gap-2 pt-2 border-t border-[#1E2638]">
-                  <button
-                    type="button"
-                    onClick={() => setMode("manual")}
-                    className="h-8 px-3 rounded-[6px] border border-[#1E2638] text-xs font-medium text-[#94A3B8] hover:bg-[#161B26] cursor-pointer"
-                  >
-                    Edit Details
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleSubmit}
-                    disabled={saving}
-                    className="flex items-center gap-1.5 h-8 px-4 rounded-[6px] bg-[#5C6BC0] hover:bg-[#4F5B93] text-white text-xs font-semibold cursor-pointer shadow-xs"
-                  >
-                    <Check size={14} />
-                    <span>Save to Ledger</span>
-                  </button>
-                </div>
-              </div>
-            )}
+        {/* ── Amount + Date ── */}
+        <div className="grid grid-cols-2 gap-3">
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="amount">Amount (₹)</Label>
+            <Input
+              id="amount"
+              type="number"
+              placeholder="e.g. 5000"
+              value={form.amount}
+              onChange={(e) => update("amount", e.target.value)}
+            />
+            {errors.amount && <p className="text-xs text-red-400">{errors.amount}</p>}
           </div>
-        )}
 
-      </DialogContent>
-    </Dialog>
+          <div className="flex flex-col gap-1.5">
+            <Label>Date</Label>
+            <Popover>
+              <PopoverTrigger asChild>
+                <button
+                  type="button"
+                  className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 text-sm ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                >
+                  {form.date
+                    ? format(form.date, "dd MMM yyyy")
+                    : <span className="text-muted-foreground">Pick a date</span>}
+                  <ChevronDownIcon className="size-4 opacity-60" />
+                </button>
+              </PopoverTrigger>
+              <PopoverContent side="top" align="start" avoidCollisions={false} className="w-auto p-0 z-50">
+                <Calendar mode="single" selected={form.date} onSelect={(d) => update("date", d)} defaultMonth={form.date} />
+              </PopoverContent>
+            </Popover>
+            {errors.date && <p className="text-xs text-red-400">{errors.date}</p>}
+          </div>
+        </div>
+
+        {/* ── Method + Status ── */}
+        <div className="grid grid-cols-2 gap-3">
+          <div className="flex flex-col gap-1.5">
+            <Label>Payment Method</Label>
+            <Select value={form.method} onValueChange={(v) => update("method", v)}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select method" />
+              </SelectTrigger>
+              <SelectContent position="popper" sideOffset={4}>
+                {METHODS.map((m) => <SelectItem key={m} value={m}>{m}</SelectItem>)}
+              </SelectContent>
+            </Select>
+            {errors.method && <p className="text-xs text-red-400">{errors.method}</p>}
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <Label>Status</Label>
+            <Select value={form.status} onValueChange={(v) => update("status", v)}>
+              <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
+              <SelectContent position="popper" sideOffset={4}>
+                <SelectItem value="Completed">Completed</SelectItem>
+                <SelectItem value="Pending">Pending</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        {errors.form && (
+          <p className="text-xs text-red-400 -mt-1">{errors.form}</p>
+        )}
+      </div>
+
+      <DialogFooter>
+        <input ref={cameraInputRef} type="file" accept="image/*" capture="environment" onChange={handleCameraScan} className="hidden" />
+        <input ref={mediaInputRef} type="file" accept="image/*" multiple onChange={handleMediaImport} className="hidden" />
+
+        {/* Scan Receipt — mobile only */}
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => cameraInputRef.current?.click()}
+          disabled={scanning || saving}
+          className="md:hidden"
+        >
+          {scanning
+            ? <><Loader2Icon className="size-4 mr-1.5 animate-spin" />Scanning...</>
+            : <><ScanIcon className="size-4 mr-1.5" />Scan Receipt</>
+          }
+        </Button>
+
+        {/* Import Media */}
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => mediaInputRef.current?.click()}
+          disabled={scanning || saving}
+        >
+          <ImageIcon className="size-4 mr-1.5" />Import Media
+        </Button>
+
+        <Button onClick={handleSubmit} disabled={saving || scanning}>
+          {saving ? "Saving..." : "Add Transaction"}
+        </Button>
+      </DialogFooter>
+    </DialogContent>
+    </Dialog >
+  )
+}
+
+// ── Helper ────────────────────────────────────────────────────────────────────
+function buildBulkMessage(
+  results: Array<{ file: string; transactions: any[] }>
+): string {
+  const allTx = results.flatMap((r) => r.transactions as any[])
+  if (!allTx.length) return ""
+  const lines = allTx.map((t: any) => {
+    const name = t.transaction ?? "Unknown"
+    const amount = t.amount ? `₹${t.amount}` : "unknown amount"
+    const date = t.date ?? "today"
+    const cat = t.category ?? "Other"
+    const method = t.method ?? "Cash"
+    const type = t.type ?? "Debit"
+    return `name "${name}", amount ${amount}, date ${date}, category ${cat}, method ${method}, type ${type}`
+  })
+  return (
+    `Bulk import ${allTx.length} transaction${allTx.length > 1 ? "s" : ""}:\n` +
+    lines.map((l, i) => `${i + 1}. ${l}`).join("\n")
   )
 }

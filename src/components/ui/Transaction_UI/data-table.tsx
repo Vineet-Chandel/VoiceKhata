@@ -198,33 +198,32 @@ function buildColumns(callbacks: TableCallbacks): ColumnDef<z.infer<typeof schem
     {
       accessorKey: "amount",
       header:      () => <div className="text-right w-[120px]">Amount</div>,
-      cell:        ({ row }) => {
-        const isCredit = row.original.type === "Credit"
-        return (
-          <div className="text-right w-[120px]">
-            <span className={`font-bold tabular-nums text-sm ${isCredit ? "text-[#16856A]" : "text-[#172033]"}`}>
-              {isCredit ? "+" : "-"}₹{row.original.amount.toLocaleString("en-IN")}
-            </span>
-          </div>
-        )
-      },
+      cell:        ({ row }) => (
+        <div className="text-right w-[120px] font-medium">
+          {"₹" + row.original.amount.toLocaleString()}
+        </div>
+      ),
     },
     {
       accessorKey: "date",
       header:      () => <div className="pl-6">Date</div>,
-      cell:        ({ row }) => <div className="pl-6 text-xs text-[#526078]">{row.original.date}</div>,
+      cell:        ({ row }) => <div className="pl-6">{row.original.date}</div>,
     },
     {
       accessorKey: "type",
-      header:      "Direction",
+      header:      "Type",
       cell:        ({ row }) => {
-        const isCredit = row.original.type === "Credit"
+        const type = row.original.type
         return (
-          <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold ${
-            isCredit ? "bg-[#E8F6F1] text-[#16856A]" : "bg-[#FDECEE] text-[#C2414B]"
-          }`}>
-            {isCredit ? "Money In" : "Money Out"}
-          </span>
+          <Badge
+            className={
+              type === "Debit"
+                ? "bg-red-500/10 text-red-400 border-red-500/20"
+                : "bg-green-500/10 text-green-400 border-green-500/20"
+            }
+          >
+            {type}
+          </Badge>
         )
       },
     },

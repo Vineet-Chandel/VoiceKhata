@@ -29,14 +29,14 @@ export function ShopkeeperFAQ() {
   ];
 
   return (
-    <section id="faqs" className="py-16 sm:py-20 bg-[#07090E] border-b border-[#1E2638]">
+    <section id="faqs" className="py-16 sm:py-20 bg-[#0F172A] border-b border-[#334155]">
       <div className="mx-auto max-w-4xl px-4 sm:px-6">
         
         <div className="text-center max-w-2xl mx-auto mb-10">
-          <span className="text-xs font-semibold uppercase tracking-wider text-[#818CF8] bg-[#1E2337] border border-[#5C6BC0]/30 px-3 py-1 rounded-full">
+          <span className="text-xs font-semibold uppercase tracking-wider text-[#818CF8] bg-[#1E293B] border border-[#5C6BC0]/30 px-3 py-1 rounded-full">
             Frequently Asked Questions
           </span>
-          <h2 className="mt-3 text-2xl sm:text-4xl font-bold text-[#F1F5F9] tracking-tight">
+          <h2 className="mt-3 text-2xl sm:text-4xl font-bold text-[#F8FAFC] tracking-tight">
             Everything You Need to Know
           </h2>
           <p className="mt-2 text-xs sm:text-sm text-[#94A3B8]">
@@ -50,11 +50,11 @@ export function ShopkeeperFAQ() {
             return (
               <div
                 key={idx}
-                className="rounded-[10px] border border-[#1E2638] bg-[#0F131C] overflow-hidden shadow-xs transition-all"
+                className="rounded-[10px] border border-[#334155] bg-[#1E293B] overflow-hidden shadow-xs transition-all"
               >
                 <button
                   onClick={() => setOpenIdx(isOpen ? null : idx)}
-                  className="flex w-full items-center justify-between p-4 sm:p-4.5 text-left text-xs sm:text-sm font-semibold text-[#F1F5F9] hover:text-[#818CF8] transition-colors cursor-pointer"
+                  className="flex w-full items-center justify-between p-4 sm:p-4.5 text-left text-xs sm:text-sm font-semibold text-[#F8FAFC] hover:text-[#818CF8] transition-colors cursor-pointer"
                 >
                   <span className="flex items-center gap-2.5">
                     <HelpCircle className="size-4 text-[#818CF8] shrink-0" />
@@ -68,7 +68,7 @@ export function ShopkeeperFAQ() {
                 </button>
 
                 {isOpen && (
-                  <div className="border-t border-[#1E2638] p-4 text-xs sm:text-sm text-[#94A3B8] leading-relaxed bg-[#07090E]">
+                  <div className="border-t border-[#334155] p-4 text-xs sm:text-sm text-[#94A3B8] leading-relaxed bg-[#0F172A]">
                     {faq.a}
                   </div>
                 )}

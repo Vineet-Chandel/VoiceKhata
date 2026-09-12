@@ -22,22 +22,6 @@ type AuthContextType = {
   logOut: () => Promise<void>
 }
 
-const DEMO_USER: any = {
-  uid: "demo-shopkeeper-uid",
-  email: "sharma.store@voicekhata.in",
-  displayName: "Sharma Kirana Store",
-  emailVerified: true,
-  isAnonymous: true,
-  providerData: [{ providerId: "password" }],
-}
-
-const DEMO_PROFILE: UserProfile = {
-  firebase_uid: "demo-shopkeeper-uid",
-  business_name: "Sharma Kirana Store",
-  email: "sharma.store@voicekhata.in",
-  display_name: "Sharma Kirana Store",
-}
-
 const AuthContext = createContext<AuthContextType>({
   user: null,
   profile: null,
@@ -51,46 +35,18 @@ const AuthContext = createContext<AuthContextType>({
 })
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [isDemo, setIsDemo] = useState<boolean>(() => {
-    try {
-      return (
-        typeof window !== "undefined" &&
-        (localStorage.getItem("voicekhata_demo_user") === "true" ||
-          new URLSearchParams(window.location.search).get("demo") === "true")
-      )
-    } catch {
-      return false
-    }
-  })
-
-  const [user, setUser] = useState<User | null>(() => {
-    if (auth.currentUser) return auth.currentUser
-    if (typeof window !== "undefined" && (localStorage.getItem("voicekhata_demo_user") === "true" || new URLSearchParams(window.location.search).get("demo") === "true")) {
-      return DEMO_USER
-    }
-    return null
-  })
-
-  const [profile, setProfile] = useState<UserProfile | null>(() => {
-    if (typeof window !== "undefined" && (localStorage.getItem("voicekhata_demo_user") === "true" || new URLSearchParams(window.location.search).get("demo") === "true")) {
-      return DEMO_PROFILE
-    }
-    return null
-  })
-
-  const [loading, setLoading] = useState(false)
+  const [user, setUser] = useState<User | null>(() => auth.currentUser)
+  const [profile, setProfile] = useState<UserProfile | null>(null)
+  const [loading, setLoading] = useState(true)
   const [loggingOut, setLoggingOut] = useState(false)
-  const [supabaseReady, setSupabaseReady] = useState(() => isDemo)
+  const [supabaseReady, setSupabaseReady] = useState(false)
 
-  const enableDemoMode = useCallback(() => {
+  // Clean any old demo state from browser storage
+  useEffect(() => {
     try {
-      localStorage.setItem("voicekhata_demo_user", "true")
+      localStorage.removeItem("voicekhata_demo_user")
+      localStorage.removeItem("voicekhata_demo_txs")
     } catch {}
-    setIsDemo(true)
-    setUser(DEMO_USER)
-    setProfile(DEMO_PROFILE)
-    setSupabaseReady(true)
-    setLoading(false)
   }, [])
 
   const syncUserData = useCallback(async (firebaseUser: User) => {
@@ -98,54 +54,57 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       startSupabaseKeepAlive()
       await getScopedSupabase(firebaseUser.uid, { force: true })
 
-      // Sync or create user profile in Supabase
-      const userProf = await ensureUserProfile(
-        firebaseUser.uid,
-        firebaseUser.displayName,
-        firebaseUser.email
-      )
-      setProfile(userProf)
+      try {
+        await ensureUserProfile({
+          displayName: firebaseUser.displayName || undefined,
+          photoURL: firebaseUser.photoURL || undefined,
+        })
+      } catch (err) {
+        console.warn("Could not ensure profile:", err)
+      }
+
+      try {
+        const p = await getUserProfile()
+        setProfile(p)
+      } catch (err) {
+        console.warn("Could not fetch profile:", err)
+      }
+
       setSupabaseReady(true)
     } catch (err) {
-      console.warn("Notice during Supabase sync:", err)
-      // Keep app responsive
-      setSupabaseReady(true)
+      console.warn("Scoped Supabase client failed:", err)
+      setSupabaseReady(false)
     }
   }, [])
 
   const refreshProfile = useCallback(async () => {
-    if (!auth.currentUser) return
-    const prof = await getUserProfile(auth.currentUser.uid)
-    if (prof) setProfile(prof)
-  }, [])
+    if (!user) return
+    try {
+      const p = await getUserProfile()
+      setProfile(p)
+    } catch (err) {
+      console.warn("Failed to refresh profile:", err)
+    }
+  }, [user])
 
   useEffect(() => {
     let unsubscribe = () => {}
+
     try {
       if (auth && typeof onAuthStateChanged === "function") {
-        unsubscribe = onAuthStateChanged(
-          auth,
-          async (firebaseUser) => {
-            if (firebaseUser) {
-              setUser(firebaseUser)
-              setSupabaseReady(false)
-              await syncUserData(firebaseUser)
-            } else {
-              clearScopedSupabase()
-              setUser(null)
-              setProfile(null)
-              setSupabaseReady(false)
-            }
+        unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+          setUser(firebaseUser)
 
-            setLoading(false)
-            setLoggingOut(false)
-          },
-          (error) => {
-            console.warn("Auth state observer error:", error)
-            setLoading(false)
-            setLoggingOut(false)
+          if (firebaseUser) {
+            await syncUserData(firebaseUser)
+          } else {
+            clearScopedSupabase()
+            setProfile(null)
+            setSupabaseReady(false)
           }
-        )
+
+          setLoading(false)
+        })
       } else {
         setLoading(false)
       }
@@ -165,10 +124,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setLoggingOut(true)
     setSupabaseReady(false)
     try {
-      try {
-        localStorage.removeItem("voicekhata_demo_user")
-      } catch {}
-      setIsDemo(false)
       clearScopedSupabase()
       await signOut(auth)
       setUser(null)
@@ -186,8 +141,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         loading,
         loggingOut,
         supabaseReady,
-        isDemoMode: isDemo,
-        enableDemoMode,
+        isDemoMode: false,
+        enableDemoMode: () => {},
         refreshProfile,
         logOut,
       }}

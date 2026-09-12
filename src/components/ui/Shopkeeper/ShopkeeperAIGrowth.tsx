@@ -22,7 +22,7 @@ export function ShopkeeperAIGrowth() {
   const isAffordable = affordAmount <= 15000;
 
   return (
-    <section id="growth" className="py-16 sm:py-24 bg-gradient-to-b from-[#07090e] via-[#0b0e18] to-[#07090e] border-y border-white/10 font-sans">
+    <section id="growth" className="py-16 sm:py-24 bg-gradient-to-b from-[#0F172A] via-[#0b0e18] to-[#0F172A] border-y border-white/10 font-sans">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}

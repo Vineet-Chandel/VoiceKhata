@@ -7,15 +7,7 @@ export default function ProtectedRoute({
 }: {
   children: React.ReactNode
 }) {
-  const { user, loading, loggingOut, enableDemoMode, isDemoMode } = useAuth()
-
-  if (typeof window !== "undefined") {
-    const isDemoStored = localStorage.getItem("voicekhata_demo_user") === "true"
-    const hasDemoParam = new URLSearchParams(window.location.search).get("demo") === "true"
-    if ((isDemoStored || hasDemoParam) && !user) {
-      enableDemoMode?.()
-    }
-  }
+  const { user, loading, loggingOut } = useAuth()
 
   if (loading || loggingOut) {
     return (
@@ -25,13 +17,13 @@ export default function ProtectedRoute({
     )
   }
 
-  if (!user && !isDemoMode) {
+  if (!user) {
     return <Navigate to="/login" replace />
   }
 
-  // If email/password user is not verified, redirect to login (demo users are exempt)
+  // If email/password user is not verified, redirect to login
   const isGoogle = user?.providerData?.some((p) => p.providerId === "google.com")
-  if (user && !user.emailVerified && !isGoogle && !user.isAnonymous) {
+  if (!user.emailVerified && !isGoogle && !user.isAnonymous) {
     return <Navigate to="/login?unverified=true" replace />
   }
 

@@ -160,22 +160,22 @@ export function VoiceActionBanner({
   }
 
   return (
-    <div className="mx-4 lg:mx-6 rounded-[14px] border border-[#1E2638] bg-[#0F131C] p-5 shadow-xs transition-all text-[#F1F5F9]">
+    <div className="mx-4 lg:mx-6 rounded-[14px] border border-[#334155] bg-[#1E293B] p-5 shadow-xs transition-all text-[#F8FAFC]">
       {/* ── 1. IDLE STATE ──────────────────────────────────────────────────────── */}
       {flowState === "idle" && (
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="space-y-1">
             <div className="flex items-center gap-2">
-              <span className="text-[11px] font-semibold tracking-wider uppercase text-[#818CF8] bg-[#1E2337] border border-[#374169] px-2.5 py-0.5 rounded-full">
+              <span className="text-[11px] font-semibold tracking-wider uppercase text-[#818CF8] bg-[#1E293B] border border-[#334155] px-2.5 py-0.5 rounded-full">
                 Voice Action
               </span>
               <span className="text-xs font-medium text-[#94A3B8]">WHAT HAPPENED TODAY?</span>
             </div>
-            <h2 className="text-lg sm:text-xl font-semibold text-[#F1F5F9]">
+            <h2 className="text-lg sm:text-xl font-semibold text-[#F8FAFC]">
               Record by voice in 3 seconds
             </h2>
             <p className="text-xs sm:text-sm text-[#94A3B8]">
-              Say e.g. <span className="text-[#F1F5F9] font-medium">"Received ₹1,200 from Ramesh via UPI"</span> or <span className="text-[#F1F5F9] font-medium">"Suresh ko ₹500 diye cash"</span>
+              Say e.g. <span className="text-[#F8FAFC] font-medium">"Received ₹1,200 from Ramesh via UPI"</span> or <span className="text-[#F8FAFC] font-medium">"Suresh ko ₹500 diye cash"</span>
             </p>
           </div>
 
@@ -187,12 +187,12 @@ export function VoiceActionBanner({
                 value={manualText}
                 onChange={(e) => setManualText(e.target.value)}
                 placeholder="Or type e.g. Ramesh ₹1200 UPI..."
-                className="w-56 lg:w-64 h-10 px-3 pr-8 text-xs rounded-[10px] border border-[#1E2638] bg-[#07090E] text-[#F1F5F9] placeholder:text-[#64748B] focus:outline-none focus:border-[#818CF8]"
+                className="w-56 lg:w-64 h-10 px-3 pr-8 text-xs rounded-[10px] border border-[#334155] bg-[#0F172A] text-[#F8FAFC] placeholder:text-[#94A3B8] focus:outline-none focus:border-[#818CF8]"
               />
               <button
                 type="submit"
                 disabled={!manualText.trim()}
-                className="absolute right-2 text-[#64748B] hover:text-[#818CF8] disabled:opacity-40"
+                className="absolute right-2 text-[#94A3B8] hover:text-[#818CF8] disabled:opacity-40"
               >
                 <Send size={14} />
               </button>
@@ -215,7 +215,7 @@ export function VoiceActionBanner({
       {flowState === "listening" && (
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 py-2">
           <div className="flex items-center gap-3.5">
-            <div className="relative flex items-center justify-center size-12 rounded-full bg-[#1E2337] text-[#818CF8]">
+            <div className="relative flex items-center justify-center size-12 rounded-full bg-[#1E293B] text-[#818CF8]">
               <Mic size={22} className="text-[#818CF8] relative z-10" />
               {/* Concentric gesture wave rings */}
               <motion.div
@@ -232,7 +232,7 @@ export function VoiceActionBanner({
             <div>
               <div className="flex items-center gap-2">
                 <span className="size-2 rounded-full bg-[#10B981] animate-pulse" />
-                <p className="text-sm font-semibold text-[#F1F5F9]">Listening... Bolna shuru kijiye</p>
+                <p className="text-sm font-semibold text-[#F8FAFC]">Listening... Bolna shuru kijiye</p>
                 {/* Real-time sound wave bars */}
                 <div className="flex items-center gap-0.5 h-3.5 ml-1">
                   {[40, 85, 100, 60, 90, 45].map((h, i) => (
@@ -263,7 +263,7 @@ export function VoiceActionBanner({
             </motion.button>
             <button
               onClick={handleTryAgain}
-              className="h-10 px-3.5 rounded-[8px] border border-[#1E2638] text-[#94A3B8] hover:text-[#F1F5F9] hover:bg-[#161B26] text-xs font-medium cursor-pointer"
+              className="h-10 px-3.5 rounded-[8px] border border-[#334155] text-[#94A3B8] hover:text-[#F8FAFC] hover:bg-[#253349] text-xs font-medium cursor-pointer"
             >
               Cancel
             </button>
@@ -282,7 +282,7 @@ export function VoiceActionBanner({
       {/* ── 4. REVIEW STATE (MANDATORY TRUST STEP) ──────────────────────────────── */}
       {flowState === "review" && (
         <div className="space-y-4">
-          <div className="flex items-center justify-between border-b border-[#1E2638] pb-3">
+          <div className="flex items-center justify-between border-b border-[#334155] pb-3">
             <div className="flex items-center gap-2">
               <span className="text-xs font-semibold text-[#10B981] bg-[#064E3B]/30 border border-[#10B981]/20 px-2 py-0.5 rounded-full">
                 I understood
@@ -299,7 +299,7 @@ export function VoiceActionBanner({
           </div>
 
           {isEditing ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 bg-[#07090E] p-3.5 rounded-[10px] border border-[#1E2638]">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 bg-[#0F172A] p-3.5 rounded-[10px] border border-[#334155]">
               <div>
                 <label className="text-[11px] font-medium text-[#94A3B8] block mb-1">Person / Customer</label>
                 <input
@@ -307,7 +307,7 @@ export function VoiceActionBanner({
                   value={editPerson}
                   onChange={(e) => setEditPerson(e.target.value)}
                   placeholder="e.g. Ramesh Kumar"
-                  className="w-full h-9 px-2.5 text-xs rounded-[8px] border border-[#1E2638] bg-[#0F131C] text-[#F1F5F9]"
+                  className="w-full h-9 px-2.5 text-xs rounded-[8px] border border-[#334155] bg-[#1E293B] text-[#F8FAFC]"
                 />
               </div>
               <div>
@@ -317,7 +317,7 @@ export function VoiceActionBanner({
                   value={editAmount}
                   onChange={(e) => setEditAmount(e.target.value)}
                   placeholder="1200"
-                  className="w-full h-9 px-2.5 text-xs rounded-[8px] border border-[#1E2638] bg-[#0F131C] text-[#F1F5F9] font-semibold"
+                  className="w-full h-9 px-2.5 text-xs rounded-[8px] border border-[#334155] bg-[#1E293B] text-[#F8FAFC] font-semibold"
                 />
               </div>
               <div>
@@ -325,7 +325,7 @@ export function VoiceActionBanner({
                 <select
                   value={editType}
                   onChange={(e) => setEditType(e.target.value as "Credit" | "Debit")}
-                  className="w-full h-9 px-2 text-xs rounded-[8px] border border-[#1E2638] bg-[#0F131C] text-[#F1F5F9]"
+                  className="w-full h-9 px-2 text-xs rounded-[8px] border border-[#334155] bg-[#1E293B] text-[#F8FAFC]"
                 >
                   <option value="Credit">Money Received (Inflow)</option>
                   <option value="Debit">Money Paid / Credit Given (Outflow)</option>
@@ -336,7 +336,7 @@ export function VoiceActionBanner({
                 <select
                   value={editMethod}
                   onChange={(e) => setEditMethod(e.target.value)}
-                  className="w-full h-9 px-2 text-xs rounded-[8px] border border-[#1E2638] bg-[#0F131C] text-[#F1F5F9]"
+                  className="w-full h-9 px-2 text-xs rounded-[8px] border border-[#334155] bg-[#1E293B] text-[#F8FAFC]"
                 >
                   <option value="UPI">UPI</option>
                   <option value="Cash">Cash</option>
@@ -346,7 +346,7 @@ export function VoiceActionBanner({
               </div>
             </div>
           ) : (
-            <div className="flex flex-wrap items-center justify-between gap-4 p-3 bg-[#161B26] rounded-[10px] border border-[#1E2638]">
+            <div className="flex flex-wrap items-center justify-between gap-4 p-3 bg-[#253349] rounded-[10px] border border-[#334155]">
               <div className="flex items-center gap-3">
                 <div className={`flex items-center justify-center size-10 rounded-[10px] ${
                   editType === "Credit" ? "bg-[#064E3B]/30 text-[#10B981]" : "bg-[#450A0A]/30 text-[#EF4444]"
@@ -354,11 +354,11 @@ export function VoiceActionBanner({
                   {editType === "Credit" ? <ArrowDownRight size={20} /> : <ArrowUpRight size={20} />}
                 </div>
                 <div>
-                  <h4 className="text-sm font-semibold text-[#F1F5F9]">
+                  <h4 className="text-sm font-semibold text-[#F8FAFC]">
                     {editPerson || "Party / Customer"}
                   </h4>
                   <div className="flex items-center gap-2 mt-0.5 text-xs text-[#94A3B8]">
-                    <span className="font-medium text-[#F1F5F9]">
+                    <span className="font-medium text-[#F8FAFC]">
                       {editType === "Credit" ? "Money received" : "Money paid"}
                     </span>
                     <span>•</span>
@@ -385,7 +385,7 @@ export function VoiceActionBanner({
           <div className="flex items-center justify-end gap-2.5 pt-1">
             <button
               onClick={handleTryAgain}
-              className="h-9 px-4 rounded-[8px] border border-[#1E2638] text-xs font-medium text-[#94A3B8] hover:text-[#F1F5F9] hover:bg-[#161B26] cursor-pointer"
+              className="h-9 px-4 rounded-[8px] border border-[#334155] text-xs font-medium text-[#94A3B8] hover:text-[#F8FAFC] hover:bg-[#253349] cursor-pointer"
             >
               Cancel
             </button>
@@ -406,7 +406,7 @@ export function VoiceActionBanner({
           <div className="flex items-start gap-2.5">
             <AlertCircle size={18} className="text-[#F59E0B] shrink-0 mt-0.5" />
             <div className="space-y-1">
-              <p className="text-xs sm:text-sm font-semibold text-[#F1F5F9]">
+              <p className="text-xs sm:text-sm font-semibold text-[#F8FAFC]">
                 "I heard ₹{Number(editAmount || 0).toLocaleString("en-IN")} {editType === "Credit" ? "received" : "going out"}, but I'm not sure who it was for."
               </p>
               <p className="text-xs text-[#94A3B8]">
@@ -421,7 +421,7 @@ export function VoiceActionBanner({
               value={editPerson}
               onChange={(e) => setEditPerson(e.target.value)}
               placeholder="Enter person name (e.g. Ramesh Kumar)"
-              className="flex-1 h-9 px-3 text-xs rounded-[8px] border border-[#1E2638] bg-[#07090E] text-[#F1F5F9]"
+              className="flex-1 h-9 px-3 text-xs rounded-[8px] border border-[#334155] bg-[#0F172A] text-[#F8FAFC]"
               autoFocus
             />
             <button
@@ -437,7 +437,7 @@ export function VoiceActionBanner({
             </button>
             <button
               onClick={handleTryAgain}
-              className="h-9 px-3 rounded-[8px] border border-[#1E2638] text-xs font-medium text-[#94A3B8] hover:bg-[#161B26] cursor-pointer"
+              className="h-9 px-3 rounded-[8px] border border-[#334155] text-xs font-medium text-[#94A3B8] hover:bg-[#253349] cursor-pointer"
             >
               Try Again
             </button>
@@ -451,7 +451,7 @@ export function VoiceActionBanner({
           <div className="flex items-start gap-2.5">
             <AlertCircle size={18} className="text-[#F59E0B] shrink-0 mt-0.5" />
             <div className="space-y-1">
-              <p className="text-xs sm:text-sm font-semibold text-[#F1F5F9]">
+              <p className="text-xs sm:text-sm font-semibold text-[#F8FAFC]">
                 "I heard ₹{Number(editAmount || 0).toLocaleString("en-IN")} for {editPerson || "this entry"}, but I'm not sure whether you received or paid this amount."
               </p>
               <p className="text-xs text-[#94A3B8]">
@@ -483,7 +483,7 @@ export function VoiceActionBanner({
             </button>
             <button
               onClick={handleTryAgain}
-              className="h-9 px-3 rounded-[8px] border border-[#1E2638] text-xs font-medium text-[#94A3B8] hover:bg-[#161B26] cursor-pointer"
+              className="h-9 px-3 rounded-[8px] border border-[#334155] text-xs font-medium text-[#94A3B8] hover:bg-[#253349] cursor-pointer"
             >
               Try Again
             </button>
@@ -511,14 +511,14 @@ export function VoiceActionBanner({
           <div className="flex items-center gap-2">
             <button
               onClick={() => handleUndo()}
-              className="flex items-center gap-1.5 h-8 px-3 rounded-[6px] bg-[#161B26] border border-[#10B981]/40 text-[#10B981] hover:bg-[#1E2337] text-xs font-semibold shadow-2xs transition-all cursor-pointer"
+              className="flex items-center gap-1.5 h-8 px-3 rounded-[6px] bg-[#253349] border border-[#10B981]/40 text-[#10B981] hover:bg-[#1E293B] text-xs font-semibold shadow-2xs transition-all cursor-pointer"
             >
               <RotateCcw size={13} />
               <span>Undo ({undoCountdown}s)</span>
             </button>
             <button
               onClick={() => setFlowState("idle")}
-              className="h-8 px-2.5 text-xs text-[#94A3B8] hover:text-[#F1F5F9] font-medium cursor-pointer"
+              className="h-8 px-2.5 text-xs text-[#94A3B8] hover:text-[#F8FAFC] font-medium cursor-pointer"
             >
               Dismiss
             </button>
@@ -537,7 +537,7 @@ export function VoiceActionBanner({
           </div>
           <button
             onClick={handleTryAgain}
-            className="h-8 px-3 rounded-[6px] bg-[#161B26] border border-[#EF4444]/40 text-[#EF4444] hover:bg-[#450A0A]/50 text-xs font-semibold cursor-pointer"
+            className="h-8 px-3 rounded-[6px] bg-[#253349] border border-[#EF4444]/40 text-[#EF4444] hover:bg-[#450A0A]/50 text-xs font-semibold cursor-pointer"
           >
             Try Again
           </button>

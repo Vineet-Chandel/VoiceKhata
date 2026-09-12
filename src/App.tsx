@@ -7,8 +7,6 @@ import { FinancialProvider } from "@/context/FinancialContext";
 import { ChatStoreProvider } from "@/components/hooks/use-chat-store";
 
 // Lazy-load other pages so their heavy dependencies don't block the root landing page
-const Landing = lazy(() => import("./components/Pages/Landing"));
-const SkeletonLanding = lazy(() => import("./components/Pages/SkeletonLanding"));
 const AuthPage = lazy(() => import("@/components/ui/SignUp/auth-page").then(m => ({ default: m.AuthPage })));
 const LoginPage = lazy(() => import("@/components/ui/SignUp/Login-page").then(m => ({ default: m.LoginPage })));
 const VerifyEmail = lazy(() => import("@/components/ui/SignUp/verifyEmail"));
@@ -44,10 +42,8 @@ export default function App() {
         <Suspense fallback={<div className="min-h-screen w-full bg-background" />}>
           <Routes>
             <Route path="/" element={<ShopkeeperLanding />} />
-            <Route path="/classic" element={<Landing />} />
             <Route path="/shopkeeper" element={<ShopkeeperLanding />} />
             <Route path="/vyapar" element={<ShopkeeperLanding />} />
-            <Route path="/skeleton" element={<SkeletonLanding />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<AuthPage />} />
             <Route path="/verify" element={<VerifyEmail />} />

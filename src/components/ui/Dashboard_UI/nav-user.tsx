@@ -53,7 +53,7 @@ export function NavUser({
 
             <SidebarMenuButton
               size="lg"
-              className="data-[state=open]:bg-[#EEF0FF] hover:bg-[#F1F3F5] text-[#172033] cursor-pointer"
+              className="data-[state=open]:bg-[#2B2B2B]"
             >
 
               <Avatar className="h-8 w-8 rounded-lg">
