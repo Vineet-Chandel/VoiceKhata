@@ -188,7 +188,7 @@ export function parseVoiceKhataInput(transcript: string): ParsedVoiceTransaction
     /^\s*([A-Za-z\u0900-\u097F][A-Za-z\u0900-\u097F .'-]{0,40}?)\s+(?:ne|ने|ko|को|se|से|borrowed|borrow|paid|pay|gave|took|bought|liya|liye|li|लिया|लिए|ली|rupees?|rupaye|rs\.?|\d)/i
   )
   if (leadingNameMatch && leadingNameMatch[1]) {
-    const cand = leadingNameMatch[1].trim(" .-'")
+    const cand = leadingNameMatch[1].trim().replace(/^[\s.-]+|[\s.-]+$/g, "")
     if (cand.length >= 2 && !/^(today|yesterday|kal|aaj|maine|mene|i|we)$/i.test(cand)) {
       person = cand.charAt(0).toUpperCase() + cand.slice(1)
     }
