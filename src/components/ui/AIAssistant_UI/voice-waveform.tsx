@@ -37,30 +37,35 @@ export function VoiceWaveform({ analyserRef, isListening, color = "rgba(255, 255
       let barData: number[] = new Array(12).fill(0)
       const numBars = 12
       
-      if (isListening && analyserRef.current) {
-        const analyser = analyserRef.current
-        const dataArray = new Uint8Array(analyser.frequencyBinCount)
-        analyser.getByteFrequencyData(dataArray)
-        
-        // Use bins 2 through 38 (skip 0 and 1 which have mic rumble/DC offset)
-        const binsPerBar = 3
-        
-        for (let i = 0; i < numBars; i++) {
-          let sum = 0
-          for (let j = 0; j < binsPerBar; j++) {
-            sum += dataArray[2 + i * binsPerBar + j]
+      if (isListening) {
+        if (analyserRef?.current) {
+          const analyser = analyserRef.current
+          const dataArray = new Uint8Array(analyser.frequencyBinCount)
+          analyser.getByteFrequencyData(dataArray)
+          
+          const binsPerBar = 3
+          for (let i = 0; i < numBars; i++) {
+            let sum = 0
+            for (let j = 0; j < binsPerBar; j++) {
+              sum += dataArray[2 + i * binsPerBar + j]
+            }
+            let avg = sum / binsPerBar
+            let val = avg / 255.0
+            if (val < 0.05) val = 0
+            const eqBoost = 1.5 + (i * 0.2) 
+            val = val * eqBoost
+            barData[i] = Math.min(1.0, val)
           }
-          let avg = sum / binsPerBar
-          let val = avg / 255.0
-          
-          // Noise gate: ignore very quiet ambient noise
-          if (val < 0.05) val = 0
-          
-          // Boost higher frequencies to balance the visualizer (since audio energy drops off at high freq)
-          const eqBoost = 1.5 + (i * 0.2) 
-          val = val * eqBoost
-          
-          barData[i] = Math.min(1.0, val)
+        } else {
+          // Fallback: Simulate natural speech volume visually since we disabled AudioContext to fix Android mic bugs
+          // We use time to make the random values feel cohesive and rhythmic
+          const t = time * 0.002
+          const intensity = Math.sin(t * 1.5) > 0 ? 0.6 : 0.2 // simulate speaking bursts
+          for (let i = 0; i < numBars; i++) {
+             // Create organic looking fake volume
+             const noise = Math.random() * 0.4 + 0.6
+             barData[i] = (Math.sin(t * 3 + i * 0.5) * 0.5 + 0.5) * noise * intensity
+          }
         }
       }
 

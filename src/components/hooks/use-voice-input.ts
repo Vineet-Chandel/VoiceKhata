@@ -26,15 +26,8 @@ export function useVoiceInput() {
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const cleanupStream = useCallback(() => {
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach((track) => track.stop())
-      streamRef.current = null
-    }
-    if (audioContextRef.current) {
-      audioContextRef.current.close().catch(() => {})
-      audioContextRef.current = null
-    }
-    analyserRef.current = null
+    // No-op: we no longer use a custom MediaStream to prevent hardware mic contention
+    // on mobile devices with SpeechRecognition.
   }, [])
 
   const cleanup = useCallback(() => {
@@ -64,33 +57,15 @@ export function useVoiceInput() {
     setVoiceState("listening")
 
     try {
-      // 1. Audio setup for waveform visualization
-      if (!navigator.mediaDevices) {
-        throw new Error("Microphone API not available. Ensure you are using HTTPS or localhost.")
-      }
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false })
-      streamRef.current = stream
-
-      const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext
-      const audioContext = new AudioContextClass()
-      audioContextRef.current = audioContext
-      if (audioContext.state === "suspended") {
-        await audioContext.resume()
-      }
-
-      const analyser = audioContext.createAnalyser()
-      analyser.fftSize = 256
-      analyser.smoothingTimeConstant = 0.8
-      analyserRef.current = analyser
-
-      const source = audioContext.createMediaStreamSource(stream)
-      source.connect(analyser)
-
-      // 2. Speech Recognition setup
+      // 1. Check if browser supports SpeechRecognition at all before proceeding
       const SpeechRecognitionClass = window.SpeechRecognition || window.webkitSpeechRecognition
       if (!SpeechRecognitionClass) {
         throw new Error("Speech recognition is not supported in this browser.")
       }
+
+      // 2. We no longer use custom getUserMedia here because it fights with 
+      // the native SpeechRecognition API for mic exclusivity on Android/Mobile,
+      // which causes silent failures (mic spins but takes no input).
 
       const recognition = new SpeechRecognitionClass()
       // Use continuous=false so recognition stops cleanly after a pause
