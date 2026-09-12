@@ -362,19 +362,17 @@ export default function DashboardHome() {
                   <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-blue-600/20 border border-blue-500/30 text-blue-400 shadow-inner">
                     <Mic className="h-6 w-6 animate-pulse" />
                   </div>
-                  <div className="flex flex-col gap-1">
+                  <div className="flex flex-col gap-1.5">
                     <div className="flex items-center gap-2">
                       <span className="text-[11px] font-bold uppercase tracking-wider text-blue-400 bg-blue-500/10 px-2.5 py-0.5 rounded-full border border-blue-500/20">
-                        VoiceKhata Workspace
+                        Add Transaction
                       </span>
-                      <span className="text-xs text-muted-foreground hidden sm:inline">•</span>
-                      <span className="text-xs text-muted-foreground hidden sm:inline">Smart Indian Ledger</span>
                     </div>
                     <h3 className="text-lg font-semibold text-foreground tracking-tight">
-                      Say what happened. Review it. Save with confidence.
+                      Speak → Review → Save
                     </h3>
-                    <p className="text-xs sm:text-sm text-muted-foreground max-w-xl">
-                      Speak in Hindi, English, or Hinglish (e.g. <span className="text-blue-300 font-mono">"रमेश ने 500 रुपये दिए"</span> or <span className="text-blue-300 font-mono">"Sharma ji ko ₹1,200 udhar diya"</span>). Auto-parses offline & with AI.
+                    <p className="text-xs sm:text-sm text-muted-foreground">
+                      Say what happened in Hindi, English, or Hinglish (e.g. <span className="text-blue-300 font-mono">"रमेश ने 500 रुपये दिए"</span> or <span className="text-blue-300 font-mono">"Paid ₹450 for groceries"</span>).
                     </p>
                   </div>
                 </div>
