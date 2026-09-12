@@ -1,4 +1,5 @@
 // src/components/hooks/use-voice-input.ts
+// Ported and aligned with avksr/VoiceKhata speech recognition pipeline
 import { useState, useRef, useCallback, useEffect } from "react"
 import { transcribeAudioBlob } from "@/lib/groq-whisper"
 
@@ -27,12 +28,9 @@ export function useVoiceInput(options?: UseVoiceInputOptions) {
   const mediaRecorderRef = useRef<MediaRecorder | null>(null)
   const audioChunksRef = useRef<Blob[]>([])
   const recognitionRef = useRef<any>(null)
+  const spokenTranscriptRef = useRef("")
   const webSpeechFailedRef = useRef(false)
-  const webSpeechFinalTranscriptRef = useRef("")
-  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const vadIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
-  const silenceTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const hasSpokenRef = useRef(false)
+  const safetyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const optionsRef = useRef(options)
 
   useEffect(() => {
@@ -40,19 +38,9 @@ export function useVoiceInput(options?: UseVoiceInputOptions) {
   }, [options])
 
   const cleanupHardware = useCallback(() => {
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current)
-      timeoutRef.current = null
-    }
-
-    if (silenceTimeoutRef.current) {
-      clearTimeout(silenceTimeoutRef.current)
-      silenceTimeoutRef.current = null
-    }
-
-    if (vadIntervalRef.current) {
-      clearInterval(vadIntervalRef.current)
-      vadIntervalRef.current = null
+    if (safetyTimeoutRef.current) {
+      clearTimeout(safetyTimeoutRef.current)
+      safetyTimeoutRef.current = null
     }
 
     if (streamRef.current) {
@@ -82,6 +70,11 @@ export function useVoiceInput(options?: UseVoiceInputOptions) {
       recognitionRef.current = null
     }
 
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state === "recording") {
+      try {
+        mediaRecorderRef.current.stop()
+      } catch {}
+    }
     mediaRecorderRef.current = null
   }, [])
 
@@ -90,103 +83,73 @@ export function useVoiceInput(options?: UseVoiceInputOptions) {
     setVoiceState("idle")
     setTranscript("")
     setErrorMessage("")
+    spokenTranscriptRef.current = ""
     webSpeechFailedRef.current = false
-    webSpeechFinalTranscriptRef.current = ""
-    hasSpokenRef.current = false
     audioChunksRef.current = []
   }, [cleanupHardware])
 
-  // Internal: Finalize transcription using Groq Whisper as PRIMARY engine
-  const finalizeTranscription = useCallback(async () => {
+  // Finalize processing: only delivers text if non-empty actual speech was detected
+  const handleFinalSpeech = useCallback(async () => {
     setVoiceState("processing")
 
-    let resultText = ""
-    const chunks = audioChunksRef.current
+    let finalText = spokenTranscriptRef.current.trim()
 
-    // 1. ALWAYS prioritize Groq Whisper AI (whisper-large-v3-turbo) for highest accuracy
-    if (chunks.length > 0) {
+    // If WebSpeech had a network error or produced no text, try Whisper with recorded audio
+    if ((!finalText || webSpeechFailedRef.current) && audioChunksRef.current.length > 0) {
       try {
-        const mimeType = mediaRecorderRef.current?.mimeType || chunks[0]?.type || "audio/webm"
-        const audioBlob = new Blob(chunks, { type: mimeType })
+        const mimeType = mediaRecorderRef.current?.mimeType || audioChunksRef.current[0]?.type || "audio/webm"
+        const audioBlob = new Blob(audioChunksRef.current, { type: mimeType })
 
-        if (audioBlob.size > 800) {
-          console.log("[useVoiceInput] Transcribing with Groq Whisper AI (size:", audioBlob.size, "bytes)...")
-          const whisperText = await transcribeAudioBlob(audioBlob)
-          if (whisperText && whisperText.trim()) {
-            resultText = whisperText.trim()
-            console.log("[useVoiceInput] Groq Whisper result:", resultText)
+        // Only call Whisper if audio has non-trivial size (> 2500 bytes)
+        if (audioBlob.size > 2500) {
+          const whisperResult = await transcribeAudioBlob(audioBlob)
+          if (whisperResult && whisperResult.trim()) {
+            finalText = whisperResult.trim()
           }
         }
-      } catch (err: any) {
-        console.warn("[useVoiceInput] Groq Whisper transcription error, falling back to WebSpeech:", err)
-      }
-    }
-
-    // 2. Fallback to WebSpeech only if Whisper returned no text
-    if (!resultText) {
-      resultText = webSpeechFinalTranscriptRef.current.trim()
-      if (resultText) {
-        console.log("[useVoiceInput] Fallback WebSpeech result:", resultText)
+      } catch (err) {
+        console.warn("[useVoiceInput] Whisper fallback error:", err)
       }
     }
 
     cleanupHardware()
 
-    if (resultText) {
-      setTranscript(resultText)
+    // If no text or empty air/silence, DO NOT convert to text; return cleanly to idle
+    if (!finalText) {
+      console.log("[useVoiceInput] Silence or null input detected. Returning to idle without triggering transaction.")
       setVoiceState("idle")
-      optionsRef.current?.onTranscript?.(resultText)
-    } else {
-      setVoiceState("idle")
+      setTranscript("")
+      return
     }
+
+    console.log("[useVoiceInput] Final accepted speech:", finalText)
+    setTranscript(finalText)
+    setVoiceState("idle")
+    optionsRef.current?.onTranscript?.(finalText)
   }, [cleanupHardware])
 
   const stopListening = useCallback(() => {
-    // Clear silence and VAD timers immediately
-    if (silenceTimeoutRef.current) {
-      clearTimeout(silenceTimeoutRef.current)
-      silenceTimeoutRef.current = null
-    }
-    if (vadIntervalRef.current) {
-      clearInterval(vadIntervalRef.current)
-      vadIntervalRef.current = null
-    }
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current)
-      timeoutRef.current = null
-    }
+    if (voiceState !== "listening") return
 
-    setVoiceState("processing")
-
-    // Stop WebSpeech if running
     if (recognitionRef.current) {
       try {
         recognitionRef.current.stop()
       } catch {}
     }
 
-    // Stop MediaRecorder — this triggers recorder.onstop -> finalizeTranscription
-    if (mediaRecorderRef.current && mediaRecorderRef.current.state === "recording") {
-      try {
-        mediaRecorderRef.current.stop()
-      } catch {
-        finalizeTranscription()
-      }
-    } else {
-      finalizeTranscription()
-    }
-  }, [finalizeTranscription])
+    handleFinalSpeech()
+  }, [voiceState, handleFinalSpeech])
 
   const startListening = useCallback(async () => {
     cleanupHardware()
     setErrorMessage("")
     setTranscript("")
+    spokenTranscriptRef.current = ""
     webSpeechFailedRef.current = false
-    webSpeechFinalTranscriptRef.current = ""
-    hasSpokenRef.current = false
     audioChunksRef.current = []
 
     try {
+      // 1. Initialize microphone stream
       if (!navigator.mediaDevices?.getUserMedia) {
         throw new Error("Microphone access is not supported by your browser.")
       }
@@ -200,55 +163,23 @@ export function useVoiceInput(options?: UseVoiceInputOptions) {
       })
       streamRef.current = stream
 
-      // Setup Web Audio API for visualizer and VAD silence detection
+      // 2. Setup Web Audio visualizer
       try {
         const AudioCtx = window.AudioContext || (window as any).webkitAudioContext
         if (AudioCtx) {
           const ctx = new AudioCtx()
           const analyser = ctx.createAnalyser()
-          analyser.fftSize = 128
+          analyser.fftSize = 64
           const source = ctx.createMediaStreamSource(stream)
           source.connect(analyser)
           audioContextRef.current = ctx
           analyserRef.current = analyser
-
-          // VAD Silence Detection: checks audio volume every 120ms
-          const bufferLength = analyser.frequencyBinCount
-          const dataArray = new Uint8Array(bufferLength)
-
-          vadIntervalRef.current = setInterval(() => {
-            if (!analyserRef.current) return
-            analyserRef.current.getByteFrequencyData(dataArray)
-            let sum = 0
-            for (let i = 0; i < bufferLength; i++) {
-              sum += dataArray[i]
-            }
-            const avgVolume = sum / bufferLength
-
-            // Volume threshold: user is speaking
-            if (avgVolume > 14) {
-              hasSpokenRef.current = true
-              // Reset silence timer because user is actively speaking
-              if (silenceTimeoutRef.current) {
-                clearTimeout(silenceTimeoutRef.current)
-                silenceTimeoutRef.current = null
-              }
-            } else if (hasSpokenRef.current) {
-              // User has spoken at least once, and has now paused
-              if (!silenceTimeoutRef.current) {
-                silenceTimeoutRef.current = setTimeout(() => {
-                  console.log("[useVoiceInput] 1.8s of silence detected after speech, auto-completing...")
-                  stopListening()
-                }, 1800)
-              }
-            }
-          }, 120)
         }
       } catch (e) {
-        console.warn("[useVoiceInput] AudioContext visualizer/VAD init error:", e)
+        console.warn("[useVoiceInput] AudioContext visualizer init failed:", e)
       }
 
-      // Setup MediaRecorder to capture clean audio for Groq Whisper
+      // 3. Setup MediaRecorder for fallback
       let mimeType = ""
       if (typeof MediaRecorder !== "undefined") {
         if (MediaRecorder.isTypeSupported("audio/webm;codecs=opus")) {
@@ -257,96 +188,77 @@ export function useVoiceInput(options?: UseVoiceInputOptions) {
           mimeType = "audio/webm"
         } else if (MediaRecorder.isTypeSupported("audio/mp4")) {
           mimeType = "audio/mp4"
-        } else if (MediaRecorder.isTypeSupported("audio/ogg")) {
-          mimeType = "audio/ogg"
         }
       }
 
       const recorder = mimeType ? new MediaRecorder(stream, { mimeType }) : new MediaRecorder(stream)
       mediaRecorderRef.current = recorder
 
-      recorder.ondataavailable = (event) => {
-        if (event.data && event.data.size > 0) {
-          audioChunksRef.current.push(event.data)
+      recorder.ondataavailable = (e) => {
+        if (e.data && e.data.size > 0) {
+          audioChunksRef.current.push(e.data)
         }
       }
 
-      recorder.onstop = () => {
-        finalizeTranscription()
-      }
-
-      recorder.start(150) // Collect 150ms chunks
+      recorder.start() // Continuous clean audio capture
       setVoiceState("listening")
 
-      // WebSpeech API for live visual preview while speaking
+      // 4. Initialize Web Speech API — Exactly as in avksr/VoiceKhata
       const SpeechRecognitionClass = window.SpeechRecognition || window.webkitSpeechRecognition
       if (SpeechRecognitionClass) {
-        try {
-          const recognition = new SpeechRecognitionClass()
-          // Continuous=true ensures the browser doesn't cut off after 1 word!
-          recognition.continuous = true
-          recognition.interimResults = true
-          recognition.lang = "en-IN"
-          recognition.maxAlternatives = 1
+        const recognition = new SpeechRecognitionClass()
+        recognition.lang = "hi-IN" // Standard Indian Hindi/English recognizer
+        recognition.interimResults = true
+        recognition.continuous = false // Stops automatically when user finishes speaking
 
-          let finalAcc = ""
+        recognition.onresult = (event: any) => {
+          let interim = ""
+          let newFinal = ""
 
-          recognition.onresult = (event: any) => {
-            let interim = ""
-            let newFinal = ""
-
-            for (let i = event.resultIndex; i < event.results.length; i++) {
-              const segment = event.results[i][0]?.transcript || ""
-              if (event.results[i].isFinal) {
-                newFinal += segment
-              } else {
-                interim += segment
-              }
-            }
-
-            if (newFinal) {
-              finalAcc = (finalAcc + " " + newFinal).trim()
-            }
-
-            const current = (finalAcc + " " + interim).trim()
-            if (current) {
-              webSpeechFinalTranscriptRef.current = current
-              setTranscript(current)
+          for (let i = event.resultIndex; i < event.results.length; i++) {
+            const segment = event.results[i][0]?.transcript || ""
+            if (event.results[i].isFinal) {
+              newFinal += segment
+            } else {
+              interim += segment
             }
           }
 
-          recognition.onerror = (event: any) => {
-            console.warn("[useVoiceInput] WebSpeech interim preview warning:", event.error)
-            webSpeechFailedRef.current = true
-
-            if (event.error === "not-allowed" || event.error === "service-not-allowed") {
-              setErrorMessage("Microphone access denied. Please allow microphone permission.")
-              setVoiceState("error")
-              cleanupHardware()
-              optionsRef.current?.onError?.("Microphone access denied.")
-            }
+          const current = (newFinal || interim).trim()
+          if (current) {
+            spokenTranscriptRef.current = current
+            setTranscript(current)
           }
-
-          recognition.onend = () => {
-            // WebSpeech ended internally; do NOT kill MediaRecorder!
-            // Let VAD silence detection or manual Done button handle completion
-            console.log("[useVoiceInput] WebSpeech cycle ended; audio recording continues via MediaRecorder.")
-          }
-
-          recognitionRef.current = recognition
-          recognition.start()
-        } catch (e) {
-          console.warn("[useVoiceInput] WebSpeech start error, recording via Whisper:", e)
-          webSpeechFailedRef.current = true
         }
+
+        recognition.onerror = (event: any) => {
+          console.warn("[useVoiceInput] SpeechRecognition error:", event.error)
+          if (event.error === "network") {
+            webSpeechFailedRef.current = true
+          } else if (event.error === "not-allowed") {
+            setErrorMessage("Microphone access denied. Please allow microphone permission.")
+            setVoiceState("error")
+            cleanupHardware()
+            optionsRef.current?.onError?.("Microphone access denied.")
+          }
+        }
+
+        recognition.onend = () => {
+          // Browser naturally detected end of speech (or pause)
+          console.log("[useVoiceInput] Natural speech end detected by browser.")
+          handleFinalSpeech()
+        }
+
+        recognitionRef.current = recognition
+        recognition.start()
       } else {
         webSpeechFailedRef.current = true
       }
 
-      // Safety cap: 25 seconds max recording
-      timeoutRef.current = setTimeout(() => {
+      // Safety timeout: 15s max
+      safetyTimeoutRef.current = setTimeout(() => {
         stopListening()
-      }, 25000)
+      }, 15000)
 
     } catch (err: any) {
       console.error("[useVoiceInput] Start error:", err)
@@ -358,7 +270,7 @@ export function useVoiceInput(options?: UseVoiceInputOptions) {
       setVoiceState("error")
       optionsRef.current?.onError?.(msg)
     }
-  }, [cleanupHardware, stopListening, finalizeTranscription])
+  }, [cleanupHardware, stopListening, handleFinalSpeech])
 
   useEffect(() => {
     return () => {

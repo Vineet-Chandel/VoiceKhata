@@ -26,11 +26,8 @@ export async function transcribeAudioBlob(blob: Blob): Promise<string> {
   formData.append("model", "whisper-large-v3-turbo")
   formData.append("response_format", "json")
   formData.append("temperature", "0")
-  // Bilingual prompt conditioning trained on avksr/VoiceKhata ledger patterns
-  formData.append(
-    "prompt",
-    "VoiceKhata khata ledger entries: Ramesh ne 500 rupaye diye, Suresh ko 1200 udhar diya, Gupta Kirana 2000 jama, Sunil ne 350 ka samaan liya, रमेश को 500 रुपये उधार दिए, सुरेश ने 1200 जमा किया, ₹, Rs, rupees, paid, received, diya, mila, liye, UPI, Cash, Bank Transfer, GPay, Paytm, PhonePe, kharcha, udhar, jama, balance."
-  )
+  // Short glossary only (NEVER full sentences, to prevent hallucination on silence/air)
+  formData.append("prompt", "₹, Rs, rupees, UPI, Cash, udhar, jama, khata")
 
   const response = await fetch("https://api.groq.com/openai/v1/audio/transcriptions", {
     method: "POST",
@@ -48,6 +45,21 @@ export async function transcribeAudioBlob(blob: Blob): Promise<string> {
 
   const data = await response.json()
   const text = (data?.text || "").trim()
+
+  // Filter out known Whisper silence hallucinations
+  const hallucinations = [
+    "subtitles by",
+    "thank you for watching",
+    "thank you",
+    "amara.org",
+    "subscribe",
+    "watching",
+  ]
+  if (hallucinations.some((h) => text.toLowerCase().includes(h)) && text.length < 35) {
+    console.log("[GroqWhisper] Ignored silence hallucination:", text)
+    return ""
+  }
+
   console.log("[GroqWhisper] Transcribed text:", text)
   return text
 }
