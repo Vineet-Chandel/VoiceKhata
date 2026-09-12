@@ -28,7 +28,7 @@ export default function DashboardPage() {
       <SidebarInset className="flex flex-col h-full overflow-hidden ">
         <SiteHeader />
 
-        <div className="flex-1 overflow-y-auto relative z-10 scroll-smooth pt-4 lg:pt-6 mt-[10px] pb-24">
+        <div className="flex-1 overflow-y-auto relative z-10 scroll-smooth pt-4 lg:pt-6 mt-[10px] pb-28 lg:pb-32">
           <Outlet />
         </div>
       </SidebarInset>

@@ -20,6 +20,7 @@ const TransactionsPage = lazy(() => import("@/components/Pages/TransactionsPage"
 const BudgetPage = lazy(() => import("@/components/Pages/BudgetPage"));
 const ReportsPage = lazy(() => import("@/components/Pages/ReportsPage"));
 const AIAssistantPage = lazy(() => import("@/components/Pages/AIAssistantPage"));
+const VoiceCapturePage = lazy(() => import("@/components/Pages/VoiceCapturePage"));
 const SettingsPage = lazy(() => import("@/components/Pages/Settings"));
 const NotificationsPage = lazy(() => import("@/components/Pages/NotificationsPage").then(m => ({ default: m.NotificationsPage })));
 const ComingSoon = lazy(() => import("@/components/ui/Page_Not_Found/coming_soon").then(m => ({ default: m.ComingSoon })));
@@ -72,6 +73,7 @@ export default function App() {
               <Route path="budget" element={<BudgetPage />} />
               <Route path="reports" element={<ReportsPage />} />
               <Route path="ai-assistant" element={<AIAssistantPage />} />
+              <Route path="voice-capture" element={<VoiceCapturePage />} />
               <Route path="settings" element={<SettingsPage />} />
               <Route path="notifications" element={<NotificationsPage />} />
             </Route>

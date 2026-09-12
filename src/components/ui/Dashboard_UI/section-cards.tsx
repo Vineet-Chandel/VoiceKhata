@@ -22,25 +22,38 @@ export function SectionCards({ income, expense, balance, savingsRate }: SectionC
     <div className="grid grid-cols-1 gap-4 px-4 *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card *:data-[slot=card]:shadow-xs lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-4 dark:*:data-[slot=card]:bg-card">
 
       {/* BALANCE */}
-      <Card className="@container/card">
+      <Card className={`@container/card transition-all ${balance < 0 ? "!border-rose-500/30 !bg-gradient-to-t !from-rose-500/10 !to-card shadow-rose-500/5" : ""}`}>
         <CardHeader>
-          <CardDescription>Total Balance</CardDescription>
-          <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            ₹{balance.toLocaleString("en-IN")}
+          <CardDescription className={balance < 0 ? "text-rose-400 font-medium" : ""}>
+            {balance < 0 ? "Net Deficit" : "Total Balance"}
+          </CardDescription>
+          <CardTitle className={`text-2xl font-semibold tabular-nums @[250px]/card:text-3xl ${balance < 0 ? "text-rose-400" : ""}`}>
+            {balance < 0 ? `-₹${Math.abs(balance).toLocaleString("en-IN")}` : `₹${balance.toLocaleString("en-IN")}`}
           </CardTitle>
           <CardAction>
-            <Badge variant="outline">
-              <IconTrendingUp />
-              Live
-            </Badge>
+            {balance < 0 ? (
+              <Badge variant="outline" className="border-rose-500/40 bg-rose-500/10 text-rose-400 flex items-center gap-1">
+                <IconTrendingDown className="size-3.5" />
+                Deficit
+              </Badge>
+            ) : (
+              <Badge variant="outline">
+                <IconTrendingUp />
+                Live
+              </Badge>
+            )}
           </CardAction>
         </CardHeader>
         <CardFooter className="flex-col items-start gap-1.5 text-sm">
           <div className="line-clamp-1 flex gap-2 font-medium">
-            Current available balance
+            {balance < 0 ? (
+              <span className="text-rose-400">Expenses exceed income</span>
+            ) : (
+              "Current available balance"
+            )}
           </div>
           <div className="text-muted-foreground">
-            Across all linked accounts
+            {balance < 0 ? `Deficit of ₹${Math.abs(balance).toLocaleString("en-IN")}` : "Across all linked accounts"}
           </div>
         </CardFooter>
       </Card>
