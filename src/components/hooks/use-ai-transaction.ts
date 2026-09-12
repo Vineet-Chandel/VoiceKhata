@@ -37,13 +37,14 @@ Return ONLY valid JSON with this shape:
 
 Rules:
 - Understand Hinglish, slang, and misspellings.
+- Recognize technical finance terms in English and Hindi (e.g., "mutual fund", "SIP", "FD", "Fixed Deposit", "RD" -> Investment; "EMI", "loan", "udhaar", "karza" -> Debt; "byaaj", "vyaaj" -> Interest; "poonjigat labh" -> Capital Gains; "kiraya" -> Rent).
 - Normalize merchant names globally (not India-only).
 - Keep transaction as a clean proper name: e.g. "mxplayer pe kiye the" -> "MX Player".
 - Infer category and debit/credit from intent.
 - Do not reject unknown merchants. Make the best probable interpretation.
 - If amount/method/date are missing, use null.
 - date must be yyyy-MM-dd if present.
-- category must be one of: Food, Shopping, Transport, Utilities, Health, Entertainment, Subscription, Income, Other.
+- category must be one of: Food, Shopping, Transport, Utilities, Health, Entertainment, Subscription, Income, Investment, Debt, Interest, Rent, Capital Gains, Other.
 - method must be one of: Cash, UPI, Bank Transfer, Credit Card, Debit Card, Net Banking, or null.
 - app_mode must be "BUSINESS" or "PERSONAL". If the user mentions "personal" or the context is clearly personal, use "PERSONAL". Otherwise default to "BUSINESS".
 - confidence must be between 0 and 1.
@@ -62,6 +63,11 @@ function sanitizeCategory(input: unknown): string {
     "Entertainment",
     "Subscription",
     "Income",
+    "Investment",
+    "Debt",
+    "Interest",
+    "Rent",
+    "Capital Gains",
     "Other",
   ])
   return allowed.has(value) ? value : "Other"
