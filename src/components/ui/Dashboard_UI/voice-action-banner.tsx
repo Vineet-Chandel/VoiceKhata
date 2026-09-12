@@ -12,6 +12,7 @@ interface VoiceActionBannerProps {
   onAddTransaction: (t: TransactionInput) => Promise<{ error?: string; data?: any } | undefined>
   onDeleteTransaction?: (id: number) => Promise<void>
   onSuccessToast?: (msg: string, undoAction?: () => void) => void
+  existingCustomers?: string[]
 }
 
 type FlowState = "idle" | "listening" | "processing" | "review" | "ambiguous_person" | "ambiguous_direction" | "success" | "error"
@@ -19,7 +20,8 @@ type FlowState = "idle" | "listening" | "processing" | "review" | "ambiguous_per
 export function VoiceActionBanner({
   onAddTransaction,
   onDeleteTransaction,
-  onSuccessToast
+  onSuccessToast,
+  existingCustomers,
 }: VoiceActionBannerProps) {
   const handleVoiceTranscript = (finalText: string) => {
     if (finalText.trim()) {
@@ -65,7 +67,7 @@ export function VoiceActionBanner({
   const processTranscript = (text: string) => {
     setFlowState("processing")
     setTimeout(() => {
-      const parsed = parseVoiceKhataInput(text)
+      const parsed = parseVoiceKhataInput(text, existingCustomers)
       setParsedTx(parsed)
       setEditPerson(parsed.person === "Customer / Party" ? "" : parsed.person)
       setEditAmount(parsed.amount || "")

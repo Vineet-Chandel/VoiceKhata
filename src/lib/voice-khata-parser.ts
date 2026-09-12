@@ -69,7 +69,39 @@ export function transliterateDevanagari(text: string): string {
   return out.replace(/\s+/g, " ").trim()
 }
 
-export function parseVoiceKhataInput(transcript: string): ParsedVoiceTransaction {
+export function matchCustomerWithKnownList(spokenName: string, knownCustomers: string[]): string | null {
+  if (!spokenName || !knownCustomers || knownCustomers.length === 0) return null
+  const cleanSpoken = transliterateDevanagari(spokenName).toLowerCase().trim()
+  if (!cleanSpoken) return null
+  const spokenTokens = cleanSpoken.split(/\s+/)
+
+  // 1. Exact match
+  for (const cust of knownCustomers) {
+    const custClean = transliterateDevanagari(cust).toLowerCase().trim()
+    if (custClean === cleanSpoken) return cust
+  }
+
+  // 2. First name / single token match
+  for (const cust of knownCustomers) {
+    const custClean = transliterateDevanagari(cust).toLowerCase().trim()
+    const custTokens = custClean.split(/\s+/)
+    if (custTokens[0] === spokenTokens[0] && spokenTokens[0].length >= 3) {
+      return cust
+    }
+  }
+
+  // 3. Substring match
+  for (const cust of knownCustomers) {
+    const custClean = transliterateDevanagari(cust).toLowerCase().trim()
+    if (cleanSpoken.length >= 3 && custClean.includes(cleanSpoken)) {
+      return cust
+    }
+  }
+
+  return null
+}
+
+export function parseVoiceKhataInput(transcript: string, knownCustomers?: string[]): ParsedVoiceTransaction {
   const rawText = transcript.trim()
   const normalized = normalizeText(rawText)
   const transliterated = transliterateDevanagari(normalized)
@@ -217,6 +249,14 @@ export function parseVoiceKhataInput(transcript: string): ParsedVoiceTransaction
       if (!lowerCandidate.includes("upi") && !lowerCandidate.includes("cash") && isNaN(Number(candidate))) {
         person = candidate.charAt(0).toUpperCase() + candidate.slice(1)
       }
+    }
+  }
+
+  if (person && knownCustomers && knownCustomers.length > 0) {
+    const matched = matchCustomerWithKnownList(person, knownCustomers)
+    if (matched) {
+      person = matched
+      isAmbiguousPerson = false
     }
   }
 

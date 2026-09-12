@@ -6,3 +6,6 @@ scratch/
 
 .env.local
 .env.*.local
+node-v22.13.0-win-x64/
+*.zip
+node_install/

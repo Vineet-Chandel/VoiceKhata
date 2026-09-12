@@ -286,6 +286,7 @@ export default function KhataPage() {
                 <VoiceActionBanner
                   onAddTransaction={addTransaction}
                   onDeleteTransaction={deleteTransaction}
+                  existingCustomers={customerList.map((c) => c.name)}
                 />
               </div>
             )}

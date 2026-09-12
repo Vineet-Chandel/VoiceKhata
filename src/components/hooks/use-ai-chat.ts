@@ -2083,7 +2083,7 @@ export function useAIChat({
             const type =
               category === "Income"
                 ? "Credit"
-                : inferredType === "Credit" && !/\b(salary|income|refund|cashback|bonus|interest|received)\b/i.test(content)
+                : inferredType === "Credit" && !/\b(salary|income|refund|cashback|bonus|interest|received|diye|diya|jama|mila|mile|payment|vasool|चुकता|जमा|दिए|दिया|मिला)\b/i.test(content)
                   ? "Debit"
                   : inferredType
 

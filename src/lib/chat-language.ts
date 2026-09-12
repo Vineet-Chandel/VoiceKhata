@@ -1,4 +1,4 @@
-﻿export type LanguageMode = "english" | "hinglish" | "hindi"
+export type LanguageMode = "english" | "hinglish" | "hindi"
 
 export type AssistantMode =
   | "conversation"
@@ -43,8 +43,8 @@ const SMALL_TALK_PATTERNS = [
 
 const BUDGET_KEYWORDS = /\b(budget|budgets|allocation|limit|limits|overspend|under\s*budget|cap)\b/i
 const ANALYTICS_KEYWORDS = /\b(spend|spent|expense|expenses|report|reports|trend|trends|compare|comparison|analytics|insight|summary|summaries|month|quarter|year|ytd|category|categories)\b/i
-const TRANSACTION_ACTION_KEYWORDS = /\b(spent|paid|pay|bought|purchase|ordered|expense|received|salary|income|refund|log|add|track|record|recharge|bill|subscription|transfer|kharcha|kharch)\b/i
-const MONEY_REGEX = /(?:₹|rs\.?|inr|rupees?)\s*\d[\d,]*(?:\.\d+)?|\b\d[\d,]*(?:\.\d+)?\b/
+const TRANSACTION_ACTION_KEYWORDS = /\b(spent|paid|pay|bought|purchase|ordered|expense|received|salary|income|refund|log|add|track|record|recharge|bill|subscription|transfer|kharcha|kharch|udhar|udhaar|jama|diye|diya|mila|mile|liye|liya|vasool|chuka|bhugtan|उधार|जमा|दिए|दिया|मिला|मिले|लिया|लिए|खर्चा|भुगतान)\b/i
+const MONEY_REGEX = /(?:₹|rs\.?|inr|rupees?|rupaye?|रुपये|रुपए|रु)\s*\d[\d,]*(?:\.\d+)?|\b\d[\d,]*(?:\.\d+)?\b/i
 const MERCHANT_PATTERN = /\b(?:on|at|for|to)\s+[a-z][a-z0-9&.\-\s]{1,40}/i
 
 const AMBIGUOUS_REPLY_REGEX = /^(ok|okay|hmm|hmmm|huh|right|fine|cool|great|yes|no|haan|nahi|h|k|kk|done|sure)[!.,\s]*$/i

@@ -102,31 +102,34 @@ export function useVoiceInput(options?: UseVoiceInputOptions) {
 
     let finalText = spokenTranscriptRef.current.trim()
 
-    // 1. Guard against pure silence/air:
-    // If WebSpeech heard nothing AND mic volume never rose above ambient noise threshold (15):
-    if (!finalText && maxVolumeRef.current < 15) {
-      console.log("[useVoiceInput] Ambient air/silence only (max volume:", maxVolumeRef.current, "). Discarding.")
-      cleanupHardware()
-      setVoiceState("idle")
-      setTranscript("")
-      return
-    }
+    // 1. If WebSpeech was active and not failed:
+    // If WebSpeech heard nothing, it means the user was silent or stopped speaking.
+    // We must NEVER send pure silence to Whisper, as Whisper decoders hallucinate on room hiss.
+    if (!webSpeechFailedRef.current) {
+      if (!finalText) {
+        console.log("[useVoiceInput] WebSpeech completed with no speech detected. Discarding cleanly.")
+        cleanupHardware()
+        setVoiceState("idle")
+        setTranscript("")
+        return
+      }
+    } else {
+      // 2. WebSpeech failed or was unsupported (e.g. Brave shields blocked Google Speech server).
+      // Use Whisper fallback ONLY if actual sound was recorded above ambient noise threshold (>= 18).
+      if (audioChunksRef.current.length > 0 && maxVolumeRef.current >= 18) {
+        try {
+          const mimeType = mediaRecorderRef.current?.mimeType || audioChunksRef.current[0]?.type || "audio/webm"
+          const audioBlob = new Blob(audioChunksRef.current, { type: mimeType })
 
-    // 2. If WebSpeech had a network error or was empty, try Whisper with recorded audio
-    if ((!finalText || webSpeechFailedRef.current) && audioChunksRef.current.length > 0) {
-      try {
-        const mimeType = mediaRecorderRef.current?.mimeType || audioChunksRef.current[0]?.type || "audio/webm"
-        const audioBlob = new Blob(audioChunksRef.current, { type: mimeType })
-
-        // Only call Whisper if audio has non-trivial size (> 3000 bytes) and volume was detected
-        if (audioBlob.size > 3000 && maxVolumeRef.current >= 15) {
-          const whisperResult = await transcribeAudioBlob(audioBlob)
-          if (whisperResult && whisperResult.trim()) {
-            finalText = whisperResult.trim()
+          if (audioBlob.size > 3500) {
+            const whisperResult = await transcribeAudioBlob(audioBlob)
+            if (whisperResult && whisperResult.trim()) {
+              finalText = whisperResult.trim()
+            }
           }
+        } catch (err) {
+          console.warn("[useVoiceInput] Whisper fallback error:", err)
         }
-      } catch (err) {
-        console.warn("[useVoiceInput] Whisper fallback error:", err)
       }
     }
 
@@ -136,7 +139,8 @@ export function useVoiceInput(options?: UseVoiceInputOptions) {
     const cleaned = finalText.toLowerCase().replace(/[^\w\s]/g, "").trim()
     const silenceStopwords = new Set([
       "the", "a", "an", "you", "so", "and", "or", "it", "to", "in", "is", "of",
-      "bye", "goodbye", "thank you", "thanks", "subtitles by", "watching", "music"
+      "bye", "goodbye", "thank you", "thanks", "subtitles by", "watching", "music",
+      "thank you for watching", "please subscribe"
     ])
 
     if (!finalText || silenceStopwords.has(cleaned) || cleaned.length <= 2) {
