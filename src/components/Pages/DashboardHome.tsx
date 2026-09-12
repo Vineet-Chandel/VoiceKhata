@@ -349,11 +349,11 @@ export default function DashboardHome() {
         {/* Voice Capture Hero Banner */}
         <div className="px-4 lg:px-6">
           {showInlineVoice ? (
-            <div className="rounded-2xl border border-blue-500/30 bg-[#0E1322] p-4 shadow-xl shadow-blue-950/30">
+            <div className="rounded-2xl border border-slate-700/60 bg-card p-4 shadow-xl shadow-slate-950/30">
               <VoiceCaptureCard onBack={() => setShowInlineVoice(false)} showBackLink={true} />
             </div>
           ) : (
-            <div className="relative overflow-hidden rounded-2xl border border-blue-500/25 bg-gradient-to-r from-[#0E1322] via-[#131B2E] to-[#0E1626] p-5 shadow-lg shadow-blue-950/20">
+            <div className="relative overflow-hidden rounded-2xl border border-slate-700/60 bg-gradient-to-r from-card via-slate-900 to-card p-5 shadow-lg shadow-slate-950/20">
               <div className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-blue-500/10 blur-3xl" />
               <div className="pointer-events-none absolute -left-12 -bottom-12 h-36 w-36 rounded-full bg-indigo-500/10 blur-2xl" />
 

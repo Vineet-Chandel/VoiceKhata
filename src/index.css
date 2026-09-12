@@ -119,51 +119,51 @@
 }
 
 .dark {
-    /* VoiceKhata Deep Obsidian Slate Theme (Dark) */
-    --bg-primary: #0B0F19;
-    --surface: #0E1322;
-    --surface-secondary: #131B2E;
-    --surface-elevated: #1A2340;
-    --text-primary: #F8FAFC;
-    --text-secondary: #94A3B8;
-    --text-muted: #64748B;
-    --border-primary: rgba(51, 65, 85, 0.4);
+    /* Custom Semantic Tokens - Dark Mode (Business Professional Slate Blue) */
+    --bg-primary: #020617; /* Slate 950 deep midnight blue */
+    --surface: #0f172a; /* Slate 900 rich navy blue */
+    --surface-secondary: #1e293b; /* Slate 800 */
+    --surface-elevated: #1e293b;
+    --text-primary: #f8fafc; /* Slate 50 */
+    --text-secondary: #94a3b8; /* Slate 400 */
+    --text-muted: #64748b; /* Slate 500 */
+    --border-primary: #334155; /* Slate 700 */
 
-    --surface-card: #131B2E;
+    --surface-card: #0f172a;
     --background: var(--bg-primary);
     --foreground: var(--text-primary);
-    --card: var(--surface-secondary);
+    --card: var(--surface);
     --card-foreground: var(--text-primary);
     --popover: var(--surface-elevated);
     --popover-foreground: var(--text-primary);
-    --primary: #3B82F6;
-    --primary-foreground: #ffffff;
+    --primary: oklch(0.7 0.1 260); /* Lighter Blue for Dark Mode */
+    --primary-foreground: #020617;
     --secondary: var(--surface-secondary);
     --secondary-foreground: var(--text-primary);
     --muted: var(--surface-secondary);
-    --muted-foreground: #94A3B8;
+    --muted-foreground: var(--text-muted);
     --accent: var(--surface-secondary);
-    --accent-foreground: #3B82F6;
-    --destructive: oklch(0.704 0.191 22.216);
+    --accent-foreground: var(--text-primary);
+    --destructive: oklch(0.6 0.2 25);
     --border: var(--border-primary);
     --input: var(--border-primary);
-    --ring: #3B82F6;
-    --chart-1: #3B82F6;
-    --chart-2: #10B981;
-    --chart-3: #F59E0B;
-    --chart-4: #EF4444;
-    --chart-5: #94A3B8;
+    --ring: oklch(0.6 0.1 260);
+    --chart-1: oklch(0.6 0.1 260);
+    --chart-2: oklch(0.7 0.1 220);
+    --chart-3: oklch(0.8 0.1 180);
+    --chart-4: oklch(0.9 0.1 140);
+    --chart-5: oklch(0.7 0.1 300);
 
-    --sidebar: #0E1322;
+    --sidebar: var(--surface);
     --sidebar-foreground: var(--text-primary);
-    --sidebar-primary: #3B82F6;
+    --sidebar-primary: oklch(0.6 0.1 260);
     --sidebar-primary-foreground: #ffffff;
     --sidebar-accent: var(--surface-secondary);
-    --sidebar-accent-foreground: #3B82F6;
-    --sidebar-border: rgba(51, 65, 85, 0.6);
-    --sidebar-ring: #3B82F6;
-    --sidebar-active: #131B2E;
-    --sidebar-active-foreground: #3B82F6;
+    --sidebar-accent-foreground: var(--text-primary);
+    --sidebar-border: var(--border-primary);
+    --sidebar-ring: oklch(0.6 0.1 260);
+    --sidebar-active: var(--surface-elevated);
+    --sidebar-active-foreground: #60a5fa;
 }
 
 /* Light mode dynamic overrides for components */
