@@ -207,10 +207,10 @@ export function ShopkeeperVoiceDemo() {
             <Sparkles className="size-3.5 text-cyan-400" />
             <span>Interactive Live Voice Playground</span>
           </div>
-          <h2 className="text-2xl sm:text-4xl font-black tracking-tight text-white">
+          <h2 className="text-2xl sm:text-4xl font-black tracking-tight text-[#F8FAFC]">
             Tap the Mic or Click Any Sample Command
           </h2>
-          <p className="mt-2 text-xs sm:text-sm text-neutral-400">
+          <p className="mt-2 text-xs sm:text-sm text-[#94A3B8]">
             See how your speech is parsed in 1 second into an itemized credit (Debit) or received (Credit) ledger entry.
           </p>
         </div>
@@ -219,7 +219,7 @@ export function ShopkeeperVoiceDemo() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           
           {/* Left: Microphone & Commands (lg:col-span-5) */}
-          <div className="lg:col-span-5 space-y-6 rounded-3xl border border-indigo-500/30 bg-gradient-to-b from-neutral-900 to-neutral-950 p-6 sm:p-8 shadow-2xl">
+          <div className="lg:col-span-5 space-y-6 rounded-3xl border border-slate-700/40 bg-[#131B2E] p-6 sm:p-8 shadow-2xl">
             
             {/* Big Mic Button */}
             <div className="flex flex-col items-center justify-center text-center pt-2 pb-4">
@@ -241,7 +241,7 @@ export function ShopkeeperVoiceDemo() {
                 <Mic className="size-10 sm:size-12 text-white" />
               </button>
 
-              <p className="mt-4 text-sm font-bold text-white">
+              <p className="mt-4 text-sm font-bold text-[#F8FAFC]">
                 {isListening ? (
                   <span className="text-rose-400 animate-pulse">🔴 Listening... Speak now!</span>
                 ) : (
@@ -282,13 +282,13 @@ export function ShopkeeperVoiceDemo() {
           </div>
 
           {/* Right: Live Digital Ledger View (lg:col-span-7) */}
-          <div className="lg:col-span-7 rounded-3xl border border-white/15 bg-[#0e0e12] p-6 sm:p-8 shadow-2xl">
+          <div className="lg:col-span-7 rounded-3xl border border-slate-700/40 bg-[#131B2E] p-6 sm:p-8 shadow-2xl">
             
             {/* Ledger Header */}
-            <div className="flex items-center justify-between border-b border-white/10 pb-4 mb-4">
+            <div className="flex items-center justify-between border-b border-slate-700/40 pb-4 mb-4">
               <div>
                 <span className="text-[10px] font-bold uppercase tracking-widest text-indigo-400">Live Customer Register</span>
-                <h3 className="text-lg font-bold text-white">Digital Store Ledger</h3>
+                <h3 className="text-lg font-bold text-[#F8FAFC]">Digital Store Ledger</h3>
               </div>
               <div className="text-right">
                 <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-cyan-400 bg-cyan-950/60 px-2.5 py-1 rounded-full border border-cyan-800/40">
@@ -303,18 +303,18 @@ export function ShopkeeperVoiceDemo() {
               <div className="rounded-2xl border border-rose-900/30 bg-rose-950/20 p-3.5 text-center">
                 <p className="text-[11px] font-semibold text-rose-300">You Will Give (Payable)</p>
                 <p className="text-xl sm:text-2xl font-black text-rose-400 mt-1">₹850</p>
-                <p className="text-[10px] text-neutral-400 mt-0.5">Supplier Dues</p>
+                <p className="text-[10px] text-[#94A3B8] mt-0.5">Supplier Dues</p>
               </div>
               <div className="rounded-2xl border border-cyan-900/30 bg-cyan-950/20 p-3.5 text-center">
                 <p className="text-[11px] font-semibold text-cyan-300">You Will Get (Receivable)</p>
                 <p className="text-xl sm:text-2xl font-black text-cyan-400 mt-1">₹4,200</p>
-                <p className="text-[10px] text-neutral-400 mt-0.5">Customer Credit Balance</p>
+                <p className="text-[10px] text-[#94A3B8] mt-0.5">Customer Credit Balance</p>
               </div>
             </div>
 
             {/* List of Entries */}
             <div className="space-y-3">
-              <p className="text-xs font-semibold text-neutral-400">Recent Voice Transactions:</p>
+              <p className="text-xs font-semibold text-[#94A3B8]">Recent Voice Transactions:</p>
 
               {ledgerEntries.map((entry) => (
                 <div
@@ -336,7 +336,7 @@ export function ShopkeeperVoiceDemo() {
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
-                        <p className="text-sm font-bold text-white leading-tight">{entry.customerName}</p>
+                        <p className="text-sm font-bold text-[#F8FAFC] leading-tight">{entry.customerName}</p>
                         <span
                           className={`rounded px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
                             entry.type === "udhar"

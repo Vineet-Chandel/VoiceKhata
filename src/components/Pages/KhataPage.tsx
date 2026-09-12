@@ -194,7 +194,7 @@ export default function KhataPage() {
   }
 
   return (
-    <div className="@container/main flex flex-1 flex-col gap-6 py-6 px-4 lg:px-8 bg-[#07090E] text-[#F1F5F9]">
+    <div className="@container/main flex flex-1 flex-col gap-6 py-6 px-4 lg:px-8 bg-[#0B0F19] text-[#F8FAFC]">
       {/* ── DETAIL VIEW ────────────────────────────────────────────────────────── */}
       {selectedCustomer ? (
         <div className="max-w-4xl mx-auto w-full space-y-6">
@@ -202,7 +202,7 @@ export default function KhataPage() {
           <div className="flex items-center justify-between">
             <button
               onClick={() => setSelectedCustomerId(null)}
-              className="flex items-center gap-2 text-xs font-semibold text-[#94A3B8] hover:text-[#F1F5F9] bg-[#0F131C] border border-[#1E2638] px-3.5 py-2 rounded-[8px] transition-all cursor-pointer"
+              className="flex items-center gap-2 text-xs font-semibold text-[#94A3B8] hover:text-[#F8FAFC] bg-[#131B2E] border border-slate-700/40 px-3.5 py-2 rounded-[8px] transition-all cursor-pointer"
             >
               <ArrowLeft size={16} />
               <span>Back to Khata</span>
@@ -221,13 +221,13 @@ export default function KhataPage() {
           </div>
 
           {/* Customer Balance Banner */}
-          <div className="rounded-[12px] border border-[#1E2638] bg-[#0F131C] p-6 shadow-xs">
+          <div className="rounded-[12px] border border-slate-700/40 bg-[#131B2E] p-6 shadow-xs">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
                 <div className="flex items-center gap-2.5">
-                  <h2 className="text-xl font-bold text-[#F1F5F9]">{selectedCustomer.name}</h2>
+                  <h2 className="text-xl font-bold text-[#F8FAFC]">{selectedCustomer.name}</h2>
                   <span className={`text-[10px] font-semibold uppercase tracking-wider px-2.5 py-0.5 rounded-full ${
-                    selectedCustomer.type === "customer" ? "bg-[#1E2337] text-[#818CF8]" : "bg-[#161B26] text-[#94A3B8]"
+                    selectedCustomer.type === "customer" ? "bg-blue-600/20 text-blue-400 border border-blue-500/30" : "bg-[#0E1322] text-[#94A3B8]"
                   }`}>
                     {selectedCustomer.type}
                   </span>
@@ -263,17 +263,17 @@ export default function KhataPage() {
             </div>
 
             {/* Quick action buttons */}
-            <div className="flex flex-wrap items-center gap-3 pt-5 mt-5 border-t border-[#1E2638]">
+            <div className="flex flex-wrap items-center gap-3 pt-5 mt-5 border-t border-slate-700/40">
               <button
                 onClick={() => setShowVoiceInCustomer(!showVoiceInCustomer)}
-                className="flex items-center gap-2 h-9 px-4 rounded-[8px] bg-[#5C6BC0] hover:bg-[#4F46E5] text-white text-xs font-semibold shadow-xs transition-all cursor-pointer"
+                className="flex items-center gap-2 h-9 px-4 rounded-[8px] bg-[#2563EB] hover:bg-[#4F46E5] text-white text-xs font-semibold shadow-xs transition-all cursor-pointer"
               >
                 <Mic size={14} />
                 <span>Record by voice</span>
               </button>
               <button
                 onClick={() => setShowAddEntry(true)}
-                className="flex items-center gap-1.5 h-9 px-4 rounded-[8px] border border-[#1E2638] bg-[#161B26] hover:bg-[#1E2337] text-xs font-semibold text-[#F1F5F9] shadow-xs transition-all cursor-pointer"
+                className="flex items-center gap-1.5 h-9 px-4 rounded-[8px] border border-slate-700/40 bg-[#0E1322] hover:bg-[#131B2E] text-xs font-semibold text-[#F8FAFC] shadow-xs transition-all cursor-pointer"
               >
                 <Plus size={14} />
                 <span>Add Entry Manually</span>
@@ -282,7 +282,7 @@ export default function KhataPage() {
 
             {/* In-ledger Voice Action Banner */}
             {showVoiceInCustomer && (
-              <div className="mt-4 pt-4 border-t border-[#1E2638]">
+              <div className="mt-4 pt-4 border-t border-slate-700/40">
                 <VoiceActionBanner
                   onAddTransaction={addTransaction}
                   onDeleteTransaction={deleteTransaction}
@@ -293,10 +293,10 @@ export default function KhataPage() {
           </div>
 
           {/* Chronological Ledger */}
-          <div className="rounded-[12px] border border-[#1E2638] bg-[#0F131C] p-6 shadow-xs space-y-4">
+          <div className="rounded-[12px] border border-slate-700/40 bg-[#131B2E] p-6 shadow-xs space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-base font-semibold text-[#F1F5F9]">Chronological Ledger</h3>
+                <h3 className="text-base font-semibold text-[#F8FAFC]">Chronological Ledger</h3>
                 <p className="text-xs text-[#64748B] mt-0.5">
                   Complete history of money received and credit given
                 </p>
@@ -360,7 +360,7 @@ export default function KhataPage() {
           {/* Header */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <h1 className="text-2xl font-bold tracking-tight text-[#F1F5F9]">Khata</h1>
+              <h1 className="text-2xl font-bold tracking-tight text-[#F8FAFC]">Khata</h1>
               <p className="text-xs sm:text-sm text-[#94A3B8] mt-0.5">
                 Customers, suppliers, and balances in one place.
               </p>
@@ -368,7 +368,7 @@ export default function KhataPage() {
 
             <button
               onClick={() => setShowAddCustomer(true)}
-              className="flex items-center justify-center gap-2 h-10 px-4 rounded-[8px] bg-[#5C6BC0] hover:bg-[#4F5B93] active:scale-[0.98] text-white text-xs font-semibold shadow-xs transition-all cursor-pointer self-start sm:self-auto"
+              className="flex items-center justify-center gap-2 h-10 px-4 rounded-[8px] bg-[#2563EB] hover:bg-[#4F5B93] active:scale-[0.98] text-white text-xs font-semibold shadow-xs transition-all cursor-pointer self-start sm:self-auto"
             >
               <Plus size={16} />
               <span>Add Customer / Supplier</span>
@@ -377,7 +377,7 @@ export default function KhataPage() {
 
           {/* Top Summary Banner */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="rounded-[10px] border border-[#1E2638] bg-[#0F131C] p-5 shadow-xs">
+            <div className="rounded-[10px] border border-slate-700/40 bg-[#131B2E] p-5 shadow-xs">
               <p className="text-xs font-medium text-[#94A3B8]">Total to receive</p>
               <div className="flex items-center gap-1.5 mt-1">
                 <ArrowDownRight size={22} className="text-[#34D399]" />
@@ -390,7 +390,7 @@ export default function KhataPage() {
               </p>
             </div>
 
-            <div className="rounded-[10px] border border-[#1E2638] bg-[#0F131C] p-5 shadow-xs">
+            <div className="rounded-[10px] border border-slate-700/40 bg-[#131B2E] p-5 shadow-xs">
               <p className="text-xs font-medium text-[#94A3B8]">Total to pay</p>
               <div className="flex items-center gap-1.5 mt-1">
                 <ArrowUpRight size={22} className="text-[#F87171]" />
@@ -403,7 +403,7 @@ export default function KhataPage() {
               </p>
             </div>
 
-            <div className="rounded-[10px] border border-[#1E2638] bg-[#0F131C] p-5 shadow-xs">
+            <div className="rounded-[10px] border border-slate-700/40 bg-[#131B2E] p-5 shadow-xs">
               <p className="text-xs font-medium text-[#94A3B8]">Overdue</p>
               <div className="flex items-center gap-1.5 mt-1">
                 <AlertTriangle size={20} className="text-[#FBBF24]" />
@@ -418,7 +418,7 @@ export default function KhataPage() {
           </div>
 
           {/* Controls: Search + Filter Tabs */}
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 bg-[#0F131C] p-3 rounded-[10px] border border-[#1E2638]">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 bg-[#131B2E] p-3 rounded-[10px] border border-slate-700/40">
             <div className="relative w-full sm:w-80">
               <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#64748B]" />
               <input
@@ -426,7 +426,7 @@ export default function KhataPage() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search customer by name or phone..."
-                className="w-full h-9 pl-9 pr-3 text-xs rounded-[8px] border border-[#1E2638] bg-[#07090E] text-[#F1F5F9] placeholder-[#64748B] focus:outline-none focus:border-[#5C6BC0]"
+                className="w-full h-9 pl-9 pr-3 text-xs rounded-[8px] border border-slate-700/40 bg-[#0B0F19] text-[#F8FAFC] placeholder-[#64748B] focus:outline-none focus:border-blue-500"
               />
             </div>
 
@@ -435,8 +435,8 @@ export default function KhataPage() {
                 onClick={() => setFilterType("all")}
                 className={`px-3 py-1.5 rounded-[6px] text-xs font-medium transition-all cursor-pointer ${
                   filterType === "all"
-                    ? "bg-[#5C6BC0] text-white"
-                    : "text-[#94A3B8] hover:bg-[#161B26]"
+                    ? "bg-[#2563EB] text-white"
+                    : "text-[#94A3B8] hover:bg-[#0E1322]"
                 }`}
               >
                 All ({customerList.length})
@@ -445,8 +445,8 @@ export default function KhataPage() {
                 onClick={() => setFilterType("customer")}
                 className={`px-3 py-1.5 rounded-[6px] text-xs font-medium transition-all cursor-pointer ${
                   filterType === "customer"
-                    ? "bg-[#5C6BC0] text-white"
-                    : "text-[#94A3B8] hover:bg-[#161B26]"
+                    ? "bg-[#2563EB] text-white"
+                    : "text-[#94A3B8] hover:bg-[#0E1322]"
                 }`}
               >
                 Customers
@@ -455,8 +455,8 @@ export default function KhataPage() {
                 onClick={() => setFilterType("supplier")}
                 className={`px-3 py-1.5 rounded-[6px] text-xs font-medium transition-all cursor-pointer ${
                   filterType === "supplier"
-                    ? "bg-[#5C6BC0] text-white"
-                    : "text-[#94A3B8] hover:bg-[#161B26]"
+                    ? "bg-[#2563EB] text-white"
+                    : "text-[#94A3B8] hover:bg-[#0E1322]"
                 }`}
               >
                 Suppliers
@@ -465,9 +465,9 @@ export default function KhataPage() {
           </div>
 
           {/* Gesture Guidance Banner */}
-          <div className="flex items-center justify-between px-3.5 py-2.5 rounded-[8px] bg-[#1E2337]/50 border border-[#5C6BC0]/30 text-xs text-[#818CF8]">
+          <div className="flex items-center justify-between px-3.5 py-2.5 rounded-[8px] bg-[#0E1322] border border-blue-500/30 text-xs text-[#60A5FA]">
             <div className="flex items-center gap-2">
-              <MoveHorizontal size={14} className="animate-pulse text-[#818CF8]" />
+              <MoveHorizontal size={14} className="animate-pulse text-[#60A5FA]" />
               <span>
                 <strong>Interactive Gestures:</strong> Swipe customer row <strong>Right 👉</strong> to quickly record payment, or <strong>Left 👈</strong> for instant WhatsApp reminder.
               </span>
@@ -491,11 +491,11 @@ export default function KhataPage() {
           </AnimatePresence>
 
           {/* Customer Rows List with Tactile Swipe Gestures */}
-          <div className="rounded-[10px] border border-[#1E2638] bg-[#0F131C] divide-y divide-[#1E2638] overflow-hidden shadow-xs">
+          <div className="rounded-[10px] border border-slate-700/40 bg-[#131B2E] divide-y divide-slate-700/40 overflow-hidden shadow-xs">
             {filteredCustomers.length === 0 ? (
               <div className="py-16 text-center text-xs text-[#64748B] space-y-2">
                 <Users size={32} className="mx-auto text-[#64748B]/40" />
-                <p className="text-sm font-semibold text-[#F1F5F9]">No customers found</p>
+                <p className="text-sm font-semibold text-[#F8FAFC]">No customers found</p>
                 <p>Try searching with another name or add a new customer.</p>
               </div>
             ) : (
@@ -510,7 +510,7 @@ export default function KhataPage() {
                     </div>
 
                     {/* Right Action (Swipe Left) */}
-                    <div className="flex items-center gap-2 text-xs font-bold text-[#818CF8] bg-[#1E2337] px-3 py-1.5 rounded-full border border-[#5C6BC0]">
+                    <div className="flex items-center gap-2 text-xs font-bold text-[#60A5FA] bg-[#0E1322] px-3 py-1.5 rounded-full border border-blue-500">
                       <span>WhatsApp Reminder</span>
                       <MessageSquare size={14} />
                     </div>
@@ -536,17 +536,17 @@ export default function KhataPage() {
                       }
                     }}
                     onClick={() => setSelectedCustomerId(cust.id)}
-                    className="relative z-10 p-4 bg-[#0F131C] hover:bg-[#161B26] transition-colors flex items-center justify-between gap-4 cursor-grab active:cursor-grabbing"
+                    className="relative z-10 p-4 bg-[#131B2E] hover:bg-[#0E1322] transition-colors flex items-center justify-between gap-4 cursor-grab active:cursor-grabbing"
                   >
                     <div className="flex items-center gap-3.5 min-w-0">
-                      <div className="flex items-center justify-center size-10 rounded-full bg-[#1E2337] text-[#818CF8] font-bold text-sm shrink-0">
+                      <div className="flex items-center justify-center size-10 rounded-full bg-blue-600/20 text-blue-400 border border-blue-500/30 font-bold text-sm shrink-0">
                         {cust.name.charAt(0)}
                       </div>
                       <div className="min-w-0">
                         <div className="flex items-center gap-2">
-                          <h3 className="text-sm font-semibold text-[#F1F5F9] truncate">{cust.name}</h3>
+                          <h3 className="text-sm font-semibold text-[#F8FAFC] truncate">{cust.name}</h3>
                           <span className={`text-[10px] font-semibold uppercase px-2 py-0.5 rounded-full ${
-                            cust.type === "customer" ? "bg-[#1E2337] text-[#818CF8]" : "bg-[#161B26] text-[#94A3B8]"
+                            cust.type === "customer" ? "bg-blue-600/20 text-blue-400 border border-blue-500/30" : "bg-[#0E1322] text-[#94A3B8]"
                           }`}>
                             {cust.type}
                           </span>
@@ -589,8 +589,8 @@ export default function KhataPage() {
       {/* ── MODAL: ADD CUSTOMER ────────────────────────────────────────────────── */}
       {showAddCustomer && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-xs p-4">
-          <div className="bg-[#0F131C] rounded-[12px] border border-[#1E2638] max-w-md w-full p-6 space-y-4 shadow-2xl">
-            <h3 className="text-base font-bold text-[#F1F5F9]">Add Customer or Supplier</h3>
+          <div className="bg-[#131B2E] rounded-[12px] border border-slate-700/40 max-w-md w-full p-6 space-y-4 shadow-2xl">
+            <h3 className="text-base font-bold text-[#F8FAFC]">Add Customer or Supplier</h3>
             <form onSubmit={handleCreateCustomer} className="space-y-3.5">
               <div>
                 <label className="text-xs font-medium text-[#94A3B8] block mb-1">Name</label>
@@ -600,7 +600,7 @@ export default function KhataPage() {
                   value={newCustName}
                   onChange={(e) => setNewCustName(e.target.value)}
                   placeholder="e.g. Ramesh Kumar"
-                  className="w-full h-9 px-3 text-xs rounded-[8px] border border-[#1E2638] bg-[#07090E] text-[#F1F5F9] placeholder-[#64748B] focus:outline-none focus:border-[#5C6BC0]"
+                  className="w-full h-9 px-3 text-xs rounded-[8px] border border-slate-700/40 bg-[#0B0F19] text-[#F8FAFC] placeholder-[#64748B] focus:outline-none focus:border-blue-500"
                 />
               </div>
 
@@ -611,7 +611,7 @@ export default function KhataPage() {
                   value={newCustPhone}
                   onChange={(e) => setNewCustPhone(e.target.value)}
                   placeholder="98765 43210"
-                  className="w-full h-9 px-3 text-xs rounded-[8px] border border-[#1E2638] bg-[#07090E] text-[#F1F5F9] placeholder-[#64748B] focus:outline-none focus:border-[#5C6BC0]"
+                  className="w-full h-9 px-3 text-xs rounded-[8px] border border-slate-700/40 bg-[#0B0F19] text-[#F8FAFC] placeholder-[#64748B] focus:outline-none focus:border-blue-500"
                 />
               </div>
 
@@ -621,10 +621,10 @@ export default function KhataPage() {
                   <select
                     value={newCustType}
                     onChange={(e) => setNewCustType(e.target.value as any)}
-                    className="w-full h-9 px-2 text-xs rounded-[8px] border border-[#1E2638] bg-[#07090E] text-[#F1F5F9] focus:outline-none focus:border-[#5C6BC0]"
+                    className="w-full h-9 px-2 text-xs rounded-[8px] border border-slate-700/40 bg-[#0B0F19] text-[#F8FAFC] focus:outline-none focus:border-blue-500"
                   >
-                    <option value="customer" className="bg-[#0F131C] text-[#F1F5F9]">Customer</option>
-                    <option value="supplier" className="bg-[#0F131C] text-[#F1F5F9]">Supplier</option>
+                    <option value="customer" className="bg-[#131B2E] text-[#F8FAFC]">Customer</option>
+                    <option value="supplier" className="bg-[#131B2E] text-[#F8FAFC]">Supplier</option>
                   </select>
                 </div>
                 <div>
@@ -634,22 +634,22 @@ export default function KhataPage() {
                     value={newCustBalance}
                     onChange={(e) => setNewCustBalance(e.target.value)}
                     placeholder="0"
-                    className="w-full h-9 px-3 text-xs rounded-[8px] border border-[#1E2638] bg-[#07090E] text-[#F1F5F9] placeholder-[#64748B] focus:outline-none focus:border-[#5C6BC0]"
+                    className="w-full h-9 px-3 text-xs rounded-[8px] border border-slate-700/40 bg-[#0B0F19] text-[#F8FAFC] placeholder-[#64748B] focus:outline-none focus:border-blue-500"
                   />
                 </div>
               </div>
 
-              <div className="flex items-center justify-end gap-2 pt-3 border-t border-[#1E2638]">
+              <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-700/40">
                 <button
                   type="button"
                   onClick={() => setShowAddCustomer(false)}
-                  className="h-9 px-4 rounded-[8px] border border-[#1E2638] text-xs font-medium text-[#94A3B8] hover:bg-[#161B26] cursor-pointer"
+                  className="h-9 px-4 rounded-[8px] border border-slate-700/40 text-xs font-medium text-[#94A3B8] hover:bg-[#0E1322] cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="h-9 px-5 rounded-[8px] bg-[#5C6BC0] hover:bg-[#4F5B93] text-white text-xs font-semibold cursor-pointer shadow-xs"
+                  className="h-9 px-5 rounded-[8px] bg-[#2563EB] hover:bg-[#4F5B93] text-white text-xs font-semibold cursor-pointer shadow-xs"
                 >
                   Save Customer
                 </button>
@@ -662,8 +662,8 @@ export default function KhataPage() {
       {/* ── MODAL: MANUAL ENTRY FOR CUSTOMER ───────────────────────────────────── */}
       {showAddEntry && selectedCustomer && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-xs p-4">
-          <div className="bg-[#0F131C] rounded-[12px] border border-[#1E2638] max-w-md w-full p-6 space-y-4 shadow-2xl">
-            <h3 className="text-base font-bold text-[#F1F5F9]">
+          <div className="bg-[#131B2E] rounded-[12px] border border-slate-700/40 max-w-md w-full p-6 space-y-4 shadow-2xl">
+            <h3 className="text-base font-bold text-[#F8FAFC]">
               Add Entry for {selectedCustomer.name}
             </h3>
             <form onSubmit={handleAddCustomerEntry} className="space-y-3.5">
@@ -676,7 +676,7 @@ export default function KhataPage() {
                     className={`h-9 rounded-[8px] text-xs font-semibold flex items-center justify-center gap-1.5 border transition-all cursor-pointer ${
                       entryType === "Credit"
                         ? "bg-[#064E3B]/40 border-[#10B981] text-[#34D399]"
-                        : "border-[#1E2638] bg-[#07090E] text-[#94A3B8] hover:bg-[#161B26]"
+                        : "border-slate-700/40 bg-[#0B0F19] text-[#94A3B8] hover:bg-[#0E1322]"
                     }`}
                   >
                     <ArrowDownRight size={14} />
@@ -688,7 +688,7 @@ export default function KhataPage() {
                     className={`h-9 rounded-[8px] text-xs font-semibold flex items-center justify-center gap-1.5 border transition-all cursor-pointer ${
                       entryType === "Debit"
                         ? "bg-[#7F1D1D]/40 border-[#EF4444] text-[#F87171]"
-                        : "border-[#1E2638] bg-[#07090E] text-[#94A3B8] hover:bg-[#161B26]"
+                        : "border-slate-700/40 bg-[#0B0F19] text-[#94A3B8] hover:bg-[#0E1322]"
                     }`}
                   >
                     <ArrowUpRight size={14} />
@@ -705,7 +705,7 @@ export default function KhataPage() {
                   value={entryAmount}
                   onChange={(e) => setEntryAmount(e.target.value)}
                   placeholder="e.g. 1200"
-                  className="w-full h-9 px-3 text-xs rounded-[8px] border border-[#1E2638] bg-[#07090E] text-[#F1F5F9] placeholder-[#64748B] font-bold focus:outline-none focus:border-[#5C6BC0]"
+                  className="w-full h-9 px-3 text-xs rounded-[8px] border border-slate-700/40 bg-[#0B0F19] text-[#F8FAFC] placeholder-[#64748B] font-bold focus:outline-none focus:border-blue-500"
                 />
               </div>
 
@@ -714,26 +714,26 @@ export default function KhataPage() {
                 <select
                   value={entryMethod}
                   onChange={(e) => setEntryMethod(e.target.value)}
-                  className="w-full h-9 px-2 text-xs rounded-[8px] border border-[#1E2638] bg-[#07090E] text-[#F1F5F9] focus:outline-none focus:border-[#5C6BC0]"
+                  className="w-full h-9 px-2 text-xs rounded-[8px] border border-slate-700/40 bg-[#0B0F19] text-[#F8FAFC] focus:outline-none focus:border-blue-500"
                 >
-                  <option value="UPI" className="bg-[#0F131C] text-[#F1F5F9]">UPI</option>
-                  <option value="Cash" className="bg-[#0F131C] text-[#F1F5F9]">Cash</option>
-                  <option value="Bank Transfer" className="bg-[#0F131C] text-[#F1F5F9]">Bank Transfer</option>
-                  <option value="Credit" className="bg-[#0F131C] text-[#F1F5F9]">Khata Credit</option>
+                  <option value="UPI" className="bg-[#131B2E] text-[#F8FAFC]">UPI</option>
+                  <option value="Cash" className="bg-[#131B2E] text-[#F8FAFC]">Cash</option>
+                  <option value="Bank Transfer" className="bg-[#131B2E] text-[#F8FAFC]">Bank Transfer</option>
+                  <option value="Credit" className="bg-[#131B2E] text-[#F8FAFC]">Khata Credit</option>
                 </select>
               </div>
 
-              <div className="flex items-center justify-end gap-2 pt-3 border-t border-[#1E2638]">
+              <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-700/40">
                 <button
                   type="button"
                   onClick={() => setShowAddEntry(false)}
-                  className="h-9 px-4 rounded-[8px] border border-[#1E2638] text-xs font-medium text-[#94A3B8] hover:bg-[#161B26] cursor-pointer"
+                  className="h-9 px-4 rounded-[8px] border border-slate-700/40 text-xs font-medium text-[#94A3B8] hover:bg-[#0E1322] cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="h-9 px-5 rounded-[8px] bg-[#5C6BC0] hover:bg-[#4F5B93] text-white text-xs font-semibold cursor-pointer shadow-xs"
+                  className="h-9 px-5 rounded-[8px] bg-[#2563EB] hover:bg-[#4F5B93] text-white text-xs font-semibold cursor-pointer shadow-xs"
                 >
                   Save to Khata
                 </button>

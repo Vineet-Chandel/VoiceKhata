@@ -22,6 +22,29 @@ type AuthContextType = {
   logOut: () => Promise<void>
 }
 
+const DEMO_USER: any = {
+  uid: "demo-shopkeeper-uid",
+  email: "sharma.store@voicekhata.in",
+  displayName: "Sharma Kirana Store",
+  emailVerified: true,
+  isAnonymous: true,
+  providerData: [{ providerId: "password" }],
+}
+
+const DEMO_PROFILE: UserProfile = {
+  firebase_uid: "demo-shopkeeper-uid",
+  full_name: "Sharma Kirana Store",
+  country: "India",
+  currency: "INR",
+  monthly_income: 150000,
+  income_source: "Retail Business",
+  savings_goal: 500000,
+  financial_experience: "Intermediate",
+  dob: "1988-04-12",
+  created_at: new Date().toISOString(),
+  profile_pic: null,
+}
+
 const AuthContext = createContext<AuthContextType>({
   user: null,
   profile: null,
@@ -35,18 +58,54 @@ const AuthContext = createContext<AuthContextType>({
 })
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(() => auth.currentUser)
-  const [profile, setProfile] = useState<UserProfile | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [loggingOut, setLoggingOut] = useState(false)
-  const [supabaseReady, setSupabaseReady] = useState(false)
-
-  // Clean any old demo state from browser storage
-  useEffect(() => {
+  const [isDemo, setIsDemo] = useState<boolean>(() => {
     try {
-      localStorage.removeItem("voicekhata_demo_user")
-      localStorage.removeItem("voicekhata_demo_txs")
+      return (
+        typeof window !== "undefined" &&
+        (localStorage.getItem("voicekhata_demo_user") === "true" ||
+          new URLSearchParams(window.location.search).get("demo") === "true")
+      )
+    } catch {
+      return false
+    }
+  })
+
+  const [user, setUser] = useState<User | null>(() => {
+    if (auth.currentUser) return auth.currentUser
+    if (
+      typeof window !== "undefined" &&
+      (localStorage.getItem("voicekhata_demo_user") === "true" ||
+        new URLSearchParams(window.location.search).get("demo") === "true")
+    ) {
+      return DEMO_USER
+    }
+    return null
+  })
+
+  const [profile, setProfile] = useState<UserProfile | null>(() => {
+    if (
+      typeof window !== "undefined" &&
+      (localStorage.getItem("voicekhata_demo_user") === "true" ||
+        new URLSearchParams(window.location.search).get("demo") === "true")
+    ) {
+      return DEMO_PROFILE
+    }
+    return null
+  })
+
+  const [loading, setLoading] = useState(false)
+  const [loggingOut, setLoggingOut] = useState(false)
+  const [supabaseReady, setSupabaseReady] = useState(() => isDemo)
+
+  const enableDemoMode = useCallback(() => {
+    try {
+      localStorage.setItem("voicekhata_demo_user", "true")
     } catch {}
+    setIsDemo(true)
+    setUser(DEMO_USER)
+    setProfile(DEMO_PROFILE)
+    setSupabaseReady(true)
+    setLoading(false)
   }, [])
 
   const syncUserData = useCallback(async (firebaseUser: User) => {
@@ -94,14 +153,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       if (auth && typeof onAuthStateChanged === "function") {
         unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-          setUser(firebaseUser)
-
           if (firebaseUser) {
+            setUser(firebaseUser)
+            setIsDemo(false)
             await syncUserData(firebaseUser)
           } else {
-            clearScopedSupabase()
-            setProfile(null)
-            setSupabaseReady(false)
+            // Only clear user if not in demo mode
+            const isDemoActive = typeof window !== "undefined" && localStorage.getItem("voicekhata_demo_user") === "true"
+            if (isDemoActive) {
+              setUser(DEMO_USER)
+              setProfile(DEMO_PROFILE)
+              setIsDemo(true)
+              setSupabaseReady(true)
+            } else {
+              clearScopedSupabase()
+              setUser(null)
+              setProfile(null)
+              setSupabaseReady(false)
+            }
           }
 
           setLoading(false)
@@ -125,6 +194,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setLoggingOut(true)
     setSupabaseReady(false)
     try {
+      try {
+        localStorage.removeItem("voicekhata_demo_user")
+      } catch {}
+      setIsDemo(false)
       clearScopedSupabase()
       await signOut(auth)
       setUser(null)
@@ -142,8 +215,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         loading,
         loggingOut,
         supabaseReady,
-        isDemoMode: false,
-        enableDemoMode: () => {},
+        isDemoMode: isDemo,
+        enableDemoMode,
         refreshProfile,
         logOut,
       }}
