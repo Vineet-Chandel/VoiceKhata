@@ -89,9 +89,10 @@ export default function TransactionsPage() {
         <div className="flex items-center justify-between px-4 lg:px-6">
           <div>
             <h1 className="text-2xl font-semibold tracking-tight">Transactions</h1>
-            <p className="text-sm text-muted-foreground mt-0.5">
-              {loading ? "Loading..." : `${filtered.length} transaction${filtered.length !== 1 ? "s" : ""} found`}
-              {" | Mode: " + window.localStorage.getItem("voicekhata:appMode")}
+            <p className="text-sm text-text-secondary mt-0.5">
+              {loading
+                ? "Loading..."
+                : `${filtered.length} transaction${filtered.length !== 1 ? "s" : ""} found | Mode: ${window.localStorage.getItem("voicekhata:appMode") || "PERSONAL"}`}
             </p>
           </div>
           <AddTransactionDialog

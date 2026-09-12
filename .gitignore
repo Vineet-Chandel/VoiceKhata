@@ -1,6 +1,8 @@
 node_modules
 .env
 dist/
+dev-dist/
+scratch/
 
 .env.local
 .env.*.local

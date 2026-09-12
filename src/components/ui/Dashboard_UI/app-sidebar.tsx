@@ -40,7 +40,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       { title: "Reports", url: "/dashboard/reports", icon: IconReport },
       { title: "AI Assistant", url: "/dashboard/ai-assistant", icon: IconRobot },
       { title: "Money Growth", url: "/dashboard/growth", icon: IconFlame },
-      // { title:"Notifications", url: "/dashboard/notifications", icon: IconBell },
     ],
   }
 

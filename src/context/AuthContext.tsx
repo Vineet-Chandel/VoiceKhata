@@ -16,6 +16,8 @@ type AuthContextType = {
   loading: boolean
   loggingOut: boolean
   supabaseReady: boolean
+  isDemoMode: boolean
+  enableDemoMode: () => void
   refreshProfile: () => Promise<void>
   logOut: () => Promise<void>
 }
@@ -26,6 +28,8 @@ const AuthContext = createContext<AuthContextType>({
   loading: true,
   loggingOut: false,
   supabaseReady: false,
+  isDemoMode: false,
+  enableDemoMode: () => {},
   refreshProfile: async () => {},
   logOut: async () => {},
 })
@@ -37,50 +41,83 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loggingOut, setLoggingOut] = useState(false)
   const [supabaseReady, setSupabaseReady] = useState(false)
 
+  // Clean any old demo state from browser storage
+  useEffect(() => {
+    try {
+      localStorage.removeItem("voicekhata_demo_user")
+      localStorage.removeItem("voicekhata_demo_txs")
+    } catch {}
+  }, [])
+
   const syncUserData = useCallback(async (firebaseUser: User) => {
     try {
       startSupabaseKeepAlive()
       await getScopedSupabase(firebaseUser.uid, { force: true })
 
-      // Sync or create user profile in Supabase
-      const userProf = await ensureUserProfile(
-        firebaseUser.uid,
-        firebaseUser.displayName,
-        firebaseUser.email
-      )
-      setProfile(userProf)
+      try {
+        await ensureUserProfile({
+          displayName: firebaseUser.displayName || undefined,
+          photoURL: firebaseUser.photoURL || undefined,
+        })
+      } catch (err) {
+        console.warn("Could not ensure profile:", err)
+      }
+
+      try {
+        const p = await getUserProfile()
+        setProfile(p)
+      } catch (err) {
+        console.warn("Could not fetch profile:", err)
+      }
+
       setSupabaseReady(true)
     } catch (err) {
-      console.warn("Notice during Supabase sync:", err)
-      // Keep app responsive
-      setSupabaseReady(true)
+      console.warn("Scoped Supabase client failed:", err)
+      setSupabaseReady(false)
     }
   }, [])
 
   const refreshProfile = useCallback(async () => {
-    if (!auth.currentUser) return
-    const prof = await getUserProfile(auth.currentUser.uid)
-    if (prof) setProfile(prof)
-  }, [])
+    if (!user) return
+    try {
+      const p = await getUserProfile()
+      setProfile(p)
+    } catch (err) {
+      console.warn("Failed to refresh profile:", err)
+    }
+  }, [user])
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-      if (firebaseUser) {
-        setUser(firebaseUser)
-        setSupabaseReady(false)
-        await syncUserData(firebaseUser)
+    let unsubscribe = () => {}
+
+    try {
+      if (auth && typeof onAuthStateChanged === "function") {
+        unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+          setUser(firebaseUser)
+
+          if (firebaseUser) {
+            await syncUserData(firebaseUser)
+          } else {
+            clearScopedSupabase()
+            setProfile(null)
+            setSupabaseReady(false)
+          }
+
+          setLoading(false)
+        })
       } else {
-        clearScopedSupabase()
-        setUser(null)
-        setProfile(null)
-        setSupabaseReady(false)
+        setLoading(false)
       }
-
+    } catch (err) {
+      console.warn("Auth initialization error caught:", err)
       setLoading(false)
-      setLoggingOut(false)
-    })
+    }
 
-    return () => unsubscribe()
+    return () => {
+      try {
+        unsubscribe()
+      } catch (e) {}
+    }
   }, [syncUserData])
 
   const logOut = async () => {
@@ -104,6 +141,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         loading,
         loggingOut,
         supabaseReady,
+        isDemoMode: false,
+        enableDemoMode: () => {},
         refreshProfile,
         logOut,
       }}

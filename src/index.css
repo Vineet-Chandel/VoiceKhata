@@ -5,6 +5,8 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
+    --font-heading: 'Inter', system-ui, -apple-system, sans-serif;
+    --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
     --color-bg-primary: var(--bg-primary);
     --color-surface: var(--surface);
     --color-surface-secondary: var(--surface-secondary);
@@ -13,6 +15,17 @@
     --color-text-secondary: var(--text-secondary);
     --color-text-muted: var(--text-muted);
     --color-border-primary: var(--border-primary);
+
+    --color-brand-primary: var(--brand-primary);
+    --color-brand-dark: var(--brand-dark);
+    --color-brand-soft: var(--brand-soft);
+
+    --color-success: var(--success);
+    --color-success-soft: var(--success-soft);
+    --color-warning: var(--warning);
+    --color-warning-soft: var(--warning-soft);
+    --color-danger: var(--danger);
+    --color-danger-soft: var(--danger-soft);
 
     --radius-sm: calc(var(--radius) - 4px);
     --radius-md: calc(var(--radius) - 2px);
@@ -75,45 +88,46 @@
     --card-foreground: var(--text-primary);
     --popover: var(--surface-elevated);
     --popover-foreground: var(--text-primary);
-    --primary: oklch(0.4 0.1 260); /* Deep Blue */
+    --primary: #5C6BC0;
     --primary-foreground: #ffffff;
     --secondary: var(--surface-secondary);
     --secondary-foreground: var(--text-primary);
     --muted: var(--surface-secondary);
     --muted-foreground: var(--text-muted);
     --accent: var(--surface-secondary);
-    --accent-foreground: var(--text-primary);
-    --destructive: oklch(0.5 0.2 25); /* Professional Red */
+    --accent-foreground: #818CF8;
+    --destructive: oklch(0.577 0.245 27.325);
     --border: var(--border-primary);
     --input: var(--border-primary);
-    --ring: oklch(0.5 0.1 260);
-    --chart-1: oklch(0.5 0.1 260); /* Deep Blue */
-    --chart-2: oklch(0.6 0.1 220); /* Azure */
-    --chart-3: oklch(0.7 0.1 180); /* Teal */
-    --chart-4: oklch(0.8 0.1 140); /* Green */
-    --chart-5: oklch(0.6 0.1 300); /* Purple */
+    --ring: #5C6BC0;
+    --chart-1: #5C6BC0;
+    --chart-2: #10B981;
+    --chart-3: #F59E0B;
+    --chart-4: #EF4444;
+    --chart-5: #94A3B8;
+
     --sidebar: var(--surface-secondary);
     --sidebar-foreground: var(--text-primary);
-    --sidebar-primary: oklch(0.4 0.1 260);
+    --sidebar-primary: #5C6BC0;
     --sidebar-primary-foreground: #ffffff;
     --sidebar-accent: var(--surface);
-    --sidebar-accent-foreground: var(--text-primary);
+    --sidebar-accent-foreground: #818CF8;
     --sidebar-border: var(--border-primary);
-    --sidebar-ring: oklch(0.5 0.1 260);
-    --sidebar-active: #e2e8f0;
-    --sidebar-active-foreground: #0f172a;
+    --sidebar-ring: #5C6BC0;
+    --sidebar-active: #222222;
+    --sidebar-active-foreground: #818CF8;
 }
 
 .dark {
-    /* Custom Semantic Tokens - Dark Mode (Business Professional) */
-    --bg-primary: #020617; /* Slate 950 */
-    --surface: #0f172a; /* Slate 900 */
-    --surface-secondary: #1e293b; /* Slate 800 */
-    --surface-elevated: #1e293b;
-    --text-primary: #f8fafc; /* Slate 50 */
-    --text-secondary: #94a3b8; /* Slate 400 */
-    --text-muted: #64748b; /* Slate 500 */
-    --border-primary: #334155; /* Slate 700 */
+    /* Original Deep Obsidian / Charcoal Theme with Blue Text Shade */
+    --bg-primary: #000000;
+    --surface: #0a0a0a;
+    --surface-secondary: #111111;
+    --surface-elevated: #151515;
+    --text-primary: #ffffff;
+    --text-secondary: #94A3B8; /* soft slate-blue shade */
+    --text-muted: #818CF8;     /* periwinkle blue shade */
+    --border-primary: #222222;
 
     --surface-card: #0f172a;
     --background: var(--bg-primary);
@@ -122,53 +136,58 @@
     --card-foreground: var(--text-primary);
     --popover: var(--surface-elevated);
     --popover-foreground: var(--text-primary);
-    --primary: oklch(0.7 0.1 260); /* Lighter Blue for Dark Mode */
-    --primary-foreground: #020617;
+    --primary: #5C6BC0;
+    --primary-foreground: #ffffff;
     --secondary: var(--surface-secondary);
     --secondary-foreground: var(--text-primary);
     --muted: var(--surface-secondary);
-    --muted-foreground: var(--text-muted);
+    --muted-foreground: #94A3B8;
     --accent: var(--surface-secondary);
-    --accent-foreground: var(--text-primary);
-    --destructive: oklch(0.6 0.2 25);
+    --accent-foreground: #818CF8;
+    --destructive: oklch(0.704 0.191 22.216);
     --border: var(--border-primary);
     --input: var(--border-primary);
-    --ring: oklch(0.6 0.1 260);
-    --chart-1: oklch(0.6 0.1 260);
-    --chart-2: oklch(0.7 0.1 220);
-    --chart-3: oklch(0.8 0.1 180);
-    --chart-4: oklch(0.9 0.1 140);
-    --chart-5: oklch(0.7 0.1 300);
-    --sidebar: var(--surface);
+    --ring: #5C6BC0;
+    --chart-1: #5C6BC0;
+    --chart-2: #10B981;
+    --chart-3: #F59E0B;
+    --chart-4: #EF4444;
+    --chart-5: #94A3B8;
+
+    --sidebar: #0a0a0a;
     --sidebar-foreground: var(--text-primary);
-    --sidebar-primary: oklch(0.6 0.1 260);
+    --sidebar-primary: #5C6BC0;
     --sidebar-primary-foreground: #ffffff;
     --sidebar-accent: var(--surface-secondary);
-    --sidebar-accent-foreground: var(--text-primary);
+    --sidebar-accent-foreground: #818CF8;
     --sidebar-border: var(--border-primary);
-    --sidebar-ring: oklch(0.6 0.1 260);
-    --sidebar-active: var(--surface-elevated);
-    --sidebar-active-foreground: var(--text-primary);
+    --sidebar-ring: #5C6BC0;
+    --sidebar-active: #171717;
+    --sidebar-active-foreground: #818CF8;
 }
 
 @layer base {
   * {
     @apply border-border outline-ring/50;
-    }
+  }
   body {
     @apply bg-background text-foreground;
-    /* subtle transition so theme change is smooth */
-    transition: background-color 0.2s ease, color 0.2s ease;
-    }
+    font-family: var(--font-sans);
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    font-variant-numeric: tabular-nums;
+    transition: background-color 0.15s ease, color 0.15s ease;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+    letter-spacing: -0.015em;
+  }
 }
+
 html {
   scroll-behavior: smooth;
+  background-color: var(--bg-primary);
 }
-.logo-gradient {
-  background: linear-gradient(to right, #60a5fa, #c084fc);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
+
 @media (max-width: 767px) {
   html, body {
     overflow-x: hidden;

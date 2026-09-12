@@ -2,7 +2,7 @@ import { useEffect, useState } from "react"
 import { applyActionCode, confirmPasswordReset, verifyPasswordResetCode } from "firebase/auth"
 import { auth } from "@/firebase/firebase"
 import { useSearchParams, useNavigate, Link } from "react-router-dom"
-import Logo from "@/components/ui/Navbar/logo"
+import Logo from "@/components/ui/logo"
 import { Button } from "@/components/ui/SignUp/button"
 import { CheckCircle2, XCircle, Loader2, Lock, ArrowRight } from "lucide-react"
 

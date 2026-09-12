@@ -9,16 +9,29 @@
     <link rel="icon" type="image/png" sizes="192x192" href="/logo-192.png" />
     <link rel="apple-touch-icon" href="/logo-192.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>VoiceKhata</title>
+    <title>VoiceKhata — Voice-First Digital Khata</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="manifest" href="/manifest.json" />
-    <meta name="theme-color" content="#000000" />
+    <meta name="theme-color" content="#07090E" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black" />
     <meta name="apple-mobile-web-app-title" content="VoiceKhata" />
   </head>
-  <body>
+  <body class="bg-[#07090E] text-[#F1F5F9] min-h-screen">
     <div id="root"></div>
+    <div id="global-error-display" style="display:none; position:fixed; top:0; left:0; right:0; z-index:999999; background:#881337; color:#ffe4e6; padding:16px; font-family:monospace; font-size:13px; white-space:pre-wrap; border-bottom:2px solid #f43f5e;"></div>
+    <script>
+      window.addEventListener('error', function(e) {
+        var el = document.getElementById('global-error-display');
+        if (el) {
+          el.style.display = 'block';
+          el.innerText = 'Runtime Error: ' + (e.error ? (e.error.stack || e.error.message) : e.message);
+        }
+      });
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

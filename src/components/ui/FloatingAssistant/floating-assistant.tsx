@@ -439,32 +439,32 @@ export function FloatingAssistant() {
           onMouseEnter={!isExpandedWorkspace ? handleMouseEnter : undefined}
           onMouseLeave={!isExpandedWorkspace ? handleMouseLeave : undefined}
           className={`
-            relative bg-white shadow-xl border border-black/[0.06] overflow-hidden flex flex-col w-full h-full mx-auto
+            relative bg-[#0F131C] shadow-2xl border border-[#1E2638] overflow-hidden flex flex-col w-full h-full mx-auto
             transition-all duration-[350ms] ease-[cubic-bezier(0.22,1,0.36,1)]
             ${isExpandedWorkspace && isMobile ? "rounded-none" : "rounded-2xl"}
           `}
           style={
             !isExpandedWorkspace && isCompact && !isActive
-              ? { boxShadow: "0 2px 12px rgba(0,0,0,0.08)" }
-              : { boxShadow: "0 4px 24px rgba(0,0,0,0.12), 0 1px 4px rgba(0,0,0,0.06)" }
+              ? { boxShadow: "0 2px 12px rgba(0,0,0,0.5)" }
+              : { boxShadow: "0 4px 24px rgba(0,0,0,0.7), 0 1px 4px rgba(0,0,0,0.4)" }
           }
         >
           {isExpandedWorkspace ? (
             /* ── Expanded Workspace UI ──────────────────────────────────── */
             <>
               {/* Floating Controls */}
-              <div className="absolute top-4 right-4 z-10 flex items-center gap-1 bg-white/90 backdrop-blur-md border border-black/[0.08] shadow-sm rounded-full p-1">
+              <div className="absolute top-4 right-4 z-10 flex items-center gap-1 bg-[#0F131C]/90 backdrop-blur-md border border-[#1E2638] shadow-sm rounded-full p-1">
                 <button
                   onClick={navigateToFull}
-                  className="size-8 rounded-full flex items-center justify-center hover:bg-black/[0.06] text-black/50 hover:text-black/80 transition-colors cursor-pointer"
+                  className="size-8 rounded-full flex items-center justify-center hover:bg-white/10 text-white/60 hover:text-white transition-colors cursor-pointer"
                   title="Open full assistant"
                 >
                   <ExternalLink size={14} />
                 </button>
-                <div className="w-px h-4 bg-black/[0.08]" />
+                <div className="w-px h-4 bg-[#1E2638]" />
                 <button
                   onClick={minimizeWorkspace}
-                  className="size-8 rounded-full flex items-center justify-center hover:bg-black/[0.06] text-black/50 hover:text-black/80 transition-colors cursor-pointer"
+                  className="size-8 rounded-full flex items-center justify-center hover:bg-white/10 text-white/60 hover:text-white transition-colors cursor-pointer"
                   title="Minimize"
                 >
                   <Minus size={14} />
@@ -472,7 +472,7 @@ export function FloatingAssistant() {
               </div>
 
               {/* Chat Body */}
-              <div className="flex flex-col flex-1 overflow-hidden bg-white">
+              <div className="flex flex-col flex-1 overflow-hidden bg-[#0F131C]">
                 <ChatWindow
                   messages={messages}
                   loading={loading}
@@ -485,12 +485,12 @@ export function FloatingAssistant() {
                   onReply={(msg) => setReplyingTo(msg)}
                   onConfirmAll={confirmMultiTransactions}
                   onCancel={cancelMultiTransactions}
-                  variant="light"
+                  variant="dark"
                 />
               </div>
 
               {/* Input */}
-              <div className="px-4 py-3 bg-white border-t border-black/[0.06] shrink-0">
+              <div className="px-4 py-3 bg-[#0F131C] border-t border-[#1E2638] shrink-0">
                 <ChatInput
                   onSend={(msg) => {
                     sendMessage(msg, replyingTo ? { id: replyingTo.id, role: replyingTo.role, content: replyingTo.content } : undefined)
@@ -503,7 +503,7 @@ export function FloatingAssistant() {
                   onStartGuided={startGuidedFlow}
                   onStartBudgetGuided={() => startBudgetFlow()}
                   onCancelGuided={cancelGuidedFlow}
-                  variant="light"
+                  variant="dark"
                 />
               </div>
             </>
@@ -512,7 +512,7 @@ export function FloatingAssistant() {
             <>
               {/* Listening pulse ring */}
               {isListening && (
-                <span className="absolute inset-0 border-2 border-violet-400/30 listening-pulse-ring pointer-events-none" />
+                <span className="absolute inset-0 border-2 border-indigo-400/30 listening-pulse-ring pointer-events-none" />
               )}
 
               <div className={`flex items-center transition-all duration-[250ms] ${isCompact && !isActive ? "px-3 py-2" : "px-3 py-2.5"}`}>
@@ -520,16 +520,16 @@ export function FloatingAssistant() {
                   <div className="flex items-center gap-3 w-full">
                     <button
                       onClick={() => { stopListening(); setTimeout(resetVoice, 50) }}
-                      className="size-8 rounded-xl bg-black/[0.04] flex items-center justify-center text-black/40 hover:text-black/70 hover:bg-black/[0.08] transition-all cursor-pointer shrink-0"
+                      className="size-8 rounded-xl bg-white/5 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/10 transition-all cursor-pointer shrink-0"
                     >
                       <X size={16} />
                     </button>
                     <div className="flex-1 h-8 flex items-center justify-center overflow-hidden">
-                      <VoiceWaveform analyserRef={analyserRef} isListening={true} color="rgba(0, 0, 0, 0.6)" />
+                      <VoiceWaveform analyserRef={analyserRef} isListening={true} color="rgba(129, 140, 248, 0.9)" />
                     </div>
                     <button
                       onClick={stopListening}
-                      className="size-8 rounded-xl bg-black flex items-center justify-center text-white hover:bg-black/80 transition-all cursor-pointer shrink-0"
+                      className="size-8 rounded-xl bg-[#5C6BC0] flex items-center justify-center text-white hover:bg-[#4F5B93] transition-all cursor-pointer shrink-0"
                     >
                       <Check size={15} strokeWidth={3} />
                     </button>
@@ -543,7 +543,7 @@ export function FloatingAssistant() {
                         else { setMenuOpen(true); expand() }
                       }}
                       disabled={loading}
-                      className={`size-7 shrink-0 rounded-lg flex items-center justify-center transition-all duration-150 cursor-pointer ${menuOpen ? "bg-black/[0.08] text-black/80" : "bg-black/[0.06] text-black/60 hover:bg-black/[0.08] hover:text-black/80"} disabled:opacity-30`}
+                      className={`size-7 shrink-0 rounded-lg flex items-center justify-center transition-all duration-150 cursor-pointer ${menuOpen ? "bg-white/15 text-white" : "bg-white/5 text-white/70 hover:bg-white/10 hover:text-white"} disabled:opacity-30`}
                     >
                       <Plus size={14} className={`transition-transform duration-200 ${menuOpen ? "rotate-45" : ""}`} />
                     </button>
@@ -557,13 +557,13 @@ export function FloatingAssistant() {
                       onBlur={handleBlur}
                       placeholder={loading ? "Thinking…" : isCompact && !isActive ? "Ask AI…" : pageConfig.placeholder}
                       disabled={isProcessing}
-                      className={`flex-1 bg-transparent text-[13px] text-black/80 placeholder:text-black/50 focus:outline-none disabled:opacity-40 transition-all duration-200 min-w-0 ${isCompact && !isActive ? "text-[12px]" : ""}`}
+                      className={`flex-1 bg-transparent text-[13px] text-[#F1F5F9] placeholder:text-[#64748B] focus:outline-none disabled:opacity-40 transition-all duration-200 min-w-0 ${isCompact && !isActive ? "text-[12px]" : ""}`}
                     />
 
                     <button
                       onClick={(e) => { e.stopPropagation(); handleMicClick() }}
                       disabled={loading || isProcessing}
-                      className={`size-8 shrink-0 rounded-xl flex items-center justify-center transition-all duration-150 cursor-pointer ${isListening ? "bg-violet-500 text-white" : "bg-black/[0.06] text-black/60 hover:bg-black/[0.08] hover:text-black/80"} disabled:opacity-30 active:scale-90`}
+                      className={`size-8 shrink-0 rounded-xl flex items-center justify-center transition-all duration-150 cursor-pointer ${isListening ? "bg-[#5C6BC0] text-white" : "bg-white/5 text-white/70 hover:bg-white/10 hover:text-white"} disabled:opacity-30 active:scale-90`}
                     >
                       {isProcessing ? (
                         <svg className="size-3.5 cmdbar-spinner" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" strokeDasharray="32" strokeDashoffset="12" /></svg>
@@ -575,7 +575,7 @@ export function FloatingAssistant() {
                     {canSend && (
                       <button
                         onClick={(e) => { e.stopPropagation(); handleSend() }}
-                        className="size-8 shrink-0 rounded-xl flex items-center justify-center bg-black text-white hover:bg-black/80 transition-all duration-150 cursor-pointer active:scale-90"
+                        className="size-8 shrink-0 rounded-xl flex items-center justify-center bg-[#5C6BC0] text-white hover:bg-[#4F5B93] transition-all duration-150 cursor-pointer active:scale-90"
                       >
                         {loading ? (
                           <svg className="size-3.5 cmdbar-spinner" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" strokeDasharray="32" strokeDashoffset="12" /></svg>
@@ -598,7 +598,7 @@ export function FloatingAssistant() {
               <button
                 key={text}
                 onClick={(e) => { e.stopPropagation(); handleSuggestionClick(text) }}
-                className="suggest-enter pointer-events-auto px-3 py-1.5 rounded-full text-[11px] bg-white text-black/70 border border-black/10 hover:bg-black/5 hover:text-black/90 transition-all duration-150 cursor-pointer shadow-sm active:scale-95"
+                className="suggest-enter pointer-events-auto px-3 py-1.5 rounded-full text-[11px] bg-[#0F131C] text-[#94A3B8] border border-[#1E2638] hover:bg-[#161B26] hover:text-[#F1F5F9] transition-all duration-150 cursor-pointer shadow-sm active:scale-95"
               >
                 {text}
               </button>
@@ -611,17 +611,17 @@ export function FloatingAssistant() {
             ref={menuRef}
             className={`absolute bottom-[calc(100%+8px)] left-4 ${menuClosing ? "menu-exit" : "menu-enter"}`}
           >
-            <div className="bg-white rounded-2xl shadow-xl border border-black/[0.06] p-1.5 w-[220px]">
+            <div className="bg-[#0F131C] rounded-2xl shadow-xl border border-[#1E2638] p-1.5 w-[220px]">
               {QUICK_ACTIONS.map(({ icon: Icon, label, prompt }) => (
                 <button
                   key={label}
                   onClick={(e) => { e.stopPropagation(); handleQuickAction(prompt) }}
-                  className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-black/[0.04] transition-colors text-left cursor-pointer group"
+                  className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-white/5 transition-colors text-left cursor-pointer group"
                 >
-                  <div className="size-7 rounded-lg bg-black/[0.04] flex items-center justify-center shrink-0 group-hover:bg-black/[0.07] transition-colors">
-                    <Icon size={13} className="text-black/50 group-hover:text-black/70 transition-colors" />
+                  <div className="size-7 rounded-lg bg-white/5 flex items-center justify-center shrink-0 group-hover:bg-white/10 transition-colors">
+                    <Icon size={13} className="text-[#818CF8] transition-colors" />
                   </div>
-                  <span className="text-[13px] text-black/70 group-hover:text-black/90 transition-colors">{label}</span>
+                  <span className="text-[13px] text-[#94A3B8] group-hover:text-[#F1F5F9] transition-colors">{label}</span>
                 </button>
               ))}
             </div>

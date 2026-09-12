@@ -20,8 +20,9 @@ export function SiteHeader() {
   const routes: Record<string, string> = {
     "/dashboard/settings":     "Settings",
     "/dashboard/transactions":  "Transaction",
-    "/dashboard/budget":       "Budget",
+    "/dashboard/budget":       "Budget & Investment",
     "/dashboard/reports":      "Reports",
+    "/dashboard/growth":       "Money Growth",
     "/dashboard/ai-assistant": "AI Assistant",
     "/dashboard/notifications":"Notifications",
   }
@@ -48,13 +49,15 @@ export function SiteHeader() {
         <h1 className="text-base font-medium">{title}</h1>
 
         <div className="ml-auto flex items-center gap-3">
+          <AppModeToggle />
+
           {path === "/dashboard/ai-assistant" && (
             <>
               <button
                 onClick={() => {
                   setChatHistoryOpen(true)
                 }}
-                className="group flex items-center gap-1.5 px-3 py-1.5 rounded-full hover:bg-bg-primary/5 dark:hover:bg-surface-secondary transition-colors border border-transparent hover:border-black/10 dark:hover:border-border"
+                className="group flex items-center gap-1.5 px-3 py-1.5 rounded-full hover:bg-bg-primary/5 dark:hover:bg-surface-secondary transition-colors border border-transparent hover:border-black/10 dark:hover:border-border cursor-pointer"
                 title="Your Chats"
               >
                 <History className="size-4.5 text-black/60 dark:text-text-secondary group-hover:text-black dark:group-hover:text-text-primary transition-colors" />
@@ -65,7 +68,7 @@ export function SiteHeader() {
               <Separator orientation="vertical" className="h-4 hidden sm:block mx-1" />
             </>
           )}
-          <AppModeToggle />
+
           <HeaderUserNav />
         </div>
 

@@ -1,5 +1,5 @@
 import { useState } from "react"
-import Logo from "@/components/ui/Navbar/logo"
+import Logo from "@/components/ui/logo"
 import { Button } from "@/components/ui/SignUp/button"
 import { ChevronLeft, Mail, Lock, User as UserIcon, AlertCircle, CheckCircle2, ArrowRight } from "lucide-react"
 import { Link, useNavigate } from "react-router-dom"
@@ -86,45 +86,45 @@ export function AuthPage() {
   }
 
   return (
-    <div className="relative w-full min-h-screen flex items-center justify-center px-6 py-12">
+    <div className="relative w-full min-h-screen flex items-center justify-center px-4 py-12 bg-[#0F172A]">
       {/* Back Button */}
-      <Button asChild className="absolute top-6 left-6" variant="ghost">
+      <Button asChild className="absolute top-6 left-6 text-[#94A3B8] hover:text-[#F8FAFC]" variant="ghost">
         <Link to="/">
-          <ChevronLeft className="mr-2 h-4 w-4" />
+          <ChevronLeft className="mr-1.5 h-4 w-4" />
           Home
         </Link>
       </Button>
 
-      <div className="w-full max-w-sm space-y-6">
-        <div className="flex justify-center">
-          <Logo className="h-7" />
+      <div className="w-full max-w-sm rounded-[12px] border border-[#334155] bg-[#1E293B] p-7 sm:p-8 shadow-2xl space-y-5">
+        <div className="flex items-center justify-center">
+          <Logo size="md" />
         </div>
 
         <div className="space-y-1 text-center">
-          <h1 className="text-2xl font-bold tracking-tight text-foreground">
+          <h1 className="text-xl font-bold tracking-tight text-[#F8FAFC]">
             Create an Account
           </h1>
-          <p className="text-muted-foreground text-sm">
-            Start managing your personal finances with VoiceKhata
+          <p className="text-xs text-[#94A3B8]">
+            Start managing your business ledger with VoiceKhata
           </p>
         </div>
 
         {/* Error Alert */}
         {error && error !== "email-exists" && (
-          <div className="flex items-start gap-2.5 p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-xs leading-relaxed">
+          <div className="flex items-start gap-2.5 p-3 rounded-[8px] bg-[#7F1D1D]/30 border border-[#EF4444]/30 text-[#F87171] text-xs leading-relaxed">
             <AlertCircle className="size-4 shrink-0 mt-0.5" />
             <p>{error}</p>
           </div>
         )}
 
         {error === "email-exists" && (
-          <div className="flex items-start gap-2.5 p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-xs leading-relaxed">
+          <div className="flex items-start gap-2.5 p-3 rounded-[8px] bg-[#7F1D1D]/30 border border-[#EF4444]/30 text-[#F87171] text-xs leading-relaxed">
             <AlertCircle className="size-4 shrink-0 mt-0.5" />
             <div>
               An account with this email already exists.{" "}
               <button
                 type="button"
-                className="font-semibold underline hover:text-text-primary cursor-pointer ml-1"
+                className="font-semibold underline hover:text-white cursor-pointer ml-1"
                 onClick={() => navigate(`/login?email=${encodeURIComponent(email)}`)}
               >
                 Log in here
@@ -135,14 +135,14 @@ export function AuthPage() {
 
         {/* Success Alert */}
         {message && (
-          <div className="flex items-start gap-2.5 p-3.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs leading-relaxed">
+          <div className="flex items-start gap-2.5 p-3.5 rounded-[8px] bg-[#064E3B]/30 border border-[#10B981]/30 text-[#34D399] text-xs leading-relaxed">
             <CheckCircle2 className="size-4 shrink-0 mt-0.5" />
             <div className="space-y-2">
               <p>{message}</p>
               <Button
                 asChild
                 size="sm"
-                className="w-full bg-emerald-600 hover:bg-emerald-500 text-text-primary font-medium cursor-pointer"
+                className="w-full bg-[#10B981] hover:bg-[#059669] text-white font-medium cursor-pointer"
               >
                 <Link to="/login">Go to Login</Link>
               </Button>
@@ -152,60 +152,60 @@ export function AuthPage() {
 
         {!message && (
           <form onSubmit={handleSignup} className="space-y-3.5">
-            <div className="space-y-1.5">
-              <label className="text-xs font-medium text-muted-foreground">Full Name</label>
+            <div className="space-y-1">
+              <label className="text-xs font-medium text-[#94A3B8]">Full Name</label>
               <div className="relative">
-                <UserIcon className="absolute left-3 top-2.5 size-4 text-muted-foreground" />
+                <UserIcon className="absolute left-3 top-2.5 size-4 text-[#94A3B8]" />
                 <input
                   type="text"
-                  placeholder="John Doe"
+                  placeholder="Your Name"
                   required
-                  className="w-full rounded-md border border-input bg-background/50 pl-9 pr-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+                  className="w-full rounded-[8px] border border-[#334155] bg-[#0F172A] pl-9 pr-3 py-2 text-xs text-[#F8FAFC] placeholder:text-[#94A3B8]/60 focus:outline-none focus:border-[#5C6BC0]"
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                 />
               </div>
             </div>
 
-            <div className="space-y-1.5">
-              <label className="text-xs font-medium text-muted-foreground">Email</label>
+            <div className="space-y-1">
+              <label className="text-xs font-medium text-[#94A3B8]">Email</label>
               <div className="relative">
-                <Mail className="absolute left-3 top-2.5 size-4 text-muted-foreground" />
+                <Mail className="absolute left-3 top-2.5 size-4 text-[#94A3B8]" />
                 <input
                   type="email"
                   placeholder="name@example.com"
                   required
-                  className="w-full rounded-md border border-input bg-background/50 pl-9 pr-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+                  className="w-full rounded-[8px] border border-[#334155] bg-[#0F172A] pl-9 pr-3 py-2 text-xs text-[#F8FAFC] placeholder:text-[#94A3B8]/60 focus:outline-none focus:border-[#5C6BC0]"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                 />
               </div>
             </div>
 
-            <div className="space-y-1.5">
-              <label className="text-xs font-medium text-muted-foreground">Password</label>
+            <div className="space-y-1">
+              <label className="text-xs font-medium text-[#94A3B8]">Password</label>
               <div className="relative">
-                <Lock className="absolute left-3 top-2.5 size-4 text-muted-foreground" />
+                <Lock className="absolute left-3 top-2.5 size-4 text-[#94A3B8]" />
                 <input
                   type="password"
                   placeholder="At least 6 characters"
                   required
-                  className="w-full rounded-md border border-input bg-background/50 pl-9 pr-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+                  className="w-full rounded-[8px] border border-[#334155] bg-[#0F172A] pl-9 pr-3 py-2 text-xs text-[#F8FAFC] placeholder:text-[#94A3B8]/60 focus:outline-none focus:border-[#5C6BC0]"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
               </div>
             </div>
 
-            <div className="space-y-1.5">
-              <label className="text-xs font-medium text-muted-foreground">Confirm Password</label>
+            <div className="space-y-1">
+              <label className="text-xs font-medium text-[#94A3B8]">Confirm Password</label>
               <div className="relative">
-                <Lock className="absolute left-3 top-2.5 size-4 text-muted-foreground" />
+                <Lock className="absolute left-3 top-2.5 size-4 text-[#94A3B8]" />
                 <input
                   type="password"
                   placeholder="Repeat your password"
                   required
-                  className="w-full rounded-md border border-input bg-background/50 pl-9 pr-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+                  className="w-full rounded-[8px] border border-[#334155] bg-[#0F172A] pl-9 pr-3 py-2 text-xs text-[#F8FAFC] placeholder:text-[#94A3B8]/60 focus:outline-none focus:border-[#5C6BC0]"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                 />
@@ -214,7 +214,7 @@ export function AuthPage() {
 
             <Button
               type="submit"
-              className="w-full cursor-pointer hover:bg-primary/90 mt-2"
+              className="w-full h-9 rounded-[8px] bg-[#5C6BC0] hover:bg-[#4F5B93] text-white text-xs font-semibold cursor-pointer mt-1 shadow-xs"
               disabled={isLoading}
             >
               {isLoading ? "Creating account..." : "Create Account"}
@@ -222,14 +222,14 @@ export function AuthPage() {
           </form>
         )}
 
-        <div className="flex items-center gap-3 my-4">
-          <div className="h-px flex-1 bg-border" />
-          <span className="text-xs text-muted-foreground">or</span>
-          <div className="h-px flex-1 bg-border" />
+        <div className="flex items-center gap-3 my-3">
+          <div className="h-px flex-1 bg-[#334155]" />
+          <span className="text-[11px] text-[#94A3B8]">or continue with</span>
+          <div className="h-px flex-1 bg-[#334155]" />
         </div>
 
         <Button
-          className="w-full cursor-pointer border border-input bg-background/60 hover:bg-accent hover:text-accent-foreground text-foreground"
+          className="w-full h-9 rounded-[8px] border border-[#334155] bg-[#0F172A] hover:bg-[#253349] text-xs font-semibold text-[#F8FAFC] cursor-pointer transition-colors"
           variant="outline"
           type="button"
           onClick={handleGoogleLogin}
@@ -239,11 +239,11 @@ export function AuthPage() {
           {isLoading ? "Please wait..." : "Continue with Google"}
         </Button>
 
-        <p className="text-muted-foreground text-xs text-center pt-2">
+        <p className="text-[#94A3B8] text-xs text-center pt-2">
           Already have an account?{" "}
           <Link
             to="/login"
-            className="underline underline-offset-4 hover:text-primary font-medium text-foreground cursor-pointer inline-flex items-center gap-1"
+            className="text-[#818CF8] hover:underline font-semibold inline-flex items-center gap-1 ml-1"
           >
             Log in
             <ArrowRight className="size-3" />

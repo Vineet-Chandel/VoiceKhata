@@ -22,8 +22,8 @@ export default function ProtectedRoute({
   }
 
   // If email/password user is not verified, redirect to login
-  const isGoogle = user.providerData?.some((p) => p.providerId === "google.com")
-  if (!user.emailVerified && !isGoogle) {
+  const isGoogle = user?.providerData?.some((p) => p.providerId === "google.com")
+  if (!user.emailVerified && !isGoogle && !user.isAnonymous) {
     return <Navigate to="/login?unverified=true" replace />
   }
 

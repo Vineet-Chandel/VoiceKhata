@@ -50,7 +50,7 @@ export default defineConfig({
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
       },
       devOptions: {
-        enabled: true,
+        enabled: false,
       },
     }),
   ],
@@ -60,6 +60,11 @@ export default defineConfig({
     },
   },
   server: {
+    host: true,
+    port: 5173,
+    watch: {
+      ignored: ["**/.edge_data/**", "**/scratch/**", "**/dist/**", "**/dev-dist/**"],
+    },
     proxy: {
       "/scan": {
         target: "http://localhost:3001",
