@@ -25,6 +25,7 @@ export function SiteHeader() {
     "/dashboard/reports":      "Reports",
     "/dashboard/growth":       "Money Growth",
     "/dashboard/ai-assistant": "AI Assistant",
+    "/dashboard/voice-capture":"Voice Capture",
     "/dashboard/notifications":"Notifications",
   }
 

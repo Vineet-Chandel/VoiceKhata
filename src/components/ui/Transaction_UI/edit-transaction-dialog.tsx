@@ -22,13 +22,11 @@ import {
 import type { Transaction } from "@/components/hooks/use-transactions"
 import type { Budget } from "@/components/hooks/use-budgets"
 import { isBudgetValidForTransaction } from "@/lib/budget-utils"
+import { useAppMode } from "@/context/AppModeContext"
+import { getCategories } from "@/lib/categories"
 
 type TransactionUpdate = Omit<Transaction, "id" | "firebase_uid" | "created_at">
 
-const BASE_CATEGORIES = [
-  "Income", "Subscription", "Food", "Shopping",
-  "Utilities", "Transport", "Health", "Entertainment", "Other",
-]
 const METHODS = [
   "Bank Transfer", "Credit Card", "Debit Card", "UPI", "Cash", "Net Banking",
 ]
@@ -50,6 +48,8 @@ export function EditTransactionDialog({
   budgetCategories = [],
   budgetRows = [],
 }: Props) {
+  const { appMode } = useAppMode()
+  const BASE_CATEGORIES = getCategories(appMode)
   const [form, setForm] = React.useState({
     transaction: transaction.transaction,
     category: transaction.category,

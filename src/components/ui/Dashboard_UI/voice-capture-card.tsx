@@ -22,6 +22,7 @@ import { VoiceWaveform } from "@/components/ui/AIAssistant_UI/voice-waveform"
 import { parseVoiceKhataInput, type ParsedVoiceTransaction } from "@/lib/voice-khata-parser"
 import { useTransactions } from "@/components/hooks/use-transactions"
 import { useAppMode } from "@/context/AppModeContext"
+import { getCategories } from "@/lib/categories"
 import { format } from "date-fns"
 
 interface VoiceCaptureCardProps {
@@ -39,18 +40,6 @@ const TRY_SAYING_PROMPTS = [
   "Spent ₹350 on petrol via GPay",
 ]
 
-const CATEGORIES = [
-  "Income",
-  "Food",
-  "Shopping",
-  "Transport",
-  "Utilities",
-  "Health",
-  "Entertainment",
-  "Debt",
-  "Other"
-]
-
 const METHODS = ["UPI", "Cash", "Bank Transfer", "Credit Card", "Debit Card"]
 
 export function VoiceCaptureCard({
@@ -60,6 +49,11 @@ export function VoiceCaptureCard({
 }: VoiceCaptureCardProps) {
   const { addTransaction, transactions } = useTransactions()
   const { appMode } = useAppMode()
+
+  const activeCategories = React.useMemo(() => {
+    const base = getCategories(appMode)
+    return Array.from(new Set([...base, "Debt", "Other"]))
+  }, [appMode])
 
   const [step, setStep] = useState<"capture" | "review" | "success">("capture")
   const [promptIndex, setPromptIndex] = useState(0)
@@ -95,10 +89,14 @@ export function VoiceCaptureCard({
     // Parse with deterministic VoiceKhata parser
     const parsed: ParsedVoiceTransaction = parseVoiceKhataInput(finalText.trim(), existingCustomers)
 
+    const defaultCat = appMode === "BUSINESS"
+      ? (parsed.type === "Debit" ? "Inventory/Purchases" : "Sales")
+      : (parsed.type === "Debit" ? "Shopping" : "Income")
+
     setPerson(parsed.person === "Customer / Party" ? "" : parsed.person)
     setAmount(parsed.amount !== null ? parsed.amount : "")
     setType(parsed.type || "Credit")
-    setCategory(parsed.category || (parsed.type === "Debit" ? "Shopping" : "Income"))
+    setCategory(parsed.category || defaultCat)
     setMethod(parsed.method || "UPI")
     setDate(parsed.date || format(new Date(), "yyyy-MM-dd"))
 
@@ -324,9 +322,14 @@ export function VoiceCaptureCard({
             >
               <div className="flex items-center justify-between pb-4 border-b border-slate-800 mb-6">
                 <div>
-                  <span className="text-[11px] font-bold tracking-[0.2em] text-indigo-400 uppercase">
-                    REVIEW ENTRY
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[11px] font-bold tracking-[0.2em] text-indigo-400 uppercase">
+                      REVIEW ENTRY
+                    </span>
+                    <span className="text-[10px] font-medium px-2 py-0.5 rounded-full border border-blue-500/30 bg-blue-500/10 text-blue-300">
+                      {appMode === "BUSINESS" ? "Business Mode" : appMode === "PERSONAL" ? "Personal Mode" : "Combo Mode"}
+                    </span>
+                  </div>
                   <h3 className="text-2xl font-bold text-white">
                     Review before saving
                   </h3>
@@ -418,7 +421,7 @@ export function VoiceCaptureCard({
                     onChange={(e) => setCategory(e.target.value)}
                     className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900/80 border border-slate-800 text-white focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors text-sm"
                   >
-                    {CATEGORIES.map((cat) => (
+                    {activeCategories.map((cat) => (
                       <option key={cat} value={cat} className="bg-slate-900 text-white">
                         {cat}
                       </option>

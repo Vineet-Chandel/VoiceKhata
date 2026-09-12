@@ -12,11 +12,13 @@ import { useRecurring } from "@/components/hooks/use-recurring"
 import { RecurringOverview } from "@/components/ui/Recurring_UI/recurring-overview"
 import { RecurringTable } from "@/components/ui/Recurring_UI/recurring-table"
 import { AddRecurringDialog } from "@/components/ui/Recurring_UI/add-recurring-dialog"
+import { useAppMode } from "@/context/AppModeContext"
 
 type TransactionInput = Omit<Transaction, "id" | "firebase_uid" | "created_at">
 type TransactionUpdate = Omit<Transaction, "id" | "firebase_uid" | "created_at">
 
 export default function TransactionsPage() {
+  const { appMode } = useAppMode()
   const { transactions, loading, addTransaction, updateTransaction, deleteTransaction } =
     useTransactions()
 
@@ -92,7 +94,7 @@ export default function TransactionsPage() {
             <p className="text-sm text-text-secondary mt-0.5">
               {loading
                 ? "Loading..."
-                : `${filtered.length} transaction${filtered.length !== 1 ? "s" : ""} found | Mode: ${window.localStorage.getItem("voicekhata:appMode") || "PERSONAL"}`}
+                : `${filtered.length} transaction${filtered.length !== 1 ? "s" : ""} found | Mode: ${appMode}`}
             </p>
           </div>
           <AddTransactionDialog
