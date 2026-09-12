@@ -198,16 +198,17 @@ export function FloatingAssistant() {
 
   // ── Handle voice transcript completion ─────────────────────────────────────
   React.useEffect(() => {
-    if (voiceState === "processing" && transcript) {
-      if (isExpandedWorkspace) {
-        // If workspace is open, we can just send it or let the user review
-        // For now, let's just send it if it's voice
-        sendMessage(transcript)
-        resetVoice()
-      } else {
-        setInputValue((prev) => (prev ? prev + " " + transcript : transcript))
-        resetVoice()
+    if (voiceState === "processing") {
+      if (transcript) {
+        if (isExpandedWorkspace) {
+          // If workspace is open, we can just send it or let the user review
+          // For now, let's just send it if it's voice
+          sendMessage(transcript)
+        } else {
+          setInputValue((prev) => (prev ? prev + " " + transcript : transcript))
+        }
       }
+      resetVoice()
     } else if (voiceState === "error" && errorMessage) {
       setMicError(errorMessage)
       resetVoice()
