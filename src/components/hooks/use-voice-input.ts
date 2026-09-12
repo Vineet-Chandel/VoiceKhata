@@ -19,8 +19,9 @@ export function useVoiceInput() {
   const analyserRef = useRef<AnalyserNode | null>(null)
   const streamRef = useRef<MediaStream | null>(null)
   const recognitionRef = useRef<any>(null)
-  // Track whether we actually received any speech results
   const hasResultRef = useRef(false)
+  // Track the current language to allow fallback
+  const langRef = useRef("hi-IN")
   // Safety timeout to prevent infinite listening
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -93,7 +94,7 @@ export function useVoiceInput() {
       // This prevents the engine from auto-restarting and causing phantom loops
       recognition.continuous = false
       recognition.interimResults = true
-      recognition.lang = "hi-IN" // Handles both Hindi and English seamlessly
+      recognition.lang = langRef.current // Uses fallback if hi-IN failed
       recognition.maxAlternatives = 1
 
       let finalTranscriptAcc = ""
@@ -131,7 +132,13 @@ export function useVoiceInput() {
           // No speech detected — gracefully go to processing so the UI resets
           // onend will fire after this and handle the state transition
         } else if (event.error === "network") {
-          setErrorMessage("Network error. Speech recognition requires an internet connection.")
+          if (langRef.current === "hi-IN") {
+            console.warn("Network error with hi-IN, falling back to en-IN")
+            langRef.current = "en-IN"
+            setErrorMessage("Hindi voice not supported by your device. Switched to English fallback. Please click mic and try again.")
+          } else {
+            setErrorMessage("Network error. Speech recognition requires an internet connection.")
+          }
           setVoiceState("error")
           cleanup()
         } else if (event.error !== "aborted") {
