@@ -82,8 +82,10 @@ export function ChatInput({ onSend, loading, guidedStep, replyingTo, onCancelRep
   React.useEffect(() => {
     if (voiceState === "processing") {
       if (transcript) {
-        setValue((prev) => (prev ? prev + " " + transcript : transcript))
-        if (textareaRef.current) autoResize(textareaRef.current)
+        const fullMessage = (value ? value + " " + transcript : transcript).trim()
+        onSend(fullMessage)
+        setValue("")
+        if (textareaRef.current) textareaRef.current.style.height = "auto"
       }
       resetVoice()
     } else if (voiceState === "error" && errorMessage) {

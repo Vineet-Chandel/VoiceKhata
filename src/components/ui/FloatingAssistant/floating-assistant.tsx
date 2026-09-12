@@ -200,12 +200,9 @@ export function FloatingAssistant() {
   React.useEffect(() => {
     if (voiceState === "processing") {
       if (transcript) {
-        if (isExpandedWorkspace) {
-          // If workspace is open, we can just send it or let the user review
-          // For now, let's just send it if it's voice
-          sendMessage(transcript)
-        } else {
-          setInputValue((prev) => (prev ? prev + " " + transcript : transcript))
+        sendMessage(transcript)
+        if (!isExpandedWorkspace) {
+          openWorkspace()
         }
       }
       resetVoice()

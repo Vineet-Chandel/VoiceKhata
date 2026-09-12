@@ -65,6 +65,9 @@ export function useVoiceInput() {
 
     try {
       // 1. Audio setup for waveform visualization
+      if (!navigator.mediaDevices) {
+        throw new Error("Microphone API not available. Ensure you are using HTTPS or localhost.")
+      }
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false })
       streamRef.current = stream
 
