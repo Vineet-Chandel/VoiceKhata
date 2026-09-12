@@ -17,7 +17,7 @@ import {
   ShieldCheck,
   ChevronLeft
 } from "lucide-react"
-import Logo from "@/components/ui/Navbar/logo"
+import Logo from "@/components/ui/logo"
 import { supabase } from "@/lib/supabase"
 interface FeedbackType {
   id: string

@@ -40,7 +40,7 @@ export function VoiceActionBanner({
   const [undoCountdown, setUndoCountdown] = useState<number>(0)
   const [successMessage, setSuccessMessage] = useState("")
 
-  const undoTimerRef = useRef<NodeJS.Timeout | null>(null)
+  const undoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   // Listen to voice input state transitions
   useEffect(() => {
