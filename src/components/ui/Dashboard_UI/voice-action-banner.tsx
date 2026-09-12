@@ -160,13 +160,13 @@ export function VoiceActionBanner({
   }
 
   return (
-    <div className="mx-4 lg:mx-6 rounded-[14px] border border-[#334155] bg-[#1E293B] p-5 shadow-xs transition-all text-[#F8FAFC]">
+    <div className="mx-4 lg:mx-6 rounded-[14px] border border-slate-700/40 bg-[#131B2E] p-5 shadow-xs transition-all text-[#F8FAFC]">
       {/* ── 1. IDLE STATE ──────────────────────────────────────────────────────── */}
       {flowState === "idle" && (
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="space-y-1">
             <div className="flex items-center gap-2">
-              <span className="text-[11px] font-semibold tracking-wider uppercase text-[#818CF8] bg-[#1E293B] border border-[#334155] px-2.5 py-0.5 rounded-full">
+              <span className="text-[11px] font-semibold tracking-wider uppercase text-blue-400 bg-[#0E1322] border border-slate-800/60 px-2.5 py-0.5 rounded-full">
                 Voice Action
               </span>
               <span className="text-xs font-medium text-[#94A3B8]">WHAT HAPPENED TODAY?</span>
@@ -187,12 +187,12 @@ export function VoiceActionBanner({
                 value={manualText}
                 onChange={(e) => setManualText(e.target.value)}
                 placeholder="Or type e.g. Ramesh ₹1200 UPI..."
-                className="w-56 lg:w-64 h-10 px-3 pr-8 text-xs rounded-[10px] border border-[#334155] bg-[#0F172A] text-[#F8FAFC] placeholder:text-[#94A3B8] focus:outline-none focus:border-[#818CF8]"
+                className="w-56 lg:w-64 h-10 px-3 pr-8 text-xs rounded-[10px] border border-slate-700/40 bg-[#0B0F19] text-[#F8FAFC] placeholder:text-[#94A3B8] focus:outline-none focus:border-blue-500"
               />
               <button
                 type="submit"
                 disabled={!manualText.trim()}
-                className="absolute right-2 text-[#94A3B8] hover:text-[#818CF8] disabled:opacity-40"
+                className="absolute right-2 text-[#94A3B8] hover:text-blue-400 disabled:opacity-40"
               >
                 <Send size={14} />
               </button>
@@ -202,7 +202,7 @@ export function VoiceActionBanner({
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.96 }}
               onClick={startListening}
-              className="flex items-center justify-center gap-2.5 h-11 px-5 rounded-[10px] bg-[#5C6BC0] hover:bg-[#4F46E5] text-white text-sm font-semibold shadow-lg shadow-[#5C6BC0]/20 transition-all w-full sm:w-auto cursor-pointer"
+              className="flex items-center justify-center gap-2.5 h-11 px-5 rounded-[10px] bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold shadow-lg shadow-blue-600/20 transition-all w-full sm:w-auto cursor-pointer"
             >
               <Mic size={18} />
               <span>Record by voice</span>
@@ -215,18 +215,18 @@ export function VoiceActionBanner({
       {flowState === "listening" && (
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 py-2">
           <div className="flex items-center gap-3.5">
-            <div className="relative flex items-center justify-center size-12 rounded-full bg-[#1E293B] text-[#818CF8]">
-              <Mic size={22} className="text-[#818CF8] relative z-10" />
+            <div className="relative flex items-center justify-center size-12 rounded-full bg-[#0E1322] text-blue-400 border border-slate-700/40">
+              <Mic size={22} className="text-blue-400 relative z-10" />
               {/* Concentric gesture wave rings */}
               <motion.div
                 animate={{ scale: [1, 1.8], opacity: [0.8, 0] }}
                 transition={{ repeat: Infinity, duration: 1.4, ease: "easeOut" }}
-                className="absolute inset-0 rounded-full border border-[#818CF8]"
+                className="absolute inset-0 rounded-full border border-blue-400"
               />
               <motion.div
                 animate={{ scale: [1, 1.4], opacity: [0.6, 0] }}
                 transition={{ repeat: Infinity, duration: 1.4, delay: 0.3, ease: "easeOut" }}
-                className="absolute inset-0 rounded-full border border-[#5C6BC0]"
+                className="absolute inset-0 rounded-full border border-blue-500"
               />
             </div>
             <div>
@@ -256,14 +256,14 @@ export function VoiceActionBanner({
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.96 }}
               onClick={stopListening}
-              className="flex items-center justify-center gap-2 h-10 px-5 rounded-[8px] bg-[#5C6BC0] hover:bg-[#4F46E5] text-white text-xs font-semibold shadow-xs transition-all cursor-pointer"
+              className="flex items-center justify-center gap-2 h-10 px-5 rounded-[8px] bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow-xs transition-all cursor-pointer"
             >
               <Check size={16} />
               <span>Done Speaking</span>
             </motion.button>
             <button
               onClick={handleTryAgain}
-              className="h-10 px-3.5 rounded-[8px] border border-[#334155] text-[#94A3B8] hover:text-[#F8FAFC] hover:bg-[#253349] text-xs font-medium cursor-pointer"
+              className="h-10 px-3.5 rounded-[8px] border border-slate-700/40 text-[#94A3B8] hover:text-[#F8FAFC] hover:bg-white/10 text-xs font-medium cursor-pointer"
             >
               Cancel
             </button>
@@ -282,7 +282,7 @@ export function VoiceActionBanner({
       {/* ── 4. REVIEW STATE (MANDATORY TRUST STEP) ──────────────────────────────── */}
       {flowState === "review" && (
         <div className="space-y-4">
-          <div className="flex items-center justify-between border-b border-[#334155] pb-3">
+          <div className="flex items-center justify-between border-b border-slate-700/40 pb-3">
             <div className="flex items-center gap-2">
               <span className="text-xs font-semibold text-[#10B981] bg-[#064E3B]/30 border border-[#10B981]/20 px-2 py-0.5 rounded-full">
                 I understood
@@ -291,7 +291,7 @@ export function VoiceActionBanner({
             </div>
             <button
               onClick={() => setIsEditing(!isEditing)}
-              className="flex items-center gap-1.5 text-xs font-medium text-[#818CF8] hover:underline cursor-pointer"
+              className="flex items-center gap-1.5 text-xs font-medium text-blue-400 hover:underline cursor-pointer"
             >
               <Edit2 size={13} />
               <span>{isEditing ? "Close Edit" : "Edit details"}</span>
@@ -299,7 +299,7 @@ export function VoiceActionBanner({
           </div>
 
           {isEditing ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 bg-[#0F172A] p-3.5 rounded-[10px] border border-[#334155]">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 bg-[#0B0F19] p-3.5 rounded-[10px] border border-slate-700/40">
               <div>
                 <label className="text-[11px] font-medium text-[#94A3B8] block mb-1">Person / Customer</label>
                 <input
@@ -307,7 +307,7 @@ export function VoiceActionBanner({
                   value={editPerson}
                   onChange={(e) => setEditPerson(e.target.value)}
                   placeholder="e.g. Ramesh Kumar"
-                  className="w-full h-9 px-2.5 text-xs rounded-[8px] border border-[#334155] bg-[#1E293B] text-[#F8FAFC]"
+                  className="w-full h-9 px-2.5 text-xs rounded-[8px] border border-slate-700/40 bg-[#131B2E] text-[#F8FAFC]"
                 />
               </div>
               <div>
@@ -317,7 +317,7 @@ export function VoiceActionBanner({
                   value={editAmount}
                   onChange={(e) => setEditAmount(e.target.value)}
                   placeholder="1200"
-                  className="w-full h-9 px-2.5 text-xs rounded-[8px] border border-[#334155] bg-[#1E293B] text-[#F8FAFC] font-semibold"
+                  className="w-full h-9 px-2.5 text-xs rounded-[8px] border border-slate-700/40 bg-[#131B2E] text-[#F8FAFC] font-semibold"
                 />
               </div>
               <div>
@@ -325,7 +325,7 @@ export function VoiceActionBanner({
                 <select
                   value={editType}
                   onChange={(e) => setEditType(e.target.value as "Credit" | "Debit")}
-                  className="w-full h-9 px-2 text-xs rounded-[8px] border border-[#334155] bg-[#1E293B] text-[#F8FAFC]"
+                  className="w-full h-9 px-2 text-xs rounded-[8px] border border-slate-700/40 bg-[#131B2E] text-[#F8FAFC]"
                 >
                   <option value="Credit">Money Received (Inflow)</option>
                   <option value="Debit">Money Paid / Credit Given (Outflow)</option>
@@ -336,7 +336,7 @@ export function VoiceActionBanner({
                 <select
                   value={editMethod}
                   onChange={(e) => setEditMethod(e.target.value)}
-                  className="w-full h-9 px-2 text-xs rounded-[8px] border border-[#334155] bg-[#1E293B] text-[#F8FAFC]"
+                  className="w-full h-9 px-2 text-xs rounded-[8px] border border-slate-700/40 bg-[#131B2E] text-[#F8FAFC]"
                 >
                   <option value="UPI">UPI</option>
                   <option value="Cash">Cash</option>
@@ -346,7 +346,7 @@ export function VoiceActionBanner({
               </div>
             </div>
           ) : (
-            <div className="flex flex-wrap items-center justify-between gap-4 p-3 bg-[#253349] rounded-[10px] border border-[#334155]">
+            <div className="flex flex-wrap items-center justify-between gap-4 p-3 bg-[#0E1322] rounded-[10px] border border-slate-700/40">
               <div className="flex items-center gap-3">
                 <div className={`flex items-center justify-center size-10 rounded-[10px] ${
                   editType === "Credit" ? "bg-[#064E3B]/30 text-[#10B981]" : "bg-[#450A0A]/30 text-[#EF4444]"
@@ -385,13 +385,13 @@ export function VoiceActionBanner({
           <div className="flex items-center justify-end gap-2.5 pt-1">
             <button
               onClick={handleTryAgain}
-              className="h-9 px-4 rounded-[8px] border border-[#334155] text-xs font-medium text-[#94A3B8] hover:text-[#F8FAFC] hover:bg-[#253349] cursor-pointer"
+              className="h-9 px-4 rounded-[8px] border border-slate-700/40 text-xs font-medium text-[#94A3B8] hover:text-[#F8FAFC] hover:bg-white/10 cursor-pointer"
             >
               Cancel
             </button>
             <button
               onClick={handleConfirmSave}
-              className="flex items-center gap-1.5 h-9 px-5 rounded-[8px] bg-[#5C6BC0] hover:bg-[#4F46E5] text-white text-xs font-semibold shadow-xs cursor-pointer"
+              className="flex items-center gap-1.5 h-9 px-5 rounded-[8px] bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow-xs cursor-pointer"
             >
               <Check size={15} />
               <span>Save Entry</span>
@@ -421,7 +421,7 @@ export function VoiceActionBanner({
               value={editPerson}
               onChange={(e) => setEditPerson(e.target.value)}
               placeholder="Enter person name (e.g. Ramesh Kumar)"
-              className="flex-1 h-9 px-3 text-xs rounded-[8px] border border-[#334155] bg-[#0F172A] text-[#F8FAFC]"
+              className="flex-1 h-9 px-3 text-xs rounded-[8px] border border-slate-700/40 bg-[#0B0F19] text-[#F8FAFC]"
               autoFocus
             />
             <button
@@ -431,13 +431,13 @@ export function VoiceActionBanner({
                 }
               }}
               disabled={!editPerson.trim()}
-              className="h-9 px-4 rounded-[8px] bg-[#5C6BC0] hover:bg-[#4F46E5] text-white text-xs font-semibold disabled:opacity-50 cursor-pointer"
+              className="h-9 px-4 rounded-[8px] bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold disabled:opacity-50 cursor-pointer"
             >
               Confirm Person
             </button>
             <button
               onClick={handleTryAgain}
-              className="h-9 px-3 rounded-[8px] border border-[#334155] text-xs font-medium text-[#94A3B8] hover:bg-[#253349] cursor-pointer"
+              className="h-9 px-3 rounded-[8px] border border-slate-700/40 text-xs font-medium text-[#94A3B8] hover:bg-white/10 cursor-pointer"
             >
               Try Again
             </button>
@@ -483,7 +483,7 @@ export function VoiceActionBanner({
             </button>
             <button
               onClick={handleTryAgain}
-              className="h-9 px-3 rounded-[8px] border border-[#334155] text-xs font-medium text-[#94A3B8] hover:bg-[#253349] cursor-pointer"
+              className="h-9 px-3 rounded-[8px] border border-slate-700/40 text-xs font-medium text-[#94A3B8] hover:bg-white/10 cursor-pointer"
             >
               Try Again
             </button>
@@ -511,7 +511,7 @@ export function VoiceActionBanner({
           <div className="flex items-center gap-2">
             <button
               onClick={() => handleUndo()}
-              className="flex items-center gap-1.5 h-8 px-3 rounded-[6px] bg-[#253349] border border-[#10B981]/40 text-[#10B981] hover:bg-[#1E293B] text-xs font-semibold shadow-2xs transition-all cursor-pointer"
+              className="flex items-center gap-1.5 h-8 px-3 rounded-[6px] bg-[#0E1322] border border-[#10B981]/40 text-[#10B981] hover:bg-[#131B2E] text-xs font-semibold shadow-2xs transition-all cursor-pointer"
             >
               <RotateCcw size={13} />
               <span>Undo ({undoCountdown}s)</span>
@@ -537,7 +537,7 @@ export function VoiceActionBanner({
           </div>
           <button
             onClick={handleTryAgain}
-            className="h-8 px-3 rounded-[6px] bg-[#253349] border border-[#EF4444]/40 text-[#EF4444] hover:bg-[#450A0A]/50 text-xs font-semibold cursor-pointer"
+            className="h-8 px-3 rounded-[6px] bg-[#0E1322] border border-[#EF4444]/40 text-[#EF4444] hover:bg-[#450A0A]/50 text-xs font-semibold cursor-pointer"
           >
             Try Again
           </button>

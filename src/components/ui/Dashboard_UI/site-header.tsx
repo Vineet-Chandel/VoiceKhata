@@ -9,6 +9,7 @@ import { useChatStore } from "@/components/hooks/use-chat-store"
 import { useNavigate } from "react-router-dom"
 import { History } from "lucide-react"
 import { AppModeToggle } from "@/components/ui/AppModeToggle"
+import { ThemeToggle } from "@/components/ui/ThemeToggle"
 
 export function SiteHeader() {
   const location = useLocation()
@@ -49,6 +50,7 @@ export function SiteHeader() {
         <h1 className="text-base font-medium">{title}</h1>
 
         <div className="ml-auto flex items-center gap-3">
+          <ThemeToggle />
           <AppModeToggle />
 
           {path === "/dashboard/ai-assistant" && (

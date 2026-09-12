@@ -70,100 +70,130 @@
 }
 
 :root {
-    /* Custom Semantic Tokens - Light Mode (Business Professional) */
-    --bg-primary: #ffffff;
-    --surface: #f8fafc; /* Slate 50 */
-    --surface-secondary: #f1f5f9; /* Slate 100 */
-    --surface-elevated: #ffffff;
-    --text-primary: #0f172a; /* Slate 900 */
-    --text-secondary: #475569; /* Slate 600 */
-    --text-muted: #94a3b8; /* Slate 400 */
-    --border-primary: #e2e8f0; /* Slate 200 */
+    /* VoiceKhata Clean Slate Light Theme */
+    --bg-primary: #F8FAFC;
+    --surface: #FFFFFF;
+    --surface-secondary: #F1F5F9;
+    --surface-elevated: #FFFFFF;
+    --text-primary: #0F172A;
+    --text-secondary: #64748B;
+    --text-muted: #94A3B8;
+    --border-primary: rgba(226, 232, 240, 0.9);
 
-    --radius: 0.5rem; /* Slightly crisper radius */
-    --surface-card: #0f172a;
+    --radius: 0.5rem;
+    --surface-card: #FFFFFF;
     --background: var(--bg-primary);
     --foreground: var(--text-primary);
-    --card: var(--surface);
+    --card: #FFFFFF;
     --card-foreground: var(--text-primary);
-    --popover: var(--surface-elevated);
+    --popover: #FFFFFF;
     --popover-foreground: var(--text-primary);
-    --primary: #5C6BC0;
+    --primary: #2563EB;
     --primary-foreground: #ffffff;
-    --secondary: var(--surface-secondary);
+    --secondary: #F1F5F9;
     --secondary-foreground: var(--text-primary);
-    --muted: var(--surface-secondary);
-    --muted-foreground: var(--text-muted);
-    --accent: var(--surface-secondary);
-    --accent-foreground: #818CF8;
+    --muted: #F1F5F9;
+    --muted-foreground: #64748B;
+    --accent: #EFF6FF;
+    --accent-foreground: #2563EB;
     --destructive: oklch(0.577 0.245 27.325);
-    --border: var(--border-primary);
-    --input: var(--border-primary);
-    --ring: #5C6BC0;
-    --chart-1: #5C6BC0;
+    --border: #E2E8F0;
+    --input: #E2E8F0;
+    --ring: #3B82F6;
+    --chart-1: #2563EB;
     --chart-2: #10B981;
     --chart-3: #F59E0B;
     --chart-4: #EF4444;
-    --chart-5: #94A3B8;
+    --chart-5: #64748B;
 
-    --sidebar: var(--surface-secondary);
-    --sidebar-foreground: var(--text-primary);
-    --sidebar-primary: #5C6BC0;
+    --sidebar: #FFFFFF;
+    --sidebar-foreground: #0F172A;
+    --sidebar-primary: #2563EB;
     --sidebar-primary-foreground: #ffffff;
-    --sidebar-accent: var(--surface);
-    --sidebar-accent-foreground: #818CF8;
-    --sidebar-border: var(--border-primary);
-    --sidebar-ring: #5C6BC0;
-    --sidebar-active: #222222;
-    --sidebar-active-foreground: #818CF8;
+    --sidebar-accent: #F1F5F9;
+    --sidebar-accent-foreground: #2563EB;
+    --sidebar-border: #E2E8F0;
+    --sidebar-ring: #3B82F6;
+    --sidebar-active: #EFF6FF;
+    --sidebar-active-foreground: #2563EB;
 }
 
 .dark {
-    /* Original Deep Obsidian / Charcoal Theme with Blue Text Shade */
-    --bg-primary: #000000;
-    --surface: #0a0a0a;
-    --surface-secondary: #111111;
-    --surface-elevated: #151515;
-    --text-primary: #ffffff;
-    --text-secondary: #94A3B8; /* soft slate-blue shade */
-    --text-muted: #818CF8;     /* periwinkle blue shade */
-    --border-primary: #222222;
+    /* VoiceKhata Deep Obsidian Slate Theme (Dark) */
+    --bg-primary: #0B0F19;
+    --surface: #0E1322;
+    --surface-secondary: #131B2E;
+    --surface-elevated: #1A2340;
+    --text-primary: #F8FAFC;
+    --text-secondary: #94A3B8;
+    --text-muted: #64748B;
+    --border-primary: rgba(51, 65, 85, 0.4);
 
-    --surface-card: #0f172a;
+    --surface-card: #131B2E;
     --background: var(--bg-primary);
     --foreground: var(--text-primary);
-    --card: var(--surface);
+    --card: var(--surface-secondary);
     --card-foreground: var(--text-primary);
     --popover: var(--surface-elevated);
     --popover-foreground: var(--text-primary);
-    --primary: #5C6BC0;
+    --primary: #3B82F6;
     --primary-foreground: #ffffff;
     --secondary: var(--surface-secondary);
     --secondary-foreground: var(--text-primary);
     --muted: var(--surface-secondary);
     --muted-foreground: #94A3B8;
     --accent: var(--surface-secondary);
-    --accent-foreground: #818CF8;
+    --accent-foreground: #3B82F6;
     --destructive: oklch(0.704 0.191 22.216);
     --border: var(--border-primary);
     --input: var(--border-primary);
-    --ring: #5C6BC0;
-    --chart-1: #5C6BC0;
+    --ring: #3B82F6;
+    --chart-1: #3B82F6;
     --chart-2: #10B981;
     --chart-3: #F59E0B;
     --chart-4: #EF4444;
     --chart-5: #94A3B8;
 
-    --sidebar: #0a0a0a;
+    --sidebar: #0E1322;
     --sidebar-foreground: var(--text-primary);
-    --sidebar-primary: #5C6BC0;
+    --sidebar-primary: #3B82F6;
     --sidebar-primary-foreground: #ffffff;
     --sidebar-accent: var(--surface-secondary);
-    --sidebar-accent-foreground: #818CF8;
-    --sidebar-border: var(--border-primary);
-    --sidebar-ring: #5C6BC0;
-    --sidebar-active: #171717;
-    --sidebar-active-foreground: #818CF8;
+    --sidebar-accent-foreground: #3B82F6;
+    --sidebar-border: rgba(51, 65, 85, 0.6);
+    --sidebar-ring: #3B82F6;
+    --sidebar-active: #131B2E;
+    --sidebar-active-foreground: #3B82F6;
+}
+
+/* Light mode dynamic overrides for components */
+:root:not(.dark) .bg-\[\#0B0F19\],
+:root:not(.dark) .bg-\[\#0B0F19\]\/95 {
+  background-color: #F8FAFC !important;
+}
+
+:root:not(.dark) .bg-\[\#131B2E\] {
+  background-color: #FFFFFF !important;
+}
+
+:root:not(.dark) .bg-\[\#0E1322\],
+:root:not(.dark) .bg-\[\#0E1322\]\/90 {
+  background-color: #F1F5F9 !important;
+}
+
+:root:not(.dark) .text-\[\#F8FAFC\] {
+  color: #0F172A !important;
+}
+
+:root:not(.dark) .text-\[\#94A3B8\] {
+  color: #64748B !important;
+}
+
+:root:not(.dark) .border-slate-700\/40,
+:root:not(.dark) .border-slate-800,
+:root:not(.dark) .border-slate-800\/60,
+:root:not(.dark) .border-\[\#1E2638\] {
+  border-color: #E2E8F0 !important;
 }
 
 @layer base {
@@ -175,7 +205,7 @@
     font-family: var(--font-sans);
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
     font-variant-numeric: tabular-nums;
-    transition: background-color 0.15s ease, color 0.15s ease;
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
   }
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-heading);
@@ -185,7 +215,12 @@
 
 html {
   scroll-behavior: smooth;
-  background-color: var(--bg-primary);
+  background-color: var(--background);
+}
+
+html, body, #root {
+  background-color: var(--background);
+  color: var(--foreground);
 }
 
 @media (max-width: 767px) {

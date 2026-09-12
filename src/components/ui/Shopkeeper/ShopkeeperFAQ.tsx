@@ -29,11 +29,11 @@ export function ShopkeeperFAQ() {
   ];
 
   return (
-    <section id="faqs" className="py-16 sm:py-20 bg-[#0F172A] border-b border-[#334155]">
+    <section id="faqs" className="py-16 sm:py-20 bg-[#0B0F19] border-b border-slate-700/40">
       <div className="mx-auto max-w-4xl px-4 sm:px-6">
         
         <div className="text-center max-w-2xl mx-auto mb-10">
-          <span className="text-xs font-semibold uppercase tracking-wider text-[#818CF8] bg-[#1E293B] border border-[#5C6BC0]/30 px-3 py-1 rounded-full">
+          <span className="text-xs font-semibold uppercase tracking-wider text-blue-300 bg-blue-600/20 border border-blue-500/30 px-3 py-1 rounded-full">
             Frequently Asked Questions
           </span>
           <h2 className="mt-3 text-2xl sm:text-4xl font-bold text-[#F8FAFC] tracking-tight">
@@ -50,25 +50,25 @@ export function ShopkeeperFAQ() {
             return (
               <div
                 key={idx}
-                className="rounded-[10px] border border-[#334155] bg-[#1E293B] overflow-hidden shadow-xs transition-all"
+                className="rounded-[12px] border border-slate-700/40 bg-[#131B2E] overflow-hidden shadow-sm transition-all"
               >
                 <button
                   onClick={() => setOpenIdx(isOpen ? null : idx)}
-                  className="flex w-full items-center justify-between p-4 sm:p-4.5 text-left text-xs sm:text-sm font-semibold text-[#F8FAFC] hover:text-[#818CF8] transition-colors cursor-pointer"
+                  className="flex w-full items-center justify-between p-4 sm:p-4.5 text-left text-xs sm:text-sm font-semibold text-[#F8FAFC] hover:text-blue-400 transition-colors cursor-pointer"
                 >
                   <span className="flex items-center gap-2.5">
-                    <HelpCircle className="size-4 text-[#818CF8] shrink-0" />
+                    <HelpCircle className="size-4 text-blue-400 shrink-0" />
                     {faq.q}
                   </span>
                   <ChevronDown
                     className={`size-4 text-[#94A3B8] transition-transform duration-200 shrink-0 ml-2 ${
-                      isOpen ? "rotate-180 text-[#818CF8]" : ""
+                      isOpen ? "rotate-180 text-blue-400" : ""
                     }`}
                   />
                 </button>
 
                 {isOpen && (
-                  <div className="border-t border-[#334155] p-4 text-xs sm:text-sm text-[#94A3B8] leading-relaxed bg-[#0F172A]">
+                  <div className="border-t border-slate-700/40 p-4 text-xs sm:text-sm text-[#94A3B8] leading-relaxed bg-[#0B0F19]">
                     {faq.a}
                   </div>
                 )}

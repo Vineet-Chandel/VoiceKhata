@@ -121,7 +121,7 @@ export default function TransactionsPage() {
         )}
 
         {/* AutoFlow Section */}
-        <div className="flex flex-col gap-4 pt-6 md:gap-6 md:pt-8 border-t border-border mt-4">
+        <div className="flex flex-col gap-4 pt-6 md:gap-6 md:pt-8 border-t border-border mt-4 pb-20">
           <div className="flex items-center justify-between px-4 lg:px-6">
             <div>
               <h2 className="text-2xl font-semibold tracking-tight">AutoFlow</h2>

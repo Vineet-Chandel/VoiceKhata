@@ -173,9 +173,9 @@ export default function FeedbackPage() {
   }
 
   return (
-    <div className="min-h-screen w-full bg-[#050505] text-white flex flex-col font-sans selection:bg-white selection:text-black">
+    <div className="min-h-screen w-full bg-[#0B0F19] text-[#F8FAFC] flex flex-col font-sans selection:bg-blue-600 selection:text-white">
       {/* Top Navbar Header */}
-      <header className="fixed top-0 left-0 right-0 z-40 bg-[#050505]/80 backdrop-blur-md border-b border-white/5 px-6 py-4">
+      <header className="fixed top-0 left-0 right-0 z-40 bg-[#0B0F19]/95 backdrop-blur-md border-b border-slate-700/40 px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2 group">
             <ChevronLeft className="size-5 text-white/50 group-hover:text-white group-hover:-translate-x-1 transition-all" />
@@ -185,7 +185,7 @@ export default function FeedbackPage() {
           <div className="flex items-center gap-3">
             <Link
               to="/review"
-              className="text-xs font-semibold px-3 py-1.5 rounded-full border border-white/10 text-white/70 hover:text-white hover:border-white/30 transition-colors"
+              className="text-xs font-semibold px-3 py-1.5 rounded-full border border-slate-700/60 text-[#94A3B8] hover:text-[#F8FAFC] hover:border-blue-500/50 hover:bg-[#131B2E] transition-colors"
             >
               Write a Review instead →
             </Link>
@@ -196,46 +196,46 @@ export default function FeedbackPage() {
       {/* Main Container */}
       <div className="flex-1 flex flex-col lg:flex-row pt-20">
         {/* Left Side Hero Panel (Sticky Showcase) */}
-        <aside className="lg:w-[42%] lg:fixed lg:top-20 lg:bottom-0 left-0 p-8 lg:p-14 flex flex-col justify-between border-b lg:border-b-0 lg:border-r border-white/5 bg-gradient-to-b from-[#0a0a0a] to-[#050505] relative overflow-hidden">
+        <aside className="lg:w-[42%] lg:fixed lg:top-20 lg:bottom-0 left-0 p-8 lg:p-14 flex flex-col justify-between border-b lg:border-b-0 lg:border-r border-slate-700/40 bg-gradient-to-b from-[#131B2E] to-[#0B0F19] relative overflow-hidden">
           {/* Ambient Lighting */}
           <div className="absolute -top-32 -left-32 w-80 h-80 rounded-full bg-emerald-500/10 blur-[100px] pointer-events-none" />
           <div className="absolute -bottom-32 -right-32 w-80 h-80 rounded-full bg-blue-500/10 blur-[100px] pointer-events-none" />
 
           <div className="relative z-10">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-medium text-white/80 mb-6">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-600/20 border border-blue-500/30 text-xs font-medium text-blue-300 mb-6">
+              <span className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
               Community Feedback Portal
             </div>
 
             <h1 className="text-4xl lg:text-5xl font-extrabold tracking-tight leading-[1.15] mb-4">
               Your Voice <br />
-              <span className="bg-gradient-to-r from-white via-white/90 to-white/40 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-[#F8FAFC] via-blue-300 to-blue-500 bg-clip-text text-transparent">
                 Shapes VoiceKhata.
               </span>
             </h1>
 
-            <p className="text-white/50 text-base leading-relaxed max-w-md mb-8">
+            <p className="text-[#94A3B8] text-base leading-relaxed max-w-md mb-8">
               Whether you discovered a small bug, have an idea for automated voice budgeting, or want to suggest an improvement — our engineering team reads every submission directly.
             </p>
 
             {/* Feature Highlights */}
             <div className="space-y-3.5 max-w-sm">
-              <div className="flex items-center gap-3 text-xs text-white/70 bg-white/[0.03] border border-white/5 rounded-xl p-3">
-                <ShieldCheck className="size-4 text-emerald-400 shrink-0" />
+              <div className="flex items-center gap-3 text-xs text-[#94A3B8] bg-[#0E1322] border border-slate-700/40 rounded-xl p-3">
+                <ShieldCheck className="size-4 text-blue-400 shrink-0" />
                 <span>100% Private — never shared with third parties</span>
               </div>
-              <div className="flex items-center gap-3 text-xs text-white/70 bg-white/[0.03] border border-white/5 rounded-xl p-3">
+              <div className="flex items-center gap-3 text-xs text-[#94A3B8] bg-[#0E1322] border border-slate-700/40 rounded-xl p-3">
                 <Mic className="size-4 text-blue-400 shrink-0" />
                 <span>Helps train better Indian-accent voice models</span>
               </div>
-              <div className="flex items-center gap-3 text-xs text-white/70 bg-white/[0.03] border border-white/5 rounded-xl p-3">
+              <div className="flex items-center gap-3 text-xs text-[#94A3B8] bg-[#0E1322] border border-slate-700/40 rounded-xl p-3">
                 <Zap className="size-4 text-amber-400 shrink-0" />
                 <span>Direct influence on upcoming roadmap releases</span>
               </div>
             </div>
           </div>
 
-          <div className="relative z-10 mt-8 pt-6 border-t border-white/5 flex items-center justify-between text-xs text-white/40">
+          <div className="relative z-10 mt-8 pt-6 border-t border-slate-700/40 flex items-center justify-between text-xs text-[#94A3B8]">
             <span>VoiceKhata Technologies</span>
             <Link to="/" className="hover:text-white transition-colors">
               voicekhata.app
@@ -259,7 +259,7 @@ export default function FeedbackPage() {
                 <button
                   type="button"
                   onClick={resetForm}
-                  className="w-full sm:w-auto px-6 py-3 rounded-full bg-white text-black font-semibold text-sm hover:bg-white/90 active:scale-95 transition-all"
+                  className="w-full sm:w-auto px-6 py-3 rounded-full bg-blue-600 text-white font-semibold text-sm hover:bg-blue-500 active:scale-95 transition-all"
                 >
                   Submit Another Feedback
                 </button>
@@ -280,9 +280,9 @@ export default function FeedbackPage() {
                   <span>Step {step} of 4</span>
                   <span>{step === 1 ? "Category" : step === 2 ? "Experience" : step === 3 ? "Details" : "Submit"}</span>
                 </div>
-                <div className="w-full h-1.5 bg-white/10 rounded-full overflow-hidden">
+                <div className="w-full h-1.5 bg-[#0E1322] rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-white transition-all duration-500 rounded-full"
+                    className="h-full bg-blue-600 transition-all duration-500 rounded-full"
                     style={{ width: `${(step / 4) * 100}%` }}
                   />
                 </div>
@@ -316,8 +316,8 @@ export default function FeedbackPage() {
                           }}
                           className={`group p-5 rounded-2xl text-left border transition-all duration-200 flex flex-col justify-between ${
                             isSelected
-                              ? "bg-white text-black border-white shadow-[0_0_20px_rgba(255,255,255,0.2)] scale-[1.01]"
-                              : "bg-[#0f0f11] text-white border-white/5 hover:border-white/20 hover:bg-[#141418]"
+                              ? "bg-blue-600 text-white border-blue-500 shadow-lg shadow-blue-600/25 scale-[1.01]"
+                              : "bg-[#131B2E] text-[#F8FAFC] border-slate-700/40 hover:border-blue-500/50 hover:bg-[#0E1322]"
                           }`}
                         >
                           <div className={`mb-4 ${isSelected ? "text-black" : "text-white/70"}`}>
@@ -338,7 +338,7 @@ export default function FeedbackPage() {
                     type="button"
                     disabled={!type}
                     onClick={() => setStep(2)}
-                    className="w-full py-4 rounded-full bg-white text-black font-bold text-sm flex items-center justify-center gap-2 hover:bg-white/90 disabled:opacity-30 disabled:cursor-not-allowed transition-all active:scale-[0.99]"
+                    className="w-full py-4 rounded-full bg-blue-600 text-white font-bold text-sm flex items-center justify-center gap-2 hover:bg-blue-500 disabled:opacity-30 disabled:cursor-not-allowed transition-all active:scale-[0.99]"
                   >
                     Continue to Experience
                     <ArrowRight size={18} />
@@ -353,7 +353,7 @@ export default function FeedbackPage() {
                   <p className="text-white/50 text-sm mb-8">Give us a quick rating and select which area this relates to.</p>
 
                   {/* Star Rating */}
-                  <div className="bg-[#0f0f11] border border-white/5 rounded-2xl p-6 mb-8">
+                  <div className="bg-[#131B2E] border border-slate-700/40 rounded-2xl p-6 mb-8">
                     <label className="block text-xs uppercase tracking-wider font-semibold text-white/60 mb-4">
                       Overall Satisfaction
                     </label>
@@ -403,8 +403,8 @@ export default function FeedbackPage() {
                             onClick={() => setFocusArea(isSelected ? "" : area)}
                             className={`px-4 py-2 rounded-full text-xs font-medium border transition-all ${
                               isSelected
-                                ? "bg-white text-black border-white"
-                                : "bg-[#0f0f11] text-white/70 border-white/10 hover:border-white/30 hover:text-white"
+                                ? "bg-blue-600 text-white border-blue-500"
+                                : "bg-[#0E1322] text-[#94A3B8] border-slate-700/40 hover:border-blue-500/50 hover:text-[#F8FAFC]"
                             }`}
                           >
                             {area}
@@ -425,7 +425,7 @@ export default function FeedbackPage() {
                     <button
                       type="button"
                       onClick={() => setStep(3)}
-                      className="flex-1 py-3.5 rounded-full bg-white text-black font-bold text-sm flex items-center justify-center gap-2 hover:bg-white/90 transition-all active:scale-[0.99]"
+                      className="flex-1 py-3.5 rounded-full bg-blue-600 text-white font-bold text-sm flex items-center justify-center gap-2 hover:bg-blue-500 transition-all active:scale-[0.99]"
                     >
                       Next: Description <ArrowRight size={16} />
                     </button>
@@ -450,7 +450,7 @@ export default function FeedbackPage() {
                         onChange={(e) => setTitle(e.target.value)}
                         placeholder="e.g., Voice recording failed on Chrome mobile or Add monthly budget rollover"
                         maxLength={140}
-                        className="w-full bg-[#0f0f11] border border-white/10 focus:border-white/40 rounded-xl px-4 py-3 text-sm text-white placeholder:text-white/20 outline-none transition-all"
+                        className="w-full bg-[#0B0F19] border border-slate-700/40 focus:border-blue-500 rounded-xl px-4 py-3 text-sm text-[#F8FAFC] placeholder:text-[#94A3B8]/60 outline-none transition-all"
                       />
                     </div>
 
@@ -467,7 +467,7 @@ export default function FeedbackPage() {
                         placeholder="Explain what happened, what you expected, or why this feature would help your workflow..."
                         maxLength={1000}
                         rows={5}
-                        className="w-full bg-[#0f0f11] border border-white/10 focus:border-white/40 rounded-xl p-4 text-sm text-white placeholder:text-white/20 outline-none transition-all resize-none"
+                        className="w-full bg-[#0B0F19] border border-slate-700/40 focus:border-blue-500 rounded-xl p-4 text-sm text-[#F8FAFC] placeholder:text-[#94A3B8]/60 outline-none transition-all resize-none"
                       />
                     </div>
 
@@ -478,7 +478,7 @@ export default function FeedbackPage() {
                       </label>
 
                       {previewUrl ? (
-                        <div className="relative w-fit bg-[#0f0f11] border border-white/15 rounded-xl p-2 flex items-center gap-3">
+                        <div className="relative w-fit bg-[#0E1322] border border-slate-700/40 rounded-xl p-2 flex items-center gap-3">
                           <img src={previewUrl} alt="Preview" className="w-16 h-16 object-cover rounded-lg" />
                           <div className="text-xs text-white/70 pr-6">
                             <p className="font-semibold truncate max-w-[200px]">{screenshot?.name}</p>
@@ -495,7 +495,7 @@ export default function FeedbackPage() {
                           </button>
                         </div>
                       ) : (
-                        <label className="flex flex-col items-center justify-center p-6 border-2 border-dashed border-white/10 hover:border-white/30 rounded-xl cursor-pointer bg-[#0f0f11]/50 hover:bg-[#0f0f11] transition-all group">
+                        <label className="flex flex-col items-center justify-center p-6 border-2 border-dashed border-slate-700/40 hover:border-blue-500/50 rounded-xl cursor-pointer bg-[#0B0F19] hover:bg-[#0E1322] transition-all group">
                           <Upload size={22} className="text-white/40 group-hover:text-white mb-2 transition-colors" />
                           <span className="text-xs text-white/60 group-hover:text-white font-medium transition-colors">
                             Click to upload an image or screenshot
@@ -524,7 +524,7 @@ export default function FeedbackPage() {
                       type="button"
                       disabled={!title.trim() || !description.trim()}
                       onClick={() => setStep(4)}
-                      className="flex-1 py-3.5 rounded-full bg-white text-black font-bold text-sm flex items-center justify-center gap-2 hover:bg-white/90 disabled:opacity-30 disabled:cursor-not-allowed transition-all active:scale-[0.99]"
+                      className="flex-1 py-3.5 rounded-full bg-blue-600 text-white font-bold text-sm flex items-center justify-center gap-2 hover:bg-blue-500 disabled:opacity-30 disabled:cursor-not-allowed transition-all active:scale-[0.99]"
                     >
                       Next: Contact & Submit <ArrowRight size={16} />
                     </button>
@@ -548,7 +548,7 @@ export default function FeedbackPage() {
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                         placeholder="e.g., Arjun Sharma"
-                        className="w-full bg-[#0f0f11] border border-white/10 focus:border-white/40 rounded-xl px-4 py-3 text-sm text-white placeholder:text-white/20 outline-none transition-all"
+                        className="w-full bg-[#0B0F19] border border-slate-700/40 focus:border-blue-500 rounded-xl px-4 py-3 text-sm text-[#F8FAFC] placeholder:text-[#94A3B8]/60 outline-none transition-all"
                       />
                     </div>
 
@@ -562,7 +562,7 @@ export default function FeedbackPage() {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder="name@example.com"
-                        className="w-full bg-[#0f0f11] border border-white/10 focus:border-white/40 rounded-xl px-4 py-3 text-sm text-white placeholder:text-white/20 outline-none transition-all"
+                        className="w-full bg-[#0B0F19] border border-slate-700/40 focus:border-blue-500 rounded-xl px-4 py-3 text-sm text-[#F8FAFC] placeholder:text-[#94A3B8]/60 outline-none transition-all"
                       />
                     </div>
 
@@ -573,11 +573,11 @@ export default function FeedbackPage() {
                       <select
                         value={source}
                         onChange={(e) => setSource(e.target.value)}
-                        className="w-full bg-[#0f0f11] border border-white/10 focus:border-white/40 rounded-xl px-4 py-3 text-sm text-white outline-none transition-all"
+                        className="w-full bg-[#0B0F19] border border-slate-700/40 focus:border-blue-500 rounded-xl px-4 py-3 text-sm text-[#F8FAFC] outline-none transition-all"
                       >
-                        <option value="" className="bg-black text-white/50">Select an option...</option>
+                          <option value="" className="bg-[#0B0F19] text-white/50">Select an option...</option>
                         {discoverySources.map((s) => (
-                          <option key={s} value={s} className="bg-black text-white">
+                          <option key={s} value={s} className="bg-[#0B0F19] text-white">
                             {s}
                           </option>
                         ))}
@@ -596,7 +596,7 @@ export default function FeedbackPage() {
                     <button
                       type="submit"
                       disabled={isSubmitting}
-                      className="flex-1 py-3.5 rounded-full bg-white text-black font-bold text-sm flex items-center justify-center gap-2 hover:bg-white/90 disabled:opacity-40 transition-all active:scale-[0.99]"
+                      className="flex-1 py-3.5 rounded-full bg-blue-600 text-white font-bold text-sm flex items-center justify-center gap-2 hover:bg-blue-500 disabled:opacity-40 transition-all active:scale-[0.99]"
                     >
                       {isSubmitting ? (
                         <>

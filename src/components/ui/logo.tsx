@@ -31,7 +31,7 @@ const Logo = ({
 
   return (
     <div className={`flex items-center gap-2.5 ${className}`}>
-      <div className={`flex items-center justify-center bg-[#1E293B] border border-[#334155] shadow-xs ${boxClasses[size]}`}>
+      <div className={`flex items-center justify-center bg-[#131B2E] border border-slate-800 shadow-xs ${boxClasses[size]}`}>
         <img
           src={logo}
           alt="VoiceKhata Logo"
@@ -42,7 +42,7 @@ const Logo = ({
         <span
           className={`font-bold tracking-tight text-[#F8FAFC] font-sans ${textSizeClasses[size]}`}
         >
-          Voice<span className="text-[#818CF8]">Khata</span>
+          Voice<span className="text-blue-500">Khata</span>
         </span>
       )}
     </div>
