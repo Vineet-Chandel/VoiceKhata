@@ -70,8 +70,10 @@ export function ChatInput({ onSend, loading, guidedStep, replyingTo, onCancelRep
   const textareaRef                 = React.useRef<HTMLTextAreaElement>(null)
 
   const handleVoiceTranscript = React.useCallback((finalText: string) => {
-    if (finalText.trim()) {
-      const fullMessage = (value ? value + " " + finalText : finalText).trim()
+    const trimmed = finalText.trim()
+    const cleaned = trimmed.toLowerCase().replace(/[^\w\s]/g, "")
+    if (trimmed && trimmed.length > 2 && !/^(the|a|an|you|bye)$/i.test(cleaned)) {
+      const fullMessage = (value ? value + " " + trimmed : trimmed).trim()
       onSend(fullMessage)
       setValue("")
       if (textareaRef.current) textareaRef.current.style.height = "auto"

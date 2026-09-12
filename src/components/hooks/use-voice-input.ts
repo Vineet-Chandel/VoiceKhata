@@ -31,6 +31,8 @@ export function useVoiceInput(options?: UseVoiceInputOptions) {
   const spokenTranscriptRef = useRef("")
   const webSpeechFailedRef = useRef(false)
   const safetyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const volumeIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const maxVolumeRef = useRef(0)
   const optionsRef = useRef(options)
 
   useEffect(() => {
@@ -41,6 +43,11 @@ export function useVoiceInput(options?: UseVoiceInputOptions) {
     if (safetyTimeoutRef.current) {
       clearTimeout(safetyTimeoutRef.current)
       safetyTimeoutRef.current = null
+    }
+
+    if (volumeIntervalRef.current) {
+      clearInterval(volumeIntervalRef.current)
+      volumeIntervalRef.current = null
     }
 
     if (streamRef.current) {
@@ -85,23 +92,34 @@ export function useVoiceInput(options?: UseVoiceInputOptions) {
     setErrorMessage("")
     spokenTranscriptRef.current = ""
     webSpeechFailedRef.current = false
+    maxVolumeRef.current = 0
     audioChunksRef.current = []
   }, [cleanupHardware])
 
-  // Finalize processing: only delivers text if non-empty actual speech was detected
+  // Finalize processing: only delivers text if genuine speech was heard
   const handleFinalSpeech = useCallback(async () => {
     setVoiceState("processing")
 
     let finalText = spokenTranscriptRef.current.trim()
 
-    // If WebSpeech had a network error or produced no text, try Whisper with recorded audio
+    // 1. Guard against pure silence/air:
+    // If WebSpeech heard nothing AND mic volume never rose above ambient noise threshold (15):
+    if (!finalText && maxVolumeRef.current < 15) {
+      console.log("[useVoiceInput] Ambient air/silence only (max volume:", maxVolumeRef.current, "). Discarding.")
+      cleanupHardware()
+      setVoiceState("idle")
+      setTranscript("")
+      return
+    }
+
+    // 2. If WebSpeech had a network error or was empty, try Whisper with recorded audio
     if ((!finalText || webSpeechFailedRef.current) && audioChunksRef.current.length > 0) {
       try {
         const mimeType = mediaRecorderRef.current?.mimeType || audioChunksRef.current[0]?.type || "audio/webm"
         const audioBlob = new Blob(audioChunksRef.current, { type: mimeType })
 
-        // Only call Whisper if audio has non-trivial size (> 2500 bytes)
-        if (audioBlob.size > 2500) {
+        // Only call Whisper if audio has non-trivial size (> 3000 bytes) and volume was detected
+        if (audioBlob.size > 3000 && maxVolumeRef.current >= 15) {
           const whisperResult = await transcribeAudioBlob(audioBlob)
           if (whisperResult && whisperResult.trim()) {
             finalText = whisperResult.trim()
@@ -114,9 +132,15 @@ export function useVoiceInput(options?: UseVoiceInputOptions) {
 
     cleanupHardware()
 
-    // If no text or empty air/silence, DO NOT convert to text; return cleanly to idle
-    if (!finalText) {
-      console.log("[useVoiceInput] Silence or null input detected. Returning to idle without triggering transaction.")
+    // 3. Filter out single-word stopword hallucinations (e.g. "The", "a", "you")
+    const cleaned = finalText.toLowerCase().replace(/[^\w\s]/g, "").trim()
+    const silenceStopwords = new Set([
+      "the", "a", "an", "you", "so", "and", "or", "it", "to", "in", "is", "of",
+      "bye", "goodbye", "thank you", "thanks", "subtitles by", "watching", "music"
+    ])
+
+    if (!finalText || silenceStopwords.has(cleaned) || cleaned.length <= 2) {
+      console.log("[useVoiceInput] Discarded silence or empty artifact:", finalText)
       setVoiceState("idle")
       setTranscript("")
       return
@@ -146,6 +170,7 @@ export function useVoiceInput(options?: UseVoiceInputOptions) {
     setTranscript("")
     spokenTranscriptRef.current = ""
     webSpeechFailedRef.current = false
+    maxVolumeRef.current = 0
     audioChunksRef.current = []
 
     try {
@@ -163,7 +188,7 @@ export function useVoiceInput(options?: UseVoiceInputOptions) {
       })
       streamRef.current = stream
 
-      // 2. Setup Web Audio visualizer
+      // 2. Setup Web Audio visualizer and real volume monitoring
       try {
         const AudioCtx = window.AudioContext || (window as any).webkitAudioContext
         if (AudioCtx) {
@@ -174,6 +199,19 @@ export function useVoiceInput(options?: UseVoiceInputOptions) {
           source.connect(analyser)
           audioContextRef.current = ctx
           analyserRef.current = analyser
+
+          const dataArray = new Uint8Array(analyser.frequencyBinCount)
+          volumeIntervalRef.current = setInterval(() => {
+            analyser.getByteFrequencyData(dataArray)
+            let sum = 0
+            for (let i = 0; i < dataArray.length; i++) {
+              sum += dataArray[i]
+            }
+            const avg = sum / dataArray.length
+            if (avg > maxVolumeRef.current) {
+              maxVolumeRef.current = avg
+            }
+          }, 80)
         }
       } catch (e) {
         console.warn("[useVoiceInput] AudioContext visualizer init failed:", e)
@@ -200,16 +238,16 @@ export function useVoiceInput(options?: UseVoiceInputOptions) {
         }
       }
 
-      recorder.start() // Continuous clean audio capture
+      recorder.start() // Clean continuous capture
       setVoiceState("listening")
 
-      // 4. Initialize Web Speech API — Exactly as in avksr/VoiceKhata
+      // 4. Initialize Web Speech API — aligned with avksr/VoiceKhata
       const SpeechRecognitionClass = window.SpeechRecognition || window.webkitSpeechRecognition
       if (SpeechRecognitionClass) {
         const recognition = new SpeechRecognitionClass()
         recognition.lang = "hi-IN" // Standard Indian Hindi/English recognizer
         recognition.interimResults = true
-        recognition.continuous = false // Stops automatically when user finishes speaking
+        recognition.continuous = false // Browser detects natural end of speech
 
         recognition.onresult = (event: any) => {
           let interim = ""
@@ -244,7 +282,6 @@ export function useVoiceInput(options?: UseVoiceInputOptions) {
         }
 
         recognition.onend = () => {
-          // Browser naturally detected end of speech (or pause)
           console.log("[useVoiceInput] Natural speech end detected by browser.")
           handleFinalSpeech()
         }

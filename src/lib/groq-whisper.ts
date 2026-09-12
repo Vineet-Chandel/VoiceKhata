@@ -47,15 +47,19 @@ export async function transcribeAudioBlob(blob: Blob): Promise<string> {
   const text = (data?.text || "").trim()
 
   // Filter out known Whisper silence hallucinations
-  const hallucinations = [
-    "subtitles by",
-    "thank you for watching",
-    "thank you",
-    "amara.org",
-    "subscribe",
-    "watching",
-  ]
-  if (hallucinations.some((h) => text.toLowerCase().includes(h)) && text.length < 35) {
+  const cleaned = text.toLowerCase().replace(/[^\w\s]/g, "").trim()
+  const silenceStopwords = new Set([
+    "the", "a", "an", "you", "so", "and", "or", "it", "to", "in", "is", "of",
+    "bye", "goodbye", "thank you", "thanks", "thank you for watching", "subtitles by",
+    "amaraorg", "subscribe", "please subscribe", "watching", "silence", "music"
+  ])
+
+  if (silenceStopwords.has(cleaned) || cleaned.length <= 2) {
+    console.log("[GroqWhisper] Ignored silence hallucination:", text)
+    return ""
+  }
+
+  if (text.length < 35 && ["subtitles by", "thank you for watching", "amara.org"].some((h) => text.toLowerCase().includes(h))) {
     console.log("[GroqWhisper] Ignored silence hallucination:", text)
     return ""
   }
