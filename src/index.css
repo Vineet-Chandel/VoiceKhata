@@ -70,18 +70,18 @@
 }
 
 :root {
-    /* Custom Semantic Tokens - Light Mode */
+    /* Custom Semantic Tokens - Light Mode (Business Professional) */
     --bg-primary: #ffffff;
-    --surface: #fafafa;
-    --surface-secondary: #f5f5f5;
+    --surface: #f8fafc; /* Slate 50 */
+    --surface-secondary: #f1f5f9; /* Slate 100 */
     --surface-elevated: #ffffff;
-    --text-primary: #111111;
-    --text-secondary: #666666;
-    --text-muted: #999999;
-    --border-primary: #e5e5e5;
+    --text-primary: #0f172a; /* Slate 900 */
+    --text-secondary: #475569; /* Slate 600 */
+    --text-muted: #94a3b8; /* Slate 400 */
+    --border-primary: #e2e8f0; /* Slate 200 */
 
-    --radius: 0.625rem;
-    --surface-card: #171717;
+    --radius: 0.5rem; /* Slightly crisper radius */
+    --surface-card: #0f172a;
     --background: var(--bg-primary);
     --foreground: var(--text-primary);
     --card: var(--surface);
@@ -129,7 +129,7 @@
     --text-muted: #818CF8;     /* periwinkle blue shade */
     --border-primary: #222222;
 
-    --surface-card: #171717;
+    --surface-card: #0f172a;
     --background: var(--bg-primary);
     --foreground: var(--text-primary);
     --card: var(--surface);

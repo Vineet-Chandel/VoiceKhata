@@ -15,6 +15,7 @@ import {
 export default function DashboardPage() {
   return (
     <SidebarProvider
+      className="h-screen w-full overflow-hidden pt-2 "
       style={
         {
           "--sidebar-width": "calc(var(--spacing) * 72)",
@@ -24,14 +25,12 @@ export default function DashboardPage() {
     >
       <AppSidebar variant="inset" />
 
-      <SidebarInset>
-
+      <SidebarInset className="flex flex-col h-full overflow-hidden ">
         <SiteHeader />
 
-        <div className="flex flex-1 flex-col overflow-hidden">
+        <div className="flex-1 overflow-y-auto relative z-10 scroll-smooth pt-4 lg:pt-6 mt-[10px]">
           <Outlet />
         </div>
-
       </SidebarInset>
 
       <FloatingAssistant />

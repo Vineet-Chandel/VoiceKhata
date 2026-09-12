@@ -80,9 +80,11 @@ export function ChatInput({ onSend, loading, guidedStep, replyingTo, onCancelRep
   } = useVoiceInput()
 
   React.useEffect(() => {
-    if (voiceState === "processing" && transcript) {
-      setValue((prev) => (prev ? prev + " " + transcript : transcript))
-      if (textareaRef.current) autoResize(textareaRef.current)
+    if (voiceState === "processing") {
+      if (transcript) {
+        setValue((prev) => (prev ? prev + " " + transcript : transcript))
+        if (textareaRef.current) autoResize(textareaRef.current)
+      }
       resetVoice()
     } else if (voiceState === "error" && errorMessage) {
       console.error(errorMessage)

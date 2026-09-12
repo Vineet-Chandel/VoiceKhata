@@ -18,58 +18,9 @@ import { useAuth } from "@/components/hooks/use-auth"
 import { getUserProfile } from "@/firebase/user"
 import { hasCustomAvatar, getAvatarPublicUrl } from "@/lib/avatar"
 import { avatarEvents } from "@/lib/avatarEvents"
+import { useResolvedAvatar } from "@/components/hooks/use-resolved-avatar"
 
-// ── Hook: resolves avatar with priority + listens for live updates ─────────────
-function useResolvedAvatar() {
-  const { user } = useAuth()
 
-  const fallback = user?.photoURL ||
-    `https://ui-avatars.com/api/?name=${encodeURIComponent(
-      user?.displayName || user?.email || "U"
-    )}&background=000&color=fff`
-
-  const [avatar, setAvatar] = React.useState<string>(fallback)
-
-  const fetchAvatar = React.useCallback(async () => {
-    if (!user) return
-    try {
-      const profile = await getUserProfile()
-      if (profile?.profile_pic) {
-        setAvatar(`${profile.profile_pic}?t=${Date.now()}`)
-        return
-      }
-
-      const hasOwn = await hasCustomAvatar(user.uid)
-      if (hasOwn) {
-        setAvatar(getAvatarPublicUrl(user.uid))
-        return
-      }
-
-      if (user.photoURL) {
-        setAvatar(user.photoURL)
-        return
-      }
-
-      setAvatar(
-        `https://ui-avatars.com/api/?name=${encodeURIComponent(
-          user.displayName || user.email || "U"
-        )}&background=000&color=fff`
-      )
-    } catch {
-      // Keep whatever is currently shown on failure
-    }
-  }, [user?.uid, user?.photoURL])
-
-  React.useEffect(() => {
-    fetchAvatar()
-  }, [fetchAvatar])
-
-  React.useEffect(() => {
-    return avatarEvents.on(fetchAvatar)
-  }, [fetchAvatar])
-
-  return avatar
-}
 
 // ── Sidebar ───────────────────────────────────────────────────────────────────
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
@@ -89,9 +40,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       { title: "Reports", url: "/dashboard/reports", icon: IconReport },
       { title: "AI Assistant", url: "/dashboard/ai-assistant", icon: IconRobot },
       { title: "Money Growth", url: "/dashboard/growth", icon: IconFlame },
-    ],
-    navSecondary: [
-      { title: "Settings", url: "/dashboard/settings", icon: IconSettings },
     ],
   }
 
@@ -124,12 +72,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
       <SidebarContent className="relative z-10">
         <NavMain items={data.navMain} />
-        <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
-
-      <SidebarFooter className="relative z-10">
-        <NavUser user={data.user} />
-      </SidebarFooter>
     </Sidebar>
   )
 }

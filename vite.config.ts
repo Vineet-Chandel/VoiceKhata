@@ -10,7 +10,7 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: "autoUpdate",
-      includeAssets: ["logo-192.png", "logo-512.png", "maskable-black.png"],
+      includeAssets: ["favicon.ico", "favicon.svg", "favicon-32x32.png", "favicon-16x16.png", "logo-192.png", "logo-512.png", "maskable-black.png"],
       manifest: {
         name: "VoiceKhata",
         short_name: "VoiceKhata",

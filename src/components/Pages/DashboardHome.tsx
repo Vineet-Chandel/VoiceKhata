@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react"
 import { ChartAreaInteractive } from "@/components/ui/Dashboard_UI/chart-area-interactive"
 import { DataTable } from "@/components/ui/Dashboard_UI/data-table-dashboard"
 import { SectionCards } from "@/components/ui/Dashboard_UI/section-cards"
+import { QuickLinks } from "@/components/ui/Dashboard_UI/quick-links"
 import { AISuggestions } from "@/components/ui/Dashboard_UI/ai-suggestions"
 import { useTransactions } from "@/components/hooks/use-transactions"
 import { useBudgets } from "@/components/hooks/use-budgets"
@@ -12,6 +13,8 @@ import { createFinancialMetrics, type FinancialMetrics } from "@/lib/financial-m
 import { getScopedSupabase, supabase } from "@/lib/supabase"
 import { Link } from "react-router-dom"
 import { Sparkles, ArrowRight } from "lucide-react"
+import { useAppMode } from "@/context/AppModeContext"
+import type { AppMode } from "@/context/AppModeContext"
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -25,9 +28,55 @@ function currency(amount: number): string {
 
 // ─── Notification templates ───────────────────────────────────────────────────
 
-function buildInsights(metrics: FinancialMetrics) {
+function buildInsights(metrics: FinancialMetrics, appMode: AppMode) {
   const { totalIncome: income, totalExpense: expense, balance, savingsRate } = metrics
   const expensePct = income > 0 ? Math.round((expense / income) * 100) : 0
+
+  if (appMode === "BUSINESS") {
+    return [
+      {
+        type: "ai_insight" as const,
+        title: "Daily Business Insight",
+        message:
+          savingsRate >= 30
+            ? `Excellent net margin of ${savingsRate}%! Your business is operating highly efficiently. Consider reinvesting surplus into inventory or marketing.`
+            : savingsRate >= 15
+            ? `Your net margin is ${savingsRate}% — solid progress. Automating supply orders could further reduce operating costs.`
+            : savingsRate >= 5
+            ? `Your margin is ${savingsRate}%. Trimming ${currency(Math.round((income - expense) * 0.1))} from operating expenses could improve profitability.`
+            : `Your margin is ${savingsRate}%. With ${currency(income)} in revenue and ${currency(expense)} in costs, analyze overhead to improve cash flow.`,
+      },
+      {
+        type: "ai_insight" as const,
+        title: "Operating Cost Analysis",
+        message:
+          expensePct > 80
+            ? `Your costs are ${currency(expense)} — that's ${expensePct}% of revenue. Review supplier terms for quick margin wins.`
+            : `You've kept costs to ${currency(expense)} (${expensePct}% of revenue). Great discipline — working capital stands at ${currency(balance)}.`,
+      },
+      {
+        type: "system" as const,
+        title: "Capital Update",
+        message: `Your working capital is ${currency(balance)}. ${
+          balance > 50000
+            ? "You have a healthy reserve — consider expanding inventory."
+            : "Monitor cash flow closely to ensure operations run smoothly."
+        }`,
+      },
+      {
+        type: "ai_insight" as const,
+        title: "Business Tip",
+        message: `Keeping operating costs under 70% of revenue ensures healthy cash flow. Your current ratio is ${expensePct}% — ${
+          expensePct <= 70 ? "you're running efficiently!" : "try negotiating better rates to improve your ratio."
+        }`,
+      },
+      {
+        type: "ai_insight" as const,
+        title: "Weekly Summary",
+        message: `Consistent tracking is key to business growth. You've recorded ${currency(income)} in sales and ${currency(expense)} in costs — keep it up!`,
+      },
+    ]
+  }
 
   return [
     {
@@ -112,12 +161,67 @@ async function maybeInsert(
   if (error) console.error("[notifications] insert error:", error.message)
 }
 
+// ─── Dashboard Greeting ─────────────────────────────────────────────────────────
+
+function DashboardGreeting({ userName }: { userName: string }) {
+  const [greeting, setGreeting] = useState("")
+  const [note, setNote] = useState("")
+  const [dateStr, setDateStr] = useState("")
+
+  useEffect(() => {
+    const now = new Date()
+    
+    // Format date: "Thursday, 10 September"
+    const formattedDate = new Intl.DateTimeFormat("en-US", {
+      weekday: "long",
+      day: "numeric",
+      month: "long"
+    }).format(now)
+    
+    setDateStr(formattedDate)
+
+    const hour = now.getHours()
+    
+    // Determine greeting and premium note
+    if (hour >= 5 && hour < 12) {
+      setGreeting("Good morning")
+      setNote("A fresh start to optimize your cash flow and track today's opportunities.")
+    } else if (hour >= 12 && hour < 17) {
+      setGreeting("Good afternoon")
+      setNote("Mid-day check-in. A quick review ensures your ledgers stay perfectly balanced.")
+    } else if (hour >= 17 && hour < 22) {
+      setGreeting("Good evening")
+      setNote("Wrapping up the day's transactions for a clear financial overview.")
+    } else {
+      setGreeting("Good night")
+      setNote("Rest well. Your financial data is securely tracked and ready for tomorrow.")
+    }
+  }, [])
+
+  const firstName = userName.split(" ")[0] || "User"
+
+  return (
+    <div className="flex flex-col gap-1 mb-2">
+      <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground/70">
+        {dateStr}
+      </p>
+      <h2 className="text-2xl font-bold tracking-tight text-foreground">
+        {greeting}, {firstName}
+      </h2>
+      <p className="text-sm text-muted-foreground max-w-xl">
+        {note}
+      </p>
+    </div>
+  )
+}
+
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function DashboardHome() {
   const { transactions, loading } = useTransactions()
   const { budgets } = useBudgets()
   const { user } = useAuth()
+  const { appMode } = useAppMode()
 
   const [carryForwardPrompt, setCarryForwardPrompt] = useState<{
     month: string
@@ -139,7 +243,7 @@ export default function DashboardHome() {
     hasFiredRef.current = true
 
     const uid = user.uid
-    const insights = buildInsights(metrics)
+    const insights = buildInsights(metrics, appMode)
 
     // First notification immediately
     maybeInsert(uid, insights[0].type, insights[0].title, insights[0].message)
@@ -187,6 +291,7 @@ export default function DashboardHome() {
         .select("category, amount")
         .eq("firebase_uid", user.uid)
         .eq("month", prevMonth)
+        .eq("app_mode", appMode)
 
       if (!prevBudgets || prevBudgets.length === 0 || !active) return
 
@@ -195,6 +300,7 @@ export default function DashboardHome() {
         .select("category, amount, type, date")
         .eq("firebase_uid", user.uid)
         .eq("type", "Debit")
+        .eq("app_mode", appMode)
         .gte("date", `${prevMonth}-01`)
         .lte("date", `${prevMonth}-31`)
 
@@ -217,7 +323,7 @@ export default function DashboardHome() {
     })()
 
     return () => { active = false }
-  }, [user?.uid])
+  }, [user?.uid, appMode])
 
   // ── Render ────────────────────────────────────────────────────────────────
 
@@ -232,32 +338,10 @@ export default function DashboardHome() {
   return (
     <div className="@container/main flex flex-1 flex-col gap-2">
       <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
-
-        {/* Money Growth Engine Spotlight Card */}
+        
+        {/* Greeting Section */}
         <div className="px-4 lg:px-6">
-          <Link
-            to="/dashboard/growth"
-            className="group relative overflow-hidden rounded-2xl border border-violet-500/30 bg-gradient-to-r from-violet-500/10 via-emerald-500/5 to-surface-secondary/40 p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 hover:border-violet-500/50 transition-all shadow-sm"
-          >
-            <div className="flex items-center gap-3.5">
-              <div className="size-10 rounded-xl bg-violet-500/20 border border-violet-500/30 flex items-center justify-center shrink-0">
-                <Sparkles className="text-violet-400" size={20} />
-              </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <h3 className="text-sm font-semibold text-text-primary">AI Money Growth Center</h3>
-                  <span className="text-[10px] font-semibold uppercase tracking-wider bg-violet-500/20 text-violet-300 px-2 py-0.5 rounded-full">New Engine</span>
-                </div>
-                <p className="text-xs text-text-muted mt-0.5">
-                  View your Financial Digital Twin, Next Best Move, Rupee Router, and What-If Simulator.
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center gap-1.5 text-xs font-semibold text-violet-400 group-hover:text-violet-300 transition-colors shrink-0">
-              <span>Launch Growth Center</span>
-              <ArrowRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
-            </div>
-          </Link>
+          <DashboardGreeting userName={user?.displayName || "User"} />
         </div>
 
         <SectionCards
@@ -294,6 +378,8 @@ export default function DashboardHome() {
           metrics={metrics}
           dataLoading={loading}
         />
+
+        <QuickLinks />
 
         <div className="px-4 lg:px-6">
           <ChartAreaInteractive data={metrics.runningBalance} />

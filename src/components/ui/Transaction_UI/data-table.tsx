@@ -49,6 +49,7 @@ import {
 import { z } from "zod"
 import { Link } from "react-router-dom"
 
+import { useAppMode } from "@/context/AppModeContext"
 import { useIsMobile } from "@/components/hooks/use-mobile"
 import { Badge } from "@/components/ui/Dashboard_UI/badge"
 import { Button } from "@/components/ui/button"
@@ -85,6 +86,7 @@ export const schema = z.object({
   method:      z.string(),
   status:      z.string(),
   type:        z.string(),
+  app_mode:    z.string().optional(),
 })
 
 type TransactionUpdate = Omit<Transaction, "id" | "firebase_uid" | "created_at">
@@ -527,11 +529,17 @@ export function DataTable({
 // ─── Transaction Viewer drawer ─────────────────────────────────────────────────
 function TransactionViewer({ item }: { item: z.infer<typeof schema> }) {
   const isMobile = useIsMobile()
+  const { appMode } = useAppMode()
 
   return (
     <Drawer direction={isMobile ? "bottom" : "right"}>
       <DrawerTrigger asChild>
-        <Button variant="link" className="px-0 text-left cursor-pointer">
+        <Button variant="link" className="px-0 text-left cursor-pointer flex items-center gap-1.5">
+          {appMode === "COMBO" && item.app_mode && (
+            <Badge variant="outline" className="h-5 px-1.5 text-[10px] uppercase font-bold text-muted-foreground">
+              {item.app_mode === "BUSINESS" ? "B" : "P"}
+            </Badge>
+          )}
           {item.transaction}
         </Button>
       </DrawerTrigger>

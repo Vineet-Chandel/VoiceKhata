@@ -8,6 +8,7 @@ export type Transaction = {
   type: string
   method: string
   status: string
+  app_mode?: "BUSINESS" | "PERSONAL"
   created_at?: string
 }
 
@@ -22,6 +23,7 @@ export type Budget = {
   spent: number
   month: string
   duration: string
+  app_mode?: "BUSINESS" | "PERSONAL"
   created_at?: string
 }
 
@@ -29,10 +31,12 @@ export type BudgetInput = {
   category: string
   amount: number
   duration: string
+  app_mode?: "BUSINESS" | "PERSONAL"
 }
 
 export type BudgetUpdateInput = {
   category: string
   amount: number
   duration: string
+  app_mode?: "BUSINESS" | "PERSONAL"
 }

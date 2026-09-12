@@ -4,6 +4,7 @@ import { Routes, Route } from "react-router-dom";
 import ProtectedRoute from "@/routes/ProtectedRoute";
 import { AuthProvider } from "@/context/AuthContext";
 import { FinancialProvider } from "@/context/FinancialContext";
+import { AppModeProvider } from "@/context/AppModeContext";
 import { ChatStoreProvider } from "@/components/hooks/use-chat-store";
 
 // Lazy-load other pages so their heavy dependencies don't block the root landing page
@@ -34,6 +35,8 @@ const Blog = lazy(() => import("@/components/ui/Footer_pages/Blog"));
 const Changelog = lazy(() => import("@/components/ui/Footer_pages/changelog"));
 const Brand = lazy(() => import("@/components/ui/Footer_pages/brand"));
 const Help = lazy(() => import("@/components/ui/Footer_pages/help"));
+const FeedbackPage = lazy(() => import("@/components/Pages/FeedbackPage"));
+const ReviewPage = lazy(() => import("@/components/Pages/ReviewPage"));
 
 export default function App() {
   return (
@@ -52,11 +55,13 @@ export default function App() {
               path="/dashboard"
               element={
                 <ProtectedRoute>
-                  <FinancialProvider>
-                    <ChatStoreProvider>
-                      <DashboardPage />
-                    </ChatStoreProvider>
-                  </FinancialProvider>
+                  <AppModeProvider>
+                    <FinancialProvider>
+                      <ChatStoreProvider>
+                        <DashboardPage />
+                      </ChatStoreProvider>
+                    </FinancialProvider>
+                  </AppModeProvider>
                 </ProtectedRoute>
               }
             >
@@ -74,6 +79,8 @@ export default function App() {
             <Route path="*" element={<NotFound />} />
             <Route path="/soon" element={<ComingSoon />} />
             <Route path="/features" element={<Features />} />
+            <Route path="/feedback" element={<FeedbackPage />} />
+            <Route path="/review" element={<ReviewPage />} />
             <Route path="/pricing" element={<Pricing />} />
             <Route path="/testimonials" element={<Testimonials />} />
             <Route path="/integration" element={<Integration />} />
