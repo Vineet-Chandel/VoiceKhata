@@ -37,15 +37,17 @@ Return ONLY valid JSON with this shape:
 }
 
 Khata & Indian Bookkeeping Rules:
-- Credit (Inflow / Money Received):
-  * "jama", "payment mila", "ne diye", "chuka diya", "vasool hua", "received", "paid me", "aaye", "जमा", "दिए", "भुगतान", "चुकता", "मिला"
-  * Example: "Ramesh ne 500 rupaye diye" -> transaction: "Ramesh", amount: 500, type: "Credit", category: "Income", method: "Cash"
-  * Example: "सुरेश ने 1200 जमा किया" -> transaction: "Suresh", amount: 1200, type: "Credit", category: "Income"
-- Debit (Outflow / Udhaar Given / Expense):
-  * "udhaar", "udhar diya", "samaan liya", "karza", "borrowed", "credit given", "spent", "kharcha", "paid to", "उधार", "कर्ज", "खर्चा", "लिया"
-  * Example: "Suresh ko 1200 udhar diya" -> transaction: "Suresh", amount: 1200, type: "Debit", category: "Debt", method: "Cash"
-  * Example: "रमेश को 500 रुपये उधार दिए" -> transaction: "Ramesh", amount: 500, type: "Debit", category: "Debt"
-  * Example: "Gupta Kirana se 350 ka samaan liya" -> transaction: "Gupta Kirana", amount: 350, type: "Debit", category: "Shopping"
+- Credit (Inflow / Money Received / Income):
+  * Markers: "ne diya", "ne diye", "se mila", "se mile", "received", "received from", "paid me", "sent me", "salary", "jama kiya", "vasool hua", "cashback", "refund", "जमा", "मिला", "भुगतान प्राप्त", "आया", "से मिला", "ने दिया", "ने दिए"
+  * RULE: "Ramesh ne 500 diye" -> Ramesh gave money -> type: "Credit"
+  * RULE: "Received 1200 from Suresh" -> Money received -> type: "Credit"
+  * RULE: "Salary 50000" -> type: "Credit", category: "Income"
+- Debit (Outflow / Money Paid Out / Expense / Udhaar Given):
+  * Markers: "paid for", "paid to", "paid" (e.g. "Paid 450 for groceries"), "spent", "ko diya", "ko diye", "udhar diya", "samaan liya", "karza diya", "bill bhar diya", "petrol bharwaya", "उधार दिया", "कर्ज", "खर्चा", "को दिया", "भुगतान किया", "खर्च"
+  * RULE: "Paid 450 for groceries" -> Money spent -> type: "Debit", category: "Food"
+  * RULE: "Spent 350 on petrol" -> Money spent -> type: "Debit", category: "Transport"
+  * RULE: "Suresh ko 1200 diye" -> Money given TO Suresh -> type: "Debit"
+  * RULE: "Ramesh ko 500 udhar diya" -> Credit given to customer -> type: "Debit", category: "Debt"
 
 General Rules:
 - Understand Devanagari Hindi, Hinglish, English, slang, and numbers in words ("do hazaar" -> 2000, "paanch sau" -> 500).

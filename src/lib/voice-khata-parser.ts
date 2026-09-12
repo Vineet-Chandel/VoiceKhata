@@ -148,66 +148,90 @@ export function parseVoiceKhataInput(transcript: string, knownCustomers?: string
     else if (combined.includes("das hazaar") || combined.includes("ten thousand") || combined.includes("दस हज़ार")) amount = 10000
   }
 
-  // 2. Direction Extraction
-  // Payment / Money Received (Credit to ledger)
-  const paymentKeywords = [
-    "paid", "payment", "received", "jama", "vasool", "mila", "mile", "aaye", "aaya", "aayi", "got", "paid me",
-    "chuka", "chuka diya", "bhugtan", "जमा", "भुगतान", "दिए", "दिया", "दे दिया", "मिला", "मिले", "आया", "आए", "चुकता", "वसूल"
-  ]
-
-  // Credit / Udhaar Given (Debit from ledger / Customer owes)
-  const creditKeywords = [
-    "udhar", "udhaar", "borrow", "borrowed", "credit", "owes", "due", "on credit", "samaan", "goods",
-    "liye", "liya", "kharcha", "spent", "debit", "karza", "उधार", "कर्ज", "लिया", "लिए", "खर्चा", "समान"
-  ]
-
-  const combinedSearch = `${lower} ${lowerTrans}`
-  let isCredit = false
-  let isDebit = false
-
-  // Special Indian grammar rule: "ne ... diye" / "ne ... payment diya" means customer gave payment
-  if (/\b(?:ne|ने)\b.*\b(?:diye|diya|दिए|दिया|payment|jama|जमा)\b/i.test(combinedSearch)) {
-    isCredit = true
-  }
-  // Special Indian grammar rule: "ko ... udhar diya" means shopkeeper gave udhaar to customer
-  if (/\b(?:ko|को)\b.*\b(?:udhar|udhaar|उधार|karza|कर्ज)\b/i.test(combinedSearch)) {
-    isDebit = true
-  }
-
-  if (!isCredit && !isDebit) {
-    for (const kw of paymentKeywords) {
-      if (new RegExp(`\\b${kw}\\b`, "i").test(combinedSearch)) {
-        isCredit = true
-        break
-      }
-    }
-    for (const kw of creditKeywords) {
-      if (new RegExp(`\\b${kw}\\b`, "i").test(combinedSearch)) {
-        isDebit = true
-        break
-      }
-    }
-  }
-
-  let type: "Credit" | "Debit" | null = null
+  // 2. Direction & Transaction Type Extraction (Credit vs Debit)
+  // CREDIT = Money Received / Inflow (Salary, Customer gave payment, Income, Refund, Cashback)
+  // DEBIT  = Money Paid / Outflow (Expense, Paid to merchant/party, Udhaar given, Food, Groceries, Petrol, Bill)
+  let type: "Credit" | "Debit" = "Debit"
   let isAmbiguousDirection = false
 
-  if (isCredit && !isDebit) {
-    type = "Credit"
-  } else if (isDebit && !isCredit) {
+  const combinedSearch = `${lower} ${lowerTrans}`
+
+  // A. High-Priority Hindi / Hinglish Case Markers:
+  // 1. "ko ... diya / diye / de diya / transfer / udhar" -> Money given TO someone -> DEBIT
+  const isKoDiya = /\b(?:ko|को)\b.*\b(?:diya|diye|de diya|de diye|bheja|bhej diya|transfer|udhar|udhaar|दिए|दिया|दे दिए|दे दिया|भेजा|उधार|कर्ज)\b/i.test(combinedSearch)
+  // 2. "ne ... diya / diye / payment / jama" -> Person GAVE to me -> CREDIT
+  const isNeDiya = /\b(?:ne|ने)\b.*\b(?:diya|diye|de diya|de diye|payment|jama|bheja|दिए|दिया|दे दिए|दे दिया|जमा|भुगतान)\b/i.test(combinedSearch)
+  // 3. "se ... mila / mile / prapt / aaya" -> Received FROM someone -> CREDIT
+  const isSeMila = /\b(?:se|से)\b.*\b(?:mila|mile|mili|mil gaya|aaya|aaye|aayi|prapt|received|मिला|मिले|मिली|मिल गया|आया|आए|आई|प्राप्त)\b/i.test(combinedSearch)
+  // 4. "maine ... diya / kharch" -> I gave / spent -> DEBIT
+  const isMaineDiya = /\b(?:maine|mene|humne|मैंने|हमने)\b.*\b(?:diya|diye|de diya|kharch|kharcha|दिया|दिए|खर्च|खर्चा)\b/i.test(combinedSearch)
+
+  // B. Explicit English Directional Phrasings:
+  const isPaidMe = /\b(?:paid me|sent me|gave me|transferred me|received from|got from|credited to|salary from)\b/i.test(combinedSearch)
+  const isPaidForOrTo = /\b(?:paid for|paid to|spent on|spent for|sent to|transferred to|gave to|bought for|ordered from)\b/i.test(combinedSearch)
+
+  // C. Inherent Credit / Inflow Indicators:
+  const creditKeywords = [
+    "received", "receive", "got", "earned", "salary", "stipend", "bonus", "cashback", "refund",
+    "credited", "credit to", "jama", "vasool", "wasool", "mila", "mile", "mili", "aaye", "aaya", "aayi",
+    "kamai", "aamdani", "munafa", "bikri", "sale", "sales", "revenue",
+    "जमा", "वसूल", "वसूली", "मिला", "मिले", "मिली", "आया", "आए", "आई", "सैलरी", "वेतन", "कमाई", "आमदनी", "मुनाफा", "बिक्री", "कैशबैक", "रिफंड"
+  ]
+
+  // D. Inherent Debit / Outflow Indicators:
+  const debitKeywords = [
+    "spent", "spend", "bought", "buy", "purchased", "purchase", "ordered", "expense", "kharcha",
+    "kharch", "bill", "recharge", "petrol", "diesel", "groceries", "grocery", "food", "dinner",
+    "lunch", "breakfast", "chai", "rent", "kiraya", "fee", "fees", "fine", "tax", "shopping",
+    "udhar", "udhaar", "borrow", "borrowed", "debited", "karza",
+    "खर्चा", "खर्च", "उधार", "कर्ज", "खरीदा", "खरीदी", "समान", "बिल", "पेट्रोल", "किराया", "फीस"
+  ]
+
+  // Generic English "paid" (e.g. "Paid 450 for groceries", "Paid ₹1200 to Ramesh"):
+  // ALWAYS Debit unless accompanied by "paid me" or "ne paid"
+  const hasGenericPaid = /\bpaid\b/i.test(combinedSearch) && !isPaidMe && !/\b(?:paid by|ne paid|ने paid)\b/i.test(combinedSearch)
+
+  if (isKoDiya) {
     type = "Debit"
-  } else if (isCredit && isDebit) {
-    // If both keywords exist, check if "udhar" takes precedence as debit
-    if (combinedSearch.includes("udhar") || combinedSearch.includes("उधार")) {
-      type = "Debit"
-    } else {
-      type = "Credit"
-      isAmbiguousDirection = true
-    }
-  } else {
-    // Default to Credit (Payment) with ambiguous direction flag
+  } else if (isNeDiya) {
     type = "Credit"
-    isAmbiguousDirection = true
+  } else if (isSeMila) {
+    type = "Credit"
+  } else if (isMaineDiya) {
+    type = "Debit"
+  } else if (isPaidMe) {
+    type = "Credit"
+  } else if (isPaidForOrTo || hasGenericPaid) {
+    type = "Debit"
+  } else {
+    const hasCreditKw = creditKeywords.some(kw => new RegExp(`\\b${kw}\\b`, "i").test(combinedSearch))
+    const hasDebitKw = debitKeywords.some(kw => new RegExp(`\\b${kw}\\b`, "i").test(combinedSearch))
+
+    if (hasCreditKw && !hasDebitKw) {
+      type = "Credit"
+    } else if (hasDebitKw && !hasCreditKw) {
+      type = "Debit"
+    } else if (hasCreditKw && hasDebitKw) {
+      // Prioritize explicit settlement / receipt words
+      if (/\b(?:received|mila|mile|mili|salary|jama|wasool|vasool|मिला|जमा)\b/i.test(combinedSearch)) {
+        type = "Credit"
+      } else {
+        type = "Debit"
+      }
+    } else {
+      // Sentence structure clues:
+      if (/^\s*(?:paid|gave|give|bought|spent|ordered|transfer)/i.test(rawText)) {
+        type = "Debit"
+      } else if (/^\s*(?:received|got|earned)/i.test(rawText)) {
+        type = "Credit"
+      } else if (/\b(?:diya|diye|दिए|दिया)\b/i.test(combinedSearch)) {
+        type = "Debit"
+      } else {
+        // Default to Debit for general spending/transactions with low confidence
+        type = "Debit"
+        isAmbiguousDirection = true
+      }
+    }
   }
 
   // 3. Counterparty / Person extraction
@@ -304,8 +328,26 @@ export function parseVoiceKhataInput(transcript: string, knownCustomers?: string
   const dd = String(dateObj.getDate()).padStart(2, "0")
   const dateStr = `${yyyy}-${mm}-${dd}`
 
-  // 7. Category
-  const category = type === "Credit" ? "Income" : "Shopping"
+  // 7. Context-Aware Category Detection
+  let category = type === "Credit" ? "Income" : "Shopping"
+
+  if (/\b(?:petrol|diesel|fuel|cab|taxi|uber|ola|metro|auto|bus|fare|flight|train|transport|rickshaw)\b/i.test(combinedSearch)) {
+    category = "Transport"
+  } else if (/\b(?:food|groceries|grocery|dinner|lunch|breakfast|chai|tea|coffee|samosa|snacks|milk|doodh|vegetables|sabji|fruits|ration|kirana|restaurant|hotel|swiggy|zomato)\b/i.test(combinedSearch)) {
+    category = "Food"
+  } else if (/\b(?:bill|electricity|bijli|water|pani|wifi|internet|broadband|recharge|mobile|cylinder|gas)\b/i.test(combinedSearch)) {
+    category = "Utilities"
+  } else if (/\b(?:medicine|medical|doctor|hospital|clinic|dawa|davai|health|pharma)\b/i.test(combinedSearch)) {
+    category = "Health"
+  } else if (/\b(?:udhar|udhaar|karza|loan|emi|debt|credit|उधार|कर्ज)\b/i.test(combinedSearch)) {
+    category = "Debt"
+  } else if (/\b(?:movie|cinema|netflix|party|game|entertainment|fun)\b/i.test(combinedSearch)) {
+    category = "Entertainment"
+  } else if (/\b(?:clothes|shopping|shoes|shirt|pant|dress|kapde|saree|mall|amazon|flipkart)\b/i.test(combinedSearch)) {
+    category = "Shopping"
+  } else if (type === "Credit") {
+    category = "Income"
+  }
 
   // 8. Overall confidence
   const confidence: "high" | "medium" | "low" = 
