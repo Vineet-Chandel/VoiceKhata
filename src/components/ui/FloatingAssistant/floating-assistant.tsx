@@ -522,22 +522,33 @@ export function FloatingAssistant() {
 
               <div className={`flex items-center transition-all duration-[250ms] ${isCompact && !isActive ? "px-3 py-2" : "px-3 py-2.5"}`}>
                 {isListening ? (
-                  <div className="flex items-center gap-3 w-full">
-                    <button
-                      onClick={() => { stopListening(); setTimeout(resetVoice, 50) }}
-                      className="size-8 rounded-xl bg-white/5 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/10 transition-all cursor-pointer shrink-0"
-                    >
-                      <X size={16} />
-                    </button>
-                    <div className="flex-1 h-8 flex items-center justify-center overflow-hidden">
-                      <VoiceWaveform analyserRef={analyserRef} isListening={true} color="rgba(59, 130, 246, 0.9)" />
+                  <div className="flex flex-col gap-1.5 w-full">
+                    <div className="flex items-center gap-3 w-full">
+                      <button
+                        onClick={() => { stopListening(); setTimeout(resetVoice, 50) }}
+                        className="size-8 rounded-xl bg-white/5 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/10 transition-all cursor-pointer shrink-0"
+                      >
+                        <X size={16} />
+                      </button>
+                      <div className="flex-1 h-8 flex items-center justify-center overflow-hidden">
+                        <VoiceWaveform analyserRef={analyserRef} isListening={true} color="rgba(59, 130, 246, 0.9)" />
+                      </div>
+                      <button
+                        onClick={stopListening}
+                        className="size-8 rounded-xl bg-blue-600 flex items-center justify-center text-white hover:bg-blue-500 transition-all cursor-pointer shrink-0 shadow-sm"
+                      >
+                        <Check size={15} strokeWidth={3} />
+                      </button>
                     </div>
-                    <button
-                      onClick={stopListening}
-                      className="size-8 rounded-xl bg-blue-600 flex items-center justify-center text-white hover:bg-blue-500 transition-all cursor-pointer shrink-0 shadow-sm"
-                    >
-                      <Check size={15} strokeWidth={3} />
-                    </button>
+                    {transcript ? (
+                      <p className="text-[11px] text-white/90 truncate text-center px-2 font-medium">
+                        "{transcript}"
+                      </p>
+                    ) : (
+                      <p className="text-[10px] text-white/50 text-center animate-pulse">
+                        Listening... Speak naturally in Hindi or English
+                      </p>
+                    )}
                   </div>
                 ) : (
                   <div className="flex items-center gap-2 w-full">

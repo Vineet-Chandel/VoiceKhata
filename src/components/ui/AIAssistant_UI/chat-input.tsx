@@ -330,28 +330,45 @@ export function ChatInput({ onSend, loading, guidedStep, replyingTo, onCancelRep
 
       {/* Input or Voice Pill */}
       {voiceState === "listening" ? (
-        <div className="flex items-center justify-between gap-4 rounded-full border border-border-secondary bg-surface-secondary px-2 py-2 max-w-[280px] mx-auto w-full animate-in fade-in zoom-in-95 duration-200">
-          <button
-            onClick={() => {
-              // Cancel: stop and clear
-              stopListening()
-              setTimeout(resetVoice, 50)
-            }}
-            className="size-9 rounded-full bg-surface-elevated border border-border flex items-center justify-center text-text-muted hover:text-text-primary transition-colors shrink-0 cursor-pointer"
-          >
-            <X size={18} />
-          </button>
-          
-          <div className="flex-1 h-8 flex items-center justify-center overflow-hidden">
-            <VoiceWaveform analyserRef={analyserRef} isListening={true} />
+        <div className="flex flex-col items-center gap-1.5 py-1 max-w-[320px] mx-auto w-full animate-in fade-in zoom-in-95 duration-200">
+          <div className="flex items-center justify-between gap-3 rounded-full border border-blue-500/30 bg-surface-secondary px-3 py-2 w-full shadow-lg shadow-blue-500/5">
+            <button
+              onClick={() => {
+                // Cancel: stop and clear
+                stopListening()
+                setTimeout(resetVoice, 50)
+              }}
+              title="Cancel"
+              className="size-8 rounded-full bg-surface-elevated border border-border flex items-center justify-center text-text-muted hover:text-red-400 hover:border-red-500/30 transition-colors shrink-0 cursor-pointer"
+            >
+              <X size={16} />
+            </button>
+            
+            <div className="flex-1 h-8 flex items-center justify-center overflow-hidden">
+              <VoiceWaveform analyserRef={analyserRef} isListening={true} color="rgba(59, 130, 246, 0.9)" />
+            </div>
+            
+            <button
+              onClick={stopListening}
+              title="Done speaking / Send"
+              className="size-8 rounded-full bg-blue-600 flex items-center justify-center text-white hover:bg-blue-500 transition-colors shrink-0 cursor-pointer shadow-md shadow-blue-600/20"
+            >
+              <Check size={16} strokeWidth={3} />
+            </button>
           </div>
-          
-          <button
-            onClick={stopListening}
-            className="size-9 rounded-full bg-white flex items-center justify-center text-black hover:bg-white/90 transition-colors shrink-0 cursor-pointer"
-          >
-            <Check size={18} strokeWidth={3} />
-          </button>
+
+          <div className="text-center px-2">
+            {transcript ? (
+              <p className="text-xs text-text-primary font-medium truncate max-w-[280px]">
+                "{transcript}"
+              </p>
+            ) : (
+              <p className="text-[11px] text-text-muted flex items-center justify-center gap-1.5 animate-pulse">
+                <span className="size-1.5 rounded-full bg-blue-500 inline-block" />
+                Listening... Speak naturally in Hindi or English
+              </p>
+            )}
+          </div>
         </div>
       ) : (
       <div

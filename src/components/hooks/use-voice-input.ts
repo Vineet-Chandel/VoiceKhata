@@ -30,6 +30,9 @@ export function useVoiceInput(options?: UseVoiceInputOptions) {
   const recognitionRef = useRef<any>(null)
   const spokenTranscriptRef = useRef("")
   const webSpeechFailedRef = useRef(false)
+  const isManualStopRef = useRef(false)
+  const isCleaningUpRef = useRef(false)
+  const silenceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const safetyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const volumeIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const maxVolumeRef = useRef(0)
@@ -39,7 +42,17 @@ export function useVoiceInput(options?: UseVoiceInputOptions) {
     optionsRef.current = options
   }, [options])
 
+  const clearSilenceTimer = useCallback(() => {
+    if (silenceTimerRef.current) {
+      clearTimeout(silenceTimerRef.current)
+      silenceTimerRef.current = null
+    }
+  }, [])
+
   const cleanupHardware = useCallback(() => {
+    isCleaningUpRef.current = true
+    clearSilenceTimer()
+
     if (safetyTimeoutRef.current) {
       clearTimeout(safetyTimeoutRef.current)
       safetyTimeoutRef.current = null
@@ -83,7 +96,8 @@ export function useVoiceInput(options?: UseVoiceInputOptions) {
       } catch {}
     }
     mediaRecorderRef.current = null
-  }, [])
+    isCleaningUpRef.current = false
+  }, [clearSilenceTimer])
 
   const reset = useCallback(() => {
     cleanupHardware()
@@ -92,12 +106,14 @@ export function useVoiceInput(options?: UseVoiceInputOptions) {
     setErrorMessage("")
     spokenTranscriptRef.current = ""
     webSpeechFailedRef.current = false
+    isManualStopRef.current = false
     maxVolumeRef.current = 0
     audioChunksRef.current = []
   }, [cleanupHardware])
 
   // Finalize processing: delivers speech text via WebSpeech or Whisper fallback
   const handleFinalSpeech = useCallback(async () => {
+    clearSilenceTimer()
     setVoiceState("processing")
 
     let finalText = spokenTranscriptRef.current.trim()
@@ -141,9 +157,12 @@ export function useVoiceInput(options?: UseVoiceInputOptions) {
     setTranscript(finalText)
     setVoiceState("idle")
     optionsRef.current?.onTranscript?.(finalText)
-  }, [cleanupHardware])
+  }, [cleanupHardware, clearSilenceTimer])
 
   const stopListening = useCallback(() => {
+    isManualStopRef.current = true
+    clearSilenceTimer()
+
     if (recognitionRef.current) {
       try {
         recognitionRef.current.stop()
@@ -157,7 +176,7 @@ export function useVoiceInput(options?: UseVoiceInputOptions) {
     }
 
     handleFinalSpeech()
-  }, [handleFinalSpeech])
+  }, [clearSilenceTimer, handleFinalSpeech])
 
   const startListening = useCallback(async () => {
     cleanupHardware()
@@ -165,6 +184,7 @@ export function useVoiceInput(options?: UseVoiceInputOptions) {
     setTranscript("")
     spokenTranscriptRef.current = ""
     webSpeechFailedRef.current = false
+    isManualStopRef.current = false
     maxVolumeRef.current = 0
     audioChunksRef.current = []
 
@@ -242,25 +262,37 @@ export function useVoiceInput(options?: UseVoiceInputOptions) {
         const recognition = new SpeechRecognitionClass()
         recognition.lang = "hi-IN" // Standard Indian Hindi/English recognizer
         recognition.interimResults = true
-        recognition.continuous = false // Browser stops on natural silence
+        recognition.continuous = true // Continuous listening: does NOT stop on micro-pauses
 
         recognition.onresult = (event: any) => {
+          let fullFinal = ""
           let interim = ""
-          let newFinal = ""
 
-          for (let i = event.resultIndex; i < event.results.length; i++) {
-            const segment = event.results[i][0]?.transcript || ""
-            if (event.results[i].isFinal) {
-              newFinal += segment
+          // Accumulate across all results from 0 to preserve prior finalized sentences
+          for (let i = 0; i < event.results.length; i++) {
+            const res = event.results[i]
+            const segment = res[0]?.transcript || ""
+            if (res.isFinal) {
+              fullFinal += (fullFinal ? " " : "") + segment.trim()
             } else {
-              interim += segment
+              interim += (interim ? " " : "") + segment.trim()
             }
           }
 
-          const current = (newFinal || interim).trim()
+          const current = (fullFinal + (interim ? " " + interim : "")).trim().replace(/\s+/g, " ")
           if (current) {
             spokenTranscriptRef.current = current
             setTranscript(current)
+
+            // Reset silence timer on every spoken syllable/word:
+            // Gives the user a comfortable 2.5 seconds pause before auto-finalizing
+            if (silenceTimerRef.current) {
+              clearTimeout(silenceTimerRef.current)
+            }
+            silenceTimerRef.current = setTimeout(() => {
+              console.log("[useVoiceInput] 2.5s pause detected. Auto-finalizing speech...")
+              stopListening()
+            }, 2500)
           }
         }
 
@@ -277,8 +309,20 @@ export function useVoiceInput(options?: UseVoiceInputOptions) {
         }
 
         recognition.onend = () => {
-          console.log("[useVoiceInput] Natural speech end detected by browser.")
-          handleFinalSpeech()
+          console.log("[useVoiceInput] SpeechRecognition onend triggered.")
+          if (isManualStopRef.current || isCleaningUpRef.current) {
+            return
+          }
+
+          // If speech was already accumulated, finalize it
+          if (spokenTranscriptRef.current.trim()) {
+            handleFinalSpeech()
+          } else if (streamRef.current && streamRef.current.active) {
+            // If browser ended before user started speaking, safely resume recognition
+            try {
+              recognition.start()
+            } catch {}
+          }
         }
 
         recognitionRef.current = recognition
@@ -287,10 +331,10 @@ export function useVoiceInput(options?: UseVoiceInputOptions) {
         webSpeechFailedRef.current = true
       }
 
-      // Safety timeout: 15s max
+      // Safety timeout: 30s max continuous session
       safetyTimeoutRef.current = setTimeout(() => {
         stopListening()
-      }, 15000)
+      }, 30000)
 
     } catch (err: any) {
       console.error("[useVoiceInput] Start error:", err)
