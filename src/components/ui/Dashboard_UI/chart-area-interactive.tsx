@@ -68,8 +68,11 @@ export function ChartAreaInteractive({ data }: { data: ChartData[] }) {
               type="category"
               tickLine={false}
               axisLine={false}
-              tickMargin={8}
-              minTickGap={28}
+              tickMargin={10}
+              angle={0}
+              textAnchor="middle"
+              height={32}
+              minTickGap={32}
               tickFormatter={(value) => {
                 const d = new Date(value)
                 return d.toLocaleDateString("en-US", {
