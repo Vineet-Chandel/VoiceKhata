@@ -282,9 +282,19 @@ export function VoiceActionBanner({
                   ))}
                 </div>
               </div>
-              <p className="text-xs text-[#94A3B8] mt-0.5 max-w-md line-clamp-1 italic">
-                {transcript || '"Received ₹1,200 from Ramesh via UPI..."'}
-              </p>
+              <div className="mt-1 flex items-center gap-2">
+                <span className="text-[11px] font-semibold text-emerald-400 uppercase tracking-wide">Live:</span>
+                <p className="text-xs sm:text-sm font-semibold text-white max-w-md break-words">
+                  {transcript ? (
+                    <>
+                      "{transcript}"
+                      <span className="inline-block w-1.5 h-3.5 ml-1 bg-emerald-400 align-middle animate-pulse rounded-xs" />
+                    </>
+                  ) : (
+                    <span className="text-xs text-[#94A3B8] italic font-normal">"Speak now... e.g. Received ₹1,200 from Ramesh via UPI"</span>
+                  )}
+                </p>
+              </div>
             </div>
           </div>
 

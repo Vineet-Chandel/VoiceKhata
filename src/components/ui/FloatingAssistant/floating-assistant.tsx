@@ -184,6 +184,9 @@ export function FloatingAssistant() {
     analyserRef,
   } = useVoiceInput({
     lang: language === "hi" ? "hi-IN" : "en-IN",
+    onLiveTranscript: (liveText) => {
+      setInputValue(liveText)
+    },
     onTranscript: handleVoiceTranscript,
     onError: (err) => {
       setMicError(err)
@@ -574,7 +577,15 @@ export function FloatingAssistant() {
                       onKeyDown={handleKeyDown}
                       onFocus={handleFocus}
                       onBlur={handleBlur}
-                      placeholder={loading ? "Thinking…" : isCompact && !isActive ? "Ask AI…" : pageConfig.placeholder}
+                      placeholder={
+                        loading
+                          ? "Thinking…"
+                          : isListening
+                          ? "Listening... speaking is typed live"
+                          : isCompact && !isActive
+                          ? "Ask AI…"
+                          : pageConfig.placeholder
+                      }
                       disabled={isProcessing}
                       className={`flex-1 bg-transparent text-[13px] text-[#F8FAFC] placeholder:text-[#64748B] focus:outline-none disabled:opacity-40 transition-all duration-200 min-w-0 ${isCompact && !isActive ? "text-[12px]" : ""}`}
                     />
@@ -582,7 +593,8 @@ export function FloatingAssistant() {
                     <button
                       onClick={(e) => { e.stopPropagation(); handleMicClick() }}
                       disabled={loading || isProcessing}
-                      className={`size-8 shrink-0 rounded-xl flex items-center justify-center transition-all duration-150 cursor-pointer ${isListening ? "bg-blue-600 text-white" : "bg-white/5 text-white/70 hover:bg-white/10 hover:text-white"} disabled:opacity-30 active:scale-90`}
+                      title={isListening ? "Stop listening" : "Speak to mic"}
+                      className={`size-8 shrink-0 rounded-xl flex items-center justify-center transition-all duration-150 cursor-pointer ${isListening ? "bg-red-500 text-white shadow-md shadow-red-500/40 animate-pulse" : "bg-white/5 text-white/70 hover:bg-white/10 hover:text-white"} disabled:opacity-30 active:scale-90`}
                     >
                       {isProcessing ? (
                         <svg className="size-3.5 cmdbar-spinner" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" strokeDasharray="32" strokeDashoffset="12" /></svg>

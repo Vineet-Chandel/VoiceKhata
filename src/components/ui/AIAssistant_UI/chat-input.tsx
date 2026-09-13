@@ -87,6 +87,13 @@ export function ChatInput({ onSend, loading, guidedStep, replyingTo, onCancelRep
     analyserRef,
   } = useVoiceInput({
     lang: language === "hi" ? "hi-IN" : "en-IN",
+    onLiveTranscript: (liveText) => {
+      setValue(liveText)
+      if (textareaRef.current) {
+        textareaRef.current.style.height = "auto"
+        textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 120)}px`
+      }
+    },
     onTranscript: handleVoiceTranscript,
     onError: (err) => console.error("[ChatInput voice error]:", err),
   })
@@ -332,53 +339,51 @@ export function ChatInput({ onSend, loading, guidedStep, replyingTo, onCancelRep
         </div>
       )}
 
-      {/* Input or Voice Pill */}
-      {voiceState === "listening" ? (
-        <div className="flex flex-col items-center gap-1.5 py-1 max-w-[320px] mx-auto w-full animate-in fade-in zoom-in-95 duration-200">
-          <div className="flex items-center justify-between gap-3 rounded-full border border-blue-500/30 bg-surface-secondary px-3 py-2 w-full shadow-lg shadow-blue-500/5">
-            <button
-              onClick={() => {
-                // Cancel: stop and clear
-                stopListening()
-                setTimeout(resetVoice, 50)
-              }}
-              title={t("common.cancel")}
-              className="size-8 rounded-full bg-surface-elevated border border-border flex items-center justify-center text-text-muted hover:text-red-400 hover:border-red-500/30 transition-colors shrink-0 cursor-pointer"
-            >
-              <X size={16} />
-            </button>
-            
-            <div className="flex-1 h-8 flex items-center justify-center overflow-hidden">
-              <VoiceWaveform analyserRef={analyserRef} isListening={true} color="rgba(59, 130, 246, 0.9)" />
-            </div>
-            
-            <button
-              onClick={stopListening}
-              title="Done speaking / Send"
-              className="size-8 rounded-full bg-blue-600 flex items-center justify-center text-white hover:bg-blue-500 transition-colors shrink-0 cursor-pointer shadow-md shadow-blue-600/20"
-            >
-              <Check size={16} strokeWidth={3} />
-            </button>
+      {/* Live Voice Transcription Banner */}
+      {voiceState === "listening" && (
+        <div className="flex items-center justify-between gap-3 px-3.5 py-2 rounded-xl bg-blue-500/10 border border-blue-500/30 animate-in fade-in duration-150">
+          <div className="flex items-center gap-2 text-xs font-semibold text-blue-500 dark:text-blue-400">
+            <span className="relative flex size-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75" />
+              <span className="relative inline-flex rounded-full size-2 bg-red-500" />
+            </span>
+            <span>Listening & writing live...</span>
           </div>
 
-          <div className="text-center px-2">
-            {transcript ? (
-              <p className="text-xs text-text-primary font-medium truncate max-w-[280px]">
-                "{transcript}"
-              </p>
-            ) : (
-              <p className="text-[11px] text-text-muted flex items-center justify-center gap-1.5 animate-pulse">
-                <span className="size-1.5 rounded-full bg-blue-500 inline-block" />
-                {t("ai.listening")}
-              </p>
-            )}
+          <div className="h-5 flex-1 max-w-[140px] flex items-center justify-center overflow-hidden">
+            <VoiceWaveform analyserRef={analyserRef} isListening={true} color="rgba(59, 130, 246, 0.9)" />
+          </div>
+
+          <div className="flex items-center gap-1.5">
+            <button
+              type="button"
+              onClick={() => {
+                stopListening()
+                setTimeout(resetVoice, 50)
+                setValue("")
+              }}
+              className="px-2.5 py-1 rounded-md text-[11px] font-medium text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-colors cursor-pointer"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              onClick={stopListening}
+              className="px-3 py-1 rounded-md text-[11px] font-semibold text-white bg-blue-600 hover:bg-blue-500 transition-colors cursor-pointer flex items-center gap-1 shadow-xs"
+            >
+              <Check size={12} strokeWidth={3} />
+              Done
+            </button>
           </div>
         </div>
-      ) : (
+      )}
+
       <div
         className={[
           "flex items-end gap-2 rounded-2xl border px-3 py-2.5 transition-all duration-150",
-          variant === "light"
+          voiceState === "listening"
+            ? "ring-2 ring-blue-500/30 border-blue-500/60 bg-blue-500/[0.03]"
+            : variant === "light"
             ? (focused ? "border-black/[0.12] bg-white shadow-sm" : "border-black/[0.08] bg-white hover:bg-black/[0.02]")
             : (focused ? "border-border-secondary bg-surface-secondary" : "border-border bg-surface-secondary"),
         ].join(" ")}
@@ -461,6 +466,8 @@ export function ChatInput({ onSend, loading, guidedStep, replyingTo, onCancelRep
           placeholder={
             isScanning
               ? "Scanning…"
+              : voiceState === "listening"
+              ? "Listening... speaking is typed here live"
               : isGuidedActive
               ? "Type your answer…"
               : t("ai.placeholder")
@@ -493,11 +500,14 @@ export function ChatInput({ onSend, loading, guidedStep, replyingTo, onCancelRep
           </button>
         ) : (
           <button
-            onClick={startListening}
+            onClick={voiceState === "listening" ? stopListening : startListening}
             disabled={isScanning || loading || voiceState === "processing"}
+            title={voiceState === "listening" ? "Stop listening" : "Speak to mic"}
             className={[
               "mb-0.5 size-8 shrink-0 rounded-xl flex items-center justify-center transition-all duration-150 cursor-pointer disabled:opacity-40 disabled:pointer-events-none",
-              variant === "light"
+              voiceState === "listening"
+                ? "bg-red-500 text-white shadow-md shadow-red-500/40 animate-pulse"
+                : variant === "light"
                 ? "bg-black/[0.04] text-black hover:bg-black/[0.08]"
                 : "bg-surface-secondary text-text-muted hover:text-text-primary hover:bg-white/5",
             ].join(" ")}
@@ -507,12 +517,11 @@ export function ChatInput({ onSend, loading, guidedStep, replyingTo, onCancelRep
                 <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" strokeDasharray="32" strokeDashoffset="12" />
               </svg>
             ) : (
-              <Mic size={15} />
+              <Mic size={15} className={voiceState === "listening" ? "animate-bounce" : ""} />
             )}
           </button>
         )}
       </div>
-      )}
 
       {/* Keyboard hint */}
       {!isGuidedActive && !focused && !isScanning && (

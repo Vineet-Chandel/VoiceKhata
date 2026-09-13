@@ -15,6 +15,7 @@ export type VoiceState = "idle" | "listening" | "processing" | "error"
 export interface UseVoiceInputOptions {
   lang?: string
   onTranscript?: (transcript: string) => void
+  onLiveTranscript?: (interim: string) => void
   onError?: (errorMessage: string) => void
 }
 
@@ -110,6 +111,7 @@ export function useVoiceInput(options?: UseVoiceInputOptions) {
     isManualStopRef.current = false
     maxVolumeRef.current = 0
     audioChunksRef.current = []
+    optionsRef.current?.onLiveTranscript?.("")
   }, [cleanupHardware])
 
   // Finalize processing: delivers speech text via WebSpeech or Whisper fallback
@@ -218,6 +220,7 @@ export function useVoiceInput(options?: UseVoiceInputOptions) {
     isManualStopRef.current = false
     maxVolumeRef.current = 0
     audioChunksRef.current = []
+    optionsRef.current?.onLiveTranscript?.("")
 
     try {
       // 0. Check for insecure origin (e.g. testing over LAN IP http://192.168.x.x without HTTPS)
@@ -326,6 +329,7 @@ export function useVoiceInput(options?: UseVoiceInputOptions) {
           if (current) {
             spokenTranscriptRef.current = current
             setTranscript(current)
+            optionsRef.current?.onLiveTranscript?.(current)
 
             // Reset silence timer on every spoken syllable/word:
             // Gives the user a comfortable 2.5 seconds pause before auto-finalizing

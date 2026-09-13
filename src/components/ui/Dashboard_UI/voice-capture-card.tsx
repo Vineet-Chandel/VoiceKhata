@@ -294,53 +294,80 @@ export function VoiceCaptureCard({
                 </button>
               </div>
 
-              {/* Active Voice Waveform, Processing, or Live Feedback */}
+              {/* Active Voice Waveform, Live Transcription & Feedback */}
               {isListening ? (
-                <div className="flex flex-col items-center gap-3 mt-4 w-full max-w-sm animate-in fade-in zoom-in-95">
-                  <div className="h-8 flex items-center justify-center w-full">
-                    <VoiceWaveform analyserRef={analyserRef} isListening={true} color="rgba(99, 102, 241, 0.95)" />
+                <div className="flex flex-col items-center gap-4 mt-3 w-full max-w-xl mx-auto animate-in fade-in zoom-in-95 duration-200">
+                  {/* Live Status Pill & Waveform */}
+                  <div className="flex items-center gap-3 px-4 py-1.5 rounded-full bg-red-500/10 border border-red-500/20 text-red-600 dark:text-red-400 text-xs font-semibold shadow-xs">
+                    <span className="relative flex size-2.5">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75" />
+                      <span className="relative inline-flex rounded-full size-2.5 bg-red-500" />
+                    </span>
+                    <span>Listening & writing live...</span>
+                    <div className="h-5 w-24 sm:w-32 flex items-center justify-center overflow-hidden">
+                      <VoiceWaveform analyserRef={analyserRef} isListening={true} color="rgba(239, 68, 68, 0.9)" />
+                    </div>
                   </div>
 
-                  {transcript ? (
-                    <p className="text-sm font-medium text-white/90 bg-white/5 border border-white/10 px-4 py-2 rounded-full shadow-sm max-w-md truncate">
-                      "{transcript}"
-                    </p>
-                  ) : (
-                    <p className="text-xs text-indigo-300/80 animate-pulse flex items-center gap-2">
-                      <span className="size-2 rounded-full bg-indigo-400 animate-ping" />
-                      Listening to your voice... Speak naturally in Hindi or English
-                    </p>
-                  )}
+                  {/* Real-Time Live Spoken Text Transcription Box */}
+                  <div className="w-full rounded-2xl border border-indigo-200 dark:border-indigo-500/30 bg-slate-50/90 dark:bg-slate-900/90 p-5 sm:p-6 shadow-xl backdrop-blur-md text-left transition-all duration-150">
+                    <div className="flex items-center justify-between gap-2 mb-2 pb-2 border-b border-slate-200/80 dark:border-slate-800 text-[11px] font-bold text-indigo-600 dark:text-indigo-400 tracking-wider uppercase">
+                      <span className="flex items-center gap-1.5">
+                        <Sparkles size={14} className="text-indigo-500" />
+                        Speaking now / जो आप बोल रहे हैं:
+                      </span>
+                      <span className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-indigo-100 dark:bg-indigo-950/80 text-indigo-700 dark:text-indigo-300 font-normal">
+                        {transcript ? "writing live..." : "waiting for voice..."}
+                      </span>
+                    </div>
 
-                  <div className="flex items-center gap-2 mt-1">
+                    <div className="min-h-[68px] flex items-center justify-center">
+                      {transcript ? (
+                        <p className="text-base sm:text-lg md:text-xl font-semibold text-slate-900 dark:text-white leading-relaxed text-center break-words w-full">
+                          "{transcript}"
+                          <span className="inline-block w-2 h-5 ml-1.5 bg-indigo-600 dark:bg-indigo-400 align-middle animate-pulse rounded-xs" />
+                        </p>
+                      ) : (
+                        <p className="text-sm sm:text-base text-slate-500 dark:text-slate-400 italic text-center animate-pulse">
+                          Say your transaction... e.g. "Paid 250 for groceries" or "रमेश को ₹500 दिए"
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Controls */}
+                  <div className="flex items-center gap-3 mt-1">
                     <button
                       onClick={() => {
                         stopListening()
                         setTimeout(resetVoice, 50)
                       }}
-                      className="px-3.5 py-1.5 rounded-full text-xs font-medium text-slate-400 hover:text-white bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60 transition-colors cursor-pointer"
+                      className="px-4 py-2 rounded-full text-xs font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white bg-slate-100 dark:bg-slate-800/80 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-700 transition-colors cursor-pointer shadow-xs"
                     >
                       Cancel
                     </button>
                     <button
                       onClick={stopListening}
-                      className="px-4 py-1.5 rounded-full text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 border border-indigo-400/40 transition-colors cursor-pointer flex items-center gap-1.5 shadow-md shadow-indigo-600/20"
+                      className="px-5 py-2 rounded-full text-xs font-semibold text-white bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 border border-indigo-400/40 transition-all cursor-pointer flex items-center gap-1.5 shadow-md shadow-indigo-600/30 hover:scale-[1.02]"
                     >
-                      <Check size={14} strokeWidth={3} />
+                      <Check size={15} strokeWidth={3} />
                       Done speaking
                     </button>
                   </div>
                 </div>
               ) : isProcessing ? (
-                <div className="flex flex-col items-center gap-3 mt-6 animate-in fade-in">
-                  <div className="flex items-center gap-2.5 px-4 py-2 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-indigo-300">
-                    <Loader2 size={16} className="animate-spin text-indigo-400" />
-                    <span className="text-xs md:text-sm font-medium">Processing speech... / प्रविष्टि तैयार हो रही है...</span>
+                <div className="flex flex-col items-center gap-3 mt-4 w-full max-w-md mx-auto animate-in fade-in duration-200">
+                  <div className="flex items-center gap-2.5 px-4 py-2 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-indigo-700 dark:text-indigo-300">
+                    <Loader2 size={16} className="animate-spin text-indigo-600 dark:text-indigo-400" />
+                    <span className="text-xs sm:text-sm font-medium">Preparing your transaction review...</span>
                   </div>
                   {transcript && (
-                    <p className="text-xs text-slate-400 max-w-xs truncate italic">
-                      "{transcript}"
-                    </p>
+                    <div className="w-full p-3 rounded-xl bg-slate-100 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-center">
+                      <p className="text-xs text-slate-500 dark:text-slate-400 uppercase font-semibold mb-1">Heard:</p>
+                      <p className="text-sm font-semibold text-slate-800 dark:text-slate-200 break-words">
+                        "{transcript}"
+                      </p>
+                    </div>
                   )}
                 </div>
               ) : (
