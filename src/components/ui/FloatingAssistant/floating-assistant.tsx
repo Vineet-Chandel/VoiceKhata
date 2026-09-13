@@ -17,6 +17,7 @@ import { useAuth } from "@/components/hooks/use-auth"
 import { VoiceWaveform } from "@/components/ui/AIAssistant_UI/voice-waveform"
 import { ChatWindow } from "@/components/ui/AIAssistant_UI/chat-window"
 import { ChatInput } from "@/components/ui/AIAssistant_UI/chat-input"
+import { useLanguage } from "@/context/LanguageContext"
 import "./floating-assistant.css"
 
 // ─── Floating AI Command Bar & Workspace ───────────────────────────────────────
@@ -130,6 +131,7 @@ export function FloatingAssistant() {
   // ── Financial data ─────────────────────────────────────────────────────────
   const { allTransactions, addTransaction } = useTransactions()
   const { allBudgets, addBudget } = useBudgets()
+  const { language } = useLanguage()
 
   // ── AI Chat engine ─────────────────────────────────────────────────────────
   const { 
@@ -181,6 +183,7 @@ export function FloatingAssistant() {
     reset: resetVoice,
     analyserRef,
   } = useVoiceInput({
+    lang: language === "hi" ? "hi-IN" : "en-IN",
     onTranscript: handleVoiceTranscript,
     onError: (err) => {
       setMicError(err)

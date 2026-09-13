@@ -35,8 +35,8 @@ export async function transcribeAudioBlob(blob: Blob): Promise<string> {
     formData.append("model", "whisper-large-v3-turbo")
     formData.append("response_format", "json")
     formData.append("temperature", "0")
-    // Bilingual prompt: signals to Whisper to recognize Hindi, Hinglish, and English financial terms
-    formData.append("prompt", "रमेश ने 500 रुपये दिए। Paid 200 for groceries. सुरेश को 300 उधार दिए। UPI, Cash.")
+    // Financial keywords prompt: preserves English for English speech, Devanagari for Hindi speech
+    formData.append("prompt", "₹, Rs, rupees, UPI, Cash, udhar, jama, khata, Ramesh, Suresh")
 
     const response = await fetch("https://api.groq.com/openai/v1/audio/transcriptions", {
       method: "POST",

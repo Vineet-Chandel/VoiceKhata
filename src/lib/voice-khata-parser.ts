@@ -163,120 +163,121 @@ export function parseVoiceKhataInput(transcript: string, knownCustomers?: string
   const ub = "(?<![\\w\\u0900-\\u097F])"
   const ue = "(?![\\w\\u0900-\\u097F])"
 
-  // A. High-Priority Hindi / Hinglish Case Markers:
-  // 1. "ko ... diya / diye / de diya / transfer / udhar" -> Money given TO someone -> DEBIT
+  // 1. Explicit credit / debit command at start or end
+  const isExplicitCredit = new RegExp(`^\\s*(?:credit|jama|credited)\\b`, "i").test(rawText) ||
+    new RegExp(`${ub}(?:credit karo|credit kar do|credit kiya|jama karo|jama kar do)${ue}`, "i").test(combinedSearch)
+  const isExplicitDebit = new RegExp(`^\\s*(?:debit|debited)\\b`, "i").test(rawText) ||
+    new RegExp(`${ub}(?:debit karo|debit kar do|debit kiya)${ue}`, "i").test(combinedSearch)
+
+  // 2. High-Priority Hindi / Hinglish Case Markers:
+  // A. "ko ... diya / diye / transfer / udhar" -> Outflow -> DEBIT
   const isKoDiya = new RegExp(`${ub}(?:ko|को)${ue}.*${ub}(?:diya|diye|diyai|de diya|de diye|bheja|bhej diya|transfer|udhar|udhaar|दिए|दिया|दे दिए|दे दिया|भेजा|उधार|कर्ज)${ue}`, "i").test(combinedSearch)
-  // 2. "ne ... diya / diye / payment / jama / kiye" -> Person GAVE to me -> CREDIT
-  const isNeDiya = new RegExp(`${ub}(?:ne|ने)${ue}.*${ub}(?:diya|diye|diyai|de diya|de diye|payment|jama|jma|kiye|kiya|kare|kare hain|bheja|दिए|दिया|दे दिए|दे दिया|जमा|किये|किया|किए|कराये|कराए|करवाए|भुगतान|डिपॉजिट|deposit)${ue}`, "i").test(combinedSearch)
-  // 3. "se ... mila / mile / prapt / aaya / liye / liya / jama" -> Received FROM someone -> CREDIT
-  const isSeMilaOrLiya = new RegExp(`${ub}(?:se|से)${ue}.*${ub}(?:mila|mile|mili|mil gaya|aaya|aaye|aayi|prapt|received|liye|liya|liyai|le liye|le liya|jama|jma|मिला|मिले|मिली|मिल गया|आया|आए|आई|प्राप्त|लिए|लिया|ले लिए|ले लिया|जमा)${ue}`, "i").test(combinedSearch)
-  // 4. "ne ... liye / liya" -> Person took from me -> DEBIT
-  const isNeLiya = new RegExp(`${ub}(?:ne|ने)${ue}.*${ub}(?:liye|liya|liyai|le liye|le liya|लिए|लिया|ले लिए)${ue}`, "i").test(combinedSearch)
-  // 5. "maine / humne ... diya / kharch" -> I gave / spent -> DEBIT
+  // B. "diye / diya ... ko" (e.g. "500 diye Ramesh ko", "udhar diya Suresh ko") -> Outflow -> DEBIT
+  const isDiyaKo = new RegExp(`${ub}(?:diya|diye|diyai|de diya|bheja|udhar|udhaar|दिए|दिया|दे दिए|दे दिया|भेजा|उधार)${ue}.*${ub}(?:ko|को)${ue}`, "i").test(combinedSearch)
+  // C. "maine / humne ... diya / kharch" -> Outflow -> DEBIT
   const isMaineDiya = new RegExp(`${ub}(?:maine|mene|humne|मैंने|हमने)${ue}.*${ub}(?:diya|diye|diyai|de diya|kharch|kharcha|bheja|दिया|दिए|खर्च|खर्चा)${ue}`, "i").test(combinedSearch)
-  // 6. "maine / humne ... liye / liya / mila" -> I received / took -> CREDIT
+  // D. "ne ... liya" (counterparty took loan/money) -> DEBIT
+  const isNeLiya = new RegExp(`${ub}(?:ne|ने)${ue}.*${ub}(?:liye|liya|liyai|le liye|le liya|udhar liya|उधार लिया|लिया|लिए)${ue}`, "i").test(combinedSearch)
+
+  // E. "ne ... diya" (counterparty gave payment) -> Inflow -> CREDIT
+  const isNeDiya = new RegExp(`${ub}(?:ne|ने)${ue}.*${ub}(?:diya|diye|diyai|de diya|de diye|payment|jama|jma|kiye|kiya|kare|kare hain|bheja|दिए|दिया|दे दिए|दे दिया|जमा|किये|किया|किए|कराये|कराए|करवाए|भुगतान|डिपॉजिट|deposit)${ue}`, "i").test(combinedSearch)
+  // F. "se ... mila / prapt / jama / aaya / liye" -> Inflow -> CREDIT
+  const isSeMilaOrLiya = new RegExp(`${ub}(?:se|से)${ue}.*${ub}(?:mila|mile|mili|mil gaya|aaya|aaye|aayi|prapt|received|liye|liya|liyai|le liye|le liya|jama|jma|मिला|मिले|मिली|मिल गया|आया|आए|आई|प्राप्त|लिए|लिया|ले लिए|ले लिया|जमा)${ue}`, "i").test(combinedSearch)
+  // G. "maine / humne ... liye / mila" -> Inflow -> CREDIT
   const isMaineLiye = new RegExp(`${ub}(?:maine|mene|humne|मैंने|हमने)${ue}.*${ub}(?:liye|liya|liyai|le liye|mila|mile|prapt|लिए|लिया|मिला|मिले)${ue}`, "i").test(combinedSearch)
-  // 7. Explicit Deposit / Collection pattern (e.g. "राहुल ने 500 जमा किये", "500 जमा राहुल", "खाते में जमा") -> CREDIT
+  // H. "jama / deposit / vasool" pattern -> CREDIT
   const isDepositPattern = new RegExp(`${ub}(?:jama|jma|deposit|deposited|जमा|वसूल|वसूली)${ue}`, "i").test(combinedSearch) &&
     !new RegExp(`${ub}(?:maine|mene|humne|मैंने|हमने)${ue}.*${ub}(?:jama|jma|जमा)${ue}`, "i").test(combinedSearch)
 
-  // B. Explicit English Directional Phrasings:
-  const isPaidMe = new RegExp(`${ub}(?:paid me|sent me|gave me|transferred me|received from|got from|credited to|salary from)${ue}`, "i").test(combinedSearch)
-  const isPaidForOrTo = new RegExp(`${ub}(?:paid for|paid to|spent on|spent for|sent to|transferred to|gave to|bought for|ordered from)${ue}`, "i").test(combinedSearch)
+  // 3. English Directional Patterns:
+  // A. Received / Inflow:
+  // - "received ... from" or "got ... from"
+  const isReceivedFrom = new RegExp(`\\b(?:received|got|collected)\\b.*\\bfrom\\b`, "i").test(combinedSearch)
+  // - Starts with received/got/earned/salary/cashback/refund
+  const isStartReceived = /^\s*(?:received|got|earned|collected|salary|stipend|bonus|cashback|refund)/i.test(rawText)
+  // - "paid me", "sent me", "gave me", "transferred me"
+  const isPaidMe = /\b(?:paid me|sent me|gave me|transferred me|credited to me)\b/i.test(combinedSearch)
+  // - Counterparty gave/paid/sent money to user (e.g. "Ramesh gave 500", "Ramesh paid 1200", "Suresh sent 2000")
+  const isPersonGaveOrPaid = /^[A-Z][a-z]+(?:\s+[A-Z][a-z]+)?\s+(?:gave|paid|sent|transferred|deposited)\s+(?:₹|rs\.?|inr|\d)/i.test(rawText)
+  // - Passive received (e.g. "₹500 received", "500 rs received")
+  const isPassiveReceived = /(?:\d+|rupees?|rs\.?|₹)\s*(?:received|credited|jama|prapt)/i.test(combinedSearch)
 
-  // C. Inherent Credit / Inflow Indicators:
-  const creditKeywords = [
-    "credit", "credited", "credit to", "credit karo", "credit kar do", "credit kiya", "credit h", "credit hai",
-    "received", "receive", "got", "earned", "salary", "stipend", "bonus", "cashback", "refund",
-    "liye", "liya", "liyai", "le liye", "le liya", "li", "li thi", "liye the", "liye hai", "liye hain", "liya hai", "paise liye",
-    "jama", "jma", "jama kiya", "jama kiye", "jama kiye hain", "jama hua", "vasool", "wasool", "vasooli", "deposit", "deposited",
-    "mila", "mile", "mili", "mil gaya", "mil gaye", "mila hai", "mile hain",
-    "aaye", "aaya", "aayi", "a gaye", "aa gaye", "aaye hain", "aaya hai",
-    "kamai", "aamdani", "munafa", "bikri", "sale", "sales", "revenue", "income",
-    "क्रेडिट", "लिए", "लिया", "ले लिए", "ले लिया", "जमा", "जमा किये", "जमा किए", "जमा किया", "वसूल", "वसूली", "मिला", "मिले", "मिली", "मिल गया", "आया", "आए", "आई", "सैलरी", "वेतन", "कमाई", "आमदनी", "मुनाफा", "बिक्री", "कैशबैक", "रिफंड", "डिपॉजिट"
-  ]
+  // B. Paid / Outflow:
+  // - "paid ... for / to", "spent ... on / for", "gave ... to", "sent ... to", "transferred ... to"
+  const isPaidForOrTo = /\b(?:paid|spent|gave|sent|transferred|bought)\b.*\b(?:for|to|on)\b/i.test(combinedSearch)
+  // - Starts with "paid", "spent", "bought", "purchased", "ordered" (unless followed by "from")
+  const isStartPaid = /^\s*(?:paid|spent|bought|purchased|ordered)\b/i.test(rawText) && !/\bfrom\b/i.test(combinedSearch)
+  // - Trailing paid (e.g. "450 paid", "coffee 150 paid", "petrol paid")
+  const isTrailingPaid = /(?:\d+|rupees?|rs\.?|₹|\w+)\s+paid\b/i.test(combinedSearch)
+  // - Known pure expense terms
+  const isPureExpenseItem = /\b(?:petrol|diesel|fuel|chai|tea|coffee|groceries|grocery|ration|dinner|lunch|breakfast|recharge|electricity|bijli|kiraya|rent|tax|fees)\b/i.test(combinedSearch)
 
-  // D. Inherent Debit / Outflow Indicators:
-  const debitKeywords = [
-    "debit", "debited", "debit karo", "debit kar do", "debit kiya", "debit h", "debit hai",
-    "diye", "diya", "diyai", "de diya", "de diye", "diya tha", "diye the", "diye hai", "diye hain", "diya hai", "paise diye",
-    "spent", "spend", "bought", "buy", "purchased", "purchase", "ordered", "expense", "kharcha",
-    "kharch", "kharch kiya", "kharcha kiya", "chuka", "chukaya", "bhugtan", "bhugtan kiya",
-    "bill", "recharge", "petrol", "diesel", "groceries", "grocery", "food", "dinner",
-    "lunch", "breakfast", "chai", "rent", "kiraya", "fee", "fees", "fine", "tax", "shopping",
-    "udhar diya", "udhaar diya", "karza diya", "borrowed", "paid",
-    "डेबिट", "दिए", "दिया", "दे दिया", "दे दिए", "खर्चा", "खर्च", "उधार", "कर्ज", "खरीदा", "खरीदी", "समान", "बिल", "पेट्रोल", "किराया", "फीस", "चुकाया", "भुगतान"
-  ]
-
-  // Generic English "paid" (e.g. "Paid 450 for groceries", "Paid ₹1200 to Ramesh"):
-  const hasGenericPaid = new RegExp(`${ub}paid${ue}`, "i").test(combinedSearch) && !isPaidMe && !new RegExp(`${ub}(?:paid by|ne paid|ने paid)${ue}`, "i").test(combinedSearch)
-
-  const matchKw = (kw: string) => {
-    return new RegExp(`${ub}${kw.replace(/\s+/g, "\\s+")}${ue}`, "i").test(combinedSearch)
-  }
-
-  const hasCreditKw = creditKeywords.some(matchKw)
-  const hasDebitKw = debitKeywords.some(matchKw)
-
-  if (isKoDiya || isMaineDiya || isNeLiya) {
-    type = "Debit"
-  } else if (isNeDiya || isSeMilaOrLiya || isMaineLiye || isPaidMe || isDepositPattern) {
+  // Resolution Order:
+  if (isExplicitCredit) {
     type = "Credit"
-  } else if (isPaidForOrTo || hasGenericPaid) {
+  } else if (isExplicitDebit) {
     type = "Debit"
-  } else if (hasCreditKw && !hasDebitKw) {
+  } else if (isKoDiya || isDiyaKo || isMaineDiya || isNeLiya || isPaidForOrTo) {
+    type = "Debit"
+  } else if (isNeDiya || isSeMilaOrLiya || isMaineLiye || isDepositPattern || isReceivedFrom || isStartReceived || isPaidMe || isPersonGaveOrPaid || isPassiveReceived) {
     type = "Credit"
-  } else if (hasDebitKw && !hasCreditKw) {
+  } else if (isStartPaid || isTrailingPaid) {
     type = "Debit"
-  } else if (hasCreditKw && hasDebitKw) {
-    if (new RegExp(`${ub}(?:credit\\s*card|debit\\s*card)${ue}`, "i").test(combinedSearch)) {
-      type = "Debit"
-    } else if (new RegExp(`${ub}(?:received|mila|mile|mili|salary|jama|jma|wasool|vasool|liye|liya|मिला|मिले|जमा|लिए|लिया)${ue}`, "i").test(combinedSearch)) {
-      type = "Credit"
-    } else {
-      type = "Debit"
-    }
+  } else if (/\b(?:received|receive|got|earned|salary|cashback|refund|jama|jma|mila|mile|mili|aaya|aaye|aayi|kamai|aamdani|munafa|bikri|income|credit|credited|जमा|मिला|मिले|कमाई|बिक्री|सैलरी|रिफंड)\b/i.test(combinedSearch)) {
+    type = "Credit"
+  } else if (/\b(?:paid|spend|spent|bought|buy|expense|kharch|kharcha|diya|diye|bill|recharge|petrol|chai|rent|kiraya|debit|debited|खर्च|खर्चा|दिए|दिया|बिल|किराया|डेबिट)\b/i.test(combinedSearch) || isPureExpenseItem) {
+    type = "Debit"
   } else {
-    // Sentence structure clues:
-    if (/^\s*(?:paid|gave|give|bought|spent|ordered|transfer|debit)/i.test(rawText)) {
-      type = "Debit"
-    } else if (/^\s*(?:received|got|earned|credit)/i.test(rawText)) {
-      type = "Credit"
-    } else if (new RegExp(`${ub}(?:diya|diye|diyai|दिए|दिया)${ue}`, "i").test(combinedSearch)) {
-      type = "Debit"
-    } else if (new RegExp(`${ub}(?:liya|liye|liyai|लिया|लिए)${ue}`, "i").test(combinedSearch)) {
-      type = "Credit"
-    } else {
-      // Default to Debit for general spending
-      type = "Debit"
-      isAmbiguousDirection = true
-    }
+    type = "Debit"
+    isAmbiguousDirection = true
   }
 
   // 3. Counterparty / Person extraction
   let person = ""
   let isAmbiguousPerson = false
 
-  // First: Pattern-based extraction from beginning of sentence:
-  // "Ramesh ne...", "Suresh ko...", "रमेश ने...", "सुरेश को..."
-  const leadingNameMatch = rawText.match(
-    /^\s*([A-Za-z\u0900-\u097F][A-Za-z\u0900-\u097F .'-]{0,40}?)\s+(?:ne|ने|ko|को|se|से|borrowed|borrow|paid|pay|gave|took|bought|liya|liye|li|diya|diye|लिया|लिए|ली|दिए|दिया|rupees?|rupaye|rs\.?|\d)/i
-  )
-  if (leadingNameMatch && leadingNameMatch[1]) {
-    const cand = leadingNameMatch[1].trim()
-      .replace(/\b(?:aayi|aaya|aaye|gaya|gaye|hai|hain|tha|thi|the|bhi|ki|ka|ke)\b/gi, "")
-      .replace(/^[\s.-]+|[\s.-]+$/g, "")
-    if (cand.length >= 2 && !/^(today|yesterday|kal|aaj|maine|mene|humne|i|we|add|credit|debit|log)$/i.test(cand) && !/^(transaction|payment|amount|bill|invoice|fee|rent|salary|expense|income)(?:\s+of)?$/i.test(cand) && !/^(i\s+had\s+a|we\s+had\s+a)/i.test(cand)) {
-      person = cand.charAt(0).toUpperCase() + cand.slice(1)
+  // Common action verbs and keywords that CANNOT be person names:
+  const actionVerbs = /^(?:received|receive|got|paid|pay|spent|spend|bought|buy|purchased|ordered|transferred|transfer|sent|send|credited|debited|add|log|give|gave|borrowed|borrow|lent|lend|today|yesterday|kal|aaj|maine|mene|humne|i|we|transaction|payment|amount|bill|invoice|fee|rent|salary|expense|income|udhar|udhaar)$/i
+
+  const cleanName = (n: string): string => {
+    if (!n) return ""
+    let c = n.trim().replace(/\b(?:by|via|in|with|using|upi|cash|card|gpay|phonepe|paytm|today|yesterday|kal|aaj|ko|se|ne|को|से|ने|hai|hain|tha|the)\b/gi, "").trim()
+    c = c.replace(/^[\s.-]+|[\s.-]+$/g, "")
+    if (c.length >= 2 && !actionVerbs.test(c)) {
+      return c.charAt(0).toUpperCase() + c.slice(1)
+    }
+    return ""
+  }
+
+  // A. Directional preposition matching: "from <Name>" for Credit, "to <Name>" for Debit
+  const fromMatch = rawText.match(/\b(?:from|se|से)\s+([A-Za-z\u0900-\u097F]+(?:\s+[A-Za-z\u0900-\u097F]+)?)/i)
+  const toMatch = rawText.match(/\b(?:to|ko|को)\s+([A-Za-z\u0900-\u097F]+(?:\s+[A-Za-z\u0900-\u097F]+)?)/i)
+
+  if (type === "Credit" && fromMatch) {
+    const p = cleanName(fromMatch[1])
+    if (p) person = p
+  } else if (type === "Debit" && toMatch) {
+    const p = cleanName(toMatch[1])
+    if (p) person = p
+  }
+
+  // B. Leading name match: "Ramesh ne ...", "Sharma ji ko ...", "रमेश ने ..."
+  if (!person) {
+    const leadingNameMatch = rawText.match(
+      /^\s*([A-Za-z\u0900-\u097F][A-Za-z\u0900-\u097F .'-]{0,40}?)\s+(?:ne|ने|ko|को|se|से|borrowed|borrow|gave|paid|sent|transferred|diya|diye|लिया|लिए|दिए|दिया)/i
+    )
+    if (leadingNameMatch && leadingNameMatch[1]) {
+      const p = cleanName(leadingNameMatch[1])
+      if (p) person = p
     }
   }
 
-  // Second: Check known names list
+  // C. Check common person names list in text
   if (!person) {
     for (const name of COMMON_PERSON_NAMES) {
       if (new RegExp(`\\b${name}\\b`, "i").test(combinedSearch)) {
         person = name
-        const afterMatch = rawText.match(new RegExp(`\\b${name}\\s+([A-Z][a-z]+|ji|bhai|uncle|kumar|singh|seth)\\b`, "i"))
+        const afterMatch = rawText.match(new RegExp(`\\b${name}\\s+(ji|bhai|uncle|kumar|singh|seth|lal|das|prasad|babu)\\b`, "i"))
         if (afterMatch && afterMatch[1]) {
           person = `${name} ${afterMatch[1].charAt(0).toUpperCase() + afterMatch[1].slice(1).toLowerCase()}`
         }
@@ -285,30 +286,25 @@ export function parseVoiceKhataInput(transcript: string, knownCustomers?: string
     }
   }
 
-  // Third: Fallback preposition matching ("from Ramesh", "to Suresh", "ko Ramesh", "se Ramesh", "by Ramesh")
+  // D. General preposition matching ("from / to / for / se / ko / ne")
   if (!person) {
-    const fromToMatch = rawText.match(/(?:from|to|for|se|ko|ne|by|से|को|ने|द्वारा)\s+([A-Za-z\u0900-\u097F]+(?:\s+[A-Za-z\u0900-\u097F]+)?)/i)
-    if (fromToMatch && fromToMatch[1]) {
-      const candidate = fromToMatch[1].trim()
-      const lowerCandidate = candidate.toLowerCase()
-      if (!lowerCandidate.includes("upi") && !lowerCandidate.includes("cash") && isNaN(Number(candidate)) && !/^(today|yesterday|kal|aaj|credit|debit|diye|liye|me|us|him|her|them)$/i.test(lowerCandidate)) {
-        person = candidate.charAt(0).toUpperCase() + candidate.slice(1)
-      }
+    const anyPrepMatch = rawText.match(/\b(?:from|to|for|se|ko|ne|द्वारा)\s+([A-Za-z\u0900-\u097F]+(?:\s+[A-Za-z\u0900-\u097F]+)?)/i)
+    if (anyPrepMatch && anyPrepMatch[1]) {
+      const p = cleanName(anyPrepMatch[1])
+      if (p) person = p
     }
   }
 
-  // Fourth: Trailing name matching ("500 debit Ramesh", "500 credit Ramesh", "500 diye Ramesh", "500 liye Ramesh")
+  // E. Trailing name matching ("500 diye Ramesh ko", "500 credit Ramesh")
   if (!person) {
-    const trailingNameMatch = rawText.match(/(?:(?:rs\.?|inr|₹|rupaye|rupees|\d+)\s+)?(?:debit|credit|diye|diya|liye|liya|paid|received|खर्च|दिए|लिए)\s+(?:to|from|ko|se|ne)?\s*([A-Za-z\u0900-\u097F]{2,25})$/i)
-    if (trailingNameMatch && trailingNameMatch[1]) {
-      const candidate = trailingNameMatch[1].trim()
-      const lowerCandidate = candidate.toLowerCase()
-      if (!/^(cash|upi|today|kal|yesterday|credit|debit|card|rupees|rupaye|income|expense)$/i.test(lowerCandidate)) {
-        person = candidate.charAt(0).toUpperCase() + candidate.slice(1)
-      }
+    const trailingMatch = rawText.match(/(?:(?:rs\.?|inr|₹|rupaye|rupees|\d+)\s+)?(?:debit|credit|diye|diya|liye|liya|paid|received|खर्च|दिए|लिए)\s+(?:to|from|ko|se|ne)?\s*([A-Za-z\u0900-\u097F]{2,25})(?:\s+(?:ko|se|ne))?$/i)
+    if (trailingMatch && trailingMatch[1]) {
+      const p = cleanName(trailingMatch[1])
+      if (p) person = p
     }
   }
 
+  // F. Match with known customers list
   if (person && knownCustomers && knownCustomers.length > 0) {
     const matched = matchCustomerWithKnownList(person, knownCustomers)
     if (matched) {
@@ -316,7 +312,7 @@ export function parseVoiceKhataInput(transcript: string, knownCustomers?: string
     }
   }
 
-  // 4. Item Extraction (e.g. "5000 rupaye ka samaan udhar", "120 rupaye ki chai", "200 petrol")
+  // 4. Item Extraction (e.g. "5000 rupaye ka samaan udhar", "120 rupaye ki chai", "200 petrol", "groceries")
   let item = type === "Credit" ? "Payment" : "Goods"
   const itemMatch = rawText.match(/(?:rupees?|rupaye|रुपये|का|की|ke)\s+([a-zA-Z\u0900-\u097F\s-]{2,25}?)\s+(?:udhar|udhaar|credit|diya|paid|payment|लिया|लिए|उधार)/i)
   if (itemMatch && itemMatch[1]) {
@@ -328,7 +324,7 @@ export function parseVoiceKhataInput(transcript: string, knownCustomers?: string
     // Check known categories as item: petrol, chai, grocery, medicine, etc.
     const quickItemMatch = rawText.match(/\b(chai|tea|coffee|petrol|diesel|groceries|grocery|ration|dinner|lunch|breakfast|doodh|milk|vegetables|sabji|medicine|recharge|wifi|electricity|bijli|rent|kiraya)\b/i)
     if (quickItemMatch && quickItemMatch[1]) {
-      item = quickItemMatch[1].charAt(0).toUpperCase() + quickItemMatch[1].slice(1)
+      item = quickItemMatch[1].charAt(0).toUpperCase() + quickItemMatch[1].slice(1).toLowerCase()
     }
   }
 
@@ -339,7 +335,6 @@ export function parseVoiceKhataInput(transcript: string, knownCustomers?: string
     } else {
       person = type === "Credit" ? "Payment Received" : "General Expense"
     }
-    // With an intelligent default description, do not block the user
     isAmbiguousPerson = false
   }
 

@@ -13,6 +13,7 @@ declare global {
 export type VoiceState = "idle" | "listening" | "processing" | "error"
 
 export interface UseVoiceInputOptions {
+  lang?: string
   onTranscript?: (transcript: string) => void
   onError?: (errorMessage: string) => void
 }
@@ -118,14 +119,15 @@ export function useVoiceInput(options?: UseVoiceInputOptions) {
 
     let finalText = spokenTranscriptRef.current.trim()
 
-    // If WebSpeech didn't capture text (e.g. Firefox, Brave, or SpeechRecognition network failure), use Groq Whisper fallback
-    if (!finalText && audioChunksRef.current.length > 0) {
+    // Transcribe audio blob via Groq Whisper if available:
+    // Whisper auto-identifies English vs Hindi from audio, preserving English in Latin script and Hindi in Devanagari script.
+    if (audioChunksRef.current.length > 0) {
       try {
         const mimeType = mediaRecorderRef.current?.mimeType || audioChunksRef.current[0]?.type || "audio/webm"
         const audioBlob = new Blob(audioChunksRef.current, { type: mimeType })
 
         if (audioBlob.size > 200) {
-          console.log(`[useVoiceInput] WebSpeech empty, transcribing audio blob (${audioBlob.size} bytes) via Whisper fallback...`)
+          console.log(`[useVoiceInput] Transcribing audio blob (${audioBlob.size} bytes) via Whisper...`)
           const whisperResult = await transcribeAudioBlob(audioBlob)
           if (whisperResult && whisperResult.trim()) {
             finalText = whisperResult.trim()
@@ -133,7 +135,7 @@ export function useVoiceInput(options?: UseVoiceInputOptions) {
           }
         }
       } catch (err) {
-        console.warn("[useVoiceInput] Whisper fallback error:", err)
+        console.warn("[useVoiceInput] Whisper error, keeping WebSpeech text:", err)
       }
     }
 
@@ -301,7 +303,7 @@ export function useVoiceInput(options?: UseVoiceInputOptions) {
       const SpeechRecognitionClass = window.SpeechRecognition || window.webkitSpeechRecognition
       if (SpeechRecognitionClass) {
         const recognition = new SpeechRecognitionClass()
-        recognition.lang = "hi-IN" // Standard Indian Hindi/English recognizer
+        recognition.lang = optionsRef.current?.lang || "en-IN" // Configured language (en-IN or hi-IN)
         recognition.interimResults = true
         recognition.continuous = true // Continuous listening: does NOT stop on micro-pauses
 

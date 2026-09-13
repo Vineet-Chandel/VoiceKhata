@@ -7,6 +7,7 @@ import { Mic, MicOff, Check, RotateCcw, AlertCircle, ArrowUpRight, ArrowDownRigh
 import { useVoiceInput } from "@/components/hooks/use-voice-input"
 import { useAITransaction } from "@/components/hooks/use-ai-transaction"
 import { parseVoiceKhataInput, type ParsedVoiceTransaction } from "@/lib/voice-khata-parser"
+import { useLanguage } from "@/context/LanguageContext"
 import type { TransactionInput } from "@/types/finance"
 
 interface VoiceActionBannerProps {
@@ -25,6 +26,7 @@ export function VoiceActionBanner({
   existingCustomers,
 }: VoiceActionBannerProps) {
   const { parseTransaction: parseAITransaction } = useAITransaction()
+  const { language } = useLanguage()
 
   const handleVoiceTranscript = (finalText: string) => {
     if (finalText.trim()) {
@@ -33,6 +35,7 @@ export function VoiceActionBanner({
   }
 
   const { voiceState, transcript, startListening, stopListening, reset } = useVoiceInput({
+    lang: language === "hi" ? "hi-IN" : "en-IN",
     onTranscript: handleVoiceTranscript,
     onError: () => setFlowState("error"),
   })

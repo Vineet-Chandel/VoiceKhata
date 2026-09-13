@@ -24,6 +24,7 @@ import { VoiceWaveform } from "@/components/ui/AIAssistant_UI/voice-waveform"
 import { parseVoiceKhataInput, type ParsedVoiceTransaction } from "@/lib/voice-khata-parser"
 import { useTransactions } from "@/components/hooks/use-transactions"
 import { useAppMode } from "@/context/AppModeContext"
+import { useLanguage } from "@/context/LanguageContext"
 import { getCategories } from "@/lib/categories"
 import { format } from "date-fns"
 
@@ -51,6 +52,7 @@ export function VoiceCaptureCard({
 }: VoiceCaptureCardProps) {
   const { addTransaction, transactions } = useTransactions()
   const { appMode } = useAppMode()
+  const { language } = useLanguage()
 
   const activeCategories = React.useMemo(() => {
     const base = getCategories(appMode)
@@ -143,6 +145,7 @@ export function VoiceCaptureCard({
     reset: resetVoice,
     analyserRef,
   } = useVoiceInput({
+    lang: language === "hi" ? "hi-IN" : "en-IN",
     onTranscript: handleVoiceTranscript,
     onError: (err) => {
       console.warn("[VoiceCaptureCard] Voice input error:", err)

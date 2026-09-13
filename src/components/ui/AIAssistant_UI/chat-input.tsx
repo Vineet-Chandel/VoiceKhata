@@ -64,7 +64,7 @@ type ScanState =
   | { status: "error";    message: string }
 
 export function ChatInput({ onSend, loading, guidedStep, replyingTo, onCancelReply, onStartGuided, onStartBudgetGuided, onCancelGuided, variant = "dark" }: Props) {
-  const { t } = useLanguage()
+  const { t, language } = useLanguage()
   const [value,      setValue]      = React.useState("")
   const [focused,    setFocused]    = React.useState(false)
   const [popOpen,    setPopOpen]    = React.useState(false)
@@ -73,14 +73,9 @@ export function ChatInput({ onSend, loading, guidedStep, replyingTo, onCancelRep
 
   const handleVoiceTranscript = React.useCallback((finalText: string) => {
     const trimmed = finalText.trim()
-    const cleaned = trimmed.toLowerCase().replace(/[^\w\s\u0900-\u097F]/g, "")
-    if (trimmed && trimmed.length >= 2 && !/^(the|a|an|you|bye)$/i.test(cleaned)) {
-      const fullMessage = (value ? value + " " + trimmed : trimmed).trim()
-      onSend(fullMessage)
-      setValue("")
-      if (textareaRef.current) textareaRef.current.style.height = "auto"
-    }
-  }, [value, onSend])
+    if (!trimmed) return
+    onSend(trimmed)
+  }, [onSend])
 
   const {
     voiceState,
@@ -91,6 +86,7 @@ export function ChatInput({ onSend, loading, guidedStep, replyingTo, onCancelRep
     reset: resetVoice,
     analyserRef,
   } = useVoiceInput({
+    lang: language === "hi" ? "hi-IN" : "en-IN",
     onTranscript: handleVoiceTranscript,
     onError: (err) => console.error("[ChatInput voice error]:", err),
   })
