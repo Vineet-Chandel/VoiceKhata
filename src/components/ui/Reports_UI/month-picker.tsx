@@ -8,8 +8,14 @@ import {
   PopoverContent,
   PopoverTrigger
 } from "@/components/ui/popover"
+import { useLanguage } from "@/context/LanguageContext"
 
-const MONTHS = [
+const MONTH_KEYS = [
+  "month.january", "month.february", "month.march", "month.april", "month.may", "month.june",
+  "month.july", "month.august", "month.september", "month.october", "month.november", "month.december"
+]
+
+const MONTHS_FALLBACK = [
   "January", "February", "March", "April", "May", "June",
   "July", "August", "September", "October", "November", "December"
 ]
@@ -20,14 +26,15 @@ interface Props {
 }
 
 export function MonthPicker({ value, onChange }: Props) {
-
+  const { t } = useLanguage()
   const [year, month] = value.split("-").map(Number)
 
   const currentYear = new Date().getFullYear()
 
   const years = Array.from({ length: 6 }, (_, i) => currentYear - i)
 
-  const label = `${MONTHS[month - 1]} ${year}`
+  const monthName = t(MONTH_KEYS[month - 1]) || MONTHS_FALLBACK[month - 1]
+  const label = `${monthName} ${year}`
 
   const selectMonth = (m: number) => {
     const formatted = `${year}-${String(m + 1).padStart(2, "0")}`
@@ -70,16 +77,19 @@ export function MonthPicker({ value, onChange }: Props) {
 
         {/* Month Selector */}
         <div className="grid grid-cols-3 gap-1">
-          {MONTHS.map((m, i) => (
-            <Button
-              key={m}
-              variant={i + 1 === month ? "default" : "ghost"}
-              size="sm"
-              onClick={() => selectMonth(i)}
-            >
-              {m.slice(0, 3)}
-            </Button>
-          ))}
+          {MONTH_KEYS.map((k, i) => {
+            const name = t(k) || MONTHS_FALLBACK[i]
+            return (
+              <Button
+                key={k}
+                variant={i + 1 === month ? "default" : "ghost"}
+                size="sm"
+                onClick={() => selectMonth(i)}
+              >
+                {name.slice(0, 3)}
+              </Button>
+            )
+          })}
         </div>
 
       </PopoverContent>

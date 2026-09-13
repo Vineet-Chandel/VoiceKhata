@@ -12,6 +12,7 @@ import { useAuth } from "@/components/hooks/use-auth"
 import { useSearchParams } from "react-router-dom"
 import { supabase } from "@/lib/supabase"
 import React from "react"
+import { useLanguage } from "@/context/LanguageContext"
 
 const COUNTRIES = ["India", "United States", "United Kingdom", "Canada", "Australia", "Germany", "France", "Japan", "Other"]
 const rawBackendUrl = (import.meta.env.VITE_BACKEND_URL as string | undefined)?.trim() || "https://voicekhata-tif3.onrender.com"
@@ -29,6 +30,7 @@ interface FinancialPanelProps {
 export function FinancialPanel({
   form, setField, profileLoading, profileSaving, profileMsg, onSave,
 }: FinancialPanelProps) {
+  const { t } = useLanguage()
   const { user } = useAuth()
   const [searchParams] = useSearchParams()
   const gmailStatus = searchParams.get("gmail")
@@ -108,15 +110,15 @@ export function FinancialPanel({
       {/* Identity Card */}
       <Card>
         <SectionLabel>Identity</SectionLabel>
-        <FieldRow icon={User} label="Full Name" description="Used in reports and exports.">
+        <FieldRow icon={User} label={t("settings.fullName")} description="Used in reports and exports.">
           <Input
             value={form.full_name}
             onChange={(e) => setField("full_name")(e.target.value)}
-            placeholder="Full name"
+            placeholder={t("settings.fullName")}
             className={inputCls}
           />
         </FieldRow>
-        <FieldRow icon={Globe} label="Country" description="Localises insights for your region.">
+        <FieldRow icon={Globe} label={t("settings.country")} description="Localises insights for your region.">
           <SelectDropdown value={form.country} options={COUNTRIES} onChange={setField("country")} />
         </FieldRow>
       </Card>
@@ -126,8 +128,8 @@ export function FinancialPanel({
         <SectionLabel>Integrations</SectionLabel>
         <FieldRow
           icon={Mail}
-          label="Gmail Auto-Import"
-          description="Automatically import UPI & bank transactions from your Gmail inbox."
+          label={t("settings.gmailImport")}
+          description={t("settings.gmailImportDesc")}
         >
           {checkingGmail ? (
             <div className="size-4 rounded-full border-2 border-border border-t-white/40 animate-spin" />
@@ -135,14 +137,14 @@ export function FinancialPanel({
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-2 text-green-400 text-sm font-medium">
                 <CheckCircle2 className="size-4" />
-                Connected
+                {t("settings.connected")}
               </div>
               <Button
                 onClick={handleDisconnectGmail}
                 size="sm"
                 className="h-8 px-3 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 cursor-pointer text-xs"
               >
-                Disconnect
+                {t("settings.disconnect")}
               </Button>
             </div>
           ) : (
@@ -153,7 +155,7 @@ export function FinancialPanel({
                 className="h-8 px-4 bg-surface-secondary hover:bg-surface-elevated text-text-primary border border-border-secondary cursor-pointer"
               >
                 <Mail className="size-3.5 mr-1.5" />
-                Connect Gmail
+                {t("settings.connectGmail")}
               </Button>
               {gmailStatus === "error" && (
                 <p className="text-xs text-red-400 flex items-center gap-1">
@@ -173,8 +175,8 @@ export function FinancialPanel({
           className="cursor-pointer h-10 px-8 bg-text-primary text-bg-primary hover:opacity-90 border-0 font-semibold"
         >
           {profileSaving
-            ? <><span className="size-4 rounded-full border-2 border-bg-primary/20 border-t-bg-primary animate-spin mr-2" />Saving…</>
-            : <><Check className="size-4 mr-2" />Save Changes</>
+            ? <><span className="size-4 rounded-full border-2 border-bg-primary/20 border-t-bg-primary animate-spin mr-2" />{t("common.saving")}</>
+            : <><Check className="size-4 mr-2" />{t("common.save")}</>
           }
         </Button>
         <Toast msg={profileMsg} />

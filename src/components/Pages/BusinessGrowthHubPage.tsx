@@ -16,12 +16,13 @@ import { WhatIfSimulator } from "@/components/ui/MoneyGrowthCenter/WhatIfSimulat
 import { CanIAffordThis } from "@/components/ui/MoneyGrowthCenter/CanIAffordThis";
 import { BusinessCommandCenter } from "@/components/ui/MoneyGrowthCenter/BusinessCommandCenter";
 
-// Business Growth Hub components
 import { BusinessOnboarding } from "@/components/ui/BusinessGrowthHub/BusinessOnboarding";
 import { BusinessSnapshot } from "@/components/ui/BusinessGrowthHub/BusinessSnapshot";
 import { DataCompleteness } from "@/components/ui/BusinessGrowthHub/DataCompleteness";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function BusinessGrowthHubPage() {
+  const { t } = useLanguage();
   const { user } = useAuth();
 
   // ── Money Growth Engine ────────────────────────────────────────────────────
@@ -76,8 +77,8 @@ export default function BusinessGrowthHubPage() {
           <div className="absolute inset-0 bg-violet-500/20 blur-xl rounded-full" />
           <Loader2 size={48} className="animate-spin text-violet-500 relative z-10" />
         </div>
-        <h2 className="text-xl font-semibold text-text-primary mt-4">Building Your Financial Digital Twin...</h2>
-        <p className="text-sm text-text-muted">Analyzing your transactions and generating intelligence</p>
+        <h2 className="text-xl font-semibold text-text-primary mt-4">{t("growth.twinTitle")}</h2>
+        <p className="text-sm text-text-muted">{t("growth.twinDesc")}</p>
       </div>
     );
   }
@@ -94,11 +95,11 @@ export default function BusinessGrowthHubPage() {
           </div>
           <div>
             <div className="flex items-center gap-2 mb-1">
-              <h1 className="text-3xl font-bold text-text-primary tracking-tight">AI Money Growth Center</h1>
+              <h1 className="text-3xl font-bold text-text-primary tracking-tight">{t("growth.hubTitle")}</h1>
               <span className="text-[10px] font-semibold uppercase tracking-wider bg-violet-500/20 text-violet-300 px-2 py-0.5 rounded-full">Engine</span>
             </div>
             <p className="text-text-secondary text-sm max-w-lg">
-              Your Financial Digital Twin — real-time intelligence on health, growth, and next best moves.
+              {t("growth.hubDesc")}
             </p>
           </div>
         </div>
@@ -108,7 +109,7 @@ export default function BusinessGrowthHubPage() {
           className="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-sm font-medium hover:bg-white/10 transition-colors disabled:opacity-50"
         >
           <RefreshCw size={14} className={growthLoading ? "animate-spin" : ""} />
-          Refresh Intelligence
+          {t("growth.refresh")}
         </button>
       </div>
 
@@ -139,7 +140,7 @@ export default function BusinessGrowthHubPage() {
         </>
       ) : (
         <div className="text-center py-16">
-          <p className="text-text-muted text-sm">No financial data available yet. Start adding transactions to power your growth engine.</p>
+          <p className="text-text-muted text-sm">{t("growth.noData")}</p>
         </div>
       )}
 
@@ -153,9 +154,9 @@ export default function BusinessGrowthHubPage() {
                 <Store className="text-blue-400" size={20} />
               </div>
               <div>
-                <h3 className="text-sm font-semibold text-text-primary">Run a business?</h3>
+                <h3 className="text-sm font-semibold text-text-primary">{t("growth.runBusiness")}</h3>
                 <p className="text-xs text-text-muted mt-0.5">
-                  Set up your Business Growth Hub to unlock shopkeeper intelligence, supplier tracking, and business-specific insights.
+                  {t("growth.runBusinessDesc")}
                 </p>
               </div>
             </div>
@@ -163,7 +164,7 @@ export default function BusinessGrowthHubPage() {
               onClick={() => setShowOnboarding(true)}
               className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-medium transition-colors shrink-0"
             >
-              Set Up Business
+              {t("growth.setupBusiness")}
             </button>
           </div>
         )}
@@ -187,9 +188,9 @@ export default function BusinessGrowthHubPage() {
                   <Store size={18} className="text-blue-400" />
                 </div>
                 <div className="text-left">
-                  <h2 className="text-lg font-semibold text-text-primary">Business Growth Hub</h2>
+                  <h2 className="text-lg font-semibold text-text-primary">{t("growth.businessGrowthHub")}</h2>
                   <p className="text-sm text-text-muted">
-                    Readiness: <span className="text-violet-400 ml-1">{profile?.readiness_state?.replace('_', ' ')}</span>
+                    {t("growth.readiness")}: <span className="text-violet-400 ml-1">{profile?.readiness_state?.replace('_', ' ')}</span>
                   </p>
                 </div>
               </div>
@@ -207,9 +208,9 @@ export default function BusinessGrowthHubPage() {
                     {snapshot && <BusinessSnapshot data={snapshot} />}
 
                     <div className="p-6 rounded-2xl bg-white/5 border border-white/10 flex flex-col gap-2">
-                      <h3 className="text-lg font-semibold text-text-primary mb-2">How is your money being used?</h3>
+                      <h3 className="text-lg font-semibold text-text-primary mb-2">{t("growth.howMoneyUsed")}</h3>
                       <p className="text-sm text-text-muted mb-4">
-                        Categorize your transactions to separate Business expenses from Personal and Owner Withdrawals.
+                        {t("growth.howMoneyUsedDesc")}
                       </p>
                       {/* Classification UI Placeholder */}
                       <div className="p-4 border border-white/5 rounded-xl bg-background/50 text-center text-sm text-text-secondary">
@@ -222,22 +223,22 @@ export default function BusinessGrowthHubPage() {
                     {completeness && <DataCompleteness data={completeness} />}
 
                     <div className="p-6 rounded-2xl bg-white/5 border border-white/10 flex flex-col gap-2">
-                      <h3 className="text-lg font-semibold text-text-primary mb-2">How your money moves</h3>
+                      <h3 className="text-lg font-semibold text-text-primary mb-2">{t("growth.howMoneyMoves")}</h3>
                       <div className="flex flex-col gap-3 text-sm text-text-secondary">
                         <div className="flex justify-between items-center py-2 border-b border-white/5">
-                          <span>Customers</span>
+                          <span>{t("growth.customers")}</span>
                           <span>0</span>
                         </div>
                         <div className="flex justify-between items-center py-2 border-b border-white/5">
-                          <span>Suppliers</span>
+                          <span>{t("growth.suppliers")}</span>
                           <span>0</span>
                         </div>
                         <div className="flex justify-between items-center py-2 border-b border-white/5">
-                          <span>Products</span>
+                          <span>{t("growth.products")}</span>
                           <span>0</span>
                         </div>
                         <div className="flex justify-between items-center py-2">
-                          <span>Connected Accounts</span>
+                          <span>{t("growth.connectedAccounts")}</span>
                           <span>1</span>
                         </div>
                       </div>

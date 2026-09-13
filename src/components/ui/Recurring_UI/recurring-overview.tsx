@@ -1,11 +1,13 @@
 import { IconCalendarRepeat, IconTrendingUp, IconTrendingDown, IconClock } from "@tabler/icons-react"
 import type { RecurringTransaction } from "@/components/hooks/use-recurring"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Dashboard_UI/card"
+import { useLanguage } from "@/context/LanguageContext"
 
 
 interface Props { recurring: RecurringTransaction[] }
 
 export function RecurringOverview({ recurring }: Props) {
+    const { t } = useLanguage()
     const active = recurring.filter((r) => r.active)
     const monthly = active.reduce((sum, r) => {
         if (r.type !== "Debit") return sum
@@ -27,10 +29,10 @@ export function RecurringOverview({ recurring }: Props) {
     }).length
 
     const cards = [
-        { title: "Active Rules", value: `${active.length}`, icon: IconCalendarRepeat, sub: `${recurring.length} total` },
-        { title: "Monthly Outflow", value: `₹${Math.round(monthly).toLocaleString("en-IN")}`, icon: IconTrendingDown, sub: "Estimated debit / month" },
-        { title: "Monthly Inflow", value: `₹${Math.round(income).toLocaleString("en-IN")}`, icon: IconTrendingUp, sub: "Estimated credit / month" },
-        { title: "Due This Week", value: `${upcoming}`, icon: IconClock, sub: "Transactions running in 7 days" },
+        { title: t("tx.activeRules"), value: `${active.length}`, icon: IconCalendarRepeat, sub: `${recurring.length} ${t("tx.total")}` },
+        { title: t("tx.monthlyOutflow"), value: `₹${Math.round(monthly).toLocaleString("en-IN")}`, icon: IconTrendingDown, sub: t("tx.estimatedDebitMonth") },
+        { title: t("tx.monthlyInflow"), value: `₹${Math.round(income).toLocaleString("en-IN")}`, icon: IconTrendingUp, sub: t("tx.estimatedCreditMonth") },
+        { title: t("tx.dueThisWeek"), value: `${upcoming}`, icon: IconClock, sub: t("tx.runningIn7Days") },
     ]
 
     return (

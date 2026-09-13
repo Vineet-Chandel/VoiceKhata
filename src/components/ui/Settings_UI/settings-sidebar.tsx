@@ -2,6 +2,7 @@
 
 import { User, Wallet, Shield, AlertTriangle, Download, CheckCircle, Loader2, Eye } from "lucide-react"
 import { useState, useEffect, useRef } from "react"
+import { useLanguage } from "@/context/LanguageContext"
 
 // ─── Nav items ────────────────────────────────────────────────────────────────
 
@@ -146,18 +147,30 @@ export function SettingsSidebar({
   activeTab,
   onTabChange,
 }: SettingsSidebarProps) {
+  const { t } = useLanguage()
   const { installed, isIOS, showButton, waiting, install } = useInstallPrompt()
+
+  const getNavLabel = (id: TabId) => {
+    switch (id) {
+      case "profile": return t("settings.profile")
+      case "appearance": return t("settings.appearance")
+      case "financial": return t("settings.financial")
+      case "security": return t("settings.security")
+      case "danger": return t("settings.danger")
+      default: return id
+    }
+  }
 
   return (
     <aside className="hidden lg:flex flex-col w-56 shrink-0 border-r border-border py-8 px-3 gap-0.5">
 
       {/* Section label */}
       <div className="px-3 mb-5">
-        <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-text-muted">Account</p>
+        <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-text-muted">{t("settings.account")}</p>
       </div>
 
       {/* Nav items */}
-      {NAV_ITEMS.map(({ id, label, icon: Icon }) => {
+      {NAV_ITEMS.map(({ id, icon: Icon }) => {
         const active   = activeTab === id
         const isDanger = id === "danger"
 
@@ -190,7 +203,7 @@ export function SettingsSidebar({
               />
             </div>
 
-            <span className="font-medium">{label}</span>
+            <span className="font-medium">{getNavLabel(id)}</span>
 
             {active && (
               <div className={`ml-auto size-1.5 rounded-full ${isDanger ? "bg-red-400" : "bg-text-primary/40"}`} />
@@ -210,7 +223,7 @@ export function SettingsSidebar({
               bg-emerald-500/[0.08] border border-emerald-500/[0.15]">
               <CheckCircle className="size-3.5 text-emerald-400 shrink-0" />
               <div>
-                <p className="text-[12px] font-semibold text-emerald-400">App Installed</p>
+                <p className="text-[12px] font-semibold text-emerald-400">{t("settings.installed")}</p>
                 <p className="text-[10px] text-text-muted leading-tight">VoiceKhata is on your device</p>
               </div>
             </div>
@@ -221,7 +234,7 @@ export function SettingsSidebar({
               bg-surface-secondary border border-border">
               <Download className="size-3.5 text-text-muted shrink-0 mt-0.5" />
               <div>
-                <p className="text-[12px] font-semibold text-text-secondary">Install App</p>
+                <p className="text-[12px] font-semibold text-text-secondary">{t("settings.installApp")}</p>
                 <p className="text-[10px] text-text-muted leading-snug mt-0.5">
                   Tap the Share icon<br />then "Add to Home Screen"
                 </p>
@@ -252,7 +265,7 @@ export function SettingsSidebar({
               </div>
               <div>
                 <p className="text-[12px] font-semibold text-text-secondary group-hover:text-text-primary transition-colors">
-                  {waiting ? "Preparing…" : "Install App"}
+                  {waiting ? "Preparing…" : t("settings.installApp")}
                 </p>
                 <p className="text-[10px] text-text-muted leading-tight">
                   {waiting ? "Just a moment" : "Add to home screen"}

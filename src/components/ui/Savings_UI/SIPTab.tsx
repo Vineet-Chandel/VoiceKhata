@@ -5,6 +5,7 @@ import { AddSIPDialog } from "./add-sip-dialog";
 import { DeleteConfirmDialog } from "./delete-confirm-dialog";
 import { type SIPPlan } from "@/lib/savings";
 import { Pencil, Trash2, Plus, TrendingUp } from "lucide-react";
+import { useLanguage } from "@/context/LanguageContext";
 
 interface SIPTabProps {
   sipPlans: SIPPlan[];
@@ -45,6 +46,7 @@ export function SIPTab({
   editSIP,
   removeSIP,
 }: SIPTabProps) {
+  const { t } = useLanguage();
   const [addOpen, setAddOpen] = useState(false);
   const [editData, setEditData] = useState<SIPPlan | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
@@ -80,7 +82,7 @@ export function SIPTab({
   if (loadingSIP) {
     return (
       <div className="flex items-center justify-center py-16 text-muted-foreground text-sm">
-        Loading SIP plans...
+        {t("sip.loading")}
       </div>
     );
   }
@@ -90,9 +92,9 @@ export function SIPTab({
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-base font-medium">SIP Plans</h2>
+          <h2 className="text-base font-medium">{t("sip.title")}</h2>
           <p className="text-sm text-muted-foreground">
-            Systematic Investment Plan tracker & calculator
+            {t("sip.subtitle")}
           </p>
         </div>
         <Button
@@ -103,7 +105,7 @@ export function SIPTab({
           }}
         >
           <Plus className="w-4 h-4 mr-1" />
-          Add SIP
+          {t("sip.addSIP")}
         </Button>
       </div>
 
@@ -112,7 +114,7 @@ export function SIPTab({
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
           <div className="rounded-lg bg-muted/40 border border-border p-3 flex flex-col gap-1">
             <span className="text-xs text-muted-foreground">
-              Total Monthly SIP
+              {t("sip.totalMonthlySIP")}
             </span>
             <span className="text-lg font-medium">
               ₹{totalMonthly.toLocaleString("en-IN")}
@@ -120,7 +122,7 @@ export function SIPTab({
           </div>
           <div className="rounded-lg bg-muted/40 border border-border p-3 flex flex-col gap-1">
             <span className="text-xs text-muted-foreground">
-              Active Plans
+              {t("sip.activePlans")}
             </span>
             <span className="text-lg font-medium">
               {sipPlans.filter((s) => s.active).length}
@@ -128,7 +130,7 @@ export function SIPTab({
           </div>
           <div className="rounded-lg bg-muted/40 border border-border p-3 flex flex-col gap-1 col-span-2 sm:col-span-1">
             <span className="text-xs text-muted-foreground">
-              Combined Future Value
+              {t("sip.combinedFV")}
             </span>
             <span className="text-lg font-medium text-green-500">
               ₹{(totalFV / 100000).toFixed(1)}L
@@ -142,7 +144,7 @@ export function SIPTab({
         <div className="flex flex-col items-center justify-center py-16 gap-3 text-center border border-dashed border-border rounded-lg">
           <TrendingUp className="w-8 h-8 text-muted-foreground" />
           <p className="text-muted-foreground text-sm">
-            No SIP plans yet. Start investing systematically.
+            {t("sip.noPlansYet")}
           </p>
           <Button
             size="sm"
@@ -153,7 +155,7 @@ export function SIPTab({
             }}
           >
             <Plus className="w-4 h-4 mr-1" />
-            Create your first SIP
+            {t("sip.createFirstSIP")}
           </Button>
         </div>
       )}
@@ -185,20 +187,20 @@ export function SIPTab({
                     ₹{plan.monthly_amount.toLocaleString("en-IN")}/mo
                   </span>
                   <Badge variant={plan.active ? "default" : "secondary"}>
-                    {plan.active ? "Active" : "Paused"}
+                    {plan.active ? t("sip.active") : t("sip.paused")}
                   </Badge>
                 </div>
                 <span className="text-xs text-muted-foreground">
-                  {plan.duration_years} yr · {plan.expected_return}% p.a.
+                  {plan.duration_years} {t("sip.yr")} · {plan.expected_return}% {t("savings.pa")}
                 </span>
               </div>
 
               {/* Time Progress */}
               <div className="flex flex-col gap-1">
                 <div className="flex justify-between text-xs text-muted-foreground">
-                  <span>Time elapsed</span>
+                  <span>{t("sip.timeElapsed")}</span>
                   <span>
-                    {Math.min(monthsElapsed, totalMonths)}/{totalMonths} months
+                    {Math.min(monthsElapsed, totalMonths)}/{totalMonths} {t("savings.months")}
                   </span>
                 </div>
                 <div className="w-full bg-muted rounded-full h-1.5 overflow-hidden">
@@ -212,19 +214,19 @@ export function SIPTab({
               {/* Returns Grid */}
               <div className="grid grid-cols-3 gap-2 text-xs">
                 <div className="flex flex-col gap-0.5">
-                  <span className="text-muted-foreground">Invested</span>
+                  <span className="text-muted-foreground">{t("sip.invested")}</span>
                   <span className="font-medium">
                     ₹{(invested / 1000).toFixed(0)}k
                   </span>
                 </div>
                 <div className="flex flex-col gap-0.5">
-                  <span className="text-muted-foreground">Returns</span>
+                  <span className="text-muted-foreground">{t("sip.returns")}</span>
                   <span className="font-medium text-green-500">
                     ₹{(returns / 1000).toFixed(0)}k
                   </span>
                 </div>
                 <div className="flex flex-col gap-0.5">
-                  <span className="text-muted-foreground">Final Value</span>
+                  <span className="text-muted-foreground">{t("sip.finalValue")}</span>
                   <span className="font-medium text-green-400">
                     ₹{(fv / 1000).toFixed(0)}k
                     <span className="text-muted-foreground ml-1">
@@ -236,7 +238,7 @@ export function SIPTab({
 
               {/* Start Date */}
               <p className="text-xs text-muted-foreground">
-                Started:{" "}
+                {t("sip.started")}:{" "}
                 {new Date(plan.start_date).toLocaleDateString("en-IN", {
                   day: "numeric",
                   month: "short",
@@ -256,7 +258,7 @@ export function SIPTab({
                   }}
                 >
                   <Pencil className="w-3 h-3 mr-1" />
-                  Edit
+                  {t("common.edit")}
                 </Button>
                 <Button
                   size="sm"
@@ -265,7 +267,7 @@ export function SIPTab({
                   onClick={() => setDeleteId(plan.id)}
                 >
                   <Trash2 className="w-3 h-3 mr-1" />
-                  Delete
+                  {t("common.delete")}
                 </Button>
               </div>
             </div>
@@ -290,8 +292,8 @@ export function SIPTab({
       <DeleteConfirmDialog
         open={!!deleteId}
         onOpenChange={(open) => !open && setDeleteId(null)}
-        title="Delete SIP Plan?"
-        description="This will permanently delete this SIP plan."
+        title={t("sip.deleteTitle")}
+        description={t("sip.deleteDesc")}
         onConfirm={handleDelete}
         loading={deleteLoading}
       />

@@ -19,8 +19,9 @@ import {
 } from "@/components/ui/select";
 import { format } from "date-fns";
 import { type ManualInvestment } from "@/lib/savings";
+import { useLanguage } from "@/context/LanguageContext";
 
-const INVESTMENT_TYPES = [
+const INVESTMENT_TYPES = (t: (key: string) => string) => [
   { value: "stocks",      label: "📈 Stocks" },
   { value: "mutual_fund", label: "🏦 Mutual Fund" },
   { value: "crypto",      label: "₿ Crypto" },
@@ -56,6 +57,7 @@ export function AddInvestmentDialog({
   onSubmit,
   editData,
 }: AddInvestmentDialogProps) {
+  const { t } = useLanguage();
   // ── Core fields ──────────────────────────────────────
   const [name, setName]           = useState("");
   const [type, setType]           = useState("stocks");
@@ -144,21 +146,21 @@ export function AddInvestmentDialog({
   // ── Submit ────────────────────────────────────────────
   const handleSubmit = async () => {
     setError(null);
-    if (!name.trim()) return setError("Investment name is required.");
+    if (!name.trim()) return setError(t("savings.investmentNameRequired"));
 
     let finalAmount  = 0;
     let finalReturn  = 10;
 
     if (mode === "price") {
-      if (!quantity || Number(quantity) <= 0) return setError("Enter a valid quantity.");
-      if (!buyPrice || Number(buyPrice) <= 0)  return setError("Enter a valid buy price.");
+      if (!quantity || Number(quantity) <= 0) return setError(t("savings.validQuantity"));
+      if (!buyPrice || Number(buyPrice) <= 0)  return setError(t("savings.validBuyPrice"));
       finalAmount  = Number(quantity) * Number(buyPrice);
       finalReturn  = preview?.impliedReturn ?? 10;
     } else {
       if (!amountInvested || Number(amountInvested) <= 0)
-        return setError("Enter a valid invested amount.");
+        return setError(t("savings.validAmountInvested"));
       if (Number(expectedReturn) < 0 || Number(expectedReturn) > 200)
-        return setError("Expected return must be between 0% and 200%.");
+        return setError(t("savings.expectedReturnRange"));
       finalAmount  = Number(amountInvested);
       finalReturn  = Number(expectedReturn);
     }
@@ -186,7 +188,7 @@ export function AddInvestmentDialog({
       <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
-            {editData ? "Edit Investment" : "Add Investment"}
+            {editData ? t("savings.editInvestment") : t("savings.addInvestment")}
           </DialogTitle>
         </DialogHeader>
 
@@ -194,7 +196,7 @@ export function AddInvestmentDialog({
 
           {/* Name */}
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="inv-name">Investment Name</Label>
+            <Label htmlFor="inv-name">{t("savings.investmentName")}</Label>
             <Input
               id="inv-name"
               placeholder="e.g. Reliance Industries, Bitcoin, Mirae Asset"
@@ -205,15 +207,15 @@ export function AddInvestmentDialog({
 
           {/* Type */}
           <div className="flex flex-col gap-1.5">
-            <Label>Investment Type</Label>
+            <Label>{t("savings.investmentType")}</Label>
             <Select value={type} onValueChange={setType}>
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {INVESTMENT_TYPES.map((t) => (
-                  <SelectItem key={t.value} value={t.value}>
-                    {t.label}
+                {INVESTMENT_TYPES(t).map((typeOpt) => (
+                  <SelectItem key={typeOpt.value} value={typeOpt.value}>
+                    {typeOpt.label}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -232,7 +234,7 @@ export function AddInvestmentDialog({
                     : "text-muted-foreground hover:text-foreground"
                 }`}
               >
-                Price Based
+                {t("savings.priceBased")}
               </button>
               <button
                 type="button"
@@ -243,7 +245,7 @@ export function AddInvestmentDialog({
                     : "text-muted-foreground hover:text-foreground"
                 }`}
               >
-                Amount Based
+                {t("savings.amountBased")}
               </button>
             </div>
           )}
@@ -253,7 +255,7 @@ export function AddInvestmentDialog({
             <>
               {/* Quantity */}
               <div className="flex flex-col gap-1.5">
-                <Label htmlFor="qty">Quantity / Units</Label>
+                <Label htmlFor="qty">{t("savings.quantityUnits")}</Label>
                 <Input
                   id="qty"
                   type="number"
@@ -265,7 +267,7 @@ export function AddInvestmentDialog({
 
               {/* Buy Price */}
               <div className="flex flex-col gap-1.5">
-                <Label htmlFor="buy-price">Buy Price per Unit (₹)</Label>
+                <Label htmlFor="buy-price">{t("savings.buyPrice")}</Label>
                 <Input
                   id="buy-price"
                   type="number"
@@ -277,7 +279,7 @@ export function AddInvestmentDialog({
 
               {/* Buy Date */}
               <div className="flex flex-col gap-1.5">
-                <Label htmlFor="buy-date">Date of Purchase</Label>
+                <Label htmlFor="buy-date">{t("savings.dateOfPurchase")}</Label>
                 <Input
                   id="buy-date"
                   type="date"
@@ -290,13 +292,13 @@ export function AddInvestmentDialog({
               {/* Current Price */}
               <div className="flex flex-col gap-1.5">
                 <Label htmlFor="cur-price">
-                  Current Price per Unit (₹)
-                  <span className="text-text-secondary text-xs ml-1.5">optional</span>
+                  {t("savings.currentPrice")}
+                  <span className="text-text-secondary text-xs ml-1.5">{t("savings.optional")}</span>
                 </Label>
                 <Input
                   id="cur-price"
                   type="number"
-                  placeholder="Leave blank if unknown"
+                  placeholder={t("savings.leaveBlank")}
                   value={currentPrice}
                   onChange={(e) => setCurrentPrice(e.target.value)}
                 />
@@ -308,7 +310,7 @@ export function AddInvestmentDialog({
           {(mode === "amount" || editData) && (
             <>
               <div className="flex flex-col gap-1.5">
-                <Label htmlFor="amount-inv">Amount Invested (₹)</Label>
+                <Label htmlFor="amount-inv">{t("savings.amountInvested")}</Label>
                 <Input
                   id="amount-inv"
                   type="number"
@@ -318,7 +320,7 @@ export function AddInvestmentDialog({
                 />
               </div>
               <div className="flex flex-col gap-1.5">
-                <Label htmlFor="exp-return">Expected Annual Return (%)</Label>
+                <Label htmlFor="exp-return">{t("savings.expectedAnnualReturn")}</Label>
                 <Input
                   id="exp-return"
                   type="number"
@@ -336,18 +338,18 @@ export function AddInvestmentDialog({
           {preview && mode === "price" && (
             <div className="rounded-lg border border-border bg-surface-elevated p-3 flex flex-col gap-2">
               <span className="text-xs text-text-secondary font-medium uppercase tracking-wide">
-                Live Preview
+                {t("savings.livePreview")}
               </span>
               <div className="grid grid-cols-2 gap-2 text-sm">
                 <div className="flex flex-col gap-0.5">
-                  <span className="text-text-secondary text-xs">Total Invested</span>
+                  <span className="text-text-secondary text-xs">{t("savings.totalInvested")}</span>
                   <span className="font-medium">
                     ₹{preview.totalInvested.toLocaleString("en-IN")}
                   </span>
                 </div>
                 {preview.currentValue !== null && (
                   <div className="flex flex-col gap-0.5">
-                    <span className="text-text-secondary text-xs">Current Value</span>
+                    <span className="text-text-secondary text-xs">{t("savings.currentValue")}</span>
                     <span className="font-medium text-blue-400">
                       ₹{Math.round(preview.currentValue).toLocaleString("en-IN")}
                     </span>
@@ -355,7 +357,7 @@ export function AddInvestmentDialog({
                 )}
                 {preview.profitLoss !== null && (
                   <div className="flex flex-col gap-0.5">
-                    <span className="text-text-secondary text-xs">P & L</span>
+                    <span className="text-text-secondary text-xs">{t("savings.pl")}</span>
                     <span
                       className={`font-medium ${
                         preview.profitLoss >= 0 ? "text-green-400" : "text-red-400"
@@ -374,23 +376,23 @@ export function AddInvestmentDialog({
                 )}
                 {preview.cagr !== null && (
                   <div className="flex flex-col gap-0.5">
-                    <span className="text-text-secondary text-xs">CAGR</span>
+                    <span className="text-text-secondary text-xs">{t("savings.cagr")}</span>
                     <span
                       className={`font-medium ${
                         preview.cagr >= 0 ? "text-green-400" : "text-red-400"
                       }`}
                     >
                       {preview.cagr >= 0 ? "+" : ""}
-                      {preview.cagr.toFixed(2)}% p.a.
+                      {preview.cagr.toFixed(2)}% {t("savings.pa")}
                     </span>
                   </div>
                 )}
               </div>
               {preview.yrsHeld > 0 && (
                 <p className="text-xs text-zinc-600">
-                  Held for {preview.yrsHeld < 1
-                    ? `${Math.round(preview.yrsHeld * 12)} months`
-                    : `${preview.yrsHeld.toFixed(1)} years`}
+                  {t("savings.heldFor")} {preview.yrsHeld < 1
+                    ? `${Math.round(preview.yrsHeld * 12)} ${t("savings.months")}`
+                    : `${preview.yrsHeld.toFixed(1)} ${t("savings.years")}`}
                 </p>
               )}
             </div>
@@ -399,7 +401,7 @@ export function AddInvestmentDialog({
           {/* Amount mode 1yr preview */}
           {mode === "amount" && amountInvested && expectedReturn && !editData && (
             <div className="rounded-lg border border-border bg-muted/30 p-3 flex justify-between text-sm">
-              <span className="text-muted-foreground">Estimated value after 1 year</span>
+              <span className="text-muted-foreground">{t("savings.estimatedValue1yr")}</span>
               <span className="text-green-400 font-medium">
                 ₹{Math.round(
                   Number(amountInvested) * (1 + Number(expectedReturn) / 100)
@@ -412,13 +414,13 @@ export function AddInvestmentDialog({
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={loading}>
-            Cancel
+          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={loading} className="cursor-pointer">
+            {t("common.cancel")}
           </Button>
-          <Button onClick={handleSubmit} disabled={loading}>
+          <Button onClick={handleSubmit} disabled={loading} className="cursor-pointer">
             {loading
-              ? editData ? "Saving..." : "Adding..."
-              : editData ? "Save Changes" : "Add Investment"}
+              ? editData ? t("common.saving") : t("form.adding")
+              : editData ? t("common.save") : t("savings.addInvestment")}
           </Button>
         </DialogFooter>
       </DialogContent>

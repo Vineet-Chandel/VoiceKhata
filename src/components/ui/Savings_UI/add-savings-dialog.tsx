@@ -37,16 +37,17 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 import { type SavingsGoal } from "@/lib/savings";
+import { useLanguage } from "@/context/LanguageContext";
 
 const QUICK_AMOUNTS = [500, 1000, 2000, 5000];
 
-const SOURCES = [
-  { value: "salary",            label: "Salary",            Icon: Briefcase   },
-  { value: "investment_return", label: "Investment Return", Icon: TrendingUp  },
-  { value: "manual",            label: "Manual Transfer",   Icon: HandCoins   },
-  { value: "cashback",          label: "Cashback / Refund", Icon: ReceiptText },
-  { value: "freelance",         label: "Freelance",         Icon: Laptop      },
-  { value: "gift",              label: "Gift / Bonus",      Icon: Gift        },
+const SOURCES = (t: (key: string) => string) => [
+  { value: "salary",            label: t("savings.salary"),            Icon: Briefcase   },
+  { value: "investment_return", label: t("savings.investmentReturn"), Icon: TrendingUp  },
+  { value: "manual",            label: t("savings.manualTransfer"),   Icon: HandCoins   },
+  { value: "cashback",          label: t("savings.cashback"),         Icon: ReceiptText },
+  { value: "freelance",         label: t("savings.freelance"),        Icon: Laptop      },
+  { value: "gift",              label: t("savings.gift"),             Icon: Gift        },
 ];
 
 interface AddSavingsDialogProps {
@@ -68,6 +69,7 @@ export function AddSavingsDialog({
   goals,
   onSubmit,
 }: AddSavingsDialogProps) {
+  const { t } = useLanguage();
   const [amount, setAmount]   = useState("");
   const [source, setSource]   = useState("manual");
   const [goalId, setGoalId]   = useState("general");
@@ -114,7 +116,7 @@ export function AddSavingsDialog({
   const handleSubmit = async () => {
     setError(null);
     if (!amount || isNaN(numAmount) || numAmount <= 0)
-      return setError("Enter a valid amount greater than 0.");
+      return setError(t("savings.validAmount"));
     setLoading(true);
     try {
       await onSubmit(
@@ -138,7 +140,7 @@ export function AddSavingsDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <PiggyBank className="w-4 h-4 text-muted-foreground" />
-            Add Savings
+            {t("savings.addSavings")}
           </DialogTitle>
         </DialogHeader>
 
@@ -146,7 +148,7 @@ export function AddSavingsDialog({
 
           {/* Quick Add */}
           <div className="flex flex-col gap-1.5">
-            <Label>Quick Add</Label>
+            <Label>{t("savings.quickAdd")}</Label>
             <div className="grid grid-cols-4 gap-2">
               {QUICK_AMOUNTS.map((q) => (
                 <button
@@ -167,7 +169,7 @@ export function AddSavingsDialog({
 
           {/* Amount */}
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="saving-amount">Amount (₹)</Label>
+            <Label htmlFor="saving-amount">{t("tx.amount")}</Label>
             <Input
               id="saving-amount"
               type="number"
@@ -179,13 +181,13 @@ export function AddSavingsDialog({
 
           {/* Source */}
           <div className="flex flex-col gap-1.5">
-            <Label>Source</Label>
+            <Label>{t("savings.source")}</Label>
             <Select value={source} onValueChange={setSource}>
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {SOURCES.map(({ value, label, Icon }) => (
+                {SOURCES(t).map(({ value, label, Icon }) => (
                   <SelectItem key={value} value={value}>
                     <span className="flex items-center gap-2">
                       <Icon className="w-3.5 h-3.5 text-muted-foreground" />
@@ -199,13 +201,13 @@ export function AddSavingsDialog({
 
           {/* Add To */}
           <div className="flex flex-col gap-1.5">
-            <Label>Add To</Label>
+            <Label>{t("savings.addTo")}</Label>
             <Select value={goalId} onValueChange={setGoalId}>
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="general">General Savings Pool</SelectItem>
+                <SelectItem value="general">{t("savings.generalSavingsPool")}</SelectItem>
                 {goals.map((g) => {
                   const pct = Math.min(
                     Math.round((g.saved_amount / g.target_amount) * 100),
@@ -226,10 +228,10 @@ export function AddSavingsDialog({
                 onClick={() => setGoalId(suggestedGoal.id)}
                 className="text-left text-xs text-amber-400 mt-1 hover:text-amber-300 transition-colors"
               >
-                Suggested: allocate to <strong>{suggestedGoal.name}</strong>{" "}
+                {t("savings.suggestedAllocateTo")} <strong>{suggestedGoal.name}</strong>{" "}
                 ({Math.round(
                   (suggestedGoal.saved_amount / suggestedGoal.target_amount) * 100
-                )}% complete) — tap to select
+                )}% {t("savings.complete")}) {t("savings.tapToSelect")}
               </button>
             )}
           </div>
@@ -238,7 +240,7 @@ export function AddSavingsDialog({
           {afterPercent && selectedGoal && (
             <div className="rounded-lg border border-border bg-surface-elevated px-3 py-2.5 flex flex-col gap-1.5">
               <span className="text-xs text-text-secondary font-medium uppercase tracking-wide">
-                Impact Preview
+                {t("savings.impactPreview")}
               </span>
               <div className="flex items-center gap-2 text-sm">
                 <span className="text-text-secondary">{currentPercent}%</span>
@@ -246,7 +248,7 @@ export function AddSavingsDialog({
                 <span className="text-green-400 font-semibold text-base">
                   {afterPercent}%
                 </span>
-                <span className="text-text-secondary">complete</span>
+                <span className="text-text-secondary">{t("savings.complete")}</span>
               </div>
               <div className="w-full bg-surface-elevated rounded-full h-1.5 overflow-hidden">
                 <div
@@ -256,12 +258,12 @@ export function AddSavingsDialog({
               </div>
               {remainingAfter !== null && remainingAfter > 0 && (
                 <span className="text-xs text-text-secondary">
-                  ₹{remainingAfter.toLocaleString("en-IN")} still remaining
+                  ₹{remainingAfter.toLocaleString("en-IN")} {t("savings.stillRemaining")}
                 </span>
               )}
               {remainingAfter === 0 && (
                 <span className="text-xs text-green-500 font-medium">
-                  This will complete your goal
+                  {t("savings.thisWillCompleteYourGoal")}
                 </span>
               )}
             </div>
@@ -269,7 +271,7 @@ export function AddSavingsDialog({
 
           {/* Date (UPDATED with Calendar + Dropdown) */}
           <div className="flex flex-col gap-1.5">
-            <Label>Date</Label>
+            <Label>{t("tx.date")}</Label>
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -292,7 +294,7 @@ export function AddSavingsDialog({
 
           {/* Notes */}
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="saving-notes">Notes (optional)</Label>
+            <Label htmlFor="saving-notes">{t("savings.notesOptional")}</Label>
             <Input
               id="saving-notes"
               placeholder="e.g. April salary surplus"
@@ -305,11 +307,11 @@ export function AddSavingsDialog({
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={loading}>
-            Cancel
+          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={loading} className="cursor-pointer">
+            {t("common.cancel")}
           </Button>
-          <Button onClick={handleSubmit} disabled={loading}>
-            {loading ? "Adding..." : "Add Savings"}
+          <Button onClick={handleSubmit} disabled={loading} className="cursor-pointer">
+            {loading ? t("form.adding") : t("savings.addSavings")}
           </Button>
         </DialogFooter>
       </DialogContent>

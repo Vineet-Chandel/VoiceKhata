@@ -45,6 +45,9 @@ const COMMON_PERSON_NAMES = [
 export function normalizeText(rawText: string): string {
   let text = (rawText || "").normalize("NFKC")
 
+  // Remove Latin diacritics (e.g. pāñc -> panc) while preserving Devanagari
+  text = text.normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+
   // Replace Devanagari digits with ASCII digits
   text = text.replace(/[०-९]/g, (digit) => DEVANAGARI_DIGITS[digit] || digit)
 
@@ -131,21 +134,21 @@ export function parseVoiceKhataInput(transcript: string, knownCustomers?: string
   // Fallback for spoken number words in English/Hindi
   if (!amount) {
     const combined = `${lower} ${lowerTrans}`
-    if (combined.includes("ek sau") || combined.includes("one hundred") || combined.includes("एक सौ")) amount = 100
-    else if (combined.includes("do sau") || combined.includes("two hundred") || combined.includes("दो सौ")) amount = 200
-    else if (combined.includes("teen sau") || combined.includes("three hundred") || combined.includes("तीन सौ")) amount = 300
-    else if (combined.includes("char sau") || combined.includes("four hundred") || combined.includes("चार सौ")) amount = 400
-    else if (combined.includes("paanch sau") || combined.includes("panch sau") || combined.includes("five hundred") || combined.includes("पांच सौ")) amount = 500
-    else if (combined.includes("chhe sau") || combined.includes("six hundred") || combined.includes("छह सौ")) amount = 600
-    else if (combined.includes("saat sau") || combined.includes("seven hundred") || combined.includes("सात सौ")) amount = 700
-    else if (combined.includes("aath sau") || combined.includes("eight hundred") || combined.includes("आठ सौ")) amount = 800
-    else if (combined.includes("nau sau") || combined.includes("nine hundred") || combined.includes("नौ सौ")) amount = 900
-    else if (combined.includes("ek hazaar") || combined.includes("one thousand") || combined.includes("एक हज़ार")) amount = 1000
-    else if (combined.includes("barah sau") || combined.includes("twelve hundred") || combined.includes("बारह सौ")) amount = 1200
-    else if (combined.includes("pandra sau") || combined.includes("fifteen hundred") || combined.includes("पंद्रह सौ")) amount = 1500
-    else if (combined.includes("do hazaar") || combined.includes("two thousand") || combined.includes("दो हज़ार")) amount = 2000
-    else if (combined.includes("paanch hazaar") || combined.includes("five thousand") || combined.includes("पांच हज़ार")) amount = 5000
-    else if (combined.includes("das hazaar") || combined.includes("ten thousand") || combined.includes("दस हज़ार")) amount = 10000
+    if (/ek (sau|saur)|one hundred|एक सौ/i.test(combined)) amount = 100
+    else if (/do (sau|saur)|two hundred|दो सौ/i.test(combined)) amount = 200
+    else if (/teen (sau|saur)|three hundred|तीन सौ/i.test(combined)) amount = 300
+    else if (/char (sau|saur)|four hundred|चार सौ/i.test(combined)) amount = 400
+    else if (/(paanch|panch|panc) (sau|saur)|five hundred|पांच सौ/i.test(combined)) amount = 500
+    else if (/(chhe|che) (sau|saur)|six hundred|छह सौ/i.test(combined)) amount = 600
+    else if (/saat (sau|saur)|seven hundred|सात सौ/i.test(combined)) amount = 700
+    else if (/aath (sau|saur)|eight hundred|आठ सौ/i.test(combined)) amount = 800
+    else if (/nau (sau|saur)|nine hundred|नौ सौ/i.test(combined)) amount = 900
+    else if (/(ek|one) (hazaar|hazar)|one thousand|एक हज़ार/i.test(combined)) amount = 1000
+    else if (/barah (sau|saur)|twelve hundred|बारह सौ/i.test(combined)) amount = 1200
+    else if (/pandra (sau|saur)|fifteen hundred|पंद्रह सौ/i.test(combined)) amount = 1500
+    else if (/do (hazaar|hazar)|two thousand|दो हज़ार/i.test(combined)) amount = 2000
+    else if (/(paanch|panch|panc) (hazaar|hazar)|five thousand|पांच हज़ार/i.test(combined)) amount = 5000
+    else if (/das (hazaar|hazar)|ten thousand|दस हज़ार/i.test(combined)) amount = 10000
   }
 
   // 2. Direction & Transaction Type Extraction (Credit vs Debit)
@@ -162,17 +165,17 @@ export function parseVoiceKhataInput(transcript: string, knownCustomers?: string
 
   // A. High-Priority Hindi / Hinglish Case Markers:
   // 1. "ko ... diya / diye / de diya / transfer / udhar" -> Money given TO someone -> DEBIT
-  const isKoDiya = new RegExp(`${ub}(?:ko|को)${ue}.*${ub}(?:diya|diye|de diya|de diye|bheja|bhej diya|transfer|udhar|udhaar|दिए|दिया|दे दिए|दे दिया|भेजा|उधार|कर्ज)${ue}`, "i").test(combinedSearch)
+  const isKoDiya = new RegExp(`${ub}(?:ko|को)${ue}.*${ub}(?:diya|diye|diyai|de diya|de diye|bheja|bhej diya|transfer|udhar|udhaar|दिए|दिया|दे दिए|दे दिया|भेजा|उधार|कर्ज)${ue}`, "i").test(combinedSearch)
   // 2. "ne ... diya / diye / payment / jama / kiye" -> Person GAVE to me -> CREDIT
-  const isNeDiya = new RegExp(`${ub}(?:ne|ने)${ue}.*${ub}(?:diya|diye|de diya|de diye|payment|jama|jma|kiye|kiya|kare|kare hain|bheja|दिए|दिया|दे दिए|दे दिया|जमा|किये|किया|किए|कराये|कराए|करवाए|भुगतान|डिपॉजिट|deposit)${ue}`, "i").test(combinedSearch)
+  const isNeDiya = new RegExp(`${ub}(?:ne|ने)${ue}.*${ub}(?:diya|diye|diyai|de diya|de diye|payment|jama|jma|kiye|kiya|kare|kare hain|bheja|दिए|दिया|दे दिए|दे दिया|जमा|किये|किया|किए|कराये|कराए|करवाए|भुगतान|डिपॉजिट|deposit)${ue}`, "i").test(combinedSearch)
   // 3. "se ... mila / mile / prapt / aaya / liye / liya / jama" -> Received FROM someone -> CREDIT
-  const isSeMilaOrLiya = new RegExp(`${ub}(?:se|से)${ue}.*${ub}(?:mila|mile|mili|mil gaya|aaya|aaye|aayi|prapt|received|liye|liya|le liye|le liya|jama|jma|मिला|मिले|मिली|मिल गया|आया|आए|आई|प्राप्त|लिए|लिया|ले लिए|ले लिया|जमा)${ue}`, "i").test(combinedSearch)
+  const isSeMilaOrLiya = new RegExp(`${ub}(?:se|से)${ue}.*${ub}(?:mila|mile|mili|mil gaya|aaya|aaye|aayi|prapt|received|liye|liya|liyai|le liye|le liya|jama|jma|मिला|मिले|मिली|मिल गया|आया|आए|आई|प्राप्त|लिए|लिया|ले लिए|ले लिया|जमा)${ue}`, "i").test(combinedSearch)
   // 4. "ne ... liye / liya" -> Person took from me -> DEBIT
-  const isNeLiya = new RegExp(`${ub}(?:ne|ने)${ue}.*${ub}(?:liye|liya|le liye|le liya|लिए|लिया|ले लिए)${ue}`, "i").test(combinedSearch)
+  const isNeLiya = new RegExp(`${ub}(?:ne|ने)${ue}.*${ub}(?:liye|liya|liyai|le liye|le liya|लिए|लिया|ले लिए)${ue}`, "i").test(combinedSearch)
   // 5. "maine / humne ... diya / kharch" -> I gave / spent -> DEBIT
-  const isMaineDiya = new RegExp(`${ub}(?:maine|mene|humne|मैंने|हमने)${ue}.*${ub}(?:diya|diye|de diya|kharch|kharcha|bheja|दिया|दिए|खर्च|खर्चा)${ue}`, "i").test(combinedSearch)
+  const isMaineDiya = new RegExp(`${ub}(?:maine|mene|humne|मैंने|हमने)${ue}.*${ub}(?:diya|diye|diyai|de diya|kharch|kharcha|bheja|दिया|दिए|खर्च|खर्चा)${ue}`, "i").test(combinedSearch)
   // 6. "maine / humne ... liye / liya / mila" -> I received / took -> CREDIT
-  const isMaineLiye = new RegExp(`${ub}(?:maine|mene|humne|मैंने|हमने)${ue}.*${ub}(?:liye|liya|le liye|mila|mile|prapt|लिए|लिया|मिला|मिले)${ue}`, "i").test(combinedSearch)
+  const isMaineLiye = new RegExp(`${ub}(?:maine|mene|humne|मैंने|हमने)${ue}.*${ub}(?:liye|liya|liyai|le liye|mila|mile|prapt|लिए|लिया|मिला|मिले)${ue}`, "i").test(combinedSearch)
   // 7. Explicit Deposit / Collection pattern (e.g. "राहुल ने 500 जमा किये", "500 जमा राहुल", "खाते में जमा") -> CREDIT
   const isDepositPattern = new RegExp(`${ub}(?:jama|jma|deposit|deposited|जमा|वसूल|वसूली)${ue}`, "i").test(combinedSearch) &&
     !new RegExp(`${ub}(?:maine|mene|humne|मैंने|हमने)${ue}.*${ub}(?:jama|jma|जमा)${ue}`, "i").test(combinedSearch)
@@ -185,7 +188,7 @@ export function parseVoiceKhataInput(transcript: string, knownCustomers?: string
   const creditKeywords = [
     "credit", "credited", "credit to", "credit karo", "credit kar do", "credit kiya", "credit h", "credit hai",
     "received", "receive", "got", "earned", "salary", "stipend", "bonus", "cashback", "refund",
-    "liye", "liya", "le liye", "le liya", "li", "li thi", "liye the", "liye hai", "liye hain", "liya hai", "paise liye",
+    "liye", "liya", "liyai", "le liye", "le liya", "li", "li thi", "liye the", "liye hai", "liye hain", "liya hai", "paise liye",
     "jama", "jma", "jama kiya", "jama kiye", "jama kiye hain", "jama hua", "vasool", "wasool", "vasooli", "deposit", "deposited",
     "mila", "mile", "mili", "mil gaya", "mil gaye", "mila hai", "mile hain",
     "aaye", "aaya", "aayi", "a gaye", "aa gaye", "aaye hain", "aaya hai",
@@ -196,7 +199,7 @@ export function parseVoiceKhataInput(transcript: string, knownCustomers?: string
   // D. Inherent Debit / Outflow Indicators:
   const debitKeywords = [
     "debit", "debited", "debit karo", "debit kar do", "debit kiya", "debit h", "debit hai",
-    "diye", "diya", "de diya", "de diye", "diya tha", "diye the", "diye hai", "diye hain", "diya hai", "paise diye",
+    "diye", "diya", "diyai", "de diya", "de diye", "diya tha", "diye the", "diye hai", "diye hain", "diya hai", "paise diye",
     "spent", "spend", "bought", "buy", "purchased", "purchase", "ordered", "expense", "kharcha",
     "kharch", "kharch kiya", "kharcha kiya", "chuka", "chukaya", "bhugtan", "bhugtan kiya",
     "bill", "recharge", "petrol", "diesel", "groceries", "grocery", "food", "dinner",
@@ -239,9 +242,9 @@ export function parseVoiceKhataInput(transcript: string, knownCustomers?: string
       type = "Debit"
     } else if (/^\s*(?:received|got|earned|credit)/i.test(rawText)) {
       type = "Credit"
-    } else if (new RegExp(`${ub}(?:diya|diye|दिए|दिया)${ue}`, "i").test(combinedSearch)) {
+    } else if (new RegExp(`${ub}(?:diya|diye|diyai|दिए|दिया)${ue}`, "i").test(combinedSearch)) {
       type = "Debit"
-    } else if (new RegExp(`${ub}(?:liya|liye|लिया|लिए)${ue}`, "i").test(combinedSearch)) {
+    } else if (new RegExp(`${ub}(?:liya|liye|liyai|लिया|लिए)${ue}`, "i").test(combinedSearch)) {
       type = "Credit"
     } else {
       // Default to Debit for general spending
@@ -263,7 +266,7 @@ export function parseVoiceKhataInput(transcript: string, knownCustomers?: string
     const cand = leadingNameMatch[1].trim()
       .replace(/\b(?:aayi|aaya|aaye|gaya|gaye|hai|hain|tha|thi|the|bhi|ki|ka|ke)\b/gi, "")
       .replace(/^[\s.-]+|[\s.-]+$/g, "")
-    if (cand.length >= 2 && !/^(today|yesterday|kal|aaj|maine|mene|humne|i|we|add|credit|debit|log)$/i.test(cand)) {
+    if (cand.length >= 2 && !/^(today|yesterday|kal|aaj|maine|mene|humne|i|we|add|credit|debit|log)$/i.test(cand) && !/^(transaction|payment|amount|bill|invoice|fee|rent|salary|expense|income)(?:\s+of)?$/i.test(cand) && !/^(i\s+had\s+a|we\s+had\s+a)/i.test(cand)) {
       person = cand.charAt(0).toUpperCase() + cand.slice(1)
     }
   }
@@ -282,13 +285,13 @@ export function parseVoiceKhataInput(transcript: string, knownCustomers?: string
     }
   }
 
-  // Third: Fallback preposition matching ("from Ramesh", "to Suresh", "ko Ramesh", "se Ramesh")
+  // Third: Fallback preposition matching ("from Ramesh", "to Suresh", "ko Ramesh", "se Ramesh", "by Ramesh")
   if (!person) {
-    const fromToMatch = rawText.match(/(?:from|to|for|se|ko|ne|से|को|ने)\s+([A-Za-z\u0900-\u097F]+(?:\s+[A-Za-z\u0900-\u097F]+)?)/i)
+    const fromToMatch = rawText.match(/(?:from|to|for|se|ko|ne|by|से|को|ने|द्वारा)\s+([A-Za-z\u0900-\u097F]+(?:\s+[A-Za-z\u0900-\u097F]+)?)/i)
     if (fromToMatch && fromToMatch[1]) {
       const candidate = fromToMatch[1].trim()
       const lowerCandidate = candidate.toLowerCase()
-      if (!lowerCandidate.includes("upi") && !lowerCandidate.includes("cash") && isNaN(Number(candidate)) && !/^(today|yesterday|kal|aaj|credit|debit|diye|liye)$/i.test(lowerCandidate)) {
+      if (!lowerCandidate.includes("upi") && !lowerCandidate.includes("cash") && isNaN(Number(candidate)) && !/^(today|yesterday|kal|aaj|credit|debit|diye|liye|me|us|him|her|them)$/i.test(lowerCandidate)) {
         person = candidate.charAt(0).toUpperCase() + candidate.slice(1)
       }
     }

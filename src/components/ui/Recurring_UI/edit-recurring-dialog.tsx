@@ -13,6 +13,7 @@ import {
   SelectTrigger, SelectValue,
 } from "@/components/ui/Dashboard_UI/select"
 import type { RecurringTransaction, RecurringInput } from "@/components/hooks/use-recurring"
+import { useLanguage } from "@/context/LanguageContext"
 
 const CATEGORIES  = ["Food","Shopping","Transport","Utilities","Health","Entertainment","Subscription","Income","Other"]
 const METHODS     = ["Cash","UPI","Bank Transfer","Credit Card","Debit Card","Net Banking"]
@@ -26,6 +27,7 @@ interface Props {
 }
 
 export function EditRecurringDialog({ recurring, open, onOpenChange, onSave }: Props) {
+  const { t, language } = useLanguage()
   const [form, setForm] = React.useState({
     transaction: recurring.transaction,
     category:    recurring.category,
@@ -86,8 +88,8 @@ export function EditRecurringDialog({ recurring, open, onOpenChange, onSave }: P
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[480px]">
         <DialogHeader>
-          <DialogTitle>Edit Autopay Rule</DialogTitle>
-          <DialogDescription>Update the details below.</DialogDescription>
+          <DialogTitle>{t("form.editAutopayRule")}</DialogTitle>
+          <DialogDescription>{t("form.editDetails")}</DialogDescription>
         </DialogHeader>
 
         <div className="flex flex-col gap-4 py-1">
@@ -104,7 +106,7 @@ export function EditRecurringDialog({ recurring, open, onOpenChange, onSave }: P
 
           {/* Amount */}
           <div className="flex flex-col gap-1.5">
-            <Label>Amount (₹)</Label>
+            <Label>{t("form.amountLabel")}</Label>
             <Input
               type="number" min={1}
               value={form.amount}
@@ -116,7 +118,7 @@ export function EditRecurringDialog({ recurring, open, onOpenChange, onSave }: P
           {/* Category + Type */}
           <div className="grid grid-cols-2 gap-3">
             <div className="flex flex-col gap-1.5">
-              <Label>Category</Label>
+              <Label>{t("tx.category")}</Label>
               <Select value={form.category} onValueChange={(v) => set("category", v)}>
                 <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
                 <SelectContent position="popper" sideOffset={4}>
@@ -125,7 +127,7 @@ export function EditRecurringDialog({ recurring, open, onOpenChange, onSave }: P
               </Select>
             </div>
             <div className="flex flex-col gap-1.5">
-              <Label>Type</Label>
+              <Label>{t("tx.type")}</Label>
               <Select value={form.type} onValueChange={(v) => set("type", v)}>
                 <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
                 <SelectContent position="popper" sideOffset={4}>
@@ -139,7 +141,7 @@ export function EditRecurringDialog({ recurring, open, onOpenChange, onSave }: P
           {/* Method + Frequency */}
           <div className="grid grid-cols-2 gap-3">
             <div className="flex flex-col gap-1.5">
-              <Label>Method</Label>
+              <Label>{t("tx.method")}</Label>
               <Select value={form.method} onValueChange={(v) => set("method", v)}>
                 <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
                 <SelectContent position="popper" sideOffset={4}>
@@ -148,7 +150,7 @@ export function EditRecurringDialog({ recurring, open, onOpenChange, onSave }: P
               </Select>
             </div>
             <div className="flex flex-col gap-1.5">
-              <Label>Frequency</Label>
+              <Label>{t("tx.frequency")}</Label>
               <Select value={form.frequency} onValueChange={(v) => set("frequency", v)}>
                 <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
                 <SelectContent position="popper" sideOffset={4}>
@@ -165,7 +167,7 @@ export function EditRecurringDialog({ recurring, open, onOpenChange, onSave }: P
           {/* Start Date + End Date */}
           <div className="grid grid-cols-2 gap-3">
             <div className="flex flex-col gap-1.5">
-              <Label>Start Date</Label>
+              <Label>{t("tx.startDate")}</Label>
               <Input
                 type="text" placeholder="YYYY-MM-DD"
                 value={form.start_date}
@@ -173,7 +175,7 @@ export function EditRecurringDialog({ recurring, open, onOpenChange, onSave }: P
               />
             </div>
             <div className="flex flex-col gap-1.5">
-              <Label>End Date <span className="text-muted-foreground text-xs">(optional)</span></Label>
+              <Label>{t("tx.endDate")} <span className="text-muted-foreground text-xs">({t("tx.optional")})</span></Label>
               <Input
                 type="text" placeholder="YYYY-MM-DD"
                 value={form.end_date}
@@ -185,7 +187,7 @@ export function EditRecurringDialog({ recurring, open, onOpenChange, onSave }: P
 
         <DialogFooter showCloseButton>
           <Button onClick={handleSubmit} disabled={saving} className="cursor-pointer">
-            {saving ? "Saving..." : "Save Changes"}
+            {saving ? t("form.saving") : t("common.save")}
           </Button>
         </DialogFooter>
       </DialogContent>

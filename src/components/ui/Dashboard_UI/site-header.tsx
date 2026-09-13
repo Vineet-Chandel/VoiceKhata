@@ -10,26 +10,29 @@ import { useNavigate } from "react-router-dom"
 import { History } from "lucide-react"
 import { AppModeToggle } from "@/components/ui/AppModeToggle"
 import { ThemeToggle } from "@/components/ui/ThemeToggle"
+import { LanguageToggle } from "@/components/ui/LanguageToggle"
+import { useLanguage } from "@/context/LanguageContext"
 
 export function SiteHeader() {
   const location = useLocation()
   const navigate = useNavigate()
   const { user } = useAuth()
   const { setChatHistoryOpen } = useChatStore()
+  const { t } = useLanguage()
   const path = location.pathname
 
   const routes: Record<string, string> = {
-    "/dashboard/settings":     "Settings",
-    "/dashboard/transactions":  "Transaction",
-    "/dashboard/budget":       "Budget & Investment",
-    "/dashboard/reports":      "Reports",
-    "/dashboard/growth":       "Money Growth",
-    "/dashboard/ai-assistant": "AI Assistant",
-    "/dashboard/voice-capture":"Voice Capture",
-    "/dashboard/notifications":"Notifications",
+    "/dashboard/settings":     t("nav.settings"),
+    "/dashboard/transactions":  t("nav.transaction"),
+    "/dashboard/budget":       t("nav.budget"),
+    "/dashboard/reports":      t("nav.reports"),
+    "/dashboard/growth":       t("nav.moneyGrowth"),
+    "/dashboard/ai-assistant": t("nav.aiAssistant"),
+    "/dashboard/voice-capture":t("nav.voiceCapture"),
+    "/dashboard/notifications":t("nav.notifications"),
   }
 
-  let title = "Dashboard"
+  let title = t("nav.dashboard")
   for (const route in routes) {
     if (path.includes(route)) {
       title = routes[route]
@@ -51,6 +54,7 @@ export function SiteHeader() {
         <h1 className="text-base font-medium">{title}</h1>
 
         <div className="ml-auto flex items-center gap-3">
+          <LanguageToggle />
           <ThemeToggle />
           <AppModeToggle />
 
@@ -61,11 +65,11 @@ export function SiteHeader() {
                   setChatHistoryOpen(true)
                 }}
                 className="group flex items-center gap-1.5 px-3 py-1.5 rounded-full hover:bg-bg-primary/5 dark:hover:bg-surface-secondary transition-colors border border-transparent hover:border-black/10 dark:hover:border-border cursor-pointer"
-                title="Your Chats"
+                title={t("header.yourChats")}
               >
                 <History className="size-4.5 text-black/60 dark:text-text-secondary group-hover:text-black dark:group-hover:text-text-primary transition-colors" />
                 <span className="text-[13px] font-medium text-black/70 dark:text-text-secondary group-hover:text-black dark:group-hover:text-text-primary hidden sm:block">
-                  Your Chats
+                  {t("header.yourChats")}
                 </span>
               </button>
               <Separator orientation="vertical" className="h-4 hidden sm:block mx-1" />

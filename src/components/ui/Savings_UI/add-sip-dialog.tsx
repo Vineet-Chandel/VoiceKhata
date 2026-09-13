@@ -16,9 +16,9 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 import { type SIPPlan } from "@/lib/savings";
+import { useLanguage } from "@/context/LanguageContext";
 
 interface AddSIPDialogProps {
   open: boolean;
@@ -35,6 +35,7 @@ export function AddSIPDialog({
   onSubmit,
   editData,
 }: AddSIPDialogProps) {
+  const { t } = useLanguage();
   const [monthlyAmount, setMonthlyAmount] = useState("");
   const [durationYears, setDurationYears] = useState("");
   const [expectedReturn, setExpectedReturn] = useState("12");
@@ -77,15 +78,15 @@ export function AddSIPDialog({
   const handleSubmit = async () => {
     setError(null);
     if (!monthlyAmount || isNaN(Number(monthlyAmount)))
-      return setError("Enter a valid monthly amount.");
+      return setError(t("savings.validMonthlyAmount"));
     if (Number(monthlyAmount) <= 0)
-      return setError("Monthly amount must be greater than 0.");
+      return setError(t("savings.monthlyAmountGreaterThanZero"));
     if (!durationYears || isNaN(Number(durationYears)))
-      return setError("Enter a valid duration.");
+      return setError(t("savings.validDuration"));
     if (Number(durationYears) < 1 || Number(durationYears) > 40)
-      return setError("Duration must be between 1 and 40 years.");
+      return setError(t("savings.durationRange"));
     if (Number(expectedReturn) < 1 || Number(expectedReturn) > 50)
-      return setError("Expected return must be between 1% and 50%.");
+      return setError(t("savings.expectedReturnRangeSIP"));
 
     setLoading(true);
     try {
@@ -109,14 +110,14 @@ export function AddSIPDialog({
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>
-            {editData ? "Edit SIP Plan" : "Add SIP Plan"}
+            {editData ? t("savings.editSIPPlan") : t("savings.addSIPPlan")}
           </DialogTitle>
         </DialogHeader>
 
         <div className="flex flex-col gap-4 py-2">
           {/* Monthly Amount */}
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="monthly-amount">Monthly SIP Amount (₹)</Label>
+            <Label htmlFor="monthly-amount">{t("savings.monthlySIPAmount")}</Label>
             <Input
               id="monthly-amount"
               type="number"
@@ -128,7 +129,7 @@ export function AddSIPDialog({
 
           {/* Duration */}
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="duration">Duration (Years)</Label>
+            <Label htmlFor="duration">{t("savings.durationYears")}</Label>
             <Input
               id="duration"
               type="number"
@@ -142,7 +143,7 @@ export function AddSIPDialog({
 
           {/* Expected Return */}
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="expected-return">Expected Annual Return (%)</Label>
+            <Label htmlFor="expected-return">{t("savings.expectedAnnualReturn")}</Label>
             <Input
               id="expected-return"
               type="number"
@@ -156,16 +157,16 @@ export function AddSIPDialog({
 
           {/* Start Date — Calendar Picker */}
           <div className="flex flex-col gap-1.5">
-            <Label>Start Date</Label>
+            <Label>{t("savings.startDate")}</Label>
             <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
-                  className="w-full justify-start text-left font-normal"
+                  className="w-full justify-start text-left font-normal cursor-pointer"
                 >
                   <CalendarIcon className="mr-2 h-4 w-4 opacity-50" />
                   {startDate ? format(startDate, "dd MMM yyyy") : (
-                    <span className="text-muted-foreground">Pick a date</span>
+                    <span className="text-muted-foreground">{t("form.pickDate")}</span>
                   )}
                 </Button>
               </PopoverTrigger>
@@ -188,17 +189,17 @@ export function AddSIPDialog({
           {/* Live Preview */}
           {result && (
             <div className="rounded-lg border border-border bg-muted/30 p-3 flex flex-col gap-1">
-              <p className="text-xs text-muted-foreground mb-1">Estimated returns</p>
+              <p className="text-xs text-muted-foreground mb-1">{t("savings.estimatedReturns")}</p>
               <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Total Invested</span>
+                <span className="text-muted-foreground">{t("savings.totalInvested")}</span>
                 <span>₹{result.invested.toLocaleString("en-IN")}</span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Total Returns</span>
+                <span className="text-muted-foreground">{t("savings.totalReturns")}</span>
                 <span className="text-green-500">₹{result.returns.toLocaleString("en-IN")}</span>
               </div>
               <div className="flex justify-between text-sm font-medium">
-                <span className="text-muted-foreground">Final Value</span>
+                <span className="text-muted-foreground">{t("savings.finalValue")}</span>
                 <span className="text-green-400">₹{result.fv.toLocaleString("en-IN")}</span>
               </div>
             </div>
@@ -208,13 +209,13 @@ export function AddSIPDialog({
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={loading}>
-            Cancel
+          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={loading} className="cursor-pointer">
+            {t("common.cancel")}
           </Button>
-          <Button onClick={handleSubmit} disabled={loading}>
+          <Button onClick={handleSubmit} disabled={loading} className="cursor-pointer">
             {loading
-              ? editData ? "Saving..." : "Adding..."
-              : editData ? "Save Changes" : "Add SIP Plan"}
+              ? editData ? t("common.saving") : t("form.adding")
+              : editData ? t("common.save") : t("savings.addSIPPlan")}
           </Button>
         </DialogFooter>
       </DialogContent>

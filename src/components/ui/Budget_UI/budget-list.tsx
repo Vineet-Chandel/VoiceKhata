@@ -7,6 +7,7 @@ import type { Budget } from "@/components/hooks/use-budgets"
 import { EditBudgetDialog }   from "@/components/ui/Budget_UI/edit-budget-dialog"
 import { DeleteBudgetDialog } from "@/components/ui/Budget_UI/delete-budget-dialog"
 import { getProgressColor, isDurationGuardedBudget } from "@/lib/budget-utils"
+import { useLanguage } from "@/context/LanguageContext"
 
 const CATEGORY_COLORS: Record<string, string> = {
   Food:          "bg-orange-500",
@@ -19,14 +20,14 @@ const CATEGORY_COLORS: Record<string, string> = {
   Other:         "bg-gray-500",
 }
 
-const DURATION_LABELS: Record<string, string> = {
-  monthly:   "Monthly",
-  "3months":  "3 Months",
-  "6months":  "6 Months",
-  "12months": "12 Months",
-  yearly:    "Yearly",        // ← new from Codex
-  timeless:  "Timeless",
-}
+const DURATION_LABELS = (t: (key: string) => string): Record<string, string> => ({
+  monthly:   t("budget.monthly"),
+  "3months":  t("budget.3months"),
+  "6months":  t("budget.6months"),
+  "12months": t("budget.12months"),
+  yearly:    t("budget.yearly"),        // ← new from Codex
+  timeless:  t("budget.timeless"),
+})
 
 const BUDGET_TEMPLATES = {
   "Indian Household": [
@@ -74,6 +75,7 @@ function BudgetRow({
   onDelete:            Props["onDelete"]
   existingCategories?: string[]
 }) {
+  const { t, language } = useLanguage()
   const [editOpen,   setEditOpen]   = React.useState(false)
   const [deleteOpen, setDeleteOpen] = React.useState(false)
 
@@ -98,19 +100,19 @@ function BudgetRow({
 
             {/* Duration badge */}
             <span className="text-[10px] px-1.5 py-0.5 rounded-full border border-border text-muted-foreground">
-              {DURATION_LABELS[duration] ?? duration}
+              {DURATION_LABELS(t)[duration] ?? duration}
             </span>
 
             {isOver && (
               <span className="text-xs bg-red-500/15 text-red-400 px-1.5 py-0.5 rounded-full">
-                Over budget
+                {t("budget.overBudget")}
               </span>
             )}
 
             {/* New: duration guard badge */}
             {guarded && (
               <span className="text-xs bg-white/8 text-muted-foreground px-1.5 py-0.5 rounded-full">
-                Duration guard
+                {t("budget.durationGuard")}
               </span>
             )}
           </div>
@@ -119,10 +121,10 @@ function BudgetRow({
           <div className="flex items-center gap-3">
             <div className="text-right hidden sm:block">
               <p className="text-xs text-muted-foreground">
-                {fmt(b.spent)} <span className="text-muted-foreground/50">of</span> {fmt(b.amount)}
+                {fmt(b.spent)} <span className="text-muted-foreground/50">{t("tx.of")}</span> {fmt(b.amount)}
               </p>
               <p className={`text-xs font-medium ${isOver ? "text-red-400" : "text-green-400"}`}>
-                {isOver ? `${fmt(Math.abs(remaining))} over` : `${fmt(remaining)} left`}
+                {isOver ? `${fmt(Math.abs(remaining))} ${t("budget.over")}` : `${fmt(remaining)} ${t("budget.left")}`}
               </p>
             </div>
 
@@ -156,14 +158,14 @@ function BudgetRow({
             {b.spent === 0 && (
               <div className="absolute left-0 -top-9 hidden group-hover/bar:flex items-center gap-1.5 bg-popover border border-border rounded-md px-2.5 py-1.5 text-xs text-muted-foreground whitespace-nowrap shadow-md z-10 pointer-events-none">
                 <span className="size-1.5 rounded-full bg-muted-foreground/40 flex-shrink-0" />
-                Budget defined at {fmt(b.amount)} — no spending recorded yet
+                {t("budget.definedAt")} {fmt(b.amount)} {t("budget.noSpendingYet")}
               </div>
             )}
           </div>
 
           {/* Mobile: show spent + pct below bar */}
           <div className="flex justify-between text-xs text-muted-foreground sm:hidden">
-            <span>{fmt(b.spent)} spent</span>
+            <span>{fmt(b.spent)} {t("budget.spent")}</span>
             <span>{pct.toFixed(0)}%</span>
           </div>
         </div>
@@ -189,6 +191,7 @@ function BudgetRow({
 export function BudgetList({
   budgets, selectedMonth, onAddTemplateBudget, onDelete, onEdit, existingCategories = [],
 }: Props) {
+  const { t } = useLanguage()
   const [templateLoading, setTemplateLoading] = React.useState<string | null>(null)
   const [templateFeedback, setTemplateFeedback] = React.useState<string | null>(null)
 
@@ -203,9 +206,9 @@ export function BudgetList({
         if (result?.error) failed.push(`${row.category}: ${result.error}`)
       }
       if (failed.length > 0) {
-        setTemplateFeedback(`Template failed for ${failed.length} item(s). ${failed[0]}`)
+        setTemplateFeedback(`${t("budget.templateFailed")} ${failed.length} ${t("budget.items")} ${failed[0]}`)
       } else {
-        setTemplateFeedback(`Template "${templateName}" applied.`)
+        setTemplateFeedback(language === 'hi' ? `टेम्प्लेट "${templateName}" लागू किया गया।` : `Template "${templateName}" applied.`)
       }
     } finally {
       setTemplateLoading(null)
@@ -217,7 +220,7 @@ export function BudgetList({
       <div className="px-4 lg:px-6">
         {/* Old dashed border style + new template buttons */}
         <div className="rounded-lg border border-dashed p-12 text-center text-muted-foreground text-sm">
-          <p className="mb-4">No budgets set for this month. Start from a template.</p>
+          <p className="mb-4">{t("budget.noBudgets")}</p>
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
             {(Object.keys(BUDGET_TEMPLATES) as Array<keyof typeof BUDGET_TEMPLATES>).map((template) => (
               <Button
@@ -228,7 +231,7 @@ export function BudgetList({
                 className="justify-between"
               >
                 <span>{template}</span>
-                {templateLoading === template ? "..." : "Use"}
+                {templateLoading === template ? "..." : t("budget.use")}
               </Button>
             ))}
           </div>

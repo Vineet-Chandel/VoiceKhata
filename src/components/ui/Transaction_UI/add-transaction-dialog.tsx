@@ -10,6 +10,7 @@ import {
 import { IconPlus } from "@tabler/icons-react"
 import { cn } from "@/lib/utils"
 import { useAppMode } from "@/context/AppModeContext"
+import { useLanguage } from "@/context/LanguageContext"
 import { getCategories } from "@/lib/categories"
 
 import { Button } from "@/components/ui/button"
@@ -65,6 +66,7 @@ export function AddTransactionDialog({
   onNavigateToAI,
 }: Props) {
   const { appMode } = useAppMode()
+  const { t } = useLanguage()
   const BASE_CATEGORIES = getCategories(appMode)
   const [open, setOpen] = React.useState(false)
   const [form, setForm] = React.useState(emptyForm)
@@ -292,15 +294,15 @@ export function AddTransactionDialog({
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         <Button size="sm">
-          <IconPlus className="size-4 mr-1" />Add Transaction
+          <IconPlus className="size-4 mr-1" />{t("form.addTransaction")}
         </Button>
       </DialogTrigger>
 
       <DialogContent className="sm:max-w-[560px]">
         <DialogHeader>
-          <DialogTitle>Add New Transaction</DialogTitle>
+          <DialogTitle>{t("form.addNewTx")}</DialogTitle>
           <DialogDescription>
-            Fill in the details or scan a receipt to auto-fill.
+            {t("form.fillDetails")}
           </DialogDescription>
         </DialogHeader>
 
@@ -312,28 +314,28 @@ export function AddTransactionDialog({
               <div className="size-5 rounded-full bg-green-500/15 flex items-center justify-center shrink-0">
                 <svg viewBox="0 0 12 12" className="size-3 fill-green-400"><path d="M10 3L5 8.5 2 5.5" /><path d="M10 3L5 8.5 2 5.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none" /></svg>
               </div>
-              Receipt scanned successfully — please review all fields.
+              {t("form.scanSuccess")}
             </div>
           )}
           {scanStatus === "low-confidence" && (
             <div className="flex items-center gap-2.5 rounded-lg bg-amber-500/10 border border-amber-500/20 px-3.5 py-2.5 text-xs text-amber-400">
               <AlertTriangleIcon className="size-3.5 shrink-0" />
-              Receipt scanned but some fields may be incorrect — please review carefully.
+              {t("form.scanLowConf")}
             </div>
           )}
           {scanStatus === "error" && (
             <div className="flex items-center gap-2.5 rounded-lg bg-red-500/10 border border-red-500/20 px-3.5 py-2.5 text-xs text-red-400">
               <div className="size-5 rounded-full bg-red-500/15 flex items-center justify-center shrink-0 text-red-400 font-bold text-[10px]">✕</div>
-              {scanErrorMsg || "AI scan unavailable, please fill manually."}
+              {scanErrorMsg || t("form.scanError")}
             </div>
           )}
 
           {/* ── Transaction Name ── */}
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="transaction">Transaction Name</Label>
+            <Label htmlFor="transaction">{t("form.txName")}</Label>
             <Input
               id="transaction"
-              placeholder="e.g. Salary Credit"
+              placeholder={t("form.txNamePlaceholder")}
               value={form.transaction}
               onChange={(e) => update("transaction", e.target.value)}
             />
@@ -345,18 +347,18 @@ export function AddTransactionDialog({
 
             {/* Category */}
             <div className="flex flex-col gap-1.5">
-              <Label>Category</Label>
+              <Label>{t("form.selectCategory")}</Label>
 
               <Select value={form.category} onValueChange={(v) => update("category", v)}>
                 <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select category" />
+                  <SelectValue placeholder={t("form.selectCategory")} />
                 </SelectTrigger>
 
                 <SelectContent position="popper" sideOffset={4}>
                   {(budgetedInList.length > 0 || customBudgeted.length > 0) && (
                     <>
                       <div className="px-2 py-1 text-[10px] text-muted-foreground uppercase tracking-wide">
-                        Budgeted
+                        {t("form.budgeted")}
                       </div>
 
                       {customBudgeted.map((c) => (
@@ -390,11 +392,11 @@ export function AddTransactionDialog({
 
             {/* Type */}
             <div className="flex flex-col gap-1.5">
-              <Label>Type</Label>
+              <Label>{t("tx.type")}</Label>
 
               <Select value={form.type} onValueChange={(v) => update("type", v)}>
                 <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Debit / Credit" />
+                  <SelectValue placeholder={t("form.typePlaceholder")} />
                 </SelectTrigger>
 
                 <SelectContent position="popper" sideOffset={4}>
@@ -421,15 +423,15 @@ export function AddTransactionDialog({
 
                     <div className="min-w-0">
                       <p className="text-[13px] font-semibold text-amber-400/90 leading-tight">
-                        No budget for "{form.category}"
+                        {t("form.noBudgetFor")} "{form.category}"
                       </p>
 
                       <p className="text-[11px] text-muted-foreground leading-relaxed mt-0.5">
-                        Track spending on{" "}
+                        {t("form.trackSpending")}{" "}
                         <span className="text-amber-400/70 font-medium">
                           "{form.category}"
                         </span>{" "}
-                        by creating a budget below.
+                        {t("form.byCreating")}
                       </p>
                     </div>
                   </div>
@@ -454,7 +456,7 @@ export function AddTransactionDialog({
                         <PlusIcon className="size-3.5 shrink-0" />
 
                         <span>
-                          Also create a budget for{" "}
+                          {t("form.alsoCreateBudget")}{" "}
                           <span className="text-amber-400 font-medium">
                             "{form.category}"
                           </span>
@@ -487,7 +489,7 @@ export function AddTransactionDialog({
 
                         <span className="flex items-center gap-1.5 text-[12px] text-muted-foreground">
                           <InfinityIcon className="size-3.5 shrink-0" />
-                          Budget type
+                          {t("form.budgetType")}
                         </span>
 
                         <div className="flex gap-1.5 shrink-0">
@@ -526,11 +528,11 @@ export function AddTransactionDialog({
         {/* ── Amount + Date ── */}
         <div className="grid grid-cols-2 gap-3">
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="amount">Amount (₹)</Label>
+            <Label htmlFor="amount">{t("form.amountLabel")}</Label>
             <Input
               id="amount"
               type="number"
-              placeholder="e.g. 5000"
+              placeholder={t("form.amountPlaceholder")}
               value={form.amount}
               onChange={(e) => update("amount", e.target.value)}
             />
@@ -547,7 +549,7 @@ export function AddTransactionDialog({
                 >
                   {form.date
                     ? format(form.date, "dd MMM yyyy")
-                    : <span className="text-muted-foreground">Pick a date</span>}
+                    : <span className="text-muted-foreground">{t("form.pickDate")}</span>}
                   <ChevronDownIcon className="size-4 opacity-60" />
                 </button>
               </PopoverTrigger>
@@ -562,10 +564,10 @@ export function AddTransactionDialog({
         {/* ── Method + Status ── */}
         <div className="grid grid-cols-2 gap-3">
           <div className="flex flex-col gap-1.5">
-            <Label>Payment Method</Label>
+            <Label>{t("form.paymentMethod")}</Label>
             <Select value={form.method} onValueChange={(v) => update("method", v)}>
               <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select method" />
+                <SelectValue placeholder={t("form.selectMethod")} />
               </SelectTrigger>
               <SelectContent position="popper" sideOffset={4}>
                 {METHODS.map((m) => <SelectItem key={m} value={m}>{m}</SelectItem>)}
@@ -575,12 +577,12 @@ export function AddTransactionDialog({
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <Label>Status</Label>
+            <Label>{t("tx.status")}</Label>
             <Select value={form.status} onValueChange={(v) => update("status", v)}>
               <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
               <SelectContent position="popper" sideOffset={4}>
-                <SelectItem value="Completed">Completed</SelectItem>
-                <SelectItem value="Pending">Pending</SelectItem>
+                <SelectItem value="Completed">{t("tx.completed")}</SelectItem>
+                <SelectItem value="Pending">{t("tx.pending")}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -604,8 +606,8 @@ export function AddTransactionDialog({
           className="md:hidden"
         >
           {scanning
-            ? <><Loader2Icon className="size-4 mr-1.5 animate-spin" />Scanning...</>
-            : <><ScanIcon className="size-4 mr-1.5" />Scan Receipt</>
+            ? <><Loader2Icon className="size-4 mr-1.5 animate-spin" />{t("form.saving")}</>
+            : <><ScanIcon className="size-4 mr-1.5" />{t("form.scanReceipt")}</>
           }
         </Button>
 
@@ -616,15 +618,15 @@ export function AddTransactionDialog({
           onClick={() => mediaInputRef.current?.click()}
           disabled={scanning || saving}
         >
-          <ImageIcon className="size-4 mr-1.5" />Import Media
+          <ImageIcon className="size-4 mr-1.5" />{t("form.import")}
         </Button>
 
         <Button onClick={handleSubmit} disabled={saving || scanning}>
-          {saving ? "Saving..." : "Add Transaction"}
+          {saving ? t("form.saving") : t("form.addTransaction")}
         </Button>
       </DialogFooter>
     </DialogContent>
-    </Dialog >
+    </Dialog>
   )
 }
 

@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import type { Budget } from "@/components/hooks/use-budgets"
 import { calculateBudgetHealthScore, getProgressColor } from "@/lib/budget-utils"
+import { useLanguage } from "@/context/LanguageContext"
 
 interface Props {
   budgets:       Budget[]
@@ -18,6 +19,7 @@ interface Props {
 }
 
 export function BudgetOverview({ budgets, totalCap, onSetTotalCap }: Props) {
+  const { t } = useLanguage()
   const sumBudget   = budgets.reduce((s, b) => s + b.amount, 0)
   const totalBudget = totalCap ?? sumBudget
   const totalSpent  = budgets.reduce((s, b) => s + b.spent, 0)
@@ -54,7 +56,7 @@ export function BudgetOverview({ budgets, totalCap, onSetTotalCap }: Props) {
       return
     }
     const num = Number(val)
-    if (isNaN(num) || num < 0) { setCapError("Enter a valid amount"); return }
+    if (isNaN(num) || num < 0) { setCapError(t("budget.enterValidAmount")); return }
     setSaving(true)
     const res = await onSetTotalCap(num)
     setSaving(false)
@@ -83,13 +85,13 @@ export function BudgetOverview({ budgets, totalCap, onSetTotalCap }: Props) {
         {/* Total Budget — editable */}
         <Card className="p-4 flex flex-col gap-1 relative">
           <div className="flex items-center justify-between">
-            <p className="text-xs text-muted-foreground">Total Budget</p>
+            <p className="text-xs text-muted-foreground">{t("budget.totalBudget")}</p>
 
             {!editing ? (
               <button
                 onClick={openEdit}
-                className="text-muted-foreground hover:text-foreground transition-colors"
-                title="Edit total budget"
+                className="text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                title={t("budget.editTotalBudget")}
               >
                 <IconPencil className="size-3.5" />
               </button>
@@ -98,15 +100,15 @@ export function BudgetOverview({ budgets, totalCap, onSetTotalCap }: Props) {
                 <button
                   onClick={saveCap}
                   disabled={saving}
-                  className="text-green-400 hover:text-green-300 disabled:opacity-50"
-                  title="Save"
+                  className="text-green-400 hover:text-green-300 disabled:opacity-50 cursor-pointer"
+                  title={t("common.save")}
                 >
                   <IconCheck className="size-3.5" />
                 </button>
                 <button
                   onClick={cancelEdit}
-                  className="text-muted-foreground hover:text-foreground"
-                  title="Cancel"
+                  className="text-muted-foreground hover:text-foreground cursor-pointer"
+                  title={t("common.cancel")}
                 >
                   <IconX className="size-3.5" />
                 </button>
@@ -133,7 +135,7 @@ export function BudgetOverview({ budgets, totalCap, onSetTotalCap }: Props) {
               </div>
               {capError && <p className="text-[10px] text-red-400">{capError}</p>}
               <p className="text-[10px] text-muted-foreground">
-                {totalCap !== null ? "Clear to auto-sum categories" : "Overrides sum of categories"}
+                {totalCap !== null ? t("budget.clearAutoSum") : t("budget.overrideSum")}
               </p>
             </div>
           ) : (
@@ -145,7 +147,7 @@ export function BudgetOverview({ budgets, totalCap, onSetTotalCap }: Props) {
                   title={`Auto-sum would be ${fmt(sumBudget)}`}
                   onClick={openEdit}
                 >
-                  (custom)
+                  {t("budget.custom")}
                 </span>
               )}
             </div>
@@ -154,13 +156,13 @@ export function BudgetOverview({ budgets, totalCap, onSetTotalCap }: Props) {
 
         {/* Total Spent */}
         <Card className="p-4 flex flex-col gap-1">
-          <p className="text-xs text-muted-foreground">Total Spent</p>
+          <p className="text-xs text-muted-foreground">{t("budget.totalSpent")}</p>
           <p className="text-lg font-semibold text-red-400">{fmt(totalSpent)}</p>
         </Card>
 
         {/* Remaining */}
         <Card className="p-4 flex flex-col gap-1">
-          <p className="text-xs text-muted-foreground">Remaining</p>
+          <p className="text-xs text-muted-foreground">{t("budget.remaining")}</p>
           <p className={`text-lg font-semibold ${remaining >= 0 ? "text-green-400" : "text-red-400"}`}>
             {fmt(remaining)}
           </p>
@@ -168,7 +170,7 @@ export function BudgetOverview({ budgets, totalCap, onSetTotalCap }: Props) {
 
         {/* Over Budget */}
         <Card className="p-4 flex flex-col gap-1">
-          <p className="text-xs text-muted-foreground">Over Budget</p>
+          <p className="text-xs text-muted-foreground">{t("budget.overBudget")}</p>
           <div className="flex items-end gap-1.5">
             <p className={`text-lg font-semibold ${overBudget > 0 ? "text-yellow-400" : "text-green-400"}`}>
               {overBudget}
@@ -177,7 +179,7 @@ export function BudgetOverview({ budgets, totalCap, onSetTotalCap }: Props) {
               variant="outline"
               className="mb-0.5 text-[10px] px-1.5 py-0"
             >
-              {overBudget === 1 ? "category" : "categories"}
+              {overBudget === 1 ? t("budget.category") : t("budget.categories")}
             </Badge>
           </div>
         </Card>
@@ -185,7 +187,7 @@ export function BudgetOverview({ budgets, totalCap, onSetTotalCap }: Props) {
         {/* Health Score — new from Codex, old card style */}
         <Card className="p-4 flex items-center justify-between gap-3">
           <div className="flex flex-col gap-1">
-            <p className="text-xs text-muted-foreground">Health Score</p>
+            <p className="text-xs text-muted-foreground">{t("budget.healthScore")}</p>
             <p className="text-lg font-semibold">{healthScore}/100</p>
           </div>
           {/* SVG ring */}
@@ -215,8 +217,8 @@ export function BudgetOverview({ budgets, totalCap, onSetTotalCap }: Props) {
       {totalBudget > 0 && (
         <Card className="p-4 flex flex-col gap-2">
           <div className="flex justify-between text-xs text-muted-foreground">
-            <span>Overall spending</span>
-            <span>{pct.toFixed(1)}% used</span>
+            <span>{t("budget.overallSpending")}</span>
+            <span>{pct.toFixed(1)}% {t("budget.used")}</span>
           </div>
           <div className="h-2 w-full rounded-full bg-muted overflow-hidden">
             <div
@@ -228,7 +230,7 @@ export function BudgetOverview({ budgets, totalCap, onSetTotalCap }: Props) {
             <>
               <Separator className="my-0.5" />
               <p className="text-[11px] text-muted-foreground">
-                Manual cap: {fmt(totalCap)} · Categories sum: {fmt(sumBudget)}
+                {t("budget.manualCap")}: {fmt(totalCap)} · {t("budget.categoriesSum")}: {fmt(sumBudget)}
               </p>
             </>
           )}

@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, FieldRow, DateField, Toast, type StatusMsg } from "./settings-ui"
 import { useInstallPrompt } from "./settings-sidebar"
+import { useLanguage } from "@/context/LanguageContext"
 
 interface ProfilePanelProps {
     displayName: string
@@ -42,7 +43,7 @@ export function ProfilePanel({
     nameSaving, nameMsg, setDisplayName, setNameMsg, onSaveName,
     dob, onDobChange, onSaveProfile, profileSaving, profileMsg,
 }: ProfilePanelProps) {
-
+    const { t } = useLanguage()
     const [showToast, setShowToast] = React.useState(false)
     const { canInstall, installed, isIOS, showButton, install } = useInstallPrompt()
 
@@ -134,7 +135,7 @@ export function ProfilePanel({
                         <div className="flex items-center gap-2 mt-1 flex-wrap">
                             <span className="text-[12px] sm:text-[13px] text-text-secondary truncate font-medium">{email}</span>
                             <span className="size-1.5 rounded-full bg-emerald-400 shadow-[0_0_6px_rgba(16,185,129,0.6)]" />
-                            <span className="text-[11px] sm:text-[12px] text-emerald-400 font-semibold">Verified</span>
+                            <span className="text-[11px] sm:text-[12px] text-emerald-400 font-semibold">{t("settings.verified")}</span>
                         </div>
 
                         <div className="flex gap-2 mt-3 flex-wrap items-center">
@@ -149,7 +150,7 @@ export function ProfilePanel({
                                             text-text-primary hover:bg-surface-secondary hover:border-white/[0.25]
                                             hover:text-text-primary active:scale-[0.97] transition-all duration-150 shadow-sm cursor-pointer"
                                     >
-                                        Change photo
+                                        {t("settings.changePhoto")}
                                     </Button>
 
                                     {avatarPreview && (
@@ -163,7 +164,7 @@ export function ProfilePanel({
                                                 hover:border-red-500/[0.4] hover:text-red-300
                                                 active:scale-[0.97] transition-all duration-150 shadow-sm cursor-pointer"
                                         >
-                                            Remove
+                                            {t("settings.removePhoto")}
                                         </Button>
                                     )}
                                 </>
@@ -180,7 +181,7 @@ export function ProfilePanel({
                                             active:scale-[0.97] transition-all duration-150
                                             disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
                                     >
-                                        {avatarSaving ? "Uploading..." : "Save photo"}
+                                        {avatarSaving ? t("settings.saving") : t("settings.savePhoto")}
                                     </Button>
 
                                     {!avatarSaving && (
@@ -194,7 +195,7 @@ export function ProfilePanel({
                                                 hover:text-text-primary active:scale-[0.97]
                                                 transition-all duration-150 cursor-pointer"
                                         >
-                                            Cancel
+                                            {t("common.cancel")}
                                         </Button>
                                     )}
                                 </div>
@@ -217,8 +218,8 @@ export function ProfilePanel({
                                 <CheckCircle className="size-4 text-emerald-400" />
                             </div>
                             <div>
-                                <p className="text-[13px] font-semibold text-text-primary">App Installed</p>
-                                <p className="text-[11px] text-text-muted">VoiceKhata is on your home screen</p>
+                                <p className="text-[13px] font-semibold text-text-primary">{t("settings.installed")}</p>
+                                <p className="text-[11px] text-text-muted">{t("settings.appInstalledDesc")}</p>
                             </div>
                         </div>
                     </Card>
@@ -234,11 +235,11 @@ export function ProfilePanel({
                                 <Download className="size-4 text-text-secondary" />
                             </div>
                             <div className="flex-1 min-w-0">
-                                <p className="text-[13px] font-semibold text-text-primary">Install VoiceKhata</p>
-                                <p className="text-[11px] text-text-muted">Add to home screen for quick access</p>
+                                <p className="text-[13px] font-semibold text-text-primary">{t("settings.installVoiceKhata")}</p>
+                                <p className="text-[11px] text-text-muted">{t("settings.installDesc")}</p>
                             </div>
                             <div className="shrink-0 px-3 py-1.5 rounded-lg bg-surface-secondary border border-border">
-                                <span className="text-[11px] font-semibold text-text-secondary">Install</span>
+                                <span className="text-[11px] font-semibold text-text-secondary">{t("settings.installApp")}</span>
                             </div>
                         </button>
                     </Card>
@@ -250,7 +251,7 @@ export function ProfilePanel({
                                 <Download className="size-4 text-text-muted" />
                             </div>
                             <div>
-                                <p className="text-[13px] font-semibold text-text-secondary">Install VoiceKhata</p>
+                                <p className="text-[13px] font-semibold text-text-secondary">{t("settings.installVoiceKhata")}</p>
                                 <p className="text-[11px] text-text-muted leading-snug mt-0.5">
                                     Tap the Share button, then choose<br />"Add to Home Screen"
                                 </p>
@@ -269,7 +270,7 @@ export function ProfilePanel({
                                 <Download className="size-4 text-text-muted" />
                             </div>
                             <div className="flex-1 min-w-0">
-                                <p className="text-[13px] font-semibold text-text-secondary">Install VoiceKhata</p>
+                                <p className="text-[13px] font-semibold text-text-secondary">{t("settings.installVoiceKhata")}</p>
                                 <p className="text-[11px] text-text-muted leading-snug">
                                     Tap ⊕ in your browser address bar
                                 </p>
@@ -281,7 +282,7 @@ export function ProfilePanel({
 
             {/* ── Name + Email + DOB Card ── */}
             <Card>
-                <FieldRow icon={Sparkles} label="Display Name" description="Shown across the entire app. 32 characters max.">
+                <FieldRow icon={Sparkles} label={t("settings.displayName")} description={t("settings.displayNameDesc")}>
                     <div className="space-y-2">
                         <div className="flex gap-2">
                             <Input
@@ -295,7 +296,7 @@ export function ProfilePanel({
                             />
                             <Button size="sm" onClick={onSaveName} disabled={nameSaving || !displayName.trim()}
                                 className="h-10 px-5 text-[13px] font-bold rounded-lg bg-text-primary text-bg-primary hover:opacity-90">
-                                {nameSaving ? "Saving..." : "Save"}
+                                {nameSaving ? t("settings.saving") : t("common.save")}
                             </Button>
                         </div>
                         <Toast msg={nameMsg} />
@@ -304,7 +305,7 @@ export function ProfilePanel({
 
                 <div className="h-px bg-surface-secondary mx-6" />
 
-                <FieldRow icon={User} label="Email Address" description="Your login email.">
+                <FieldRow icon={User} label={t("settings.emailAddress")} description={t("settings.loginEmailDesc")}>
                     <Input value={email} disabled className="h-10 text-[14px] font-medium opacity-30 bg-surface-secondary rounded-lg" />
                 </FieldRow>
 
@@ -312,8 +313,8 @@ export function ProfilePanel({
 
                 <FieldRow
                     icon={CalendarIcon}
-                    label="Date of Birth"
-                    description="Private — used for age-based insights only."
+                    label={t("settings.dob")}
+                    description={t("settings.dobDesc")}
                 >
                     <DateField value={dob} onChange={onDobChange} />
                 </FieldRow>
@@ -328,8 +329,8 @@ export function ProfilePanel({
                         className="cursor-pointer h-10 px-8 bg-text-primary text-bg-primary hover:opacity-90 border-0 font-semibold"
                     >
                         {profileSaving
-                            ? <><span className="size-4 rounded-full border-2 border-bg-primary/20 border-t-bg-primary animate-spin mr-2" />Saving…</>
-                            : <>Save Profile</>
+                            ? <><span className="size-4 rounded-full border-2 border-bg-primary/20 border-t-bg-primary animate-spin mr-2" />{t("settings.saving")}</>
+                            : <>{t("settings.saveProfile")}</>
                         }
                     </Button>
                     <Toast msg={profileMsg} />

@@ -20,6 +20,7 @@ import {
     SelectTrigger, SelectValue,
 } from "@/components/ui/Dashboard_UI/select"
 import type { RecurringInput } from "@/components/hooks/use-recurring"
+import { useLanguage } from "@/context/LanguageContext"
 
 const CATEGORIES = ["Food", "Shopping", "Transport", "Utilities", "Health", "Entertainment", "Subscription", "Income", "Other"]
 const METHODS = ["Cash", "UPI", "Bank Transfer", "Credit Card", "Debit Card", "Net Banking"]
@@ -30,6 +31,7 @@ interface Props {
 }
 
 export function AddRecurringDialog({ onAdd }: Props) {
+    const { t } = useLanguage()
     const [open, setOpen] = React.useState(false)
     const [loading, setLoading] = React.useState(false)
 
@@ -71,14 +73,14 @@ export function AddRecurringDialog({ onAdd }: Props) {
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button size="sm" className="gap-1.5">
-                    <IconPlus className="h-4 w-4" /> Add Autopay
+                <Button size="sm" className="gap-1.5 cursor-pointer">
+                    <IconPlus className="h-4 w-4" /> {t("form.addAutopay")}
                 </Button>
             </DialogTrigger>
 
             <DialogContent className="sm:max-w-md">
                 <DialogHeader>
-                    <DialogTitle>New Autopay / Recurring</DialogTitle>
+                    <DialogTitle>{t("form.newAutopay")}</DialogTitle>
                 </DialogHeader>
 
                 <form onSubmit={handleSubmit} className="flex flex-col gap-4 mt-2">
@@ -96,7 +98,7 @@ export function AddRecurringDialog({ onAdd }: Props) {
 
                     {/* Amount */}
                     <div className="flex flex-col gap-1.5">
-                        <Label>Amount (₹)</Label>
+                        <Label>{t("form.amountLabel")}</Label>
                         <Input
                             type="number" min={1} placeholder="e.g. 499"
                             value={form.amount || ""}
@@ -108,7 +110,7 @@ export function AddRecurringDialog({ onAdd }: Props) {
                     {/* Category + Type */}
                     <div className="grid grid-cols-2 gap-3">
                         <div className="flex flex-col gap-1.5">
-                            <Label>Category</Label>
+                            <Label>{t("tx.category")}</Label>
                             <Select value={form.category} onValueChange={(v) => set("category", v)}>
                                 <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
                                 <SelectContent position="popper" sideOffset={4}>
@@ -117,7 +119,7 @@ export function AddRecurringDialog({ onAdd }: Props) {
                             </Select>
                         </div>
                         <div className="flex flex-col gap-1.5">
-                            <Label>Type</Label>
+                            <Label>{t("tx.type")}</Label>
                             <Select value={form.type} onValueChange={(v) => set("type", v)}>
                                 <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
                                 <SelectContent position="popper" sideOffset={4}>
@@ -131,7 +133,7 @@ export function AddRecurringDialog({ onAdd }: Props) {
                     {/* Method + Frequency */}
                     <div className="grid grid-cols-2 gap-3">
                         <div className="flex flex-col gap-1.5">
-                            <Label>Method</Label>
+                            <Label>{t("tx.method")}</Label>
                             <Select value={form.method} onValueChange={(v) => set("method", v)}>
                                 <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
                                 <SelectContent position="popper" sideOffset={4}>
@@ -140,7 +142,7 @@ export function AddRecurringDialog({ onAdd }: Props) {
                             </Select>
                         </div>
                         <div className="flex flex-col gap-1.5">
-                            <Label>Frequency</Label>
+                            <Label>{t("tx.frequency")}</Label>
                             <Select
                                 value={form.frequency}
                                 onValueChange={(v) => set("frequency", v as RecurringInput["frequency"])}
@@ -160,16 +162,16 @@ export function AddRecurringDialog({ onAdd }: Props) {
                     {/* Start Date + End Date — Popover + Calendar like add-transaction-dialog */}
                     <div className="grid grid-cols-2 gap-3">
                         <div className="flex flex-col gap-1.5">
-                            <Label>Start Date</Label>
+                            <Label>{t("tx.startDate")}</Label>
                             <Popover>
                                 <PopoverTrigger asChild>
                                     <button
                                         type="button"
-                                        className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 text-sm ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                                        className="cursor-pointer flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 text-sm ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                                     >
                                         {startDate
                                             ? format(startDate, "dd MMM yyyy")
-                                            : <span className="text-muted-foreground">Pick a date</span>}
+                                            : <span className="text-muted-foreground">{t("form.pickDate")}</span>}
                                         <ChevronDownIcon className="size-4 opacity-60" />
                                     </button>
                                 </PopoverTrigger>
@@ -186,18 +188,18 @@ export function AddRecurringDialog({ onAdd }: Props) {
 
                         <div className="flex flex-col gap-1.5">
                             <Label>
-                                End Date{" "}
-                                <span className="text-muted-foreground text-xs">(optional)</span>
+                                {t("tx.endDate")}{" "}
+                                <span className="text-muted-foreground text-xs">({t("tx.optional")})</span>
                             </Label>
                             <Popover>
                                 <PopoverTrigger asChild>
                                     <button
                                         type="button"
-                                        className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 text-sm ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                                        className="cursor-pointer flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 text-sm ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                                     >
                                         {endDate
                                             ? format(endDate, "dd MMM yyyy")
-                                            : <span className="text-muted-foreground">No end date</span>}
+                                            : <span className="text-muted-foreground">{t("tx.noEndDate")}</span>}
                                         <ChevronDownIcon className="size-4 opacity-60" />
                                     </button>
                                 </PopoverTrigger>
@@ -217,7 +219,7 @@ export function AddRecurringDialog({ onAdd }: Props) {
                                                 className="w-full text-muted-foreground cursor-pointer"
                                                 onClick={() => setEndDate(undefined)}
                                             >
-                                                Clear
+                                                {t("common.cancel")}
                                             </Button>
                                         </div>
                                     )}
@@ -226,8 +228,8 @@ export function AddRecurringDialog({ onAdd }: Props) {
                         </div>
                     </div>
 
-                    <Button type="submit" disabled={loading} className="mt-1">
-                        {loading ? "Adding…" : "Add Autopay"}
+                    <Button type="submit" disabled={loading} className="mt-1 cursor-pointer">
+                        {loading ? t("form.adding") : t("form.addAutopay")}
                     </Button>
                 </form>
             </DialogContent>

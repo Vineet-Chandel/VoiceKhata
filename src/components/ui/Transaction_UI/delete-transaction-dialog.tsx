@@ -3,6 +3,7 @@
 
 import * as React from "react"
 import { IconAlertTriangle } from "@tabler/icons-react"
+import { useLanguage } from "@/context/LanguageContext"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -29,6 +30,7 @@ export function DeleteTransactionDialog({
     onOpenChange,
     onConfirm,
 }: DeleteTransactionDialogProps) {
+    const { t } = useLanguage()
     const [deleting, setDeleting] = React.useState(false)
 
     const handleConfirm = async () => {
@@ -52,9 +54,9 @@ export function DeleteTransactionDialog({
                             <IconAlertTriangle className="size-5 text-red-100" />
                         </div>
                         <div>
-                            <DialogTitle>Delete Transaction</DialogTitle>
+                            <DialogTitle>{t("form.deleteTransaction")}</DialogTitle>
                             <DialogDescription className="mt-0.5">
-                                This action cannot be undone.
+                                {t("form.cannotUndo")}
                             </DialogDescription>
                         </div>
                     </div>
@@ -62,7 +64,7 @@ export function DeleteTransactionDialog({
 
                 <div className="rounded-lg border border-border bg-muted/40 px-4 py-3 text-sm">
                     <p className="text-muted-foreground">
-                        You are about to permanently delete:
+                        {t("form.aboutToDelete")}
                     </p>
                     <p className="mt-1 font-semibold text-foreground">
                         {transaction.transaction}
@@ -78,14 +80,14 @@ export function DeleteTransactionDialog({
                         onClick={() => onOpenChange(false)}
                         disabled={deleting}
                     >
-                        Cancel
+                        {t("common.cancel")}
                     </Button>
                     <Button className="cursor-pointer bg-red-500/40 hover:bg-red-500/20 hover:text-text-primary"
                         variant="destructive"
                         onClick={handleConfirm}
                         disabled={deleting}
                     >
-                        {deleting ? "Deleting..." : "Delete Transaction"}
+                        {deleting ? t("form.deleting") : t("form.deleteTransaction")}
                     </Button>
                 </DialogFooter>
             </DialogContent>

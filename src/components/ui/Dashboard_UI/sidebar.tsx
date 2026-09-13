@@ -218,25 +218,29 @@ function Sidebar({
       <div
         data-slot="sidebar-gap"
         className={cn(
-          "relative w-(--sidebar-width) bg-transparent",
-          "group-data-[collapsible=offcanvas]:w-0",
-          "group-data-[side=right]:rotate-180",
-          variant === "floating" || variant === "inset"
-            ? "group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+(--spacing(4)))]"
-            : "group-data-[collapsible=icon]:w-(--sidebar-width-icon)"
+          "relative bg-transparent transition-[width] duration-200 ease-linear",
+          state === "expanded" ? "w-(--sidebar-width)" :
+          collapsible === "offcanvas" ? "w-0" :
+          collapsible === "icon" ? (variant === "floating" || variant === "inset" ? "w-[calc(var(--sidebar-width-icon)+1rem)]" : "w-(--sidebar-width-icon)") :
+          "w-(--sidebar-width)",
+          "group-data-[side=right]:rotate-180"
         )}
       />
       <div
         data-slot="sidebar-container"
         className={cn(
-          "fixed inset-y-0 z-10 hidden h-svh w-(--sidebar-width) transition-[left,right,width] duration-200 ease-linear md:flex",
+          "fixed inset-y-0 z-10 hidden h-svh transition-[left,right,width] duration-200 ease-linear md:flex",
+          // Conditional width
+          state === "expanded" ? "w-(--sidebar-width)" :
+          collapsible === "offcanvas" ? "w-(--sidebar-width)" :
+          collapsible === "icon" ? (variant === "floating" || variant === "inset" ? "w-[calc(var(--sidebar-width-icon)+1rem+2px)]" : "w-(--sidebar-width-icon)") :
+          "w-(--sidebar-width)",
+          // Side positioning
           side === "left"
-            ? "left-0 group-data-[collapsible=offcanvas]:left-[calc(var(--sidebar-width)*-1)]"
-            : "right-0 group-data-[collapsible=offcanvas]:right-[calc(var(--sidebar-width)*-1)]",
-          // Adjust the padding for floating and inset variants.
-          variant === "floating" || variant === "inset"
-            ? "p-2 group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+(--spacing(4))+2px)]"
-            : "group-data-[collapsible=icon]:w-(--sidebar-width-icon) group-data-[side=left]:border-r group-data-[side=right]:border-l",
+            ? (state === "collapsed" && collapsible === "offcanvas" ? "left-[calc(var(--sidebar-width)*-1)]" : "left-0")
+            : (state === "collapsed" && collapsible === "offcanvas" ? "right-[calc(var(--sidebar-width)*-1)]" : "right-0"),
+          // Padding & Border
+          variant === "floating" || variant === "inset" ? "p-2" : (state === "collapsed" && collapsible === "icon" ? (side === "left" ? "border-r" : "border-l") : (side === "left" ? "border-r" : "border-l")),
           className
         )}
         {...props}
@@ -305,12 +309,13 @@ function SidebarRail({ className, ...props }: React.ComponentProps<"button">) {
 }
 
 function SidebarInset({ className, ...props }: React.ComponentProps<"main">) {
+  const { state } = useSidebar()
   return (
     <main
       data-slot="sidebar-inset"
       className={cn(
-        "relative flex w-full flex-1 flex-col bg-background",
-        "md:peer-data-[variant=inset]:m-2 md:peer-data-[variant=inset]:ml-0 md:peer-data-[variant=inset]:rounded-xl md:peer-data-[variant=inset]:shadow-sm md:peer-data-[variant=inset]:peer-data-[state=collapsed]:ml-2",
+        "relative flex w-full flex-1 flex-col bg-background md:m-2 md:rounded-xl md:shadow-sm",
+        state === "collapsed" ? "md:ml-2" : "md:ml-0",
         className
       )}
       {...props}

@@ -9,12 +9,15 @@ import {
   AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { Card, FieldRow } from "./settings-ui"
+import { useLanguage } from "@/context/LanguageContext"
 
 interface DangerPanelProps {
   onDeleteAccount: () => void
 }
 
 export function DangerPanel({ onDeleteAccount }: DangerPanelProps) {
+  const { t } = useLanguage()
+
   return (
     <div className="space-y-4">
 
@@ -22,9 +25,9 @@ export function DangerPanel({ onDeleteAccount }: DangerPanelProps) {
       <div className="flex items-start gap-3 p-4 rounded-xl border border-red-500/20 bg-red-500/[0.03]">
         <AlertTriangle className="size-5 text-red-400 shrink-0 mt-0.5" />
         <div>
-          <p className="text-sm font-semibold text-red-300">Irreversible Actions</p>
+          <p className="text-sm font-semibold text-red-300">{t("settings.irreversible")}</p>
           <p className="text-xs text-red-400/70 mt-0.5 leading-relaxed">
-            Actions on this page cannot be undone. Your data will be permanently lost.
+            {t("settings.irreversibleDesc")}
           </p>
         </div>
       </div>
@@ -33,8 +36,8 @@ export function DangerPanel({ onDeleteAccount }: DangerPanelProps) {
       <Card className="border-red-500/20 bg-red-500/[0.02]">
         <FieldRow
           icon={Trash2}
-          label="Delete Account"
-          description="Permanently removes your account, transactions, budgets, and all data. No recovery possible."
+          label={t("settings.deleteAccount")}
+          description={t("settings.deleteConfirmDesc")}
         >
           <AlertDialog>
             <AlertDialogTrigger asChild>
@@ -43,7 +46,7 @@ export function DangerPanel({ onDeleteAccount }: DangerPanelProps) {
                   bg-red-500/10 border border-red-500/30
                   hover:bg-red-500/20 hover:border-red-500/50
                   text-red-400 font-semibold">
-                <Trash2 className="size-4" /> Delete Account
+                <Trash2 className="size-4" /> {t("settings.deleteAccount")}
               </Button>
             </AlertDialogTrigger>
 
@@ -58,19 +61,13 @@ export function DangerPanel({ onDeleteAccount }: DangerPanelProps) {
                   </div>
 
                   <AlertDialogTitle className="text-xl font-semibold text-text-primary">
-                    Delete your account?
+                    {t("settings.deleteConfirmTitle")}
                   </AlertDialogTitle>
                 </div>
 
                 {/* Description */}
                 <AlertDialogDescription className="leading-relaxed text-text-secondary">
-                  This permanently removes your account and{" "}
-                  <span className="text-text-primary font-medium">all data</span> — transactions,
-                  budgets, goals, everything.
-                  <br />
-                  <span className="text-red-400 font-medium">
-                    This action cannot be undone.
-                  </span>
+                  {t("settings.deleteConfirmDesc")}
                 </AlertDialogDescription>
 
               </AlertDialogHeader>
@@ -82,7 +79,7 @@ export function DangerPanel({ onDeleteAccount }: DangerPanelProps) {
                   className="cursor-pointer h-10 px-4
                     bg-surface-secondary border border-border
                     text-text-secondary hover:bg-surface-secondary">
-                  Cancel
+                  {t("common.cancel")}
                 </AlertDialogCancel>
 
                 <AlertDialogAction
@@ -90,7 +87,7 @@ export function DangerPanel({ onDeleteAccount }: DangerPanelProps) {
                   className="cursor-pointer h-10 px-5
                     bg-red-500 hover:bg-red-600
                     text-text-primary font-semibold shadow-lg shadow-red-500/20">
-                  Delete Account
+                  {t("settings.deleteAccount")}
                 </AlertDialogAction>
 
               </AlertDialogFooter>

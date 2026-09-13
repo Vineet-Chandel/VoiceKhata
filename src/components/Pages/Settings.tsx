@@ -8,9 +8,11 @@ import {
   type TabId,
 } from "@/components/ui/Settings_UI"
 import { NAV_ITEMS } from "@/components/ui/Settings_UI/settings-sidebar"
+import { useLanguage } from "@/context/LanguageContext"
 
 export default function SettingsPage() {
   const s = useSettings()
+  const { t } = useLanguage()
   const [activeTab, setActiveTab] = React.useState<TabId>("profile")
 
   if (!s.user) return null
@@ -44,15 +46,19 @@ export default function SettingsPage() {
 
             <div>
               <h1 className="text-2xl font-semibold tracking-tight text-text-primary">
-                {activeNav.label}
+                {activeTab === "profile" && t("settings.profile")}
+                {activeTab === "appearance" && t("settings.appearance")}
+                {activeTab === "financial" && t("settings.financial")}
+                {activeTab === "security" && t("settings.security")}
+                {activeTab === "danger" && t("settings.danger")}
               </h1>
 
               <p className="text-sm text-text-muted mt-1">
-                {activeTab === "profile" && "Your identity across the platform."}
-                {activeTab === "appearance" && "Customize how VoiceKhata looks across your workspace."}
-                {activeTab === "financial" && "Keep your financial data accurate for better insights."}
-                {activeTab === "security" && "Protect your account with a strong password."}
-                {activeTab === "danger" && "Destructive actions — proceed with extreme caution."}
+                {activeTab === "profile" && t("settings.profileDesc")}
+                {activeTab === "appearance" && t("settings.appearanceDesc")}
+                {activeTab === "financial" && t("settings.financialDesc")}
+                {activeTab === "security" && t("settings.securityDesc")}
+                {activeTab === "danger" && t("settings.dangerDesc")}
               </p>
             </div>
           </div>

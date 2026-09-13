@@ -8,6 +8,7 @@ import { VoiceWaveform } from "@/components/ui/AIAssistant_UI/voice-waveform"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { scanReceiptMulti } from "@/lib/scan-receipt"
 import type { GuidedStep, Message } from "@/components/hooks/use-ai-chat"
+import { useLanguage } from "@/context/LanguageContext"
 
 interface Props {
   onSend:         (msg: string) => void
@@ -63,6 +64,7 @@ type ScanState =
   | { status: "error";    message: string }
 
 export function ChatInput({ onSend, loading, guidedStep, replyingTo, onCancelReply, onStartGuided, onStartBudgetGuided, onCancelGuided, variant = "dark" }: Props) {
+  const { t } = useLanguage()
   const [value,      setValue]      = React.useState("")
   const [focused,    setFocused]    = React.useState(false)
   const [popOpen,    setPopOpen]    = React.useState(false)
@@ -315,7 +317,13 @@ export function ChatInput({ onSend, loading, guidedStep, replyingTo, onCancelRep
               )
             })}
             <span className="ml-1 text-[11px] text-text-muted font-medium">
-              {STEP_LABELS[guidedStep]}
+              {guidedStep === "name" ? t("transactions.title") :
+               guidedStep === "amount" ? t("reports.amount") :
+               guidedStep === "category" ? t("reports.category") :
+               guidedStep === "type" ? t("transactions.type") :
+               guidedStep === "method" ? t("transactions.method") :
+               guidedStep === "confirm" ? t("common.confirm") :
+               STEP_LABELS[guidedStep]}
             </span>
           </div>
           <button
@@ -323,7 +331,7 @@ export function ChatInput({ onSend, loading, guidedStep, replyingTo, onCancelRep
             className="flex items-center gap-1 text-[11px] text-text-muted hover:text-red-400 transition-colors cursor-pointer"
           >
             <X size={11} />
-            Cancel
+            {t("common.cancel")}
           </button>
         </div>
       )}
@@ -338,7 +346,7 @@ export function ChatInput({ onSend, loading, guidedStep, replyingTo, onCancelRep
                 stopListening()
                 setTimeout(resetVoice, 50)
               }}
-              title="Cancel"
+              title={t("common.cancel")}
               className="size-8 rounded-full bg-surface-elevated border border-border flex items-center justify-center text-text-muted hover:text-red-400 hover:border-red-500/30 transition-colors shrink-0 cursor-pointer"
             >
               <X size={16} />
@@ -365,7 +373,7 @@ export function ChatInput({ onSend, loading, guidedStep, replyingTo, onCancelRep
             ) : (
               <p className="text-[11px] text-text-muted flex items-center justify-center gap-1.5 animate-pulse">
                 <span className="size-1.5 rounded-full bg-blue-500 inline-block" />
-                Listening... Speak naturally in Hindi or English
+                {t("ai.listening")}
               </p>
             )}
           </div>
@@ -407,9 +415,14 @@ export function ChatInput({ onSend, loading, guidedStep, replyingTo, onCancelRep
               sideOffset={10}
               className={`w-52 p-1.5 border rounded-2xl shadow-2xl ${variant === "light" ? "bg-white border-black/[0.06]" : "bg-[#161616] border-border"}`}
             >
-              {MENU_ITEMS.map(({ icon: Icon, label, action }) => (
+              {[
+                { icon: Plus,       label: t("ai.logTransaction"),    action: "guided"  },
+                { icon: Receipt,    label: t("ai.scanReceipt"),       action: "receipt" },
+                { icon: Images,     label: t("ai.importScreenshots"), action: "bulk"    },
+                { icon: CreditCard, label: t("ai.setBudget"),         action: "budget"  },
+              ].map(({ icon: Icon, label, action }) => (
                 <button
-                  key={label}
+                  key={action}
                   onClick={() => handleMenuAction(action)}
                   className={[
                     "w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl hover:bg-surface-secondary transition-colors text-left cursor-pointer group",
@@ -424,7 +437,7 @@ export function ChatInput({ onSend, loading, guidedStep, replyingTo, onCancelRep
               ))}
 
               <div className="h-px bg-surface-secondary my-1.5 mx-1" />
-              <p className="text-[10px] text-text-muted px-3 pb-1 tracking-wide uppercase">Coming soon</p>
+              <p className="text-[10px] text-text-muted px-3 pb-1 tracking-wide uppercase">{t("ai.comingSoon")}</p>
 
               {COMING_SOON.map(({ icon: Icon, label }) => (
                 <div
@@ -454,7 +467,7 @@ export function ChatInput({ onSend, loading, guidedStep, replyingTo, onCancelRep
               ? "Scanning…"
               : isGuidedActive
               ? "Type your answer…"
-              : "Ask anything or say what you spent…"
+              : t("ai.placeholder")
           }
           rows={1}
           disabled={isScanning || voiceState === "processing"}
@@ -508,8 +521,8 @@ export function ChatInput({ onSend, loading, guidedStep, replyingTo, onCancelRep
       {/* Keyboard hint */}
       {!isGuidedActive && !focused && !isScanning && (
         <p className="text-center text-[10px] text-text-muted select-none">
-          <kbd className="font-mono">Enter</kbd> to send ·{" "}
-          <kbd className="font-mono">Shift+Enter</kbd> for new line
+          <kbd className="font-mono">Enter</kbd> {t("ai.enterToSend")} ·{" "}
+          <kbd className="font-mono">Shift+Enter</kbd> {t("ai.shiftEnter")}
         </p>
       )}
     </div>

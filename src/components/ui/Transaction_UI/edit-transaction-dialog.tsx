@@ -23,6 +23,7 @@ import type { Transaction } from "@/components/hooks/use-transactions"
 import type { Budget } from "@/components/hooks/use-budgets"
 import { isBudgetValidForTransaction } from "@/lib/budget-utils"
 import { useAppMode } from "@/context/AppModeContext"
+import { useLanguage } from "@/context/LanguageContext"
 import { getCategories } from "@/lib/categories"
 
 type TransactionUpdate = Omit<Transaction, "id" | "firebase_uid" | "created_at">
@@ -49,6 +50,7 @@ export function EditTransactionDialog({
   budgetRows = [],
 }: Props) {
   const { appMode } = useAppMode()
+  const { t } = useLanguage()
   const BASE_CATEGORIES = getCategories(appMode)
   const [form, setForm] = React.useState({
     transaction: transaction.transaction,
@@ -135,18 +137,18 @@ export function EditTransactionDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[560px]">
         <DialogHeader>
-          <DialogTitle>Edit Transaction</DialogTitle>
-          <DialogDescription>Update the details below to modify this transaction.</DialogDescription>
+          <DialogTitle>{t("form.editTransaction")}</DialogTitle>
+          <DialogDescription>{t("form.editDetails")}</DialogDescription>
         </DialogHeader>
 
         <div className="flex flex-col gap-4 py-2">
 
           {/* Transaction Name */}
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="edit-transaction">Transaction Name</Label>
+            <Label htmlFor="edit-transaction">{t("form.txName")}</Label>
             <Input
               id="edit-transaction"
-              placeholder="e.g. Salary Credit"
+              placeholder={t("form.txNamePlaceholder")}
               value={form.transaction}
               onChange={(e) => update("transaction", e.target.value)}
             />
@@ -156,17 +158,17 @@ export function EditTransactionDialog({
           {/* Category + Type */}
           <div className="grid grid-cols-2 gap-3">
             <div className="flex flex-col gap-1.5">
-              <Label>Category</Label>
+              <Label>{t("form.selectCategory")}</Label>
               <Select value={form.category} onValueChange={(v) => update("category", v)}>
                 <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select category" />
+                  <SelectValue placeholder={t("form.selectCategory")} />
                 </SelectTrigger>
                 <SelectContent position="popper" sideOffset={4}>
                   {/* Budgeted first */}
                   {(budgetedInList.length > 0 || customBudgeted.length > 0) && (
                     <>
                       <div className="px-2 py-1 text-[10px] text-muted-foreground uppercase tracking-wide">
-                        Budgeted
+                        {t("form.budgeted")}
                       </div>
                       {customBudgeted.map((c) => (
                         <SelectItem key={c} value={c}>{c}</SelectItem>
@@ -187,10 +189,10 @@ export function EditTransactionDialog({
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <Label>Type</Label>
+              <Label>{t("tx.type")}</Label>
               <Select value={form.type} onValueChange={(v) => update("type", v)}>
                 <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Debit / Credit" />
+                  <SelectValue placeholder={t("form.typePlaceholder")} />
                 </SelectTrigger>
                 <SelectContent position="popper" sideOffset={4}>
                   <SelectItem value="Credit">Credit</SelectItem>
@@ -204,21 +206,21 @@ export function EditTransactionDialog({
           {hasAnyBudgetForCategory && form.date && !hasValidBudgetForDate && (
             <div className="flex items-center gap-2 rounded-xl border border-amber-500/20 bg-amber-500/[0.05] px-3 py-2.5 text-xs text-amber-300 animate-in fade-in slide-in-from-top-1 duration-200">  
               <AlertTriangleIcon className="h-4 w-4 shrink-0" />
-              No active budget found for{" "}
+              {t("form.noActiveBudget")} {" "}
               <span className="font-medium">
                 {form.category}
               </span>{" "}
-              in {format(form.date, "MMM yyyy")}
+              {t("form.in")} {format(form.date, "MMM yyyy")}
             </div>
           )}
           {/* Amount + Date */}
           <div className="grid grid-cols-2 gap-3">
             <div className="flex flex-col gap-1.5">
-              <Label htmlFor="edit-amount">Amount (₹)</Label>
+              <Label htmlFor="edit-amount">{t("form.amountLabel")}</Label>
               <Input
                 id="edit-amount"
                 type="number"
-                placeholder="e.g. 5000"
+                placeholder={t("form.amountPlaceholder")}
                 value={form.amount}
                 onChange={(e) => update("amount", e.target.value)}
               />
@@ -226,14 +228,14 @@ export function EditTransactionDialog({
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <Label>Date</Label>
+              <Label>{t("form.pickDate")}</Label>
               <Popover>
                 <PopoverTrigger asChild>
                   <button
                     type="button"
                     className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 text-sm ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
                   >
-                    {form.date ? format(form.date, "dd MMM yyyy") : <span className="text-muted-foreground">Pick a date</span>}
+                    {form.date ? format(form.date, "dd MMM yyyy") : <span className="text-muted-foreground">{t("form.pickDate")}</span>}
                     <ChevronDownIcon className="size-4 opacity-60" />
                   </button>
                 </PopoverTrigger>
@@ -248,9 +250,9 @@ export function EditTransactionDialog({
           {/* Method + Status */}
           <div className="grid grid-cols-2 gap-3">
             <div className="flex flex-col gap-1.5">
-              <Label>Payment Method</Label>
+              <Label>{t("form.paymentMethod")}</Label>
               <Select value={form.method} onValueChange={(v) => update("method", v)}>
-                <SelectTrigger className="w-full"><SelectValue placeholder="Select method" /></SelectTrigger>
+                <SelectTrigger className="w-full"><SelectValue placeholder={t("form.selectMethod")} /></SelectTrigger>
                 <SelectContent position="popper" sideOffset={4}>
                   {METHODS.map((m) => <SelectItem key={m} value={m}>{m}</SelectItem>)}
                 </SelectContent>
@@ -259,12 +261,12 @@ export function EditTransactionDialog({
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <Label>Status</Label>
+              <Label>{t("tx.status")}</Label>
               <Select value={form.status} onValueChange={(v) => update("status", v)}>
                 <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
                 <SelectContent position="popper" sideOffset={4}>
-                  <SelectItem value="Completed">Completed</SelectItem>
-                  <SelectItem value="Pending">Pending</SelectItem>
+                  <SelectItem value="Completed">{t("tx.completed")}</SelectItem>
+                  <SelectItem value="Pending">{t("tx.pending")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -274,7 +276,7 @@ export function EditTransactionDialog({
 
         <DialogFooter showCloseButton className="pt-2">
           <Button onClick={handleSubmit} disabled={saving} className="cursor-pointer">
-            {saving ? "Saving..." : "Save Changes"}
+            {saving ? t("form.saving") : t("common.save")}
           </Button>
         </DialogFooter>
       </DialogContent>

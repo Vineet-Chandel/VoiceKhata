@@ -6,7 +6,8 @@ import { IconChevronLeft, IconChevronRight, IconAlertTriangle, IconRefresh } fro
 import { useAISuggestions } from "@/components/hooks/use-ai-suggestions"
 import type { Transaction } from "@/components/hooks/use-transactions"
 import type { Budget } from "@/components/hooks/use-budgets"
-import type { FinancialMetrics } from "@/lib/financial-metrics"   // ← new
+import type { FinancialMetrics } from "@/lib/financial-metrics"
+import { useLanguage } from "@/context/LanguageContext"
 
 interface Props {
   transactions: Transaction[]
@@ -18,8 +19,8 @@ interface Props {
 const SLIDE_INTERVAL = 4000
 
 export function AISuggestions({ transactions, budgets, metrics, dataLoading }: Props) {
-  // metrics now forwarded into the hook  ← only logic change
   const { suggestions, loading, refresh } = useAISuggestions(transactions, budgets, metrics, dataLoading)
+  const { t } = useLanguage()
   const [current, setCurrent] = useState(0)
   const [paused,  setPaused]  = useState(false)
   const [visible, setVisible] = useState(true)
@@ -59,12 +60,12 @@ export function AISuggestions({ transactions, budgets, metrics, dataLoading }: P
       <div className="mx-4 lg:mx-6 rounded-xl border bg-card shadow-sm overflow-hidden">
         <div className="flex items-center justify-between px-6 pt-5 pb-4">
           <div>
-            <h3 className="font-semibold text-foreground text-base leading-none">Smart Suggestions</h3>
-            <p className="text-sm text-muted-foreground mt-1.5">Personalised tips based on your spending</p>
+            <h3 className="font-semibold text-foreground text-base leading-none">{t("ai.smartSuggestions")}</h3>
+            <p className="text-sm text-muted-foreground mt-1.5">{t("ai.smartSuggestionsDesc")}</p>
           </div>
           <div className="flex items-center gap-1.5 border border-border/60 rounded-full px-2.5 py-1">
             <span className="size-1.5 rounded-full bg-amber-400 inline-block animate-pulse" />
-            <span className="text-xs font-medium text-foreground/70">Generating</span>
+            <span className="text-xs font-medium text-foreground/70">{t("ai.generating")}</span>
           </div>
         </div>
         <div className="px-6 pb-5 space-y-2.5">
@@ -87,8 +88,8 @@ export function AISuggestions({ transactions, budgets, metrics, dataLoading }: P
       {/* ── Header ── */}
       <div className="flex items-center justify-between px-6 pt-5 pb-4">
         <div>
-          <h3 className="font-semibold text-foreground text-base leading-none">Smart Suggestions</h3>
-          <p className="text-sm text-muted-foreground mt-1.5">Personalised tips based on your spending</p>
+          <h3 className="font-semibold text-foreground text-base leading-none">{t("ai.smartSuggestions")}</h3>
+          <p className="text-sm text-muted-foreground mt-1.5">{t("ai.smartSuggestionsDesc")}</p>
         </div>
 
         <div className="flex items-center gap-2.5">
@@ -101,7 +102,7 @@ export function AISuggestions({ transactions, budgets, metrics, dataLoading }: P
               className="size-1.5 rounded-full bg-emerald-400 inline-block"
               style={{ animation: "livepulse 1.8s ease-in-out infinite" }}
             />
-            <span className="text-xs font-medium text-foreground/70">Live</span>
+            <span className="text-xs font-medium text-foreground/70">{t("ai.live")}</span>
           </div>
 
           <button
@@ -110,7 +111,7 @@ export function AISuggestions({ transactions, budgets, metrics, dataLoading }: P
             className="flex items-center gap-1.5 border border-border/60 rounded-full px-2.5 py-1 hover:bg-muted transition-colors cursor-pointer group"
           >
             <IconRefresh className="size-3 text-muted-foreground group-hover:text-foreground transition-all group-hover:rotate-180 duration-300" />
-            <span className="text-xs font-medium text-foreground/70">Refresh</span>
+            <span className="text-xs font-medium text-foreground/70">{t("ai.refresh")}</span>
           </button>
         </div>
       </div>
@@ -174,14 +175,14 @@ export function AISuggestions({ transactions, budgets, metrics, dataLoading }: P
         <div className="flex items-center gap-2">
           <IconAlertTriangle className="size-3 text-muted-foreground/60 shrink-0" />
           <span className="text-xs text-muted-foreground/60">
-            AI-generated suggestions — not financial advice.
+            {t("ai.disclaimer")}
           </span>
         </div>
         <Link
           to="ai-assistant"
           className="flex items-center gap-1 text-xs font-medium text-primary/70 hover:text-primary transition-colors group"
         >
-          <span>Chat with AI</span>
+          <span>{t("ai.chatWithAI")}</span>
           <IconChevronRight className="size-3 transition-transform group-hover:translate-x-0.5" />
         </Link>
       </div>

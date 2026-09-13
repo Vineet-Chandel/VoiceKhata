@@ -16,9 +16,9 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 import { type SavingsGoal } from "@/lib/savings";
+import { useLanguage } from "@/context/LanguageContext";
 
 const COLORS = [
   "#4ade80",
@@ -46,6 +46,7 @@ export function AddGoalDialog({
   onSubmit,
   editData,
 }: AddGoalDialogProps) {
+  const { t } = useLanguage();
   const [name, setName] = useState("");
   const [targetAmount, setTargetAmount] = useState("");
   const [savedAmount, setSavedAmount] = useState("");
@@ -77,13 +78,13 @@ export function AddGoalDialog({
 
   const handleSubmit = async () => {
     setError(null);
-    if (!name.trim()) return setError("Goal name is required.");
+    if (!name.trim()) return setError(t("savings.goalNameRequired"));
     if (!targetAmount || isNaN(Number(targetAmount)))
-      return setError("Enter a valid target amount.");
+      return setError(t("savings.validTargetAmount"));
     if (Number(targetAmount) <= 0)
-      return setError("Target amount must be greater than 0.");
+      return setError(t("savings.targetAmountGreaterThanZero"));
     if (savedAmount && Number(savedAmount) > Number(targetAmount))
-      return setError("Saved amount cannot exceed target amount.");
+      return setError(t("savings.savedExceedsTarget"));
 
     setLoading(true);
     try {
@@ -107,14 +108,14 @@ export function AddGoalDialog({
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>
-            {editData ? "Edit Goal" : "Add Savings Goal"}
+            {editData ? t("savings.editGoal") : t("savings.addSavingsGoal")}
           </DialogTitle>
         </DialogHeader>
 
         <div className="flex flex-col gap-4 py-2">
           {/* Name */}
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="goal-name">Goal Name</Label>
+            <Label htmlFor="goal-name">{t("savings.goalName")}</Label>
             <Input
               id="goal-name"
               placeholder="e.g. Emergency Fund, New Laptop"
@@ -125,7 +126,7 @@ export function AddGoalDialog({
 
           {/* Target Amount */}
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="target-amount">Target Amount (₹)</Label>
+            <Label htmlFor="target-amount">{t("savings.targetAmount")}</Label>
             <Input
               id="target-amount"
               type="number"
@@ -137,7 +138,7 @@ export function AddGoalDialog({
 
           {/* Saved Amount */}
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="saved-amount">Already Saved (₹)</Label>
+            <Label htmlFor="saved-amount">{t("savings.alreadySaved")}</Label>
             <Input
               id="saved-amount"
               type="number"
@@ -150,7 +151,7 @@ export function AddGoalDialog({
           {/* Deadline — Calendar Picker */}
           <div className="flex flex-col gap-1.5">
             <div className="flex items-center justify-between">
-              <Label>Deadline (optional)</Label>
+              <Label>{t("savings.deadline")}</Label>
               <button
                 type="button"
                 onClick={() => {
@@ -162,7 +163,7 @@ export function AddGoalDialog({
                   : "text-text-secondary border-zinc-600 hover:border-zinc-400"
                   }`}
               >
-                ∞ Timeless
+                {t("savings.timeless")}
               </button>
             </div>
 
@@ -171,11 +172,11 @@ export function AddGoalDialog({
                 <PopoverTrigger asChild>
                   <Button
                     variant="outline"
-                    className="w-full justify-start text-left font-normal"
+                    className="w-full justify-start text-left font-normal cursor-pointer"
                   >
                     <CalendarIcon className="mr-2 h-4 w-4 opacity-50" />
                     {deadline ? format(deadline, "dd MMM yyyy") : (
-                      <span className="text-muted-foreground">Pick a date</span>
+                      <span className="text-muted-foreground">{t("form.pickDate")}</span>
                     )}
                   </Button>
                 </PopoverTrigger>
@@ -195,13 +196,13 @@ export function AddGoalDialog({
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="w-full text-text-secondary hover:text-text-primary text-xs"
+                        className="w-full text-text-secondary hover:text-text-primary text-xs cursor-pointer"
                         onClick={() => {
                           setDeadline(undefined);
                           setCalendarOpen(false);
                         }}
                       >
-                        Clear date
+                        {t("savings.clearDate")}
                       </Button>
                     </div>
                   )}
@@ -211,15 +212,14 @@ export function AddGoalDialog({
 
             {timeless && (
               <div className="flex items-center gap-2 px-3 py-2 rounded-md border border-border text-text-secondary text-sm">
-                <span>∞</span>
-                <span>No deadline — this goal runs forever</span>
+                <span>{t("savings.noDeadline")}</span>
               </div>
             )}
           </div>
 
           {/* Color Picker */}
           <div className="flex flex-col gap-1.5">
-            <Label>Color</Label>
+            <Label>{t("savings.color")}</Label>
             <div className="flex gap-2 flex-wrap">
               {COLORS.map((c) => (
                 <button
@@ -241,13 +241,13 @@ export function AddGoalDialog({
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={loading}>
-            Cancel
+          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={loading} className="cursor-pointer">
+            {t("common.cancel")}
           </Button>
-          <Button onClick={handleSubmit} disabled={loading}>
+          <Button onClick={handleSubmit} disabled={loading} className="cursor-pointer">
             {loading
-              ? editData ? "Saving..." : "Adding..."
-              : editData ? "Save Changes" : "Add Goal"}
+              ? editData ? t("common.saving") : t("form.adding")
+              : editData ? t("common.save") : t("savings.addGoal")}
           </Button>
         </DialogFooter>
       </DialogContent>

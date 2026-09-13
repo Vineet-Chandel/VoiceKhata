@@ -50,6 +50,7 @@ import { z } from "zod"
 import { Link } from "react-router-dom"
 
 import { useAppMode } from "@/context/AppModeContext"
+import { useLanguage } from "@/context/LanguageContext"
 import { useIsMobile } from "@/components/hooks/use-mobile"
 import { Badge } from "@/components/ui/Dashboard_UI/badge"
 import { Button } from "@/components/ui/button"
@@ -133,6 +134,8 @@ function ActionsCell({
     firebase_uid: "",
   }
 
+  const { t } = useLanguage()
+
   return (
     <>
       <DropdownMenu>
@@ -143,7 +146,7 @@ function ActionsCell({
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuItem onSelect={() => setEditOpen(true)} className="cursor-pointer">
-            Edit
+            {t("common.edit")}
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem
@@ -151,7 +154,7 @@ function ActionsCell({
             onSelect={() => setDeleteOpen(true)}
             className="cursor-pointer"
           >
-            Delete
+            {t("common.delete")}
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
@@ -176,7 +179,7 @@ function ActionsCell({
 }
 
 // ─── Column factory ───────────────────────────────────────────────────────────
-function buildColumns(callbacks: TableCallbacks): ColumnDef<z.infer<typeof schema>>[] {
+function buildColumns(callbacks: TableCallbacks, t: (key: string) => string): ColumnDef<z.infer<typeof schema>>[] {
   return [
     {
       id:     "drag",
@@ -185,12 +188,12 @@ function buildColumns(callbacks: TableCallbacks): ColumnDef<z.infer<typeof schem
     },
     {
       accessorKey: "transaction",
-      header:      "Transaction",
+      header:      t("tx.transaction"),
       cell:        ({ row }) => <TransactionViewer item={row.original} />,
     },
     {
       accessorKey: "category",
-      header:      "Category",
+      header:      t("tx.category"),
       cell:        ({ row }) => (
         <div className="inline-flex">
           <Badge variant="outline">{row.original.category}</Badge>
@@ -199,7 +202,7 @@ function buildColumns(callbacks: TableCallbacks): ColumnDef<z.infer<typeof schem
     },
     {
       accessorKey: "amount",
-      header:      () => <div className="text-right w-[120px]">Amount</div>,
+      header:      () => <div className="text-right w-[120px]">{t("tx.amount")}</div>,
       cell:        ({ row }) => (
         <div className="text-right w-[120px] font-medium">
           {"₹" + row.original.amount.toLocaleString()}
@@ -208,12 +211,12 @@ function buildColumns(callbacks: TableCallbacks): ColumnDef<z.infer<typeof schem
     },
     {
       accessorKey: "date",
-      header:      () => <div className="pl-6">Date</div>,
+      header:      () => <div className="pl-6">{t("tx.date")}</div>,
       cell:        ({ row }) => <div className="pl-6">{row.original.date}</div>,
     },
     {
       accessorKey: "type",
-      header:      "Type",
+      header:      t("tx.type"),
       cell:        ({ row }) => {
         const type = row.original.type
         return (
@@ -231,11 +234,11 @@ function buildColumns(callbacks: TableCallbacks): ColumnDef<z.infer<typeof schem
     },
     {
       accessorKey: "method",
-      header:      "Method",
+      header:      t("tx.method"),
     },
     {
       accessorKey: "status",
-      header:      "Status",
+      header:      t("tx.status"),
       cell:        ({ row }) => (
         <Badge variant="outline">
           {row.original.status === "Completed"
@@ -303,6 +306,7 @@ export function DataTable({
   budgetCategories?: string[]
   budgetRows?:       Budget[]
 }) {
+  const { t, language } = useLanguage()
   const [data, setData] = React.useState(() =>
     limit ? initialData.slice(0, limit) : initialData
   )
@@ -330,8 +334,8 @@ export function DataTable({
   )
 
   const columns = React.useMemo(
-    () => buildColumns({ onEdit, onDelete, budgetCategories, budgetRows }),
-    [onEdit, onDelete, budgetCategories, budgetRows]
+    () => buildColumns({ onEdit, onDelete, budgetCategories, budgetRows }, t),
+    [onEdit, onDelete, budgetCategories, budgetRows, t]
   )
 
   const table = useReactTable({
@@ -373,8 +377,8 @@ export function DataTable({
           <DropdownMenuTrigger asChild>
             <Button variant="outline" size="sm" className="cursor-pointer">
               <IconLayoutColumns />
-              <span className="hidden lg:inline">Customize Columns</span>
-              <span className="lg:hidden">Columns</span>
+              <span className="hidden lg:inline">{language === 'hi' ? 'कॉलम कस्टमाइज़ करें' : 'Customize Columns'}</span>
+              <span className="lg:hidden">{language === 'hi' ? 'कॉलम' : 'Columns'}</span>
               <IconChevronDown />
             </Button>
           </DropdownMenuTrigger>
@@ -430,7 +434,7 @@ export function DataTable({
                 ) : (
                   <TableRow>
                     <TableCell colSpan={columns.length} className="h-24 text-center">
-                      No results.
+                      {t("tx.noResults")}
                     </TableCell>
                   </TableRow>
                 )}
@@ -447,12 +451,12 @@ export function DataTable({
                 to={viewAllHref}
                 className="text-sm text-primary underline-offset-4 hover:underline"
               >
-                View all transactions →
+                {language === 'hi' ? 'सभी लेन-देन देखें →' : 'View all transactions →'}
               </Link>
             ) : (
               <span>
-                {table.getFilteredSelectedRowModel().rows.length} of{" "}
-                {table.getFilteredRowModel().rows.length} row(s) selected.
+                {table.getFilteredSelectedRowModel().rows.length} {t("tx.of")}{" "}
+                {table.getFilteredRowModel().rows.length} {language === 'hi' ? 'पंक्तियाँ चुनी गईं।' : 'row(s) selected.'}
               </span>
             )}
           </div>
@@ -461,7 +465,7 @@ export function DataTable({
             <div className="flex w-full items-center gap-8 lg:w-fit">
               <div className="hidden items-center gap-2 lg:flex">
                 <Label htmlFor="rows-per-page" className="text-sm font-medium">
-                  Rows per page
+                  {t("tx.rowsPerPage")}
                 </Label>
                 <Select
                   value={`${table.getState().pagination.pageSize}`}
@@ -479,7 +483,7 @@ export function DataTable({
               </div>
 
               <div className="flex w-fit items-center justify-center text-sm font-medium">
-                Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
+                {t("tx.pageOf")} {table.getState().pagination.pageIndex + 1} {t("tx.of")} {table.getPageCount()}
               </div>
 
               <div className="ml-auto flex items-center gap-2 lg:ml-0">
@@ -530,6 +534,7 @@ export function DataTable({
 function TransactionViewer({ item }: { item: z.infer<typeof schema> }) {
   const isMobile = useIsMobile()
   const { appMode } = useAppMode()
+  const { t } = useLanguage()
 
   return (
     <Drawer direction={isMobile ? "bottom" : "right"}>
@@ -546,40 +551,40 @@ function TransactionViewer({ item }: { item: z.infer<typeof schema> }) {
       <DrawerContent>
         <DrawerHeader>
           <DrawerTitle>{item.transaction}</DrawerTitle>
-          <DrawerDescription>Transaction details</DrawerDescription>
+          <DrawerDescription>{t("tx.transaction")} details</DrawerDescription>
         </DrawerHeader>
         <div className="flex flex-col gap-4 px-4 text-sm">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label>Category</Label>
+              <Label>{t("tx.category")}</Label>
               <p className="text-muted-foreground">{item.category}</p>
             </div>
             <div>
-              <Label>Amount</Label>
+              <Label>{t("tx.amount")}</Label>
               <p className="font-medium">{"₹" + item.amount.toLocaleString()}</p>
             </div>
           </div>
           <Separator />
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label>Date</Label>
+              <Label>{t("tx.date")}</Label>
               <p className="text-muted-foreground">{item.date}</p>
             </div>
             <div>
-              <Label>Payment Method</Label>
+              <Label>{t("tx.method")}</Label>
               <p className="text-muted-foreground">{item.method}</p>
             </div>
           </div>
           <Separator />
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label>Type</Label>
+              <Label>{t("tx.type")}</Label>
               <p className={item.type === "Debit" ? "text-red-400" : "text-green-400"}>
                 {item.type}
               </p>
             </div>
             <div>
-              <Label>Status</Label>
+              <Label>{t("tx.status")}</Label>
               <p className="text-muted-foreground">{item.status}</p>
             </div>
           </div>

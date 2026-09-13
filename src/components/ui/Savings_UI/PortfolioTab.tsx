@@ -45,6 +45,7 @@ import {
     Activity,
 } from "lucide-react";
 import { format } from "date-fns";
+import { useLanguage } from "@/context/LanguageContext";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -61,6 +62,13 @@ const TYPE_LABELS: Record<string, string> = {
     etf: "ETF",
     other: "Other",
 };
+
+function getTypeLabel(type: string, t: (k: string) => string) {
+    const key = `portfolio.type.${type}`;
+    const translated = t(key);
+    if (translated !== key) return translated;
+    return TYPE_LABELS[type] || type;
+}
 
 // Pure B&W greyscale palette
 const TYPE_COLORS: Record<string, string> = {
@@ -211,6 +219,7 @@ interface AddInvestmentDialogProps {
 }
 
 function AddInvestmentDialog({ open, onOpenChange, editData, onSubmit }: AddInvestmentDialogProps) {
+    const { t } = useLanguage();
     const [form, setForm] = useState<DialogForm>(EMPTY_FORM);
     const [calOpen, setCalOpen] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -245,15 +254,15 @@ function AddInvestmentDialog({ open, onOpenChange, editData, onSubmit }: AddInve
 
     const handleSubmit = async () => {
         setError("");
-        if (!form.name.trim()) return setError("Name is required.");
-        if (!form.type) return setError("Select an asset type.");
+        if (!form.name.trim()) return setError(t("savings.investmentNameRequired"));
+        if (!form.type) return setError(t("savings.investmentType"));
         if (isStock) {
-            if (!form.quantity || parseFloat(form.quantity) <= 0) return setError("Enter valid quantity.");
-            if (!form.bought_price || parseFloat(form.bought_price) <= 0) return setError("Enter valid bought price.");
-            if (!form.current_price || parseFloat(form.current_price) <= 0) return setError("Enter valid current price.");
+            if (!form.quantity || parseFloat(form.quantity) <= 0) return setError(t("savings.validQuantity"));
+            if (!form.bought_price || parseFloat(form.bought_price) <= 0) return setError(t("savings.validBuyPrice"));
+            if (!form.current_price || parseFloat(form.current_price) <= 0) return setError(t("savings.enterValidAmount"));
         } else {
             if (!form.amount_invested || parseFloat(form.amount_invested) <= 0)
-                return setError("Enter valid amount invested.");
+                return setError(t("savings.validAmountInvested"));
         }
         setLoading(true);
         try {
@@ -275,7 +284,7 @@ function AddInvestmentDialog({ open, onOpenChange, editData, onSubmit }: AddInve
             onOpenChange(false);
         } catch (err: any) {
             console.error("Investment Error:", err);
-            setError(err?.message || "Something went wrong.");
+            setError(err?.message || t("common.error"));
         } finally {
             setLoading(false);
         }
@@ -293,7 +302,7 @@ function AddInvestmentDialog({ open, onOpenChange, editData, onSubmit }: AddInve
                         </div>
                         <div>
                             <DialogTitle className="text-text-primary font-semibold text-[15px] tracking-tight">
-                                {editData ? "Edit Investment" : "Add Investment"}
+                                {editData ? t("savings.editInvestment") : t("savings.addInvestment")}
                             </DialogTitle>
                             <p className="text-white/35 text-xs mt-0.5 leading-relaxed">
                                 {isStock
@@ -310,7 +319,7 @@ function AddInvestmentDialog({ open, onOpenChange, editData, onSubmit }: AddInve
                     {/* Name + Type */}
                     <div className="grid grid-cols-2 gap-4">
                         <div className="flex flex-col gap-2">
-                            <BwLabel>Investment Name</BwLabel>
+                            <BwLabel>{t("savings.investmentName")}</BwLabel>
                             <BwInput
                                 placeholder={isStock ? "Reliance Industries" : "SBI Bluechip Fund"}
                                 value={form.name}
@@ -320,7 +329,7 @@ function AddInvestmentDialog({ open, onOpenChange, editData, onSubmit }: AddInve
 
                         {/* Asset Type — DropdownMenu */}
                         <div className="flex flex-col gap-2">
-                            <BwLabel>Asset Type</BwLabel>
+                            <BwLabel>{t("savings.investmentType")}</BwLabel>
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
                                     <button className="flex items-center justify-between w-full h-9 px-3 rounded-lg
@@ -332,17 +341,17 @@ function AddInvestmentDialog({ open, onOpenChange, editData, onSubmit }: AddInve
                                                 className="w-2 h-2 rounded-full flex-shrink-0"
                                                 style={{ backgroundColor: TYPE_COLORS[form.type] ?? "#595959" }}
                                             />
-                                            <span>{TYPE_LABELS[form.type] ?? "Select type"}</span>
+                                            <span>{getTypeLabel(form.type, t) || t("common.search")}</span>
                                         </div>
                                         <ChevronDown className="w-3.5 h-3.5 text-text-muted" />
                                     </button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent className="bg-surface border-border text-text-primary min-w-[180px] rounded-xl p-1">
                                     <DropdownMenuLabel className="text-[10px] text-text-muted uppercase tracking-widest px-2 py-1.5">
-                                        Asset Class
+                                        {t("savings.investmentType")}
                                     </DropdownMenuLabel>
                                     <DropdownMenuSeparator className="bg-surface-secondary my-1" />
-                                    {Object.entries(TYPE_LABELS).map(([val, label]) => (
+                                    {Object.entries(TYPE_LABELS).map(([val]) => (
                                         <DropdownMenuItem
                                             key={val}
                                             onClick={() => set("type", val)}
@@ -353,7 +362,7 @@ function AddInvestmentDialog({ open, onOpenChange, editData, onSubmit }: AddInve
                                                 className="w-2 h-2 rounded-full flex-shrink-0"
                                                 style={{ backgroundColor: TYPE_COLORS[val] }}
                                             />
-                                            {label}
+                                            {getTypeLabel(val, t)}
                                             {form.type === val && (
                                                 <span className="ml-auto text-text-secondary text-xs">✓</span>
                                             )}
@@ -387,7 +396,7 @@ function AddInvestmentDialog({ open, onOpenChange, editData, onSubmit }: AddInve
                                     <span className="text-[10px] text-text-muted">NSE → .NS · BSE → .BO</span>
                                 </div>
                                 <div className="flex flex-col gap-2">
-                                    <BwLabel>Quantity (Shares)</BwLabel>
+                                    <BwLabel>{t("savings.quantityUnits")}</BwLabel>
                                     <BwInput
                                         type="number"
                                         placeholder="10"
@@ -401,7 +410,7 @@ function AddInvestmentDialog({ open, onOpenChange, editData, onSubmit }: AddInve
                             {/* Bought Price + Bought Date via Calendar */}
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="flex flex-col gap-2">
-                                    <BwLabel><span className="flex items-center gap-1"><IndianRupee className="w-3 h-3" /> Bought Price</span></BwLabel>
+                                    <BwLabel><span className="flex items-center gap-1"><IndianRupee className="w-3 h-3" /> {t("savings.buyPrice")}</span></BwLabel>
                                     <BwInput
                                         type="number"
                                         placeholder="2450.00"
@@ -413,7 +422,7 @@ function AddInvestmentDialog({ open, onOpenChange, editData, onSubmit }: AddInve
 
                                 {/* Calendar Popover */}
                                 <div className="flex flex-col gap-2">
-                                    <BwLabel><span className="flex items-center gap-1"><CalendarDays className="w-3 h-3" /> Bought Date</span></BwLabel>
+                                    <BwLabel><span className="flex items-center gap-1"><CalendarDays className="w-3 h-3" /> {t("savings.dateOfPurchase")}</span></BwLabel>
                                     <Popover open={calOpen} onOpenChange={setCalOpen}>
                                         <PopoverTrigger asChild>
                                             <button className="flex items-center justify-between w-full h-9 px-3 rounded-lg
@@ -423,7 +432,7 @@ function AddInvestmentDialog({ open, onOpenChange, editData, onSubmit }: AddInve
                                                 <span className={form.bought_date ? "text-text-primary" : "text-text-muted"}>
                                                     {form.bought_date
                                                         ? format(form.bought_date, "dd MMM yyyy")
-                                                        : "Pick date"}
+                                                        : t("form.pickDate")}
                                                 </span>
                                                 <CalendarDays className="w-3.5 h-3.5 text-text-muted" />
                                             </button>
@@ -456,7 +465,7 @@ function AddInvestmentDialog({ open, onOpenChange, editData, onSubmit }: AddInve
 
                             {/* Current Price */}
                             <div className="flex flex-col gap-2">
-                                <BwLabel><span className="flex items-center gap-1"><TrendingUp className="w-3 h-3" /> Current Price / Share</span></BwLabel>
+                                <BwLabel><span className="flex items-center gap-1"><TrendingUp className="w-3 h-3" /> {t("savings.currentPrice")}</span></BwLabel>
                                 <BwInput
                                     type="number"
                                     placeholder="2780.00"
@@ -470,7 +479,7 @@ function AddInvestmentDialog({ open, onOpenChange, editData, onSubmit }: AddInve
                             {/* Auto total */}
                             {autoInvested && (
                                 <div className="rounded-lg bg-surface-secondary border border-border px-4 py-2.5 flex items-center justify-between">
-                                    <span className="text-xs text-white/35">Total Invested (qty × price)</span>
+                                    <span className="text-xs text-white/35">{t("savings.totalInvested")}</span>
                                     <span className="text-sm font-semibold text-text-primary tabular-nums">
                                         {formatINR(parseFloat(autoInvested))}
                                     </span>
@@ -486,7 +495,7 @@ function AddInvestmentDialog({ open, onOpenChange, editData, onSubmit }: AddInve
                                     }`}>
                                     <div className="flex flex-col gap-0.5">
                                         <span className="text-[9px] text-text-muted uppercase tracking-widest font-semibold">
-                                            Live P&L Preview
+                                            {t("savings.livePreview")}
                                         </span>
                                         <span className={`text-2xl font-bold tabular-nums ${previewPnl.gain >= 0 ? "text-text-primary" : "text-text-muted"
                                             }`}>
@@ -494,7 +503,7 @@ function AddInvestmentDialog({ open, onOpenChange, editData, onSubmit }: AddInve
                                         </span>
                                     </div>
                                     <div className="flex flex-col items-end gap-0.5">
-                                        <span className="text-[10px] text-text-muted">Current Value</span>
+                                        <span className="text-[10px] text-text-muted">{t("savings.currentValue")}</span>
                                         <span className="text-sm font-semibold text-text-primary tabular-nums">
                                             {formatINR(previewPnl.current)}
                                         </span>
@@ -515,7 +524,7 @@ function AddInvestmentDialog({ open, onOpenChange, editData, onSubmit }: AddInve
                     {!isStock && (
                         <div className="grid grid-cols-2 gap-4">
                             <div className="flex flex-col gap-2">
-                                <BwLabel>Amount Invested (₹)</BwLabel>
+                                <BwLabel>{t("savings.amountInvested")}</BwLabel>
                                 <BwInput
                                     type="number"
                                     placeholder="50000"
@@ -525,7 +534,7 @@ function AddInvestmentDialog({ open, onOpenChange, editData, onSubmit }: AddInve
                                 />
                             </div>
                             <div className="flex flex-col gap-2">
-                                <BwLabel>Expected Return % p.a.</BwLabel>
+                                <BwLabel>{t("savings.expectedAnnualReturn")}</BwLabel>
                                 <BwInput
                                     type="number"
                                     placeholder="12"
@@ -554,7 +563,7 @@ function AddInvestmentDialog({ open, onOpenChange, editData, onSubmit }: AddInve
                         className="flex-1 h-9 text-white/35 hover:text-text-secondary hover:bg-surface-secondary
               border border-border rounded-lg text-sm"
                     >
-                        Cancel
+                        {t("common.cancel")}
                     </Button>
                     <Button
                         onClick={handleSubmit}
@@ -562,7 +571,7 @@ function AddInvestmentDialog({ open, onOpenChange, editData, onSubmit }: AddInve
                         className="flex-1 h-9 bg-white text-black hover:bg-white/90
               font-semibold rounded-lg text-sm transition-colors"
                     >
-                        {loading ? "Saving..." : editData ? "Save Changes" : "Add Investment"}
+                        {loading ? t("common.saving") : editData ? t("common.save") : t("savings.addInvestment")}
                     </Button>
                 </DialogFooter>
             </DialogContent>
@@ -579,6 +588,7 @@ export function PortfolioTab({
     editInvestment,
     removeInvestment,
 }: PortfolioTabProps) {
+    const { t } = useLanguage();
     const [addOpen, setAddOpen] = useState(false);
     const [editData, setEditData] = useState<ExtendedInvestment | null>(null);
     const [deleteId, setDeleteId] = useState<string | null>(null);
@@ -604,16 +614,16 @@ export function PortfolioTab({
     const donutData = useMemo(() => {
         const types = Object.keys(byType);
         return {
-            labels: types.map((t) => TYPE_LABELS[t] || t),
+            labels: types.map((tKey) => getTypeLabel(tKey, t)),
             datasets: [{
-                data: types.map((t) => byType[t]),
-                backgroundColor: types.map((t) => TYPE_COLORS[t] || "#595959"),
+                data: types.map((tKey) => byType[tKey]),
+                backgroundColor: types.map((tKey) => TYPE_COLORS[tKey] || "#595959"),
                 borderColor: "#000000",
                 borderWidth: 2,
                 hoverOffset: 4,
             }],
         };
-    }, [byType]);
+    }, [byType, t]);
 
     const donutOptions = {
         responsive: true,
@@ -639,7 +649,7 @@ export function PortfolioTab({
     if (loadingInvestments) {
         return (
             <div className="flex items-center justify-center py-16 text-text-muted text-sm">
-                Loading portfolio...
+                {t("portfolio.loading")}
             </div>
         );
     }
@@ -650,9 +660,9 @@ export function PortfolioTab({
             {/* ── Header ── */}
             <div className="flex items-center justify-between">
                 <div>
-                    <h2 className="text-sm font-semibold text-text-primary tracking-tight">Manual Portfolio</h2>
+                    <h2 className="text-sm font-semibold text-text-primary tracking-tight">{t("portfolio.title")}</h2>
                     <p className="text-xs text-white/35 mt-0.5">
-                        Track and manage all your investments in one place
+                        {t("portfolio.subtitle")}
                     </p>
                 </div>
                 <Button
@@ -661,7 +671,7 @@ export function PortfolioTab({
                     className="bg-white text-black hover:bg-white/90 font-semibold text-xs h-8 px-3 rounded-lg"
                 >
                     <Plus className="w-3.5 h-3.5 mr-1.5" />
-                    Add Investment
+                    {t("portfolio.addInvestment")}
                 </Button>
             </div>
 
@@ -669,24 +679,24 @@ export function PortfolioTab({
             {investments.length > 0 && (
                 <div className="grid grid-cols-3 gap-3">
                     <div className="rounded-xl bg-surface-secondary border border-border p-4 flex flex-col gap-1">
-                        <span className="text-[10px] text-text-muted uppercase tracking-widest font-medium">Invested</span>
+                        <span className="text-[10px] text-text-muted uppercase tracking-widest font-medium">{t("portfolio.invested")}</span>
                         <span className="text-xl font-bold text-text-primary tabular-nums">{formatINR(totalInvested)}</span>
                         <span className="text-[10px] text-text-muted">
-                            {investments.length} holding{investments.length !== 1 ? "s" : ""}
+                            {investments.length} {investments.length !== 1 ? t("portfolio.holdings") : t("portfolio.holding")}
                         </span>
                     </div>
 
                     <div className="rounded-xl bg-surface-secondary border border-border p-4 flex flex-col gap-1">
-                        <span className="text-[10px] text-text-muted uppercase tracking-widest font-medium">Current Value</span>
+                        <span className="text-[10px] text-text-muted uppercase tracking-widest font-medium">{t("portfolio.currentValue")}</span>
                         <span className="text-xl font-bold text-text-primary tabular-nums">{formatINR(totalCurrentValue)}</span>
-                        <span className="text-[10px] text-text-muted">estimated</span>
+                        <span className="text-[10px] text-text-muted">{t("portfolio.estimated")}</span>
                     </div>
 
                     <div className={`rounded-xl border p-4 flex flex-col gap-1 ${totalGain >= 0
                         ? "bg-green-500/10 border-green-500/30"
                         : "bg-red-500/10 border-red-500/30"
                         }`}>
-                        <span className="text-[10px] text-text-muted uppercase tracking-widest font-medium">Total P&L</span>
+                        <span className="text-[10px] text-text-muted uppercase tracking-widest font-medium">{t("portfolio.totalPL")}</span>
                         <span className="text-xl font-bold text-text-primary tabular-nums">
                             {totalGain >= 0 ? "+" : ""}{formatINR(totalGain)}
                         </span>
@@ -696,7 +706,7 @@ export function PortfolioTab({
                                 ? <ArrowUpRight className="w-3 h-3 text-green-400" />
                                 : <ArrowDownRight className="w-3 h-3 text-red-400" />
                             }
-                            {totalGainPct >= 0 ? "+" : ""}{totalGainPct.toFixed(1)}% overall
+                            {totalGainPct >= 0 ? "+" : ""}{totalGainPct.toFixed(1)}% {t("portfolio.overall")}
                         </span>
                     </div>
                 </div>
@@ -706,7 +716,7 @@ export function PortfolioTab({
             {investments.length > 0 && (
                 <div className="rounded-xl border border-border bg-surface-secondary p-5">
                     <span className="text-[10px] font-semibold text-text-muted uppercase tracking-widest">
-                        Allocation by Asset Class
+                        {t("portfolio.allocation")}
                     </span>
                     <div className="flex items-center gap-8 mt-4">
                         <div style={{ width: 140, height: 140, flexShrink: 0 }}>
@@ -723,7 +733,7 @@ export function PortfolioTab({
                                             className="w-2 h-2 rounded-full flex-shrink-0"
                                             style={{ backgroundColor: TYPE_COLORS[type] || "#595959" }}
                                         />
-                                        <span className="text-sm text-white/45 flex-1">{TYPE_LABELS[type] || type}</span>
+                                        <span className="text-sm text-white/45 flex-1">{getTypeLabel(type, t)}</span>
                                         <span className="text-sm font-medium text-text-primary tabular-nums">{formatINR(amount)}</span>
                                         <span className="text-xs text-text-muted w-8 text-right tabular-nums">{pct}%</span>
                                     </div>
@@ -743,9 +753,9 @@ export function PortfolioTab({
                         <Briefcase className="w-5 h-5 text-text-muted" />
                     </div>
                     <div className="flex flex-col gap-1">
-                        <p className="text-sm font-medium text-text-muted">No investments recorded yet</p>
+                        <p className="text-sm font-medium text-text-muted">{t("portfolio.noInvestments")}</p>
                         <p className="text-xs text-text-muted">
-                            Add your first holding to begin tracking portfolio performance
+                            {t("portfolio.noInvestmentsDesc")}
                         </p>
                     </div>
                     <Button
@@ -756,7 +766,7 @@ export function PortfolioTab({
               text-xs h-8 px-4 rounded-lg"
                     >
                         <Plus className="w-3.5 h-3.5 mr-1.5" />
-                        Add your first investment
+                        {t("portfolio.addFirst")}
                     </Button>
                 </div>
             )}
@@ -765,7 +775,7 @@ export function PortfolioTab({
             {investments.length > 0 && (
                 <div className="flex flex-col gap-2">
                     <span className="text-[10px] font-semibold text-text-muted uppercase tracking-widest">
-                        Holdings
+                        {t("portfolio.holdingsList")}
                     </span>
 
                     {investments.map((inv) => {
@@ -811,19 +821,19 @@ export function PortfolioTab({
                                             className="text-[10px] px-1.5 py-0 border-border
                         text-text-muted bg-transparent rounded"
                                         >
-                                            {TYPE_LABELS[inv.type] || inv.type}
+                                            {getTypeLabel(inv.type, t)}
                                         </Badge>
 
                                         {stockGrowth ? (
                                             <>
                                                 <span className="text-[11px] text-text-muted">
-                                                    {inv.quantity} shares · bought {formatINR(inv.bought_price!)}
+                                                    {inv.quantity} {t("portfolio.shares")} · {t("portfolio.bought")} {formatINR(inv.bought_price!)}
                                                 </span>
                                                 <span className="text-[11px] text-text-muted">
-                                                    now {formatINR(inv.current_price!)}
+                                                    {t("portfolio.now")} {formatINR(inv.current_price!)}
                                                 </span>
                                                 <span className="text-[11px] text-text-muted">
-                                                    {formatDays(stockGrowth.daysHeld)} held
+                                                    {formatDays(stockGrowth.daysHeld)} {t("portfolio.held")}
                                                 </span>
                                             </>
                                         ) : (
@@ -835,11 +845,11 @@ export function PortfolioTab({
                                                 )}
                                                 <span className="text-[11px] text-text-muted">
                                                     {yrsHeld < 1
-                                                        ? `${Math.round(yrsHeld * 12)}mo held`
-                                                        : `${yrsHeld.toFixed(1)}yr held`}
+                                                        ? `${Math.round(yrsHeld * 12)}mo ${t("portfolio.held")}`
+                                                        : `${yrsHeld.toFixed(1)}yr ${t("portfolio.held")}`}
                                                 </span>
                                                 <span className="text-[11px] text-text-muted">
-                                                    {inv.expected_return}% p.a.
+                                                    {inv.expected_return}% {t("savings.pa")}
                                                 </span>
                                             </>
                                         )}
@@ -862,7 +872,7 @@ export function PortfolioTab({
                                         {displayGain >= 0 ? "+" : ""}{formatINR(Math.abs(displayGain))}
                                     </span>
                                     <span className="text-[10px] text-text-muted tabular-nums">
-                                        invested {formatINR(inv.amount_invested)}
+                                        {t("portfolio.invested")} {formatINR(inv.amount_invested)}
                                     </span>
                                 </div>
 
@@ -886,7 +896,7 @@ export function PortfolioTab({
                         focus:text-text-primary cursor-pointer gap-2 rounded-lg"
                                         >
                                             <Pencil className="w-3.5 h-3.5" />
-                                            Edit
+                                            {t("common.edit")}
                                         </DropdownMenuItem>
                                         <DropdownMenuSeparator className="bg-surface-secondary my-1" />
                                         <DropdownMenuItem
@@ -895,7 +905,7 @@ export function PortfolioTab({
                         focus:text-text-secondary cursor-pointer gap-2 rounded-lg"
                                         >
                                             <Trash2 className="w-3.5 h-3.5" />
-                                            Delete
+                                            {t("common.delete")}
                                         </DropdownMenuItem>
                                     </DropdownMenuContent>
                                 </DropdownMenu>
@@ -908,8 +918,7 @@ export function PortfolioTab({
             {/* ── Disclaimer ── */}
             {investments.length > 0 && (
                 <p className="text-[10px] text-text-muted border-t border-border pt-3 leading-relaxed">
-                    Stock values are calculated from manually entered current prices. Non-stock values use
-                    compound interest based on expected annual return. Update current prices periodically for accuracy.
+                    {t("portfolio.disclaimer")}
                 </p>
             )}
 
@@ -926,8 +935,8 @@ export function PortfolioTab({
             <DeleteConfirmDialog
                 open={!!deleteId}
                 onOpenChange={(open) => !open && setDeleteId(null)}
-                title="Delete Investment?"
-                description="This will permanently remove this investment record from your portfolio."
+                title={t("portfolio.deleteTitle")}
+                description={t("portfolio.deleteDesc")}
                 onConfirm={handleDelete}
                 loading={deleteLoading}
             />

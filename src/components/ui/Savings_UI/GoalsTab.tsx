@@ -7,6 +7,7 @@ import { AddSavingsDialog } from "./add-savings-dialog";
 import { DeleteConfirmDialog } from "./delete-confirm-dialog";
 import { type SavingsGoal } from "@/lib/savings";
 import { Pencil, Trash2, Plus, PiggyBank } from "lucide-react";
+import { useLanguage } from "@/context/LanguageContext";
 
 interface GoalsTabProps {
   goals: SavingsGoal[];
@@ -28,6 +29,7 @@ export function GoalsTab({
   editGoal,
   removeGoal,
 }: GoalsTabProps) {
+  const { t } = useLanguage();
   const [addOpen, setAddOpen]         = useState(false);
   const [editData, setEditData]       = useState<SavingsGoal | null>(null);
   const [deleteId, setDeleteId]       = useState<string | null>(null);
@@ -86,7 +88,7 @@ export function GoalsTab({
   if (loadingGoals) {
     return (
       <div className="flex items-center justify-center py-16 text-muted-foreground text-sm">
-        Loading goals...
+        {t("savings.loadingGoals")}
       </div>
     );
   }
@@ -96,9 +98,9 @@ export function GoalsTab({
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-base font-medium">Savings Goals</h2>
+          <h2 className="text-base font-medium">{t("savings.goalsTitle")}</h2>
           <p className="text-sm text-muted-foreground">
-            Track progress toward your financial targets
+            {t("savings.goalsSubtitle")}
           </p>
         </div>
         <div className="flex gap-2">
@@ -108,7 +110,7 @@ export function GoalsTab({
             onClick={() => openAddSavings("general")}
           >
             <PiggyBank className="w-4 h-4 mr-1" />
-            Add Savings
+            {t("savings.addSavingsBtn")}
           </Button>
           <Button
             size="sm"
@@ -118,7 +120,7 @@ export function GoalsTab({
             }}
           >
             <Plus className="w-4 h-4 mr-1" />
-            Add Goal
+            {t("savings.addGoalBtn")}
           </Button>
         </div>
       </div>
@@ -126,7 +128,7 @@ export function GoalsTab({
       {/* Empty State */}
       {goals.length === 0 && (
         <div className="flex flex-col items-center justify-center py-16 gap-3 text-center border border-dashed border-border rounded-lg">
-          <p className="text-muted-foreground text-sm">No savings goals yet.</p>
+          <p className="text-muted-foreground text-sm">{t("savings.noGoalsYet")}</p>
           <Button
             size="sm"
             variant="outline"
@@ -136,7 +138,7 @@ export function GoalsTab({
             }}
           >
             <Plus className="w-4 h-4 mr-1" />
-            Create your first goal
+            {t("savings.createFirstGoal")}
           </Button>
         </div>
       )}
@@ -169,13 +171,13 @@ export function GoalsTab({
                       }`}
                     >
                       {daysLeft < 0
-                        ? `${Math.abs(daysLeft)} days overdue`
+                        ? `${Math.abs(daysLeft)} ${t("savings.daysOverdue")}`
                         : daysLeft === 0
-                        ? "Due today"
-                        : `${daysLeft} days left`}
+                        ? t("savings.dueToday")
+                        : `${daysLeft} ${t("savings.daysLeft")}`}
                     </span>
                   ) : (
-                    <span className="text-xs text-zinc-600">∞ Timeless</span>
+                    <span className="text-xs text-zinc-600">∞ {t("budget.timeless")}</span>
                   )}
                 </div>
                 <Badge
@@ -196,19 +198,19 @@ export function GoalsTab({
 
               {/* Amounts */}
               <div className="flex justify-between text-xs text-muted-foreground">
-                <span>₹{goal.saved_amount.toLocaleString("en-IN")} saved</span>
-                <span>₹{goal.target_amount.toLocaleString("en-IN")} target</span>
+                <span>₹{goal.saved_amount.toLocaleString("en-IN")} {t("savings.saved")}</span>
+                <span>₹{goal.target_amount.toLocaleString("en-IN")} {t("savings.target")}</span>
               </div>
 
               {remaining > 0 && (
                 <p className="text-xs text-muted-foreground">
-                  ₹{remaining.toLocaleString("en-IN")} remaining
+                  ₹{remaining.toLocaleString("en-IN")} {t("savings.remaining")}
                 </p>
               )}
 
               {percent >= 100 && (
                 <p className="text-xs text-green-500 font-medium">
-                  🎉 Goal achieved!
+                  {t("savings.goalAchieved")}
                 </p>
               )}
 
@@ -222,7 +224,7 @@ export function GoalsTab({
                     onClick={() => openAddSavings(goal.id)}
                   >
                     <PiggyBank className="w-3 h-3 mr-1" />
-                    Add Money
+                    {t("savings.addMoney")}
                   </Button>
                 )}
                 <Button
@@ -271,8 +273,8 @@ export function GoalsTab({
       <DeleteConfirmDialog
         open={!!deleteId}
         onOpenChange={(open) => !open && setDeleteId(null)}
-        title="Delete Savings Goal?"
-        description="This will permanently delete this goal and all its progress."
+        title={t("savings.deleteGoalTitle")}
+        description={t("savings.deleteGoalDesc")}
         onConfirm={handleDelete}
         loading={deleteLoading}
       />

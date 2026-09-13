@@ -14,6 +14,7 @@ import {
   DropdownMenu, DropdownMenuTrigger,
   DropdownMenuContent, DropdownMenuItem,
 } from "@/components/ui/dropdown-menu"
+import { useLanguage } from "@/context/LanguageContext"
 
 // ── Toast ─────────────────────────────────────────────────────────────────────
 export type StatusMsg = { type: "success" | "error"; text: string } | null
@@ -291,6 +292,7 @@ function MiniCalendar({ selected, maxDate, onSelect }: {
 
 // ── DateField ─────────────────────────────────────────────────────────────────
 export function DateField({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const { t } = useLanguage()
   const parseLocalDate = (str: string): Date | undefined => {
     if (!str) return undefined
     const [y, m, d] = str.split("-").map(Number)
@@ -319,7 +321,7 @@ export function DateField({ value, onChange }: { value: string; onChange: (v: st
             bg-surface-secondary border-border hover:bg-surface-secondary hover:border-border-secondary
             text-text-secondary data-[empty=true]:text-text-muted transition-all"
         >
-          {date ? format(date, "PPP") : "Pick a date"}
+          {date ? format(date, "PPP") : t("settings.pickDate")}
           <ChevronDownIcon className="size-4 opacity-30" />
         </Button>
       </PopoverTrigger>
@@ -366,6 +368,7 @@ export function PasswordInput({ value, onChange, placeholder }: {
 
 // ── PasswordStrength ──────────────────────────────────────────────────────────
 export function PasswordStrength({ password }: { password: string }) {
+  const { t } = useLanguage()
   if (!password) return null
   const checks = [
     password.length >= 8,
@@ -375,7 +378,7 @@ export function PasswordStrength({ password }: { password: string }) {
   ]
   const score  = checks.filter(Boolean).length
   const fill   = ["bg-surface-elevated", "bg-text-primary/40", "bg-text-primary/65", "bg-text-primary/90"]
-  const labels = ["Weak", "Fair", "Good", "Strong"]
+  const labels = [t("settings.weak"), t("settings.fair"), t("settings.good"), t("settings.strong")]
   return (
     <div className="mt-2 space-y-1.5">
       <div className="flex gap-1">
@@ -385,7 +388,7 @@ export function PasswordStrength({ password }: { password: string }) {
         ))}
       </div>
       <p className="text-[11px] text-text-muted">
-        Strength: <span className="text-text-secondary font-medium">{labels[score - 1] ?? "Weak"}</span>
+        {t("settings.strength")} <span className="text-text-secondary font-medium">{labels[score - 1] ?? t("settings.weak")}</span>
       </p>
     </div>
   )

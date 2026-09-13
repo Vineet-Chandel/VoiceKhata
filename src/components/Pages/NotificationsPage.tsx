@@ -8,6 +8,7 @@ import {
 import { useNotifications } from '@/components/hooks/use-notifications'
 import { useAuth } from '@/components/hooks/use-auth'
 import type { Notification } from '@/types/notifications'
+import { useLanguage } from '@/context/LanguageContext'
 
 // ─── Type config ─────────────────────────────────────────────────────────────
 
@@ -54,13 +55,29 @@ type FilterValue = (typeof FILTERS)[number]['value']
 export function NotificationsPage() {
   const { user } = useAuth()
   const firebase_uid = user?.uid ?? ''
-
+  const { t, language } = useLanguage()
   const [filter, setFilter] = useState<FilterValue>('all')
 
   const {
     notifications, unreadCount, loading,
     markAsRead, markAllRead, deleteNotif, deleteAll,
   } = useNotifications(firebase_uid)
+
+  const FILTERS_TRANSLATED = [
+    { value: 'all',          label: t('notif.all')         },
+    { value: 'unread',       label: t('notif.unread')      },
+    { value: 'budget_alert', label: t('notif.budget')      },
+    { value: 'transaction',  label: t('notif.transaction') },
+    { value: 'ai_insight',   label: t('notif.aiInsight')   },
+  ] as const
+
+  const TYPE_CONFIG_T: Record<string, { icon: React.ReactNode; label: string; badge: string }> = {
+    budget_alert: { icon: <AlertTriangle size={14} />, label: t('notif.budget'), badge: 'bg-red-500/10 text-red-400 border-red-500/20' },
+    transaction:  { icon: <ArrowLeftRight size={14} />, label: t('notif.transaction'), badge: 'bg-blue-500/10 text-blue-400 border-blue-500/20' },
+    ai_insight:   { icon: <Sparkles size={14} />, label: t('notif.aiInsight'), badge: 'bg-violet-500/10 text-violet-400 border-violet-500/20' },
+    system:       { icon: <Settings size={14} />, label: t('notif.system'), badge: 'bg-muted/60 text-muted-foreground border-border' },
+    goal:         { icon: <Target size={14} />, label: t('notif.goal'), badge: 'bg-green-500/10 text-green-400 border-green-500/20' },
+  }
 
   const filtered = notifications.filter((n) => {
     if (filter === 'unread') return !n.read
@@ -75,13 +92,13 @@ export function NotificationsPage() {
         {/* ── Header ── */}
         <div className="flex items-start justify-between">
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight">Notifications</h1>
+            <h1 className="text-2xl font-semibold tracking-tight">{t('notif.title')}</h1>
             <p className="text-sm text-muted-foreground mt-0.5">
               {loading
-                ? 'Loading...'
+                ? t('common.loading')
                 : unreadCount > 0
-                ? `${unreadCount} unread notification${unreadCount !== 1 ? 's' : ''}`
-                : "You're all caught up"}
+                ? `${unreadCount} ${t('notif.unread')}`
+                : (language === 'hi' ? 'सब कुछ पढ़ लिया गया है' : "You're all caught up")}
             </p>
           </div>
 
@@ -92,7 +109,7 @@ export function NotificationsPage() {
                 className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground border border-border px-3 py-1.5 rounded-lg transition-colors"
               >
                 <CheckCheck size={14} />
-                Mark all read
+                {t('notif.markAllRead')}
               </button>
             )}
             {notifications.length > 0 && (
@@ -101,7 +118,7 @@ export function NotificationsPage() {
                 className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-red-400 border border-border px-3 py-1.5 rounded-lg transition-colors"
               >
                 <Trash2 size={14} />
-                Clear all
+                {t('notif.clearAll')}
               </button>
             )}
           </div>
@@ -115,7 +132,7 @@ export function NotificationsPage() {
 
             {/* Filter tabs */}
             <div className="flex items-center gap-1.5 flex-wrap">
-              {FILTERS.map((f) => {
+              {FILTERS_TRANSLATED.map((f) => {
                 const count =
                   f.value === 'all'    ? notifications.length
                   : f.value === 'unread' ? unreadCount
@@ -124,7 +141,7 @@ export function NotificationsPage() {
                 return (
                   <button
                     key={f.value}
-                    onClick={() => setFilter(f.value)}
+                    onClick={() => setFilter(f.value as FilterValue)}
                     className={`flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg border transition-all ${
                       filter === f.value
                         ? 'bg-primary/10 text-primary border-primary/30 font-medium'
@@ -159,6 +176,7 @@ export function NotificationsPage() {
                   <NotifRow
                     key={n.id}
                     n={n}
+                    typeConfig={TYPE_CONFIG_T}
                     onRead={() => markAsRead(n.id)}
                     onDelete={() => deleteNotif(n.id)}
                   />
@@ -176,13 +194,14 @@ export function NotificationsPage() {
 // ─── NotifRow ────────────────────────────────────────────────────────────────
 
 function NotifRow({
-  n, onRead, onDelete,
+  n, onRead, onDelete, typeConfig,
 }: {
   n: Notification
   onRead: () => void
   onDelete: () => void
+  typeConfig: Record<string, { icon: React.ReactNode; label: string; badge: string }>
 }) {
-  const config = TYPE_CONFIG[n.type]
+  const config = typeConfig[n.type]
 
   return (
     <div
@@ -236,18 +255,21 @@ function NotifRow({
 // ─── Empty state ─────────────────────────────────────────────────────────────
 
 function EmptyState({ filter }: { filter: FilterValue }) {
+  const { t, language } = useLanguage()
   return (
     <div className="flex flex-col items-center justify-center py-20 rounded-xl border border-dashed border-border">
       <div className="w-12 h-12 rounded-xl bg-muted/30 border border-border flex items-center justify-center mb-4">
         <BellOff size={20} className="text-muted-foreground/30" />
       </div>
       <p className="text-sm font-medium text-muted-foreground">
-        {filter === 'unread' ? 'No unread notifications' : 'No notifications'}
+        {filter === 'unread'
+          ? (language === 'hi' ? 'कोई अपठित सूचना नहीं' : 'No unread notifications')
+          : t('notif.noNotifications')}
       </p>
       <p className="text-xs text-muted-foreground/50 mt-1">
         {filter === 'unread'
-          ? 'Switch to "All" to see past activity.'
-          : "We'll notify you when something happens."}
+          ? (language === 'hi' ? '"सभी" में जाकर पुरानी गतिविधि देखें।' : 'Switch to "All" to see past activity.')
+          : (language === 'hi' ? 'जब कुछ होगा तो हम आपको सूचित करेंगे।' : "We'll notify you when something happens.")}
       </p>
     </div>
   )

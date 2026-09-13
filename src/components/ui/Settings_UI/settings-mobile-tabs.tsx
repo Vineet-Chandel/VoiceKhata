@@ -2,6 +2,7 @@
 "use client"
 
 import { NAV_ITEMS, type TabId } from "./settings-sidebar"
+import { useLanguage } from "@/context/LanguageContext"
 
 interface SettingsMobileTabsProps {
   activeTab:   TabId
@@ -9,11 +10,24 @@ interface SettingsMobileTabsProps {
 }
 
 export function SettingsMobileTabs({ activeTab, onTabChange }: SettingsMobileTabsProps) {
+  const { t } = useLanguage()
+
+  const getNavLabel = (id: TabId) => {
+    switch (id) {
+      case "profile": return t("settings.profile")
+      case "appearance": return t("settings.appearance")
+      case "financial": return t("settings.financial")
+      case "security": return t("settings.security")
+      case "danger": return t("settings.danger")
+      default: return id
+    }
+  }
+
   return (
     <div className="lg:hidden fixed bottom-0 inset-x-0 z-50 border-t border-border
       bg-bg-primary/95 backdrop-blur-xl">
       <div className="flex">
-        {NAV_ITEMS.map(({ id, label, icon: Icon }) => {
+        {NAV_ITEMS.map(({ id, icon: Icon }) => {
           const active = activeTab === id
           return (
             <button key={id} onClick={() => onTabChange(id)}
@@ -23,7 +37,7 @@ export function SettingsMobileTabs({ activeTab, onTabChange }: SettingsMobileTab
               </div>
               <span className={`text-[9px] font-bold uppercase tracking-wide
                 ${active ? "text-text-primary" : "text-text-muted"}`}>
-                {label.split(" ")[0]}
+                {getNavLabel(id).split(" ")[0]}
               </span>
             </button>
           )

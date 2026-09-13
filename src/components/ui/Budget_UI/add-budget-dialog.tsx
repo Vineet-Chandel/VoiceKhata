@@ -16,15 +16,16 @@ import {
 } from "@/components/ui/Dashboard_UI/select"
 import { useAppMode } from "@/context/AppModeContext"
 import { getCategories } from "@/lib/categories"
+import { useLanguage } from "@/context/LanguageContext"
 
 
 
-const DURATIONS = [
-  { value: "monthly",  label: "Monthly"            },
-  { value: "3months",  label: "3 Months"           },
-  { value: "6months",  label: "6 Months"           },
-  { value: "yearly",   label: "Yearly"             },
-  { value: "timeless", label: "Timeless"           },
+const DURATIONS = (t: (key: string) => string) => [
+  { value: "monthly",  label: t("budget.monthly")       },
+  { value: "3months",  label: t("budget.3months")       },
+  { value: "6months",  label: t("budget.6months")       },
+  { value: "yearly",   label: t("budget.yearly")        },
+  { value: "timeless", label: t("budget.timeless")      },
 ]
 
 interface Props {
@@ -33,6 +34,7 @@ interface Props {
 }
 
 export function AddBudgetDialog({ onAdd, existingCategories = [] }: Props) {
+  const { t } = useLanguage()
   const { appMode } = useAppMode()
   const BASE_CATEGORIES = getCategories(appMode)
   const [open,       setOpen]       = React.useState(false)
@@ -73,20 +75,20 @@ export function AddBudgetDialog({ onAdd, existingCategories = [] }: Props) {
   return (
     <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) reset() }}>
       <DialogTrigger asChild>
-        <Button size="sm"><IconPlus className="size-4 mr-1" />Set Budget</Button>
+        <Button size="sm" className="cursor-pointer"><IconPlus className="size-4 mr-1" />{t("budget.setBudget")}</Button>
       </DialogTrigger>
 
       <DialogContent className="sm:max-w-[380px]">
         <DialogHeader>
-          <DialogTitle>Set Budget</DialogTitle>
-          <DialogDescription>Set a spending limit for a category.</DialogDescription>
+          <DialogTitle>{t("budget.setBudget")}</DialogTitle>
+          <DialogDescription>{t("budget.setSpendingLimit")}</DialogDescription>
         </DialogHeader>
 
         <div className="flex flex-col gap-4 py-1">
 
           {/* Category */}
           <div className="flex flex-col gap-1.5">
-            <Label>Category</Label>
+            <Label>{t("tx.category")}</Label>
             <Select
               value={category}
               onValueChange={(v) => {
@@ -96,7 +98,7 @@ export function AddBudgetDialog({ onAdd, existingCategories = [] }: Props) {
               }}
             >
               <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select category" />
+                <SelectValue placeholder={t("tx.category")} />
               </SelectTrigger>
               <SelectContent position="popper" sideOffset={4}>
 
@@ -104,7 +106,7 @@ export function AddBudgetDialog({ onAdd, existingCategories = [] }: Props) {
                 {activeCats.length > 0 && (
                   <>
                     <div className="px-2 py-1 text-[10px] text-muted-foreground uppercase tracking-wide">
-                      Already budgeted
+                      {t("budget.alreadyBudgeted")}
                     </div>
                     {activeCats.map((c) => (
                       <SelectItem key={c} value={c}>{c}</SelectItem>
@@ -117,7 +119,7 @@ export function AddBudgetDialog({ onAdd, existingCategories = [] }: Props) {
                 {pinnedCats.length > 0 && (
                   <>
                     <div className="px-2 py-1 text-[10px] text-muted-foreground uppercase tracking-wide">
-                      Your categories
+                      {t("budget.yourCategories")}
                     </div>
                     {pinnedCats.map((c) => (
                       <SelectItem key={c} value={c}>{c}</SelectItem>
@@ -132,7 +134,7 @@ export function AddBudgetDialog({ onAdd, existingCategories = [] }: Props) {
                 ))}
 
                 <SelectSeparator />
-                <SelectItem value="Other">Other (custom name)</SelectItem>
+                <SelectItem value="Other">{t("budget.otherCustomName")}</SelectItem>
               </SelectContent>
             </Select>
             {errors.category && <p className="text-xs text-red-400">{errors.category}</p>}
@@ -141,7 +143,7 @@ export function AddBudgetDialog({ onAdd, existingCategories = [] }: Props) {
           {/* Custom name — only when Other */}
           {isOther && (
             <div className="flex flex-col gap-1.5">
-              <Label>Category Name</Label>
+              <Label>{t("budget.categoryName")}</Label>
               <Input
                 placeholder="e.g. Gym, Pet Care, Travel…"
                 value={customName}
@@ -154,7 +156,7 @@ export function AddBudgetDialog({ onAdd, existingCategories = [] }: Props) {
 
           {/* Amount */}
           <div className="flex flex-col gap-1.5">
-            <Label>Spending Limit (₹)</Label>
+            <Label>{t("budget.spendingLimit")}</Label>
             <Input
               type="number"
               placeholder="e.g. 5000"
@@ -166,23 +168,23 @@ export function AddBudgetDialog({ onAdd, existingCategories = [] }: Props) {
 
           {/* Duration */}
           <div className="flex flex-col gap-1.5">
-            <Label>Duration</Label>
+            <Label>{t("budget.duration")}</Label>
             <Select value={duration} onValueChange={setDuration}>
               <SelectTrigger className="w-full">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent position="popper" sideOffset={4}>
-                {DURATIONS.map((d) => (
+                {DURATIONS(t).map((d) => (
                   <SelectItem key={d.value} value={d.value}>{d.label}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
             <p className="text-[11px] text-muted-foreground">
               {duration === "timeless"
-                ? "Budget applies until manually deleted."
+                ? t("budget.timelessDesc")
                 : duration === "monthly"
-                  ? "Budget resets each month."
-                  : `Budget spans ${duration.replace("months", "")} months from creation.`}
+                  ? t("budget.monthlyDesc")
+                  : `${t("budget.spansMonths")} ${duration.replace("months", "")} ${t("budget.fromCreation")}`}
             </p>
           </div>
 
@@ -190,8 +192,8 @@ export function AddBudgetDialog({ onAdd, existingCategories = [] }: Props) {
         </div>
 
         <DialogFooter showCloseButton>
-          <Button onClick={handleSubmit} disabled={saving}>
-            {saving ? "Saving…" : "Set Budget"}
+          <Button onClick={handleSubmit} disabled={saving} className="cursor-pointer">
+            {saving ? t("common.saving") : t("budget.setBudget")}
           </Button>
         </DialogFooter>
       </DialogContent>

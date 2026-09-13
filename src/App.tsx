@@ -5,6 +5,7 @@ import ProtectedRoute from "@/routes/ProtectedRoute";
 import { AuthProvider } from "@/context/AuthContext";
 import { FinancialProvider } from "@/context/FinancialContext";
 import { AppModeProvider } from "@/context/AppModeContext";
+import { LanguageProvider } from "@/context/LanguageContext";
 import { ChatStoreProvider } from "@/components/hooks/use-chat-store";
 
 // Lazy-load other pages so their heavy dependencies don't block the root landing page
@@ -56,13 +57,15 @@ export default function App() {
               path="/dashboard"
               element={
                 <ProtectedRoute>
-                  <AppModeProvider>
-                    <FinancialProvider>
-                      <ChatStoreProvider>
-                        <DashboardPage />
-                      </ChatStoreProvider>
-                    </FinancialProvider>
-                  </AppModeProvider>
+                  <LanguageProvider>
+                    <AppModeProvider>
+                      <FinancialProvider>
+                        <ChatStoreProvider>
+                          <DashboardPage />
+                        </ChatStoreProvider>
+                      </FinancialProvider>
+                    </AppModeProvider>
+                  </LanguageProvider>
                 </ProtectedRoute>
               }
             >

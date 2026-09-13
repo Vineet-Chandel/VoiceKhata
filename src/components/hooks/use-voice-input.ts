@@ -118,17 +118,21 @@ export function useVoiceInput(options?: UseVoiceInputOptions) {
 
     let finalText = spokenTranscriptRef.current.trim()
 
-    // Dual pipeline: If WebSpeech produced no text OR failed, fall back to Whisper on recorded audio blob
-    if (!finalText && audioChunksRef.current.length > 0) {
+    // Always prefer Whisper on recorded audio blob for highest accuracy (especially for Hinglish)
+    if (audioChunksRef.current.length > 0) {
       try {
         const mimeType = mediaRecorderRef.current?.mimeType || audioChunksRef.current[0]?.type || "audio/webm"
         const audioBlob = new Blob(audioChunksRef.current, { type: mimeType })
 
         if (audioBlob.size > 2000) {
-          console.log("[useVoiceInput] WebSpeech produced no text. Transcribing audio blob via Whisper...")
+          console.log("[useVoiceInput] Transcribing audio blob via Whisper for highest accuracy...")
           const whisperResult = await transcribeAudioBlob(audioBlob)
           if (whisperResult && whisperResult.trim()) {
             finalText = whisperResult.trim()
+            console.log("[useVoiceInput] Using Whisper transcript:", finalText)
+          } else {
+            // Whisper returned empty (e.g. rejected Urdu/Latin gibberish) - keep WebSpeech text
+            console.log("[useVoiceInput] Whisper returned empty, using WebSpeech transcript:", finalText)
           }
         }
       } catch (err) {

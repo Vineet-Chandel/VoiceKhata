@@ -13,12 +13,14 @@ import { RecurringOverview } from "@/components/ui/Recurring_UI/recurring-overvi
 import { RecurringTable } from "@/components/ui/Recurring_UI/recurring-table"
 import { AddRecurringDialog } from "@/components/ui/Recurring_UI/add-recurring-dialog"
 import { useAppMode } from "@/context/AppModeContext"
+import { useLanguage } from "@/context/LanguageContext"
 
 type TransactionInput = Omit<Transaction, "id" | "firebase_uid" | "created_at">
 type TransactionUpdate = Omit<Transaction, "id" | "firebase_uid" | "created_at">
 
 export default function TransactionsPage() {
   const { appMode } = useAppMode()
+  const { t } = useLanguage()
   const { transactions, loading, addTransaction, updateTransaction, deleteTransaction } =
     useTransactions()
 
@@ -90,11 +92,11 @@ export default function TransactionsPage() {
 
         <div className="flex items-center justify-between px-4 lg:px-6">
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight">Transactions</h1>
+            <h1 className="text-2xl font-semibold tracking-tight">{t("nav.transaction")}</h1>
             <p className="text-sm text-text-secondary mt-0.5">
               {loading
-                ? "Loading..."
-                : `${filtered.length} transaction${filtered.length !== 1 ? "s" : ""} found | Mode: ${appMode}`}
+                ? t("common.loading")
+                : `${filtered.length} ${t("tx.transactionsFound")} | ${t("tx.mode")}: ${appMode === "BUSINESS" ? t("common.business") : t("common.personal")}`}
             </p>
           </div>
           <AddTransactionDialog
@@ -110,7 +112,7 @@ export default function TransactionsPage() {
 
         {loading ? (
           <div className="flex items-center justify-center py-20 text-muted-foreground text-sm">
-            Loading transactions...
+            {t("common.loading")}
           </div>
         ) : (
           <DataTable
@@ -126,11 +128,11 @@ export default function TransactionsPage() {
         <div className="flex flex-col gap-4 pt-6 md:gap-6 md:pt-8 border-t border-border mt-4 pb-20">
           <div className="flex items-center justify-between px-4 lg:px-6">
             <div>
-              <h2 className="text-2xl font-semibold tracking-tight">AutoFlow</h2>
+              <h2 className="text-2xl font-semibold tracking-tight">{t("tx.autoflow")}</h2>
               <p className="text-sm text-muted-foreground mt-0.5">
                 {recurringLoading
-                  ? "Loading..."
-                  : `${recurring.length} recurring rule${recurring.length !== 1 ? "s" : ""}`}
+                  ? t("common.loading")
+                  : `${recurring.length} ${t("tx.recurringRules")}`}
               </p>
             </div>
             <AddRecurringDialog onAdd={addRecurring} />
@@ -138,7 +140,7 @@ export default function TransactionsPage() {
 
           {recurringLoading ? (
             <div className="flex items-center justify-center py-20 text-muted-foreground text-sm">
-              Loading autopay rules…
+              {t("tx.loadingRules")}
             </div>
           ) : (
             <>

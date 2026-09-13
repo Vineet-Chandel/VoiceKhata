@@ -32,6 +32,7 @@ import { MonthPicker } from "@/components/ui/Reports_UI/month-picker"
 import { getProgressColor, isBudgetActiveForMonth, computeBudgetSpent } from "@/lib/budget-utils"
 import { getScopedSupabase, supabase } from "@/lib/supabase"
 import type { Budget } from "@/components/hooks/use-budgets"
+import { useLanguage } from "@/context/LanguageContext"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -360,6 +361,7 @@ function StatItem({ label, value, valueClass = "" }: { label: string; value: str
 
 export default function ReportsPage() {
   const { user } = useAuth()
+  const { t } = useLanguage()
   const { transactions, loading: txLoading } = useTransactions()
   const [month, setMonth] = React.useState(getCurrentMonth())
   const [reportsData, setReportsData] = React.useState<ReportsData>({
@@ -646,9 +648,9 @@ export default function ReportsPage() {
           {/* Header */}
           <div className="flex items-center justify-between px-4 lg:px-6">
             <div>
-              <h1 className="text-2xl font-semibold tracking-tight">Reports</h1>
+              <h1 className="text-2xl font-semibold tracking-tight">{t("reports.title")}</h1>
               <p className="text-sm text-muted-foreground mt-0.5">
-                Detailed analytics across cash flow, budgets, savings, and investments
+                {t("reports.subtitle")}
               </p>
             </div>
             <MonthPicker value={month} onChange={setMonth} />
@@ -656,7 +658,7 @@ export default function ReportsPage() {
 
           {loading ? (
             <div className="flex items-center justify-center py-20 text-muted-foreground text-sm">
-              Loading reports...
+              {t("reports.loading")}
             </div>
           ) : (
             <>
@@ -667,19 +669,19 @@ export default function ReportsPage() {
                * collapses to 4 cols on md, 2 cols on sm.
                */}
               <div className="grid grid-cols-2 gap-3 px-4 lg:px-6 md:grid-cols-4 xl:grid-cols-4">
-                <KpiCard label="Total Income" value={fmt(monthIncome)} change={momDelta(monthIncome, prevIncome)} positive trend={incomeTrend} />
-                <KpiCard label="Total Expenses" value={fmt(monthExpense)} change={momDelta(monthExpense, prevExpense)} positive={false} trend={expenseTrend} />
-                <KpiCard label="Net Savings" value={fmt(monthNet)} change={momDelta(monthNet, prevNet)} positive={monthNet >= 0} trend={netTrend} />
-                <KpiCard label="Savings Rate" value={`${monthSavingsRate.toFixed(1)}%`} positive={monthSavingsRate >= 20} sub="20% = healthy baseline" />
-                <KpiCard label="Expense Ratio" value={`${expenseRatio.toFixed(1)}%`} positive={expenseRatio < 50} sub="income consumed" />
-                <KpiCard label="Avg Transaction" value={fmt(avgTx)} sub={`Median ${fmt(medianTx)}`} />
-                <KpiCard label="Transactions" value={String(monthTx.length)} sub={`${monthTx.filter(t => t.type === "Debit").length} debits · ${monthTx.filter(t => t.type === "Credit").length} credits`} />
-                <KpiCard label="Budget Used" value={`${budgetUtilPct.toFixed(1)}%`} positive={budgetUtilPct <= 80} sub={`${fmt(budgetSpent)} of ${fmt(budgetTotal)}`} />
+                <KpiCard label={t("reports.totalIncome")} value={fmt(monthIncome)} change={momDelta(monthIncome, prevIncome)} positive trend={incomeTrend} />
+                <KpiCard label={t("reports.totalExpenses")} value={fmt(monthExpense)} change={momDelta(monthExpense, prevExpense)} positive={false} trend={expenseTrend} />
+                <KpiCard label={t("reports.netSavings")} value={fmt(monthNet)} change={momDelta(monthNet, prevNet)} positive={monthNet >= 0} trend={netTrend} />
+                <KpiCard label={t("reports.savingsRate")} value={`${monthSavingsRate.toFixed(1)}%`} positive={monthSavingsRate >= 20} sub="20% = healthy baseline" />
+                <KpiCard label={t("reports.expenseRatio")} value={`${expenseRatio.toFixed(1)}%`} positive={expenseRatio < 50} sub="income consumed" />
+                <KpiCard label={t("reports.avgTx")} value={fmt(avgTx)} sub={`Median ${fmt(medianTx)}`} />
+                <KpiCard label={t("reports.transactions")} value={String(monthTx.length)} sub={`${monthTx.filter(t => t.type === "Debit").length} debits · ${monthTx.filter(t => t.type === "Credit").length} credits`} />
+                <KpiCard label={t("reports.budgetUsed")} value={`${budgetUtilPct.toFixed(1)}%`} positive={budgetUtilPct <= 80} sub={`${fmt(budgetSpent)} of ${fmt(budgetTotal)}`} />
               </div>
 
               {/* ── Row 2: Monthly overview + Cash flow ── */}
               <div className="grid grid-cols-1 gap-4 px-4 lg:px-6 xl:grid-cols-2">
-                <SurfaceCard title="Monthly Overview" subtitle="12-month income vs expense · net savings line">
+                <SurfaceCard title={t("reports.monthlyOverview")} subtitle="12-month income vs expense · net savings line">
                   <div className="h-[260px]">
                     <ResponsiveContainer width="100%" height="100%">
                       <ComposedChart data={monthlyOverview} barGap={4} barCategoryGap="30%" style={{ backgroundColor: "transparent" }}>
@@ -698,17 +700,17 @@ export default function ReportsPage() {
                         <YAxis tick={{ fill: "#fff", fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={(v) => `₹${v >= 1000 ? `${(v / 1000).toFixed(0)}k` : v}`} />
                         <Tooltip content={<ChartTooltip />} cursor={{ fill: "transparent" }} />
                         <Legend wrapperStyle={{ color: "#9ca3af", fontSize: 12 }} />
-                        <Bar dataKey="income" name="Income" fill="url(#incG)" radius={[6, 6, 0, 0]} />
-                        <Bar dataKey="expense" name="Expense" fill="url(#expG)" radius={[6, 6, 0, 0]} />
-                        <Line type="monotone" dataKey="savings" name="Net" stroke="#34d399" strokeWidth={2} dot={false} />
+                        <Bar dataKey="income" name={t("reports.income")} fill="url(#incG)" radius={[6, 6, 0, 0]} />
+                        <Bar dataKey="expense" name={t("reports.expense")} fill="url(#expG)" radius={[6, 6, 0, 0]} />
+                        <Line type="monotone" dataKey="savings" name={t("reports.netSavings")} stroke="#34d399" strokeWidth={2} dot={false} />
                       </ComposedChart>
                     </ResponsiveContainer>
                   </div>
                 </SurfaceCard>
 
-                <SurfaceCard title="Cash Flow Timeline" subtitle="Daily running balance · expense events highlighted">
+                <SurfaceCard title={t("reports.cashFlowTimeline")} subtitle="Daily running balance · expense events highlighted">
                   {cashFlow.series.length === 0 ? (
-                    <div className="flex items-center justify-center h-[260px] text-sm text-muted-foreground">No transactions this month</div>
+                    <div className="flex items-center justify-center h-[260px] text-sm text-muted-foreground">{t("reports.noTransactions")}</div>
                   ) : (
                     <div className="h-[260px]">
                       <ResponsiveContainer width="100%" height="100%">
@@ -717,8 +719,8 @@ export default function ReportsPage() {
                           <XAxis dataKey="day" tick={{ fill: "#fff", fontSize: 11 }} axisLine={false} tickLine={false} />
                           <YAxis tick={{ fill: "#fff", fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={(v) => `₹${v >= 1000 ? `${(v / 1000).toFixed(0)}k` : v}`} />
                           <Tooltip content={<ChartTooltip />} cursor={{ fill: "transparent" }} />
-                          <Line data={cashFlow.series} type="monotone" dataKey="balance" name="Balance" stroke="#60a5fa" strokeWidth={2} dot={false} />
-                          <Scatter data={cashFlow.expensePoints} dataKey="balance" name="Expense" fill="#f87171" />
+                          <Line data={cashFlow.series} type="monotone" dataKey="balance" name={t("reports.balance")} stroke="#60a5fa" strokeWidth={2} dot={false} />
+                          <Scatter data={cashFlow.expensePoints} dataKey="balance" name={t("reports.expense")} fill="#f87171" />
                         </ComposedChart>
                       </ResponsiveContainer>
                     </div>
@@ -728,7 +730,7 @@ export default function ReportsPage() {
 
               {/* ── Row 3: Health score + Velocity + Income quality ── */}
               <div className="grid grid-cols-1 gap-4 px-4 lg:px-6 xl:grid-cols-3">
-                <SurfaceCard title="Financial Health Score" subtitle="Savings (30%) · Expense ctrl (20%) · Budget (20%) · Diversity (15%) · Stability (15%)" icon={Zap}>
+                <SurfaceCard title={t("reports.financialHealth")} subtitle="Savings (30%) · Expense ctrl (20%) · Budget (20%) · Diversity (15%) · Stability (15%)" icon={Zap}>
                   <div className="h-[180px]">
                     <ResponsiveContainer width="100%" height="100%">
                       <RadialBarChart innerRadius="65%" outerRadius="95%" data={healthScoreData} startAngle={180} endAngle={0} style={{ backgroundColor: "transparent" }}>
@@ -741,11 +743,11 @@ export default function ReportsPage() {
                   </div>
                   <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-muted-foreground mt-1">
                     {[
-                      ["Savings rate", healthScores.savingsRateScore],
-                      ["Expense ctrl", healthScores.expenseControlScore],
-                      ["Budget use", healthScores.budgetUtilScore],
-                      ["Diversity", healthScores.diversityScore],
-                      ["Income stability", healthScores.incomeStabilityScore],
+                      [t("reports.savingsRate"), healthScores.savingsRateScore],
+                      [t("reports.expenseRatio"), healthScores.expenseControlScore],
+                      [t("reports.budgetUsed"), healthScores.budgetUtilScore],
+                      [t("reports.category"), healthScores.diversityScore],
+                      [t("reports.stability"), healthScores.incomeStabilityScore],
                     ].map(([label, score]) => (
                       <div key={label as string} className="flex justify-between">
                         <span>{label}</span>
@@ -756,34 +758,34 @@ export default function ReportsPage() {
                 </SurfaceCard>
 
                 {/* CHANGE: stat rows now use StatItem for consistent hover/active feedback */}
-                <SurfaceCard title="Spending Velocity" subtitle="Daily burn rate and projected month-end">
+                <SurfaceCard title={t("reports.velocity")} subtitle="Daily burn rate and projected month-end">
                   <div className="space-y-0.5">
-                    <StatItem label="Burn rate" value={`${fmt(velocity.burnRate)} / day`} />
-                    <StatItem label="Projected month-end" value={fmt(velocity.projectedEnd)} />
-                    <StatItem label="Days with spend" value={String(velocity.daysWithSpend)} />
-                    <StatItem label="Spend-free days" value={String(velocity.daysWithoutSpend)} />
-                    <StatItem label="Largest single day" value={`${fmt(velocity.largestDay.amount)} (${velocity.largestDay.date})`} />
-                    <StatItem label="Median transaction" value={fmt(medianTx)} />
+                    <StatItem label={t("reports.burnRate")} value={`${fmt(velocity.burnRate)} / day`} />
+                    <StatItem label={t("reports.projectedEnd")} value={fmt(velocity.projectedEnd)} />
+                    <StatItem label={t("reports.daysWithSpend")} value={String(velocity.daysWithSpend)} />
+                    <StatItem label={t("reports.spendFreeDays")} value={String(velocity.daysWithoutSpend)} />
+                    <StatItem label={t("reports.largestSingleDay")} value={`${fmt(velocity.largestDay.amount)} (${velocity.largestDay.date})`} />
+                    <StatItem label={t("reports.medianTransaction")} value={fmt(medianTx)} />
                   </div>
                 </SurfaceCard>
 
-                <SurfaceCard title="Income Quality" subtitle="Source concentration and consistency">
+                <SurfaceCard title={t("reports.incomeQuality")} subtitle="Source concentration and consistency">
                   <div className="space-y-0.5">
-                    <StatItem label="Unique sources" value={String(new Set(monthTx.filter(t => t.type === "Credit").map(t => t.transaction)).size)} />
-                    <StatItem label="Largest credit" value={fmt(Math.max(0, ...monthTx.filter(t => t.type === "Credit").map(t => toNumber(t.amount))))} />
-                    <StatItem label="Stability (6mo)" value={incomeStabilityLabel} valueClass={incomeCv < 0.15 ? "text-emerald-400" : incomeCv < 0.35 ? "text-yellow-400" : "text-red-400"} />
-                    <StatItem label="Expense ratio" value={`${expenseRatio.toFixed(1)}%`} />
-                    <StatItem label="Net retained" value={`${monthSavingsRate.toFixed(1)}%`} />
-                    <StatItem label="Monthly SIP" value={fmt(investmentStats.monthlySip)} />
+                    <StatItem label={t("reports.uniqueSources")} value={String(new Set(monthTx.filter(t => t.type === "Credit").map(t => t.transaction)).size)} />
+                    <StatItem label={t("reports.largestCredit")} value={fmt(Math.max(0, ...monthTx.filter(t => t.type === "Credit").map(t => toNumber(t.amount))))} />
+                    <StatItem label={t("reports.stability")} value={incomeStabilityLabel} valueClass={incomeCv < 0.15 ? "text-emerald-400" : incomeCv < 0.35 ? "text-yellow-400" : "text-red-400"} />
+                    <StatItem label={t("reports.expenseRatio")} value={`${expenseRatio.toFixed(1)}%`} />
+                    <StatItem label={t("reports.netRetained")} value={`${monthSavingsRate.toFixed(1)}%`} />
+                    <StatItem label={t("reports.monthlySip")} value={fmt(investmentStats.monthlySip)} />
                   </div>
                 </SurfaceCard>
               </div>
 
               {/* ── Row 4: Category breakdown + Budget utilisation ── */}
               <div className="grid grid-cols-1 gap-4 px-4 lg:px-6 xl:grid-cols-2">
-                <SurfaceCard title="Category Breakdown" subtitle="Donut + current vs previous comparison">
+                <SurfaceCard title={t("reports.categoryBreakdown")} subtitle="Donut + current vs previous comparison">
                   {categoryDonut.length === 0 ? (
-                    <div className="flex items-center justify-center h-64 text-sm text-muted-foreground">No expense data for this month</div>
+                    <div className="flex items-center justify-center h-64 text-sm text-muted-foreground">{t("reports.noExpenseData")}</div>
                   ) : (
                     <>
                       <div className="grid grid-cols-2 gap-3">
@@ -812,8 +814,8 @@ export default function ReportsPage() {
                               <XAxis type="number" tick={{ fill: "#dcdcdc", fontSize: 10 }} axisLine={false} tickLine={false} tickFormatter={(v) => v >= 1000 ? `${(v / 1000).toFixed(0)}k` : String(v)} />
                               <YAxis type="category" dataKey="category" width={80} tick={{ fill: "#dcdcdc", fontSize: 10 }} axisLine={false} tickLine={false} />
                               <Tooltip content={<ChartTooltip />} cursor={false} />
-                              <Bar dataKey="current" name="Current" fill="url(#expenseGradient)" radius={[0, 6, 6, 0]} barSize={14} />
-                              <Bar dataKey="previous" name="Previous" fill="rgba(156,163,175,0.4)" radius={[0, 6, 6, 0]} barSize={14} />
+                              <Bar dataKey="current" name={t("reports.current")} fill="url(#expenseGradient)" radius={[0, 6, 6, 0]} barSize={14} />
+                              <Bar dataKey="previous" name={t("reports.previous")} fill="rgba(156,163,175,0.4)" radius={[0, 6, 6, 0]} barSize={14} />
                             </BarChart>
                           </ResponsiveContainer>
                         </div>
@@ -823,10 +825,10 @@ export default function ReportsPage() {
                         <table className="w-full text-xs">
                           <thead className="text-muted-foreground sticky top-0 bg-[var(--surface-card)]">
                             <tr>
-                              <th className="text-left py-1.5">Category</th>
-                              <th className="text-right py-1.5">Current</th>
-                              <th className="text-right py-1.5">Previous</th>
-                              <th className="text-right py-1.5">MoM</th>
+                              <th className="text-left py-1.5">{t("reports.category")}</th>
+                              <th className="text-right py-1.5">{t("reports.current")}</th>
+                              <th className="text-right py-1.5">{t("reports.previous")}</th>
+                              <th className="text-right py-1.5">{t("reports.mom")}</th>
                             </tr>
                           </thead>
                           <tbody>
@@ -847,9 +849,9 @@ export default function ReportsPage() {
                   )}
                 </SurfaceCard>
 
-                <SurfaceCard title="Budget Utilisation" subtitle="Allocated vs spent vs remaining">
+                <SurfaceCard title={t("reports.budgetUtilisation")} subtitle="Allocated vs spent vs remaining">
                   {budgetRows.length === 0 ? (
-                    <p className="text-sm text-muted-foreground">No active budgets for this month.</p>
+                    <p className="text-sm text-muted-foreground">{t("reports.noBudgets")}</p>
                   ) : (
                     /* CHANGE: scrollbar now invisible via GlobalScrollbarStyle */
                     <div className="space-y-2 max-h-72 overflow-auto">
@@ -860,15 +862,15 @@ export default function ReportsPage() {
                   )}
                   <div className="mt-3 pt-3 border-t border-white/5 grid grid-cols-3 gap-2 text-xs">
                     <div className="text-center">
-                      <p className="text-muted-foreground mb-0.5">Allocated</p>
+                      <p className="text-muted-foreground mb-0.5">{t("reports.allocated")}</p>
                       <p className="font-semibold text-text-primary">{fmt(budgetTotal)}</p>
                     </div>
                     <div className="text-center">
-                      <p className="text-muted-foreground mb-0.5">Spent</p>
+                      <p className="text-muted-foreground mb-0.5">{t("reports.spent")}</p>
                       <p className="font-semibold text-red-400">{fmt(budgetSpent)}</p>
                     </div>
                     <div className="text-center">
-                      <p className="text-muted-foreground mb-0.5">Remaining</p>
+                      <p className="text-muted-foreground mb-0.5">{t("reports.remaining")}</p>
                       <p className="font-semibold text-emerald-400">{fmt(budgetTotal - budgetSpent)}</p>
                     </div>
                   </div>
@@ -877,7 +879,7 @@ export default function ReportsPage() {
 
               {/* ── Row 5: Savings projection + Goals ── */}
               <div className="grid grid-cols-1 gap-4 px-4 lg:px-6 xl:grid-cols-2">
-                <SurfaceCard title="Savings Projection" subtitle={`12-month at 6% p.a. · monthly contribution ${fmt(projection.pmt)}`} icon={Target}>
+                <SurfaceCard title={t("reports.savingsProjection")} subtitle={`12-month at 6% p.a. · monthly contribution ${fmt(projection.pmt)}`} icon={Target}>
                   <div className="h-[240px]">
                     <ResponsiveContainer width="100%" height="100%">
                       <AreaChart data={projection.rows} style={{ backgroundColor: "transparent" }}>
@@ -903,9 +905,9 @@ export default function ReportsPage() {
                   </div>
                 </SurfaceCard>
 
-                <SurfaceCard title="Savings Goals" subtitle="Completion status and required daily savings" icon={Target}>
+                <SurfaceCard title={t("reports.savingsGoals")} subtitle="Completion status and required daily savings" icon={Target}>
                   {goalsStatus.length === 0 ? (
-                    <p className="text-sm text-muted-foreground">No savings goals found.</p>
+                    <p className="text-sm text-muted-foreground">{t("reports.noGoals")}</p>
                   ) : (
                     /* CHANGE: scrollbar now invisible */
                     <div className="space-y-2 max-h-[280px] overflow-auto">
@@ -941,28 +943,28 @@ export default function ReportsPage() {
 
               {/* ── Row 6: Investments + Recurring ── */}
               <div className="grid grid-cols-1 gap-4 px-4 lg:px-6 xl:grid-cols-2">
-                <SurfaceCard title="SIP & Investments" subtitle="Monthly SIP totals and holding-level P/L">
+                <SurfaceCard title={t("reports.sipInvestments")} subtitle="Monthly SIP totals and holding-level P/L">
                   <div className="flex items-center gap-6 text-sm mb-3">
                     <div>
-                      <p className="text-muted-foreground text-xs mb-0.5">Monthly SIP</p>
+                      <p className="text-muted-foreground text-xs mb-0.5">{t("reports.monthlySip")}</p>
                       <p className="font-semibold text-text-primary">{fmt(investmentStats.monthlySip)}</p>
                     </div>
                     <div>
-                      <p className="text-muted-foreground text-xs mb-0.5">Unrealised P/L</p>
+                      <p className="text-muted-foreground text-xs mb-0.5">{t("reports.unrealisedPnl")}</p>
                       <p className={`font-semibold ${investmentStats.totalPnl >= 0 ? "text-emerald-400" : "text-red-400"}`}>{fmt(investmentStats.totalPnl)}</p>
                     </div>
                   </div>
                   {investmentStats.rows.length === 0 ? (
-                    <p className="text-sm text-muted-foreground">No investments tracked.</p>
+                    <p className="text-sm text-muted-foreground">{t("reports.noInvestments")}</p>
                   ) : (
                     /* CHANGE: scrollbar now invisible */
                     <div className="max-h-48 overflow-auto">
                       <table className="w-full text-xs">
                         <thead className="text-muted-foreground sticky top-0 bg-[var(--surface-card)]">
                           <tr>
-                            <th className="text-left py-1.5">Holding</th>
-                            <th className="text-right py-1.5">Invested</th>
-                            <th className="text-right py-1.5">P/L</th>
+                            <th className="text-left py-1.5">{t("reports.holding")}</th>
+                            <th className="text-right py-1.5">{t("reports.invested")}</th>
+                            <th className="text-right py-1.5">{t("reports.pnl")}</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -979,28 +981,28 @@ export default function ReportsPage() {
                   )}
                 </SurfaceCard>
 
-                <SurfaceCard title="Recurring Panel" subtitle="Next runs, monthly committed, renewals in 7 days" icon={Repeat}>
+                <SurfaceCard title={t("reports.recurringPanel")} subtitle="Next runs, monthly committed, renewals in 7 days" icon={Repeat}>
                   <div className="flex items-center gap-6 text-sm mb-3">
                     <div>
-                      <p className="text-muted-foreground text-xs mb-0.5">Monthly committed</p>
+                      <p className="text-muted-foreground text-xs mb-0.5">{t("reports.monthlyCommitted")}</p>
                       <p className="font-semibold text-text-primary">{fmt(recurringPanel.committed)}</p>
                     </div>
                     <div>
-                      <p className="text-muted-foreground text-xs mb-0.5">Renewals in 7 days</p>
+                      <p className="text-muted-foreground text-xs mb-0.5">{t("reports.renewalsIn7Days")}</p>
                       <p className={`font-semibold ${recurringPanel.renewalsSoon.length > 0 ? "text-amber-400" : "text-text-primary"}`}>{recurringPanel.renewalsSoon.length}</p>
                     </div>
                   </div>
                   {reportsData.recurringTransactions.length === 0 ? (
-                    <p className="text-sm text-muted-foreground">No recurring transactions.</p>
+                    <p className="text-sm text-muted-foreground">{t("reports.noRecurring")}</p>
                   ) : (
                     /* CHANGE: scrollbar now invisible */
                     <div className="max-h-48 overflow-auto">
                       <table className="w-full text-xs">
                         <thead className="text-muted-foreground sticky top-0 bg-[var(--surface-card)]">
                           <tr>
-                            <th className="text-left py-1.5">Name</th>
-                            <th className="text-right py-1.5">Amount</th>
-                            <th className="text-right py-1.5">Next run</th>
+                            <th className="text-left py-1.5">{t("reports.name")}</th>
+                            <th className="text-right py-1.5">{t("reports.amount")}</th>
+                            <th className="text-right py-1.5">{t("reports.nextRun")}</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -1023,7 +1025,7 @@ export default function ReportsPage() {
 
               {/* ── Row 7: Merchant intelligence + Anomalies ── */}
               <div className="grid grid-cols-1 gap-4 px-4 lg:px-6 xl:grid-cols-2">
-                <SurfaceCard title="Merchant Intelligence" subtitle="Top merchants by hit count and category split" icon={Brain}>
+                <SurfaceCard title={t("reports.merchantIntelligence")} subtitle="Top merchants by hit count and category split" icon={Brain}>
                   <div className="grid grid-cols-2 gap-3">
                     <div className="space-y-0.5">
                       {merchantStats.topMerchants.map((m, idx) => (
@@ -1060,11 +1062,11 @@ export default function ReportsPage() {
                   </div>
                 </SurfaceCard>
 
-                <SurfaceCard title="Anomaly Flags" subtitle="Transactions > mean + 2σ per category" icon={AlertTriangle}>
+                <SurfaceCard title={t("reports.anomalyFlags")} subtitle="Transactions > mean + 2σ per category" icon={AlertTriangle}>
                   {anomalyFlags.length === 0 ? (
                     <div className="flex items-center gap-2 text-sm text-emerald-400">
                       <span>✓</span>
-                      <span>No anomalies detected for this month</span>
+                      <span>{t("reports.noAnomalies")}</span>
                     </div>
                   ) : (
                     /* CHANGE: scrollbar now invisible */
@@ -1072,10 +1074,10 @@ export default function ReportsPage() {
                       <table className="w-full text-xs">
                         <thead className="text-muted-foreground sticky top-0 bg-[var(--surface-card)]">
                           <tr>
-                            <th className="text-left py-1.5">Date</th>
-                            <th className="text-left py-1.5">Transaction</th>
-                            <th className="text-right py-1.5">Amount</th>
-                            <th className="text-right py-1.5">Threshold</th>
+                            <th className="text-left py-1.5">{t("reports.date")}</th>
+                            <th className="text-left py-1.5">{t("reports.transactions")}</th>
+                            <th className="text-right py-1.5">{t("reports.amount")}</th>
+                            <th className="text-right py-1.5">{t("reports.threshold")}</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -1096,14 +1098,14 @@ export default function ReportsPage() {
 
               {/* ── Row 8: YTD Summary ── */}
               <div className="px-4 lg:px-6">
-                <SurfaceCard title="Year-to-Date Summary" subtitle={`January – ${monthLabel(month)} · ${new Date().getFullYear()}`}>
+                <SurfaceCard title={t("reports.ytdSummary")} subtitle={`January – ${monthLabel(month)} · ${new Date().getFullYear()}`}>
                   <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-5 text-xs">
                     {[
-                      { label: "YTD Income", value: fmt(ytd.income), color: "text-emerald-400" },
-                      { label: "YTD Expense", value: fmt(ytd.expense), color: "text-red-400" },
-                      { label: "YTD Savings", value: fmt(ytd.savings), color: ytd.savings >= 0 ? "text-emerald-400" : "text-red-400" },
-                      { label: "YTD Rate", value: `${ytd.rate.toFixed(1)}%`, color: "text-text-primary" },
-                      { label: "Annual Goal", value: fmt(ytd.annualGoal), color: "text-text-primary" },
+                      { label: t("reports.ytdIncome"), value: fmt(ytd.income), color: "text-emerald-400" },
+                      { label: t("reports.ytdExpense"), value: fmt(ytd.expense), color: "text-red-400" },
+                      { label: t("reports.ytdSavings"), value: fmt(ytd.savings), color: ytd.savings >= 0 ? "text-emerald-400" : "text-red-400" },
+                      { label: t("reports.ytdRate"), value: `${ytd.rate.toFixed(1)}%`, color: "text-text-primary" },
+                      { label: t("reports.annualGoal"), value: fmt(ytd.annualGoal), color: "text-text-primary" },
                     ].map((item) => (
                       <div
                         key={item.label}
@@ -1121,17 +1123,17 @@ export default function ReportsPage() {
                   </div>
                   <div className="mt-3 grid grid-cols-1 gap-2 md:grid-cols-3 text-xs">
                     <div className="flex items-center justify-between border-b border-white/5 pb-1.5">
-                      <span className="text-muted-foreground">Best month</span>
+                      <span className="text-muted-foreground">{t("reports.bestMonth")}</span>
                       <span className="text-emerald-400 font-medium">{ytd.bestMonth.label} · {fmt(ytd.bestMonth.savings)}</span>
                     </div>
                     <div className="flex items-center justify-between border-b border-white/5 pb-1.5">
-                      <span className="text-muted-foreground">Worst month</span>
+                      <span className="text-muted-foreground">{t("reports.worstMonth")}</span>
                       <span className="text-red-400 font-medium">{ytd.worstMonth.label} · {fmt(ytd.worstMonth.savings)}</span>
                     </div>
                     <div className="flex items-center justify-between border-b border-white/5 pb-1.5">
-                      <span className="text-muted-foreground">Goal track</span>
+                      <span className="text-muted-foreground">{t("reports.goalTrack")}</span>
                       <span className={ytd.onTrack == null ? "text-muted-foreground" : ytd.onTrack ? "text-emerald-400" : "text-red-400"}>
-                        {ytd.onTrack == null ? "No goal set" : ytd.onTrack ? "✓ On track" : "⚠ Behind pace"}
+                        {ytd.onTrack == null ? t("reports.noGoalSet") : ytd.onTrack ? t("reports.onTrack") : t("reports.behindPace")}
                       </span>
                     </div>
                   </div>

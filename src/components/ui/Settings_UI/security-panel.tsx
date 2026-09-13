@@ -4,6 +4,7 @@
 import { Lock, LogOut, AlertTriangle, Check } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, FieldRow, PasswordInput, PasswordStrength, Toast, type StatusMsg } from "./settings-ui"
+import { useLanguage } from "@/context/LanguageContext"
 
 interface SecurityPanelProps {
     currentPassword: string
@@ -24,14 +25,16 @@ export function SecurityPanel({
     setCurrentPassword, setNewPassword, setConfirmPassword, setPasswordMsg,
     passwordSaving, passwordMsg, onSavePassword, onLogout,
 }: SecurityPanelProps) {
+    const { t } = useLanguage()
+
     return (
         <div className="space-y-4">
 
             {/* Change password */}
             <Card>
                 <div className="px-5 pt-5 pb-4 border-b border-border">
-                    <p className="text-sm font-semibold text-text-primary">Change Password</p>
-                    <p className="text-xs text-text-muted mt-1">Use a strong, unique password. Minimum 6 characters.</p>
+                    <p className="text-sm font-semibold text-text-primary">{t("settings.changePassword")}</p>
+                    <p className="text-xs text-text-muted mt-1">{t("settings.passwordHelp")}</p>
                 </div>
 
                 <div className="p-5 space-y-4">
@@ -41,24 +44,24 @@ export function SecurityPanel({
                         {/* Current Password */}
                         <div className="space-y-1.5">
                             <label className="text-xs font-semibold text-text-muted uppercase tracking-wider">
-                                Current Password
+                                {t("settings.currentPassword")}
                             </label>
                             <PasswordInput
                                 value={currentPassword}
                                 onChange={(v) => { setCurrentPassword(v); setPasswordMsg(null) }}
-                                placeholder="Enter current password"
+                                placeholder={t("settings.enterCurrentPassword")}
                             />
                         </div>
 
                         {/* New Password */}
                         <div className="space-y-1.5">
                             <label className="text-xs font-semibold text-text-muted uppercase tracking-wider">
-                                New Password
+                                {t("settings.newPassword")}
                             </label>
                             <PasswordInput
                                 value={newPassword}
                                 onChange={(v) => { setNewPassword(v); setPasswordMsg(null) }}
-                                placeholder="Enter new password"
+                                placeholder={t("settings.enterNewPassword")}
                             />
                             <PasswordStrength password={newPassword} />
                         </div>
@@ -66,23 +69,23 @@ export function SecurityPanel({
                         {/* Confirm Password */}
                         <div className="space-y-1.5 md:col-span-2">
                             <label className="text-xs font-semibold text-text-muted uppercase tracking-wider">
-                                Confirm New Password
+                                {t("settings.confirmPassword")}
                             </label>
                             <PasswordInput
                                 value={confirmPassword}
                                 onChange={(v) => { setConfirmPassword(v); setPasswordMsg(null) }}
-                                placeholder="Repeat new password"
+                                placeholder={t("settings.repeatNewPassword")}
                             />
 
                             {confirmPassword && newPassword !== confirmPassword && (
                                 <p className="text-[11px] text-text-muted flex items-center gap-1 mt-1">
-                                    <AlertTriangle className="size-3" /> Passwords don't match
+                                    <AlertTriangle className="size-3" /> {t("settings.passwordsDoNotMatch")}
                                 </p>
                             )}
 
                             {confirmPassword && newPassword === confirmPassword && newPassword.length >= 6 && (
                                 <p className="text-[11px] text-text-secondary flex items-center gap-1 mt-1">
-                                    <Check className="size-3" /> Passwords match
+                                    <Check className="size-3" /> {t("settings.passwordsMatch")}
                                 </p>
                             )}
                         </div>
@@ -95,8 +98,8 @@ export function SecurityPanel({
                             disabled={passwordSaving || !newPassword || !currentPassword}
                             className="cursor-pointer h-10 px-6 bg-text-primary text-bg-primary hover:opacity-90 border-0 font-semibold">
                             {passwordSaving
-                                ? <><span className="size-4 rounded-full border-2 border-bg-primary/20 border-t-bg-primary animate-spin mr-2" />Updating…</>
-                                : <><Lock className="size-4 mr-2" />Update Password</>
+                                ? <><span className="size-4 rounded-full border-2 border-bg-primary/20 border-t-bg-primary animate-spin mr-2" />{t("settings.updating")}</>
+                                : <><Lock className="size-4 mr-2" />{t("settings.updatePassword")}</>
                             }
                         </Button>
                         <Toast msg={passwordMsg} />
@@ -110,13 +113,13 @@ export function SecurityPanel({
                 <Card className="w-full">
                     <FieldRow
                         icon={LogOut}
-                        label="Sign Out"
-                        description="End your current session on this device."
+                        label={t("settings.signOut")}
+                        description={t("settings.signOutDesc")}
                     >
                         <Button variant="outline" onClick={onLogout}
                             className="cursor-pointer gap-2 h-10 bg-surface-secondary border-border
                 hover:bg-surface-secondary hover:border-border-secondary text-text-secondary w-full sm:w-auto">
-                            <LogOut className="size-4" /> Sign Out
+                            <LogOut className="size-4" /> {t("settings.signOut")}
                         </Button>
                     </FieldRow>
                 </Card>

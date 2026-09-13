@@ -8,6 +8,7 @@ import {
     DialogFooter, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog"
 import type { RecurringTransaction } from "@/components/hooks/use-recurring"
+import { useLanguage } from "@/context/LanguageContext"
 
 interface Props {
     recurring: RecurringTransaction
@@ -17,6 +18,7 @@ interface Props {
 }
 
 export function DeleteRecurringDialog({ recurring, open, onOpenChange, onConfirm }: Props) {
+    const { t } = useLanguage()
     const [deleting, setDeleting] = React.useState(false)
 
     const handleConfirm = async () => {
@@ -40,14 +42,14 @@ export function DeleteRecurringDialog({ recurring, open, onOpenChange, onConfirm
                             <IconAlertTriangle className="size-5 text-red-100" />
                         </div>
                         <div>
-                            <DialogTitle>Delete Autopay Rule</DialogTitle>
-                            <DialogDescription className="mt-0.5">This action cannot be undone.</DialogDescription>
+                            <DialogTitle>{t("form.deleteAutopayRule")}</DialogTitle>
+                            <DialogDescription className="mt-0.5">{t("form.cannotUndo")}</DialogDescription>
                         </div>
                     </div>
                 </DialogHeader>
 
                 <div className="rounded-lg border border-border bg-muted/40 px-4 py-3 text-sm">
-                    <p className="text-muted-foreground">You are about to permanently delete:</p>
+                    <p className="text-muted-foreground">{t("form.aboutToDelete")}</p>
                     <p className="mt-1 font-semibold text-foreground">{recurring.transaction}</p>
                     <p className="text-muted-foreground">
                         ₹{recurring.amount.toLocaleString("en-IN")} · {recurring.frequency} · {recurring.category}
@@ -56,7 +58,7 @@ export function DeleteRecurringDialog({ recurring, open, onOpenChange, onConfirm
 
                 <DialogFooter className="gap-2 sm:gap-2">
                     <Button variant="outline" onClick={() => onOpenChange(false)} disabled={deleting} className="cursor-pointer">
-                        Cancel
+                        {t("common.cancel")}
                     </Button>
                     <Button
                         variant="destructive"
@@ -64,7 +66,7 @@ export function DeleteRecurringDialog({ recurring, open, onOpenChange, onConfirm
                         disabled={deleting}
                         className="cursor-pointer bg-red-500/40 hover:bg-red-500/20 hover:text-text-primary"
                     >
-                        {deleting ? "Deleting..." : "Delete Autopay"}
+                        {deleting ? t("form.deleting") : t("form.deleteAutopay")}
                     </Button>
                 </DialogFooter>
             </DialogContent>

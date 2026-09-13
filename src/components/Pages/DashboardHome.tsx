@@ -16,6 +16,7 @@ import { Sparkles, ArrowRight, Mic } from "lucide-react"
 import { useAppMode } from "@/context/AppModeContext"
 import type { AppMode } from "@/context/AppModeContext"
 import { VoiceCaptureCard } from "@/components/ui/Dashboard_UI/voice-capture-card"
+import { useLanguage } from "@/context/LanguageContext"
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -168,12 +169,13 @@ function DashboardGreeting({ userName }: { userName: string }) {
   const [greeting, setGreeting] = useState("")
   const [note, setNote] = useState("")
   const [dateStr, setDateStr] = useState("")
+  const { t, language } = useLanguage()
 
   useEffect(() => {
     const now = new Date()
     
-    // Format date: "Thursday, 10 September"
-    const formattedDate = new Intl.DateTimeFormat("en-US", {
+    // Format date based on language
+    const formattedDate = new Intl.DateTimeFormat(language === "hi" ? "hi-IN" : "en-US", {
       weekday: "long",
       day: "numeric",
       month: "long"
@@ -183,21 +185,20 @@ function DashboardGreeting({ userName }: { userName: string }) {
 
     const hour = now.getHours()
     
-    // Determine greeting and premium note
     if (hour >= 5 && hour < 12) {
-      setGreeting("Good morning")
-      setNote("A fresh start to optimize your cash flow and track today's opportunities.")
+      setGreeting(t("home.greeting.morning"))
+      setNote(language === "hi" ? "आज के दिन की शुरुआत में अपने नकद प्रवाह को बेहतर बनाएं।" : "A fresh start to optimize your cash flow and track today's opportunities.")
     } else if (hour >= 12 && hour < 17) {
-      setGreeting("Good afternoon")
-      setNote("Mid-day check-in. A quick review ensures your ledgers stay perfectly balanced.")
+      setGreeting(t("home.greeting.afternoon"))
+      setNote(language === "hi" ? "दोपहर की जांच। एक त्वरित समीक्षा सुनिश्चित करती है कि आपके खाते सही रहें।" : "Mid-day check-in. A quick review ensures your ledgers stay perfectly balanced.")
     } else if (hour >= 17 && hour < 22) {
-      setGreeting("Good evening")
-      setNote("Wrapping up the day's transactions for a clear financial overview.")
+      setGreeting(t("home.greeting.evening"))
+      setNote(language === "hi" ? "दिन के लेन-देन का स्पष्ट वित्तीय अवलोकन।" : "Wrapping up the day's transactions for a clear financial overview.")
     } else {
-      setGreeting("Good night")
-      setNote("Rest well. Your financial data is securely tracked and ready for tomorrow.")
+      setGreeting(t("home.greeting.night"))
+      setNote(language === "hi" ? "आराम करें। आपका वित्तीय डेटा सुरक्षित है।" : "Rest well. Your financial data is securely tracked and ready for tomorrow.")
     }
-  }, [])
+  }, [language, t])
 
   const firstName = userName.split(" ")[0] || "User"
 
@@ -223,6 +224,7 @@ export default function DashboardHome() {
   const { budgets } = useBudgets()
   const { user } = useAuth()
   const { appMode } = useAppMode()
+  const { t, language } = useLanguage()
 
   const [carryForwardPrompt, setCarryForwardPrompt] = useState<{
     month: string
@@ -365,11 +367,11 @@ export default function DashboardHome() {
                   <div className="flex flex-col gap-1.5">
                     <div className="flex items-center gap-2">
                       <span className="text-[11px] font-bold uppercase tracking-wider text-blue-700 dark:text-blue-400 bg-blue-100/90 dark:bg-blue-500/10 px-2.5 py-0.5 rounded-full border border-blue-200/80 dark:border-blue-500/20">
-                        Add Transaction
+                        {t("home.addTransaction")}
                       </span>
                     </div>
                     <h3 className="text-lg font-semibold text-slate-900 dark:text-foreground tracking-tight">
-                      Speak → Review → Save
+                      {t("home.speakReviewSave")}
                     </h3>
                     <p className="text-xs sm:text-sm text-slate-600 dark:text-muted-foreground leading-relaxed">
                       Say what happened in Hindi, English, or Hinglish (e.g.{" "}
@@ -386,20 +388,20 @@ export default function DashboardHome() {
                 </div>
 
                 <div className="flex items-center gap-3 shrink-0">
-                  <button
-                    onClick={() => setShowInlineVoice(true)}
-                    className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-4 py-2.5 text-sm font-medium text-white shadow-md shadow-blue-600/20 hover:from-blue-700 hover:to-indigo-700 dark:shadow-blue-600/25 dark:hover:from-blue-500 dark:hover:to-indigo-500 transition-all active:scale-[0.98] cursor-pointer"
-                  >
-                    <Mic className="h-4 w-4" />
-                    Record by Voice
-                  </button>
-                  <Link
-                    to="/dashboard/voice-capture"
-                    className="flex items-center gap-1.5 rounded-xl border border-blue-200 bg-white text-blue-700 hover:bg-blue-50 hover:text-blue-800 shadow-xs dark:border-blue-500/30 dark:bg-blue-500/10 dark:text-blue-200 dark:hover:bg-blue-500/20 dark:hover:text-white px-3.5 py-2.5 text-sm font-medium transition-all"
-                  >
-                    Full View
-                    <ArrowRight className="h-3.5 w-3.5" />
-                  </Link>
+                    <button
+                      onClick={() => setShowInlineVoice(true)}
+                      className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-4 py-2.5 text-sm font-medium text-white shadow-md shadow-blue-600/20 hover:from-blue-700 hover:to-indigo-700 dark:shadow-blue-600/25 dark:hover:from-blue-500 dark:hover:to-indigo-500 transition-all active:scale-[0.98] cursor-pointer"
+                    >
+                      <Mic className="h-4 w-4" />
+                      {t("home.recordByVoice")}
+                    </button>
+                    <Link
+                      to="/dashboard/voice-capture"
+                      className="flex items-center gap-1.5 rounded-xl border border-blue-200 bg-white text-blue-700 hover:bg-blue-50 hover:text-blue-800 shadow-xs dark:border-blue-500/30 dark:bg-blue-500/10 dark:text-blue-200 dark:hover:bg-blue-500/20 dark:hover:text-white px-3.5 py-2.5 text-sm font-medium transition-all"
+                    >
+                      {t("home.fullView")}
+                      <ArrowRight className="h-3.5 w-3.5" />
+                    </Link>
                 </div>
               </div>
             </div>

@@ -15,8 +15,10 @@ import { Bot } from "lucide-react"
 import { createChat, saveMessages, generateChatTitle } from "@/lib/api-chat"
 import { ChatHistoryModal } from "@/components/ui/AIAssistant_UI/chat-history-modal"
 import type { Message } from "@/components/hooks/use-ai-chat"
+import { useLanguage } from "@/context/LanguageContext"
 
 export default function AIAssistantPage() {
+  const { t } = useLanguage()
   const { allTransactions, addTransaction } = useTransactions()
   const { allBudgets, addBudget } = useBudgets()
   const { user } = useAuth()
@@ -152,10 +154,10 @@ export default function AIAssistantPage() {
               <Bot size={15} className="text-violet-400" />
             </div>
             <div>
-              <h1 className="text-sm font-medium text-text-primary leading-tight">VoiceKhata AI</h1>
+              <h1 className="text-sm font-medium text-text-primary leading-tight">{t("ai.title")}</h1>
               <div className="flex items-center gap-1.5 mt-0.5">
                 <span className="size-1.5 rounded-full bg-emerald-400" />
-                <span className="text-[11px] text-white/35">Online</span>
+                <span className="text-[11px] text-white/35">{t("common.online")}</span>
               </div>
             </div>
           </div>
@@ -165,7 +167,7 @@ export default function AIAssistantPage() {
               onClick={handleClearChat}
               className="text-[11px] text-text-muted hover:text-text-secondary transition-colors"
             >
-              Clear chat
+              {t("ai.clearChat")}
             </button>
           )}
         </div>
@@ -175,13 +177,12 @@ export default function AIAssistantPage() {
           {messages.length === 0 ? (
             <div className="flex flex-col items-center justify-center flex-1 gap-7 px-4 py-8">
               <div className="text-center">
-                <p className="text-base font-medium text-text-primary">How can I help you today?</p>
+                <p className="text-base font-medium text-text-primary">{t("ai.howCanIHelp")}</p>
                 <p className="text-sm text-text-muted mt-1.5 leading-relaxed">
-                  Ask about your finances or say{" "}
+                  {t("ai.askPrompt")}{" "}
                   <span className="text-text-secondary bg-surface-secondary px-1.5 py-0.5 rounded text-xs font-mono">
                     I spent ₹500 on groceries
-                  </span>{" "}
-                  to log it instantly.
+                  </span>
                 </p>
               </div>
               <SuggestedPrompts onSelect={(msg) => sendMessage(msg, replyingTo ? { id: replyingTo.id, role: replyingTo.role, content: replyingTo.content } : undefined)} />

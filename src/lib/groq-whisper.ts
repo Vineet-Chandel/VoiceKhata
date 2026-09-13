@@ -27,7 +27,9 @@ export async function transcribeAudioBlob(blob: Blob): Promise<string> {
     formData.append("model", "whisper-large-v3-turbo")
     formData.append("response_format", "json")
     formData.append("temperature", "0")
-    formData.append("prompt", "₹, Rs, rupees, UPI, Cash, udhar, jama, khata, Ramesh, Suresh")
+    // Pure Devanagari prompt: signals to Whisper to output in Hindi script (not Urdu/Arabic)
+    formData.append("prompt", "रमेश ने पाँच सौ रुपये जमा किए। सुरेश को दो सौ रुपये दिए। उधार, खाता, रुपये, खर्च, जमा, लिए, दिए, यूपीआई, कैश।")
+    formData.append("language", "hi")
 
     const response = await fetch("https://api.groq.com/openai/v1/audio/transcriptions", {
       method: "POST",
@@ -46,8 +48,17 @@ export async function transcribeAudioBlob(blob: Blob): Promise<string> {
     const data = await response.json()
     const text = (data?.text || "").trim()
 
+    // Reject Urdu/Arabic script output — Whisper sometimes confuses Hindi with Urdu.
+    // Arabic Unicode block: \u0600-\u06FF. If majority of non-ASCII chars are Arabic, reject.
+    const arabicChars = (text.match(/[\u0600-\u06FF]/g) || []).length
+    const devanagariChars = (text.match(/[\u0900-\u097F]/g) || []).length
+    if (arabicChars > 0 && arabicChars >= devanagariChars) {
+      console.warn("[GroqWhisper] Rejected Urdu/Arabic script output, will use WebSpeech fallback:", text)
+      return ""
+    }
+
     // Filter out known Whisper silence hallucinations
-    const cleaned = text.toLowerCase().replace(/[^\w\s]/g, "").trim()
+    const cleaned = text.toLowerCase().replace(/[^\w\s\u0900-\u097F]/g, "").trim()
     const silenceStopwords = new Set([
       "the", "a", "an", "you", "so", "and", "or", "it", "to", "in", "is", "of",
       "bye", "goodbye", "thank you", "thanks", "thank you for watching", "subtitles by",

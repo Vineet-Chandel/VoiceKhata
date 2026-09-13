@@ -19,6 +19,7 @@ import { getUserProfile } from "@/firebase/user"
 import { hasCustomAvatar, getAvatarPublicUrl } from "@/lib/avatar"
 import { avatarEvents } from "@/lib/avatarEvents"
 import { useResolvedAvatar } from "@/components/hooks/use-resolved-avatar"
+import { useLanguage } from "@/context/LanguageContext"
 
 
 
@@ -26,6 +27,7 @@ import { useResolvedAvatar } from "@/components/hooks/use-resolved-avatar"
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { user } = useAuth()
   const avatar = useResolvedAvatar()
+  const { t } = useLanguage()
 
   const data = {
     user: {
@@ -34,18 +36,18 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       avatar,
     },
     navMain: [
-      { title: "Dashboard", url: "/dashboard", icon: IconDashboard },
-      { title: "Voice Capture", url: "/dashboard/voice-capture", icon: IconMicrophone },
-      { title: "Transaction", url: "/dashboard/transactions", icon: IconWallet },
-      { title: "Budget & Investment", url: "/dashboard/budget", icon: IconChartPie },
-      { title: "Reports", url: "/dashboard/reports", icon: IconReport },
-      { title: "AI Assistant", url: "/dashboard/ai-assistant", icon: IconRobot },
-      { title: "Money Growth", url: "/dashboard/growth", icon: IconFlame },
+      { title: t("nav.dashboard"),     url: "/dashboard",                icon: IconDashboard },
+      { title: t("nav.voiceCapture"),  url: "/dashboard/voice-capture",  icon: IconMicrophone },
+      { title: t("nav.transaction"),   url: "/dashboard/transactions",   icon: IconWallet },
+      { title: t("nav.budget"),        url: "/dashboard/budget",         icon: IconChartPie },
+      { title: t("nav.reports"),       url: "/dashboard/reports",        icon: IconReport },
+      { title: t("nav.aiAssistant"),   url: "/dashboard/ai-assistant",   icon: IconRobot },
+      { title: t("nav.moneyGrowth"),   url: "/dashboard/growth",         icon: IconFlame },
     ],
   }
 
   return (
-    <Sidebar collapsible="offcanvas" className="relative overflow-hidden" {...props}>
+    <Sidebar collapsible="icon" className="relative overflow-hidden" {...props}>
       {/* Premium Gradient Background Image Overlay */}
       <div 
         className="absolute inset-0 pointer-events-none z-0"

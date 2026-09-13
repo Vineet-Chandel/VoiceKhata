@@ -1,8 +1,10 @@
 import { Store, User } from "lucide-react";
 import { useAppMode } from "@/context/AppModeContext";
+import { useLanguage } from "@/context/LanguageContext";
 
 export function AppModeToggle() {
   const { appMode, setAppMode } = useAppMode();
+  const { t } = useLanguage();
 
   return (
     <div className="flex items-center gap-1 rounded-full border bg-muted/20 p-1">
@@ -15,7 +17,7 @@ export function AppModeToggle() {
         }`}
       >
         <Store className="h-3.5 w-3.5" />
-        Business
+        {t("common.business")}
       </button>
       <button
         onClick={() => setAppMode("PERSONAL")}
@@ -26,7 +28,7 @@ export function AppModeToggle() {
         }`}
       >
         <User className="h-3.5 w-3.5" />
-        Personal
+        {t("common.personal")}
       </button>
       <button
         onClick={() => setAppMode("COMBO")}

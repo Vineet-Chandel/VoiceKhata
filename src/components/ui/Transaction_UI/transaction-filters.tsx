@@ -20,6 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/Dashboard_UI/select"
+import { useLanguage } from "@/context/LanguageContext"
 
 export interface TransactionFilters {
   search: string
@@ -63,6 +64,8 @@ function filterDateClass(value: string) {
 }
 
 export function TransactionFiltersBar({ filters, onChange }: TransactionFiltersProps) {
+  const { t } = useLanguage()
+
   const update = (key: keyof TransactionFilters, value: string) => {
     onChange({ ...filters, [key]: value })
   }
@@ -98,7 +101,7 @@ export function TransactionFiltersBar({ filters, onChange }: TransactionFiltersP
       <div className="relative">
         <IconSearch className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
         <Input
-          placeholder="Search transactions..."
+          placeholder={t("tx.searchPlaceholder")}
           value={filters.search}
           onChange={(e) => update("search", e.target.value)}
           className="pl-9"
@@ -114,10 +117,10 @@ export function TransactionFiltersBar({ filters, onChange }: TransactionFiltersP
           onValueChange={(v) => update("category", v === "all" ? "" : v)}
         >
           <SelectTrigger size="sm" className={`w-[150px] ${activeClass(filters.category)}`}>
-            <SelectValue placeholder="Category" />
+            <SelectValue placeholder={t("tx.category")} />
           </SelectTrigger>
           <SelectContent position="popper" sideOffset={4}>
-            <SelectItem value="all">All Categories</SelectItem>
+            <SelectItem value="all">{t("tx.allCategories")}</SelectItem>
             {CATEGORIES.map((c) => (
               <SelectItem key={c} value={c}>{c}</SelectItem>
             ))}
@@ -130,12 +133,12 @@ export function TransactionFiltersBar({ filters, onChange }: TransactionFiltersP
           onValueChange={(v) => update("type", v === "all" ? "" : v)}
         >
           <SelectTrigger size="sm" className={`w-[120px] ${activeClass(filters.type)}`}>
-            <SelectValue placeholder="Type" />
+            <SelectValue placeholder={t("tx.type")} />
           </SelectTrigger>
           <SelectContent position="popper" sideOffset={4}>
-            <SelectItem value="all">All Types</SelectItem>
-            <SelectItem value="Credit">Credit</SelectItem>
-            <SelectItem value="Debit">Debit</SelectItem>
+            <SelectItem value="all">{t("tx.allTypes")}</SelectItem>
+            <SelectItem value="Credit">{t("tx.credit")}</SelectItem>
+            <SelectItem value="Debit">{t("tx.debit")}</SelectItem>
           </SelectContent>
         </Select>
 
@@ -145,12 +148,12 @@ export function TransactionFiltersBar({ filters, onChange }: TransactionFiltersP
           onValueChange={(v) => update("status", v === "all" ? "" : v)}
         >
           <SelectTrigger size="sm" className={`w-[135px] ${activeClass(filters.status)}`}>
-            <SelectValue placeholder="Status" />
+            <SelectValue placeholder={t("tx.status")} />
           </SelectTrigger>
           <SelectContent position="popper" sideOffset={4}>
-            <SelectItem value="all">All Statuses</SelectItem>
-            <SelectItem value="Completed">Completed</SelectItem>
-            <SelectItem value="Pending">Pending</SelectItem>
+            <SelectItem value="all">{t("tx.allStatuses")}</SelectItem>
+            <SelectItem value="Completed">{t("tx.completed")}</SelectItem>
+            <SelectItem value="Pending">{t("tx.pending")}</SelectItem>
           </SelectContent>
         </Select>
 
@@ -160,10 +163,10 @@ export function TransactionFiltersBar({ filters, onChange }: TransactionFiltersP
           onValueChange={(v) => update("method", v === "all" ? "" : v)}
         >
           <SelectTrigger size="sm" className={`w-[150px] ${activeClass(filters.method)}`}>
-            <SelectValue placeholder="Method" />
+            <SelectValue placeholder={t("tx.method")} />
           </SelectTrigger>
           <SelectContent position="popper" sideOffset={4}>
-            <SelectItem value="all">All Methods</SelectItem>
+            <SelectItem value="all">{t("tx.allMethods")}</SelectItem>
             {METHODS.map((m) => (
               <SelectItem key={m} value={m}>{m}</SelectItem>
             ))}
@@ -178,7 +181,7 @@ export function TransactionFiltersBar({ filters, onChange }: TransactionFiltersP
               size="sm"
               className={filterDateClass(filters.dateFrom)}
             >
-              {dateFrom ? format(dateFrom, "dd MMM yyyy") : <span>From date</span>}
+              {dateFrom ? format(dateFrom, "dd MMM yyyy") : <span>{t("tx.fromDate")}</span>}
               <ChevronDownIcon className="size-3.5 ml-2" />
             </Button>
           </PopoverTrigger>
@@ -198,7 +201,7 @@ export function TransactionFiltersBar({ filters, onChange }: TransactionFiltersP
                   className="w-full text-muted-foreground cursor-pointer"
                   onClick={() => update("dateFrom", "")}
                 >
-                  Clear
+                  {t("tx.clear")}
                 </Button>
               </div>
             )}
@@ -213,7 +216,7 @@ export function TransactionFiltersBar({ filters, onChange }: TransactionFiltersP
               size="sm"
               className={filterDateClass(filters.dateTo)}
             >
-              {dateTo ? format(dateTo, "dd MMM yyyy") : <span>To date</span>}
+              {dateTo ? format(dateTo, "dd MMM yyyy") : <span>{t("tx.toDate")}</span>}
               <ChevronDownIcon className="size-3.5 ml-2" />
             </Button>
           </PopoverTrigger>
@@ -233,7 +236,7 @@ export function TransactionFiltersBar({ filters, onChange }: TransactionFiltersP
                   className="w-full text-muted-foreground cursor-pointer"
                   onClick={() => update("dateTo", "")}
                 >
-                  Clear
+                  {t("tx.clear")}
                 </Button>
               </div>
             )}
@@ -249,7 +252,7 @@ export function TransactionFiltersBar({ filters, onChange }: TransactionFiltersP
             className="text-muted-foreground hover:text-foreground"
           >
             <IconX className="size-3.5 mr-1" />
-            Clear all
+            {t("tx.clearAll")}
           </Button>
         )}
 
