@@ -9,17 +9,25 @@ export async function transcribeAudioBlob(blob: Blob): Promise<string> {
   }
 
   try {
-    // Ensure blob has a valid extension for Whisper API
-    const extension = blob.type.includes("webm")
-      ? "webm"
-      : blob.type.includes("mp4")
-      ? "mp4"
-      : blob.type.includes("ogg")
-      ? "ogg"
-      : "wav"
+    // MediaRecorder in Chrome/Brave/Edge produces WebM; Safari produces MP4
+    let extension = "webm"
+    let mime = "audio/webm"
+
+    if (blob.type.includes("mp4")) {
+      extension = "mp4"
+      mime = "audio/mp4"
+    } else if (blob.type.includes("ogg")) {
+      extension = "ogg"
+      mime = "audio/ogg"
+    } else if (blob.type.includes("wav")) {
+      extension = "wav"
+      mime = "audio/wav"
+    }
+
+    console.log(`[GroqWhisper] Sending audio.${extension} (${blob.size} bytes, type: ${mime}) to Groq Whisper...`)
 
     const file = new File([blob], `audio.${extension}`, {
-      type: blob.type || `audio/${extension}`,
+      type: mime,
     })
 
     const formData = new FormData()

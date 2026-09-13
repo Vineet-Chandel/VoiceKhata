@@ -572,9 +572,6 @@ export const translations: Record<string, Record<Language, string>> = {
   "reports.income":         { en: "Income",           hi: "आय" },
   "reports.expense":        { en: "Expense",          hi: "खर्च" },
   "reports.balance":        { en: "Balance",          hi: "बकाया" },
-  "reports.monthly":        { en: "Monthly",          hi: "मासिक" },
-  "reports.weekly":         { en: "Weekly",           hi: "साप्ताहिक" },
-  "reports.yearly":         { en: "Yearly",           hi: "वार्षिक" },
   "reports.totalIncome":    { en: "Total Income",     hi: "कुल आय" },
   "reports.totalExpenses":  { en: "Total Expenses",   hi: "कुल खर्च" },
   "reports.netSavings":     { en: "Net Savings",      hi: "कुल बचत" },
@@ -674,11 +671,9 @@ export const translations: Record<string, Record<Language, string>> = {
   "growth.noData":          { en: "No financial data available yet. Start adding transactions to power your growth engine.", hi: "अभी कोई वित्तीय डेटा उपलब्ध नहीं है। अपने विकास इंजन को सक्रिय करने के लिए लेन-देन जोड़ना शुरू करें।" },
 
   // ── AI Assistant ──
-  "ai.title":               { en: "VoiceKhata AI",    hi: "वॉइसखाता एआई" },
   "ai.clearChat":           { en: "Clear chat",       hi: "चैट साफ़ करें" },
   "ai.howCanIHelp":         { en: "How can I help you today?", hi: "आज मैं आपकी क्या सहायता कर सकता हूँ?" },
   "ai.askPrompt":           { en: "Ask about your finances or say", hi: "अपने वित्त के बारे में पूछें या कहें" },
-  "ai.placeholder":         { en: "Ask anything or say what you spent…", hi: "कुछ भी पूछें या बताएं कि आपने क्या खर्च किया…" },
   "ai.replyingTo":          { en: "Replying to",      hi: "जवाब दे रहे हैं" },
   "ai.you":                 { en: "You",              hi: "आप" },
   "ai.enterToSend":         { en: "Enter to send",    hi: "भेजने के लिए Enter दबाएं" },
@@ -697,11 +692,6 @@ export const translations: Record<string, Record<Language, string>> = {
   "settings.financial":     { en: "Financial",        hi: "वित्तीय" },
   "settings.security":      { en: "Security",         hi: "सुरक्षा" },
   "settings.danger":        { en: "Danger Zone",      hi: "खतरा क्षेत्र" },
-  "settings.profileDesc":   { en: "Manage your personal information, profile photo and birth details", hi: "अपनी व्यक्तिगत जानकारी, प्रोफ़ाइल फ़ोटो और जन्म विवरण प्रबंधित करें" },
-  "settings.appearanceDesc":{ en: "Customize the visual appearance and theme of the application", hi: "एप्लिकेशन का दृश्य स्वरूप और थीम अनुकूलित करें" },
-  "settings.financialDesc": { en: "Configure your financial preferences, country and integrations", hi: "अपनी वित्तीय प्राथमिकताएं, देश और एकीकरण कॉन्फ़िगर करें" },
-  "settings.securityDesc":  { en: "Manage your password, account credentials and active sessions", hi: "अपना पासवर्ड, खाता क्रेडेंशियल और सक्रिय सत्र प्रबंधित करें" },
-  "settings.dangerDesc":    { en: "Delete your account and permanently erase all financial records", hi: "अपना खाता हटाएं और सभी वित्तीय रिकॉर्ड स्थायी रूप से मिटाएं" },
   "settings.theme":         { en: "Theme",            hi: "थीम" },
   "settings.themeTitle":    { en: "Customize how VoiceKhata looks", hi: "चुनें कि वॉइसखाता कैसा दिखे" },
   "settings.themeSubtitle": { en: "Choose your preferred appearance for the entire workspace.", hi: "पूरे कार्यक्षेत्र के लिए अपना पसंदीदा स्वरूप चुनें।" },
@@ -757,10 +747,6 @@ export const translations: Record<string, Record<Language, string>> = {
   "settings.good":          { en: "Good",             hi: "अच्छा" },
   "settings.strong":        { en: "Strong",           hi: "मज़बूत" },
   "settings.strength":      { en: "Strength:",        hi: "मजबूती:" },
-
-  // ── Common ──
-  "common.save":            { en: "Save",             hi: "सेव करें" },
-  "common.cancel":          { en: "Cancel",           hi: "रद्द करें" },
 
   // ── Days of week ──
   "common.sunday":          { en: "Sunday",           hi: "रविवार" },
