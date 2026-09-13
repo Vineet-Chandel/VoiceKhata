@@ -26,6 +26,7 @@ import {
   type LanguageMode,
 } from "@/lib/chat-language"
 import { MONEY_GROWTH_ENGINE_PROMPT } from "@/lib/prompts/money-growth-engine"
+import type { AppMode } from "@/context/AppModeContext"
 
 export type Message = {
   id: string
@@ -82,6 +83,7 @@ type BudgetGuidedStep = "idle" | "category" | "amount" | "duration" | "confirm"
 interface Props {
   transactions: Transaction[]
   budgets: Budget[]
+  appMode?: AppMode
   onAddTransaction: (t: TransactionInput) => Promise<{ error?: string; data?: Transaction } | undefined>
   onAddBudget: (b: BudgetInput) => Promise<{ error?: string; data?: Budget } | undefined>
   messages: Message[]
@@ -687,9 +689,168 @@ function applyDateScope(transactions: Transaction[], scope: DateScope): Transact
   })
 }
 
-function buildDatabaseAnswer(input: string, transactions: Transaction[], budgets: Budget[]): string | null {
+function buildDatabaseAnswer(
+  input: string,
+  transactions: Transaction[],
+  budgets: Budget[],
+  appMode: AppMode = "BUSINESS"
+): string | null {
   const text = normalizeForMatch(input)
   if (!text) return null
+
+  const todayStr = format(new Date(), "yyyy-MM-dd")
+  const todayFormatted = format(new Date(), "dd MMM yyyy")
+
+  // ── Business Query 1: Who owes me money / Pending payments / Udhaar baaki ────
+  const asksWhoOwes =
+    /\b(who owes|pending payments?|who has to pay|kiska (baaki|baki|udhaar|udhar|paisa)|udhaar baaki|udhar baki|baaki (hisaab|paisa|payment)|receivables?|debtors?)\b/i.test(text) ||
+    (/\b(who|kiska)\b/i.test(text) && /\b(owes?|baaki|baki|udhaar|udhar)\b/i.test(text))
+
+  if (asksWhoOwes) {
+    const partyMap = new Map<string, { name: string; balance: number; debitTotal: number; creditTotal: number; count: number; lastDate: string }>()
+    for (const t of transactions) {
+      const rawName = (t.transaction || "").trim()
+      if (!rawName) continue
+      const key = rawName.toLowerCase()
+      let entry = partyMap.get(key)
+      if (!entry) {
+        entry = { name: rawName, balance: 0, debitTotal: 0, creditTotal: 0, count: 0, lastDate: t.date }
+        partyMap.set(key, entry)
+      }
+      entry.count++
+      if (t.date > entry.lastDate) entry.lastDate = t.date
+      if (t.type === "Credit") {
+        entry.creditTotal += t.amount
+        entry.balance -= t.amount
+      } else {
+        entry.debitTotal += t.amount
+        entry.balance += t.amount
+      }
+    }
+
+    const debtors = Array.from(partyMap.values())
+      .filter((d) => d.balance > 0)
+      .sort((a, b) => b.balance - a.balance)
+
+    if (debtors.length === 0) {
+      return "No pending customer dues found! All customer khata balances are clear."
+    }
+
+    const totalPending = debtors.reduce((sum, d) => sum + d.balance, 0)
+    const lines = [
+      `Pending Customer Dues (Udhaar Baaki):`,
+      `Total Pending: ₹${totalPending.toLocaleString("en-IN")} across ${debtors.length} customer(s)\n`,
+    ]
+    debtors.slice(0, 10).forEach((d, i) => {
+      lines.push(`${i + 1}. ${d.name}: ₹${d.balance.toLocaleString("en-IN")} (Last active: ${d.lastDate})`)
+    })
+    if (debtors.length > 10) {
+      lines.push(`\n...and ${debtors.length - 10} more customer(s). Check Khata page for full list.`)
+    }
+    return lines.join("\n")
+  }
+
+  // ── Business Query 2: Specific party balance / Udhaar enquiry ────────────────
+  const specificPartyMatch =
+    text.match(/(?:how much does|how much)\s+([a-zA-Z\s]+?)\s+(?:owe|due|have to pay)/i) ||
+    text.match(/([a-zA-Z\s]+?)\s+ka\s+kitna\s+(?:baaki|baki|udhaar|udhar)/i) ||
+    text.match(/(?:balance|ledger|khata)\s+(?:of|for)\s+([a-zA-Z\s]+)/i) ||
+    text.match(/([a-zA-Z\s]+?)\s+(?:ka\s+balance|balance|ledger|khata)/i)
+
+  if (specificPartyMatch && specificPartyMatch[1]) {
+    const rawTarget = specificPartyMatch[1].trim().toLowerCase()
+    const stopWords = ["i", "you", "we", "he", "she", "they", "my", "me", "all", "total", "category", "this", "last", "month", "today", "money"]
+    if (!stopWords.includes(rawTarget) && rawTarget.length > 1) {
+      const partyMatches = transactions.filter(
+        (t) => (t.transaction || "").toLowerCase().includes(rawTarget)
+      )
+      if (partyMatches.length > 0) {
+        const canonicalName = partyMatches[0].transaction || rawTarget
+        let debitTotal = 0
+        let creditTotal = 0
+        let lastDate = partyMatches[0].date
+        partyMatches.forEach((t) => {
+          if (t.date > lastDate) lastDate = t.date
+          if (t.type === "Credit") creditTotal += t.amount
+          else debitTotal += t.amount
+        })
+        const balance = debitTotal - creditTotal
+        if (balance > 0) {
+          return `${canonicalName}'s Khata Balance:\nPending Due (Udhaar): ₹${balance.toLocaleString("en-IN")}\nTotal Credit Taken: ₹${debitTotal.toLocaleString("en-IN")}\nTotal Paid (Jama): ₹${creditTotal.toLocaleString("en-IN")}\nTransactions: ${partyMatches.length}\nLast Activity: ${lastDate}`
+        } else if (balance < 0) {
+          return `${canonicalName}'s Khata Balance:\nAdvance Paid: ₹${Math.abs(balance).toLocaleString("en-IN")}\nTransactions: ${partyMatches.length}\nLast Activity: ${lastDate}`
+        } else {
+          return `${canonicalName}'s Khata is settled (₹0 balance).\nTransactions: ${partyMatches.length}\nLast Activity: ${lastDate}`
+        }
+      }
+    }
+  }
+
+  // ── Business Query 3: Today's sales / Aaj ki bikri ──────────────────────────
+  const asksTodaySales =
+    (/\b(today('?s)?|aaj (ki|ka)?)\b/i.test(text) && /\b(sale|sales|bikri|sell|sold|revenue)\b/i.test(text)) ||
+    /\b(how much did i sell today|show today('?s)? sales|today('?s)? sales|aaj kitni bikri hui)\b/i.test(text)
+
+  if (asksTodaySales) {
+    const todaySalesTxs = transactions.filter(
+      (t) => t.date === todayStr && (t.type === "Credit" || t.category === "Sales")
+    )
+    const totalSales = todaySalesTxs.reduce((sum, t) => sum + t.amount, 0)
+    if (todaySalesTxs.length === 0) {
+      return `Today's Sales (${todayFormatted}):\nNo sales recorded yet today.`
+    }
+    const lines = [
+      `Today's Sales Summary (${todayFormatted}):`,
+      `Total Sales / Collections: ₹${totalSales.toLocaleString("en-IN")}`,
+      `Transactions: ${todaySalesTxs.length}\n`,
+    ]
+    todaySalesTxs.slice(0, 5).forEach((t) => {
+      lines.push(`- ${t.transaction}: ₹${t.amount.toLocaleString("en-IN")} (${t.method || "Cash"})`)
+    })
+    if (todaySalesTxs.length > 5) {
+      lines.push(`...and ${todaySalesTxs.length - 5} more transactions.`)
+    }
+    return lines.join("\n")
+  }
+
+  // ── Business Query 4: Today's credit given / Aaj kitna udhar diya ────────────
+  const asksTodayCredit =
+    (/\b(today('?s)?|aaj)\b/i.test(text) && /\b(credit|udhaar|udhar)\b/i.test(text) && /\b(give|gave|diya|given|kitna|how much)\b/i.test(text)) ||
+    /\b(today('?s)? credit|aaj kitna udhar diya)\b/i.test(text)
+
+  if (asksTodayCredit) {
+    const todayCreditTxs = transactions.filter(
+      (t) => t.date === todayStr && t.type === "Debit"
+    )
+    const totalCredit = todayCreditTxs.reduce((sum, t) => sum + t.amount, 0)
+    if (todayCreditTxs.length === 0) {
+      return `Today's Credit Given (${todayFormatted}):\nNo credit (Udhaar) given today.`
+    }
+    const lines = [
+      `Today's Credit Given (Udhaar) (${todayFormatted}):`,
+      `Total Credit Given: ₹${totalCredit.toLocaleString("en-IN")}`,
+      `Transactions: ${todayCreditTxs.length}\n`,
+    ]
+    todayCreditTxs.slice(0, 5).forEach((t) => {
+      lines.push(`- ${t.transaction}: ₹${t.amount.toLocaleString("en-IN")} (${t.category})`)
+    })
+    if (todayCreditTxs.length > 5) {
+      lines.push(`...and ${todayCreditTxs.length - 5} more transactions.`)
+    }
+    return lines.join("\n")
+  }
+
+  // ── Business Query 5: Today's transactions / Aaj ke transactions ────────────
+  const asksTodayTransactions =
+    /\b(today('?s)?|aaj ke)\b/i.test(text) && /\btransactions?\b/i.test(text)
+
+  if (asksTodayTransactions) {
+    const todayTxs = transactions.filter((t) => t.date === todayStr)
+    if (todayTxs.length === 0) {
+      return `No transactions recorded today (${todayFormatted}).`
+    }
+    return buildTransactionRowsMessage(todayTxs, `Today's Transactions (${todayFormatted})`)
+  }
 
   const scope = extractDateScope(input)
   const scopeLabel = scope.label
@@ -1111,11 +1272,87 @@ function buildConfirmCard(draft: Partial<TransactionDraft>, languageMode: Langua
 }
 
 function buildSystemPrompt(
-  
   transactions: Transaction[],
   budgets: Budget[],
-  languageMode: LanguageMode
+  languageMode: LanguageMode,
+  appMode: AppMode = "BUSINESS"
 ): string {
+  const languageInstruction =
+    languageMode === "hindi"
+      ? "Reply fully in Hindi script (Devanagari)."
+      : languageMode === "hinglish"
+        ? "Reply in Hinglish using English letters only (Roman script). Do not use Devanagari."
+        : "Reply fully in English. Do not include Hindi words."
+
+  const todayFormatted = format(new Date(), "EEEE, MMMM d, yyyy")
+  const todayStr = format(new Date(), "yyyy-MM-dd")
+
+  if (appMode === "BUSINESS") {
+    const todayTxs = transactions.filter((t) => t.date === todayStr)
+    const todaySalesTxs = todayTxs.filter((t) => t.type === "Credit" || t.category === "Sales")
+    const todaySales = todaySalesTxs.reduce((sum, t) => sum + t.amount, 0)
+    const todayCreditTxs = todayTxs.filter((t) => t.type === "Debit")
+    const todayCreditGiven = todayCreditTxs.reduce((sum, t) => sum + t.amount, 0)
+
+    const totalInflow = transactions.filter((t) => t.type === "Credit").reduce((sum, t) => sum + t.amount, 0)
+    const totalOutflow = transactions.filter((t) => t.type === "Debit").reduce((sum, t) => sum + t.amount, 0)
+    const netCashFlow = totalInflow - totalOutflow
+
+    // Calculate Customer Ledgers (Udhaar Baaki)
+    const partyMap = new Map<string, { name: string; balance: number; lastDate: string }>()
+    transactions.forEach((t) => {
+      const raw = (t.transaction || "").trim()
+      if (!raw) return
+      const key = raw.toLowerCase()
+      const entry = partyMap.get(key) || { name: raw, balance: 0, lastDate: t.date }
+      if (t.date > entry.lastDate) entry.lastDate = t.date
+      if (t.type === "Credit") {
+        entry.balance -= t.amount
+      } else {
+        entry.balance += t.amount
+      }
+      partyMap.set(key, entry)
+    })
+
+    const debtors = Array.from(partyMap.values())
+      .filter((p) => p.balance > 0)
+      .sort((a, b) => b.balance - a.balance)
+    const totalReceivables = debtors.reduce((sum, d) => sum + d.balance, 0)
+    const topDebtorsLines = debtors.slice(0, 8).map((d) => `- ${d.name}: Rs.${d.balance.toLocaleString("en-IN")} (Last active: ${d.lastDate})`).join("\n") || "- No pending customer dues"
+
+    const recentLines = [...transactions]
+      .sort((a, b) => b.date.localeCompare(a.date))
+      .slice(0, 30)
+      .map((t) => `- ${t.date} | ${t.transaction} | ${t.type === "Credit" ? "+Rs." : "-Rs."}${t.amount.toLocaleString("en-IN")} (${t.type === "Credit" ? "Jama/Received" : "Udhaar/Paid"}) | ${t.category} | ${t.method}`)
+      .join("\n") || "- No transactions yet"
+
+    return `You are VoiceKhata AI, an intelligent digital Munim (मुनीम) and business bookkeeping assistant for Indian shopkeepers and small business owners.
+
+Today's date: ${todayFormatted}
+
+Shopkeeper / Business Financial Snapshot:
+- Today's Sales / Collections (Jama): Rs.${todaySales.toLocaleString("en-IN")} (${todaySalesTxs.length} tx)
+- Today's Credit Given (Udhaar): Rs.${todayCreditGiven.toLocaleString("en-IN")} (${todayCreditTxs.length} tx)
+- Total Sales / Inflow: Rs.${totalInflow.toLocaleString("en-IN")}
+- Total Outflows / Purchases: Rs.${totalOutflow.toLocaleString("en-IN")}
+- Net Cash Flow / Working Capital: Rs.${netCashFlow.toLocaleString("en-IN")}
+- Total Outstanding Receivables (Udhaar Baaki from customers): Rs.${totalReceivables.toLocaleString("en-IN")} across ${debtors.length} customer(s)
+- Top Pending Customer Dues:
+${topDebtorsLines}
+
+Recent Business Transactions:
+${recentLines}
+
+Rules:
+1. You act as a trustworthy Digital Munim. Focus on daily sales, customer khata balances, recovering pending Udhaar, managing supplier payments, and shop cash flow.
+2. DO NOT give personal finance advice like mutual funds, SIPs, emergency funds, personal salary savings rate, or personal grocery budget tips. Your sole domain is shopkeeping, business operations, and customer credit ledger.
+3. When asked about customer balances (e.g. 'Who owes me money?', 'Ramesh ka kitna baaki hai?', 'Pending payments', 'Today's sales'), use the customer ledger data and transactions accurately.
+4. Keep replies crisp, business-oriented, respectful, and practical for a busy shopkeeper.
+5. Use only provided data for numbers.
+6. ${languageInstruction}
+7. Never claim you wrote to database yourself.`
+  }
+
   const metrics = createFinancialMetrics(transactions, budgets)
   const currentMonth = metrics.currentMonth.monthKey
   const lastMonthTrend = metrics.monthlyTrends.length >= 2
@@ -1154,15 +1391,6 @@ function buildSystemPrompt(
     },
     {}
   )
-
-  const languageInstruction =
-    languageMode === "hindi"
-      ? "Reply fully in Hindi script (Devanagari)."
-      : languageMode === "hinglish"
-        ? "Reply in Hinglish using English letters only (Roman script). Do not use Devanagari."
-        : "Reply fully in English. Do not include Hindi words."
-
-  const todayFormatted = format(new Date(), "EEEE, MMMM d, yyyy")
 
 return `You are VoiceKhata AI, a smart finance companion.
 
@@ -1321,6 +1549,7 @@ function shouldTreatAsTransactionInput(content: string, confidence: number, amou
 export function useAIChat({
   transactions,
   budgets,
+  appMode = "BUSINESS",
   onAddTransaction,
   onAddBudget,
   messages,
@@ -2567,7 +2796,7 @@ export function useAIChat({
         return
       }
 
-      const databaseAnswer = buildDatabaseAnswer(content, transactions, budgets)
+      const databaseAnswer = buildDatabaseAnswer(content, transactions, budgets, appMode)
       if (databaseAnswer) {
         addMessage({ role: "assistant", content: databaseAnswer })
         setLoading(false)
@@ -2722,20 +2951,24 @@ if (isLikelyUnrelated(trimmedContent)) {
       }
 
       const text = await callGroq(
-  apiKey,
-  buildSystemPrompt(transactions, budgets, nextLanguageMode),
-  [...messages, userMsg]
-)
+        apiKey,
+        buildSystemPrompt(transactions, budgets, nextLanguageMode, appMode),
+        [...messages, userMsg]
+      )
 
-// Safety net: if Groq answered with code or off-topic content anyway, intercept it
-const looksOffTopic = /```[\s\S]{40,}```|#include\s|def \w+\(|function \w+\(|import [a-z]|\bclass \w+/.test(text)
-const safeText = looksOffTopic
-  ? localizeByMode(nextLanguageMode, {
-      english: "I'm VoiceKhata AI — I'm here to help with your finances only. Want to log a transaction, check your budget, or review your spending?",
-      hinglish: "Main VoiceKhata AI hoon — sirf finance ke liye hoon. Transaction log karein, budget check karein, ya spending review karein?",
-      hindi: "",
-    })
-  : text
+      // Safety net: if Groq answered with code or off-topic content anyway, intercept it
+      const looksOffTopic = /```[\s\S]{40,}```|#include\s|def \w+\(|function \w+\(|import [a-z]|\bclass \w+/.test(text)
+      const safeText = looksOffTopic
+        ? localizeByMode(nextLanguageMode, {
+            english: appMode === "BUSINESS"
+              ? "I'm VoiceKhata AI — your Digital Munim. I'm here to help with your shop's transactions, customers, and business finances. Want to log a transaction or check pending dues?"
+              : "I'm VoiceKhata AI — I'm here to help with your finances only. Want to log a transaction, check your budget, or review your spending?",
+            hinglish: appMode === "BUSINESS"
+              ? "Main VoiceKhata AI hoon — aapka Digital Munim. Sirf vyaparik len-den, customers, aur khata ke liye hoon. Transaction log karein ya baaki udhaar check karein?"
+              : "Main VoiceKhata AI hoon — sirf finance ke liye hoon. Transaction log karein, budget check karein, ya spending review karein?",
+            hindi: "",
+          })
+        : text
 
 addMessage({ role: "assistant", content: safeText })
     } catch (err) {

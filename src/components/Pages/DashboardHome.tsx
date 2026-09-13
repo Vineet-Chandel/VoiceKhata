@@ -237,6 +237,21 @@ export default function DashboardHome() {
     [transactions, budgets]
   )
 
+  const receivables = useMemo(() => {
+    const map = new Map<string, number>()
+    transactions.forEach((t) => {
+      const party = (t.transaction || "Customer").trim().toLowerCase()
+      const current = map.get(party) ?? 0
+      if (t.type === "Credit") map.set(party, current - Number(t.amount || 0))
+      else map.set(party, current + Number(t.amount || 0))
+    })
+    let total = 0
+    for (const bal of map.values()) {
+      if (bal > 0) total += bal
+    }
+    return total
+  }, [transactions])
+
   // ── Notification firing — guarded to fire once per session ────────────────
   const hasFiredRef = useRef(false)
 
@@ -376,11 +391,11 @@ export default function DashboardHome() {
                     <p className="text-xs sm:text-sm text-slate-600 dark:text-muted-foreground leading-relaxed">
                       Say what happened in Hindi, English, or Hinglish (e.g.{" "}
                       <span className="inline-block font-medium text-blue-700 dark:text-blue-300 font-mono bg-blue-100/70 dark:bg-blue-950/40 px-1.5 py-0.5 rounded border border-blue-200/70 dark:border-blue-800/40">
-                        "रमेश ने 500 रुपये दिए"
+                        {appMode === "BUSINESS" ? '"रमेश ने 500 रुपये जमा किए"' : '"Paid ₹450 for groceries"'}
                       </span>{" "}
                       or{" "}
                       <span className="inline-block font-medium text-blue-700 dark:text-blue-300 font-mono bg-blue-100/70 dark:bg-blue-950/40 px-1.5 py-0.5 rounded border border-blue-200/70 dark:border-blue-800/40">
-                        "Paid ₹450 for groceries"
+                        {appMode === "BUSINESS" ? '"Sharma ji ko ₹1,200 ka maal udhaar diya"' : '"Spent ₹350 on petrol"'}
                       </span>
                       ).
                     </p>
@@ -413,6 +428,8 @@ export default function DashboardHome() {
           expense={metrics.totalExpense}
           balance={metrics.balance}
           savingsRate={metrics.savingsRate}
+          appMode={appMode}
+          receivables={receivables}
         />
 
         {/* Carry-forward banner — new feature from Codex */}

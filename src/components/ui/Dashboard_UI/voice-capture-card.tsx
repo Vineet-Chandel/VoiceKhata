@@ -34,13 +34,22 @@ interface VoiceCaptureCardProps {
   className?: string
 }
 
-const TRY_SAYING_PROMPTS = [
-  "Received ₹1,200 from Ramesh by UPI",
+const BUSINESS_TRY_SAYING_PROMPTS = [
+  "Ramesh ne ₹500 jama kiye",
   "रमेश ने 500 रुपये दिए",
-  "Sharma ji ko 1500 udhar diya",
-  "Paid ₹450 for groceries by cash",
+  "Ramesh ne ₹1,200 ka samaan udhaar liya",
+  "Sharma ji ko 1500 ka maal udhar diya",
   "सुरेश से 2000 रुपये जमा मिला",
-  "Spent ₹350 on petrol via GPay",
+  "गुप्ता ट्रेडर्स को ₹5,000 पेमेंट दिया",
+]
+
+const PERSONAL_TRY_SAYING_PROMPTS = [
+  "Paid ₹450 for groceries by cash",
+  "Spent ₹350 on petrol via UPI",
+  "Received ₹50,000 salary in bank",
+  "Paid ₹1,200 electricity bill",
+  "Dinner with friends ₹850 via GPay",
+  "Bought books for ₹600 with debit card",
 ]
 
 const METHODS = ["UPI", "Cash", "Bank Transfer", "Credit Card", "Debit Card"]
@@ -73,13 +82,18 @@ export function VoiceCaptureCard({
   const [isSaving, setIsSaving] = useState(false)
   const [saveSuccessMsg, setSaveSuccessMsg] = useState("")
 
+  const prompts = React.useMemo(() => {
+    return appMode === "BUSINESS" ? BUSINESS_TRY_SAYING_PROMPTS : PERSONAL_TRY_SAYING_PROMPTS
+  }, [appMode])
+
   // Rotating suggestion timer
   useEffect(() => {
+    setPromptIndex(0)
     const interval = setInterval(() => {
-      setPromptIndex((prev) => (prev + 1) % TRY_SAYING_PROMPTS.length)
+      setPromptIndex((prev) => (prev + 1) % prompts.length)
     }, 4000)
     return () => clearInterval(interval)
-  }, [])
+  }, [prompts.length])
 
   // Existing customer names for intelligent matching
   const existingCustomers = React.useMemo(() => {
@@ -385,11 +399,11 @@ export function VoiceCaptureCard({
                       transition={{ duration: 0.3 }}
                       className="text-sm md:text-base font-medium text-indigo-300/90 italic cursor-pointer hover:text-indigo-200 transition-colors"
                       onClick={() => {
-                        handleVoiceTranscript(TRY_SAYING_PROMPTS[promptIndex])
+                        handleVoiceTranscript(prompts[promptIndex % prompts.length])
                       }}
                       title="Click to try this example"
                     >
-                      "{TRY_SAYING_PROMPTS[promptIndex]}"
+                      "{prompts[promptIndex % prompts.length]}"
                     </motion.div>
                   </AnimatePresence>
                 </div>

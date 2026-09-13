@@ -4,9 +4,20 @@
 import {
   TrendingUp, AlertTriangle, PiggyBank,
   Lightbulb, BarChart2, ArrowLeftRight,
+  Users, Clock, ArrowUpRight, Receipt, UserCheck
 } from "lucide-react"
+import { useAppMode } from "@/context/AppModeContext"
 
-const PROMPTS = [
+const BUSINESS_PROMPTS = [
+  { text: "Who owes me money?",              Icon: Users,          color: "text-rose-400",    bg: "bg-rose-500/10"    },
+  { text: "How much did I sell today?",       Icon: TrendingUp,     color: "text-emerald-400", bg: "bg-emerald-500/10" },
+  { text: "Show pending payments",           Icon: Clock,          color: "text-amber-400",   bg: "bg-amber-500/10"   },
+  { text: "How much credit did I give today?",Icon: ArrowUpRight,   color: "text-violet-400",  bg: "bg-violet-500/10"  },
+  { text: "Show today's transactions",       Icon: Receipt,        color: "text-teal-400",    bg: "bg-teal-500/10"    },
+  { text: "How much does Ramesh owe?",       Icon: UserCheck,      color: "text-blue-400",    bg: "bg-blue-500/10"    },
+]
+
+const PERSONAL_PROMPTS = [
   { text: "What did I spend the most on this month?",      Icon: TrendingUp,      color: "text-violet-400",  bg: "bg-violet-500/10"  },
   { text: "Am I over budget in any category?",             Icon: AlertTriangle,   color: "text-red-400",     bg: "bg-red-500/10"     },
   { text: "How much did I save this month?",               Icon: PiggyBank,       color: "text-emerald-400", bg: "bg-emerald-500/10" },
@@ -16,9 +27,12 @@ const PROMPTS = [
 ]
 
 export function SuggestedPrompts({ onSelect }: { onSelect: (p: string) => void }) {
+  const { appMode } = useAppMode()
+  const prompts = appMode === "BUSINESS" ? BUSINESS_PROMPTS : PERSONAL_PROMPTS
+
   return (
     <div className="grid grid-cols-2 gap-2 w-full max-w-[440px]">
-      {PROMPTS.map(({ text, Icon, color, bg }) => (
+      {prompts.map(({ text, Icon, color, bg }) => (
         <button
           key={text}
           onClick={() => onSelect(text)}

@@ -8,6 +8,7 @@ import type { Transaction } from "@/components/hooks/use-transactions"
 import type { Budget } from "@/components/hooks/use-budgets"
 import type { FinancialMetrics } from "@/lib/financial-metrics"
 import { useLanguage } from "@/context/LanguageContext"
+import { useAppMode } from "@/context/AppModeContext"
 
 interface Props {
   transactions: Transaction[]
@@ -19,7 +20,8 @@ interface Props {
 const SLIDE_INTERVAL = 4000
 
 export function AISuggestions({ transactions, budgets, metrics, dataLoading }: Props) {
-  const { suggestions, loading, refresh } = useAISuggestions(transactions, budgets, metrics, dataLoading)
+  const { appMode } = useAppMode()
+  const { suggestions, loading, refresh } = useAISuggestions(transactions, budgets, metrics, dataLoading, appMode)
   const { t } = useLanguage()
   const [current, setCurrent] = useState(0)
   const [paused,  setPaused]  = useState(false)
@@ -60,8 +62,12 @@ export function AISuggestions({ transactions, budgets, metrics, dataLoading }: P
       <div className="mx-4 lg:mx-6 rounded-xl border bg-card shadow-sm overflow-hidden">
         <div className="flex items-center justify-between px-6 pt-5 pb-4">
           <div>
-            <h3 className="font-semibold text-foreground text-base leading-none">{t("ai.smartSuggestions")}</h3>
-            <p className="text-sm text-muted-foreground mt-1.5">{t("ai.smartSuggestionsDesc")}</p>
+            <h3 className="font-semibold text-foreground text-base leading-none">
+              {appMode === "BUSINESS" ? "Digital Munim Insights" : t("ai.smartSuggestions")}
+            </h3>
+            <p className="text-sm text-muted-foreground mt-1.5">
+              {appMode === "BUSINESS" ? "Actionable tips for shop cash flow and Udhaar" : t("ai.smartSuggestionsDesc")}
+            </p>
           </div>
           <div className="flex items-center gap-1.5 border border-border/60 rounded-full px-2.5 py-1">
             <span className="size-1.5 rounded-full bg-amber-400 inline-block animate-pulse" />
@@ -88,8 +94,12 @@ export function AISuggestions({ transactions, budgets, metrics, dataLoading }: P
       {/* ── Header ── */}
       <div className="flex items-center justify-between px-6 pt-5 pb-4">
         <div>
-          <h3 className="font-semibold text-foreground text-base leading-none">{t("ai.smartSuggestions")}</h3>
-          <p className="text-sm text-muted-foreground mt-1.5">{t("ai.smartSuggestionsDesc")}</p>
+          <h3 className="font-semibold text-foreground text-base leading-none">
+            {appMode === "BUSINESS" ? "Digital Munim Insights" : t("ai.smartSuggestions")}
+          </h3>
+          <p className="text-sm text-muted-foreground mt-1.5">
+            {appMode === "BUSINESS" ? "Actionable tips for shop cash flow and Udhaar" : t("ai.smartSuggestionsDesc")}
+          </p>
         </div>
 
         <div className="flex items-center gap-2.5">

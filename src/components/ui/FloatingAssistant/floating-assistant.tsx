@@ -5,7 +5,8 @@ import * as React from "react"
 import { useLocation, useNavigate } from "react-router-dom"
 import {
   Mic, X, ArrowUp, Plus, Square, Check,
-  TrendingUp, Wallet, PiggyBank, BarChart3, RefreshCw, Lightbulb, Bot, Minus, ExternalLink
+  TrendingUp, Wallet, PiggyBank, BarChart3, RefreshCw, Lightbulb, Bot, Minus, ExternalLink,
+  Users, Clock, ArrowUpRight
 } from "lucide-react"
 import { useVoiceInput } from "@/components/hooks/use-voice-input"
 import { useChatStore } from "@/components/hooks/use-chat-store"
@@ -18,17 +19,58 @@ import { VoiceWaveform } from "@/components/ui/AIAssistant_UI/voice-waveform"
 import { ChatWindow } from "@/components/ui/AIAssistant_UI/chat-window"
 import { ChatInput } from "@/components/ui/AIAssistant_UI/chat-input"
 import { useLanguage } from "@/context/LanguageContext"
+import { useAppMode } from "@/context/AppModeContext"
 import "./floating-assistant.css"
 
 // ─── Floating AI Command Bar & Workspace ───────────────────────────────────────
 // A centered, adaptive command bar that expands into a full chat workspace.
 // ────────────────────────────────────────────────────────────────────────────────
 
-// ── Page-aware configuration ─────────────────────────────────────────────────
-const PAGE_CONFIG: Record<string, {
-  placeholder: string
-  suggestions: string[]
-}> = {
+// ── Page-aware configurations ────────────────────────────────────────────────
+const BUSINESS_PAGE_CONFIG: Record<string, { placeholder: string; suggestions: string[] }> = {
+  "/dashboard": {
+    placeholder: "Ask your Digital Munim…",
+    suggestions: [
+      "Who owes me money?",
+      "How much did I sell today?",
+      "How much credit did I give today?",
+    ],
+  },
+  "/dashboard/khata": {
+    placeholder: "Ask about customer ledgers…",
+    suggestions: [
+      "Who owes me money?",
+      "Show pending payments",
+      "Which customer has highest dues?",
+    ],
+  },
+  "/dashboard/transactions": {
+    placeholder: "Ask about your business entries…",
+    suggestions: [
+      "Show today's transactions",
+      "Show today's sales",
+      "How much credit did I give today?",
+    ],
+  },
+  "/dashboard/growth": {
+    placeholder: "Ask about business growth…",
+    suggestions: [
+      "How can I grow my sales?",
+      "Which customers purchase the most?",
+      "Tips to speed up Udhaar collection",
+    ],
+  },
+  "/dashboard/reports": {
+    placeholder: "Ask about your business reports…",
+    suggestions: [
+      "Summarize this month's sales",
+      "Total Udhaar given this month",
+      "Cash vs UPI sales breakdown",
+    ],
+  },
+}
+
+const PERSONAL_PAGE_CONFIG: Record<string, { placeholder: string; suggestions: string[] }> = {
   "/dashboard": {
     placeholder: "Ask about your finances…",
     suggestions: [
@@ -53,14 +95,6 @@ const PAGE_CONFIG: Record<string, {
       "Help me set a new budget",
     ],
   },
-  "/dashboard/autopay": {
-    placeholder: "Ask about recurring payments…",
-    suggestions: [
-      "What payments are coming up?",
-      "Show recurring expenses",
-      "How much do I spend on subscriptions?",
-    ],
-  },
   "/dashboard/reports": {
     placeholder: "Ask about your reports…",
     suggestions: [
@@ -69,25 +103,18 @@ const PAGE_CONFIG: Record<string, {
       "Show income vs expenses trend",
     ],
   },
-  "/dashboard/finvault": {
-    placeholder: "Ask about your savings…",
-    suggestions: [
-      "How much have I saved?",
-      "Tips to save more money",
-      "Track my savings progress",
-    ],
-  },
-  "/dashboard/growth": {
-    placeholder: "Ask about business growth…",
-    suggestions: [
-      "How can I grow my revenue?",
-      "Identify cost reduction areas",
-      "What's my growth trajectory?",
-    ],
-  },
 }
 
-const DEFAULT_CONFIG = {
+const DEFAULT_BUSINESS_CONFIG = {
+  placeholder: "Ask your Digital Munim…",
+  suggestions: [
+    "Who owes me money?",
+    "Show today's sales",
+    "Show pending payments",
+  ],
+}
+
+const DEFAULT_PERSONAL_CONFIG = {
   placeholder: "Ask your financial assistant…",
   suggestions: [
     "How much did I spend this month?",
@@ -97,7 +124,16 @@ const DEFAULT_CONFIG = {
 }
 
 // ── Quick actions ────────────────────────────────────────────────────────────
-const QUICK_ACTIONS = [
+const BUSINESS_QUICK_ACTIONS = [
+  { icon: Users,       label: "Who owes me money?", prompt: "Who owes me money?" },
+  { icon: TrendingUp,  label: "Today's sales",       prompt: "How much did I sell today?" },
+  { icon: Clock,       label: "Pending payments",    prompt: "Show pending payments" },
+  { icon: ArrowUpRight,label: "Today's credit",      prompt: "How much credit did I give today?" },
+  { icon: BarChart3,   label: "Business cash flow",  prompt: "What is my current business cash flow?" },
+  { icon: Lightbulb,   label: "Munim suggestions",   prompt: "Give me key recommendations to improve business cash flow and recover Udhaar" },
+]
+
+const PERSONAL_QUICK_ACTIONS = [
   { icon: TrendingUp,  label: "Analyze spending",     prompt: "Analyze my spending patterns this month" },
   { icon: Wallet,      label: "Improve cash flow",    prompt: "How can I improve my cash flow?" },
   { icon: PiggyBank,   label: "Review budget",        prompt: "Am I on track with my budget this month?" },
@@ -111,12 +147,15 @@ export function FloatingAssistant() {
   const navigate = useNavigate()
   const isMobile = useIsMobile()
   const { user } = useAuth()
+  const { appMode } = useAppMode()
 
   // ── Don't render on the AI assistant or dedicated Voice Capture page ───────
   const isOnAssistantPage = location.pathname === "/dashboard/ai-assistant" || location.pathname.startsWith("/dashboard/voice-capture")
 
   // ── Page-aware config ──────────────────────────────────────────────────────
-  const pageConfig = PAGE_CONFIG[location.pathname] ?? DEFAULT_CONFIG
+  const configMap = appMode === "BUSINESS" ? BUSINESS_PAGE_CONFIG : PERSONAL_PAGE_CONFIG
+  const pageConfig = configMap[location.pathname] ?? (appMode === "BUSINESS" ? DEFAULT_BUSINESS_CONFIG : DEFAULT_PERSONAL_CONFIG)
+  const activeQuickActions = appMode === "BUSINESS" ? BUSINESS_QUICK_ACTIONS : PERSONAL_QUICK_ACTIONS
 
   // ── Chat store (shared with AIAssistantPage) ───────────────────────────────
   const {
@@ -146,6 +185,7 @@ export function FloatingAssistant() {
   } = useAIChat({
     transactions: allTransactions,
     budgets: allBudgets,
+    appMode,
     onAddTransaction: addTransaction,
     onAddBudget: addBudget,
     messages,
@@ -643,7 +683,7 @@ export function FloatingAssistant() {
             className={`absolute bottom-[calc(100%+8px)] left-4 ${menuClosing ? "menu-exit" : "menu-enter"}`}
           >
             <div className="bg-[#131B2E] rounded-2xl shadow-xl border border-slate-700/40 p-1.5 w-[220px]">
-              {QUICK_ACTIONS.map(({ icon: Icon, label, prompt }) => (
+              {activeQuickActions.map(({ icon: Icon, label, prompt }) => (
                 <button
                   key={label}
                   onClick={(e) => { e.stopPropagation(); handleQuickAction(prompt) }}

@@ -16,9 +16,11 @@ import { createChat, saveMessages, generateChatTitle } from "@/lib/api-chat"
 import { ChatHistoryModal } from "@/components/ui/AIAssistant_UI/chat-history-modal"
 import type { Message } from "@/components/hooks/use-ai-chat"
 import { useLanguage } from "@/context/LanguageContext"
+import { useAppMode } from "@/context/AppModeContext"
 
 export default function AIAssistantPage() {
   const { t } = useLanguage()
+  const { appMode } = useAppMode()
   const { allTransactions, addTransaction } = useTransactions()
   const { allBudgets, addBudget } = useBudgets()
   const { user } = useAuth()
@@ -44,6 +46,7 @@ export default function AIAssistantPage() {
   const { loading, sendMessage, clearChat, startGuidedFlow, startBudgetFlow, cancelGuidedFlow, confirmMultiTransactions, cancelMultiTransactions } = useAIChat({
     transactions: allTransactions,
     budgets: allBudgets,
+    appMode,
     onAddTransaction: addTransaction,
     onAddBudget: addBudget,
     messages,
@@ -154,7 +157,9 @@ export default function AIAssistantPage() {
               <Bot size={15} className="text-violet-400" />
             </div>
             <div>
-              <h1 className="text-sm font-medium text-text-primary leading-tight">{t("ai.title")}</h1>
+              <h1 className="text-sm font-medium text-text-primary leading-tight">
+                {appMode === "BUSINESS" ? t("ai.titleBusiness") : t("ai.title")}
+              </h1>
               <div className="flex items-center gap-1.5 mt-0.5">
                 <span className="size-1.5 rounded-full bg-emerald-400" />
                 <span className="text-[11px] text-white/35">{t("common.online")}</span>
@@ -177,11 +182,13 @@ export default function AIAssistantPage() {
           {messages.length === 0 ? (
             <div className="flex flex-col items-center justify-center flex-1 gap-7 px-4 py-8">
               <div className="text-center">
-                <p className="text-base font-medium text-text-primary">{t("ai.howCanIHelp")}</p>
+                <p className="text-base font-medium text-text-primary">
+                  {appMode === "BUSINESS" ? t("ai.howCanIHelpBusiness") : t("ai.howCanIHelp")}
+                </p>
                 <p className="text-sm text-text-muted mt-1.5 leading-relaxed">
-                  {t("ai.askPrompt")}{" "}
+                  {appMode === "BUSINESS" ? t("ai.askPromptBusiness") : t("ai.askPrompt")}{" "}
                   <span className="text-text-secondary bg-surface-secondary px-1.5 py-0.5 rounded text-xs font-mono">
-                    I spent ₹500 on groceries
+                    {appMode === "BUSINESS" ? "Ramesh ne ₹500 jama kiye" : "I spent ₹500 on groceries"}
                   </span>
                 </p>
               </div>

@@ -106,6 +106,14 @@ export const translations: Record<string, Record<Language, string>> = {
   "cards.saving":           { en: "Saving",           hi: "बचत" },
   "cards.percentageSaved":  { en: "Percentage of income saved", hi: "आय का बचाया गया प्रतिशत" },
   "cards.calculatedFromMetrics": { en: "Calculated from centralized metrics engine", hi: "केंद्रीय मेट्रिक्स इंजन से गणना" },
+  "cards.businessBalance":  { en: "Net Cash Flow",    hi: "शुद्ध नकदी प्रवाह" },
+  "cards.businessExpenses": { en: "Business Outflows / Udhaar", hi: "व्यापारिक खर्च / दिया गया उधार" },
+  "cards.businessIncome":   { en: "Sales & Collections", hi: "कुल बिक्री व जमा" },
+  "cards.receivables":      { en: "Outstanding Receivables", hi: "कुल बकाया (उधार)" },
+  "cards.receivablesDesc":  { en: "Pending from customers in Khata", hi: "खाते में ग्राहकों से लेना बाकी" },
+  "cards.cashFlowDesc":     { en: "Inflows minus outflows", hi: "कुल आवक घटाव जावक" },
+  "cards.businessDebitDesc":{ en: "Credit given & expenses", hi: "ग्राहकों को दिया उधार व व्यापारिक खर्च" },
+  "cards.businessCreditDesc":{ en: "Sales & customer payments", hi: "नकद/UPI बिक्री व ग्राहकों से जमा" },
 
   // ── Quick Links ──
   "quicklinks.title":       { en: "Quick Actions",   hi: "त्वरित क्रियाएं" },
@@ -645,7 +653,10 @@ export const translations: Record<string, Record<Language, string>> = {
   // ── AI Assistant ──
   "ai.clearChat":           { en: "Clear chat",       hi: "चैट साफ़ करें" },
   "ai.howCanIHelp":         { en: "How can I help you today?", hi: "आज मैं आपकी क्या सहायता कर सकता हूँ?" },
+  "ai.howCanIHelpBusiness": { en: "How can I help with your business today?", hi: "आज मैं आपके व्यापार में क्या सहायता कर सकता हूँ?" },
   "ai.askPrompt":           { en: "Ask about your finances or say", hi: "अपने वित्त के बारे में पूछें या कहें" },
+  "ai.askPromptBusiness":   { en: "Ask about customers, transactions, sales or payments, or say", hi: "ग्राहकों, लेन-देन, बिक्री या भुगतान के बारे में पूछें या कहें" },
+  "ai.titleBusiness":       { en: "Digital Munim AI", hi: "डिजिटल मुनीम AI" },
   "ai.replyingTo":          { en: "Replying to",      hi: "जवाब दे रहे हैं" },
   "ai.you":                 { en: "You",              hi: "आप" },
   "ai.enterToSend":         { en: "Enter to send",    hi: "भेजने के लिए Enter दबाएं" },
