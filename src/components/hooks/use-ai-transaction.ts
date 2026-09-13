@@ -121,7 +121,11 @@ function sanitizeConfidence(input: unknown): number {
 export function useAITransaction() {
   const [loading, setLoading] = useState(false)
 
-  const parseTransaction = async (message: string): Promise<AITransactionResult | null> => {
+  const parseTransaction = async (
+    message: string,
+    appMode?: "BUSINESS" | "PERSONAL" | "COMBO" | string,
+    existingTransactions?: any[]
+  ): Promise<AITransactionResult | null> => {
     if (!message.trim()) return null
     setLoading(true)
 
@@ -131,10 +135,14 @@ export function useAITransaction() {
       const groqApiKey = (import.meta.env.VITE_GROQ_API_KEY as string | undefined)?.trim()
       const openRouterApiKey = (import.meta.env.VITE_OPENROUTER_API_KEY as string | undefined)?.trim()
       
+      const knownParties = existingTransactions && Array.isArray(existingTransactions)
+        ? Array.from(new Set(existingTransactions.map((t: any) => t.transaction))).filter(Boolean)
+        : undefined
+
       // If no API keys are configured locally, immediately use local VoiceKhata parser
       if (!groqApiKey && !openRouterApiKey) {
         console.log("[useAITransaction] No AI API keys found, using local VoiceKhata ledger engine...")
-        const localParsed = parseVoiceKhataInput(message)
+        const localParsed = parseVoiceKhataInput(message, knownParties)
         if (localParsed) {
           const isParty = localParsed.person && localParsed.person !== "Customer / Party"
           return {
@@ -148,7 +156,7 @@ export function useAITransaction() {
             reasoning: "Parsed deterministically using VoiceKhata local ledger engine.",
             merchant_type: isParty ? "customer" : "retail",
             tags: ["khata", "local_engine"],
-            app_mode: "BUSINESS",
+            app_mode: appMode === "PERSONAL" ? "PERSONAL" : "BUSINESS",
           }
         }
         return null
@@ -169,7 +177,12 @@ export function useAITransaction() {
             body: JSON.stringify({
               model: "google/gemini-2.5-flash",
               messages: [
-                { role: "system", content: `${SYSTEM_PROMPT}\nToday's date is ${today}.` },
+                {
+                  role: "system",
+                  content: `${SYSTEM_PROMPT}\nToday's date is ${today}.${appMode ? ` Mode: ${appMode}.` : ""}${
+                    knownParties?.length ? ` Known counterparties/customers: ${knownParties.slice(0, 15).join(", ")}.` : ""
+                  }`,
+                },
                 { role: "user", content: message },
               ],
               temperature: 0.1,
@@ -202,7 +215,12 @@ export function useAITransaction() {
               body: JSON.stringify({
                 model,
                 messages: [
-                  { role: "system", content: `${SYSTEM_PROMPT}\nToday's date is ${today}.` },
+                  {
+                    role: "system",
+                    content: `${SYSTEM_PROMPT}\nToday's date is ${today}.${appMode ? ` Mode: ${appMode}.` : ""}${
+                      knownParties?.length ? ` Known counterparties/customers: ${knownParties.slice(0, 15).join(", ")}.` : ""
+                    }`,
+                  },
                   { role: "user", content: message },
                 ],
                 temperature: 0.1,
@@ -227,7 +245,7 @@ export function useAITransaction() {
 
       if (!content) {
         console.warn("[useAITransaction] All AI models failed. Falling back to local VoiceKhata parser...")
-        const localParsed = parseVoiceKhataInput(message)
+        const localParsed = parseVoiceKhataInput(message, knownParties)
         if (localParsed) {
           const isParty = localParsed.person && localParsed.person !== "Customer / Party"
           return {
@@ -241,7 +259,7 @@ export function useAITransaction() {
             reasoning: "Local VoiceKhata parser fallback.",
             merchant_type: isParty ? "customer" : "retail",
             tags: ["khata", "local_fallback"],
-            app_mode: "BUSINESS",
+            app_mode: appMode === "PERSONAL" ? "PERSONAL" : "BUSINESS",
           }
         }
         return null
@@ -263,11 +281,14 @@ export function useAITransaction() {
         reasoning: typeof parsed.reasoning === "string" ? parsed.reasoning : "",
         merchant_type: typeof parsed.merchant_type === "string" ? parsed.merchant_type.trim() : undefined,
         tags: Array.isArray(parsed.tags) ? parsed.tags.filter((tag: unknown) => typeof tag === "string") : undefined,
-        app_mode: parsed.app_mode === "PERSONAL" ? "PERSONAL" : "BUSINESS",
+        app_mode: parsed.app_mode === "PERSONAL" || appMode === "PERSONAL" ? "PERSONAL" : "BUSINESS",
       }
     } catch (err) {
       console.error("[useAITransaction] Fetch error, attempting local parse:", err)
-      const localParsed = parseVoiceKhataInput(message)
+      const knownParties = existingTransactions && Array.isArray(existingTransactions)
+        ? Array.from(new Set(existingTransactions.map((t: any) => t.transaction))).filter(Boolean)
+        : undefined
+      const localParsed = parseVoiceKhataInput(message, knownParties)
       if (localParsed) {
         const isParty = localParsed.person && localParsed.person !== "Customer / Party"
         return {
@@ -281,7 +302,7 @@ export function useAITransaction() {
           reasoning: "Local VoiceKhata parser fallback.",
           merchant_type: isParty ? "customer" : "retail",
           tags: ["khata", "local_fallback"],
-          app_mode: "BUSINESS",
+          app_mode: appMode === "PERSONAL" ? "PERSONAL" : "BUSINESS",
         }
       }
       return null
@@ -290,5 +311,10 @@ export function useAITransaction() {
     }
   }
 
-  return { parseTransaction, loading }
+  return {
+    parseTransaction,
+    parseAITransaction: parseTransaction,
+    loading,
+    isParsing: loading,
+  }
 }
