@@ -162,8 +162,8 @@ export function FloatingAssistant() {
 
   const handleVoiceTranscript = React.useCallback((text: string) => {
     const trimmed = text.trim()
-    const cleaned = trimmed.toLowerCase().replace(/[^\w\s]/g, "")
-    if (trimmed && trimmed.length > 2 && !/^(the|a|an|you|bye)$/i.test(cleaned)) {
+    const cleaned = trimmed.toLowerCase().replace(/[^\w\s\u0900-\u097F]/g, "")
+    if (trimmed && trimmed.length >= 2 && !/^(the|a|an|you|bye)$/i.test(cleaned)) {
       sendMessage(trimmed)
       setIsExpandedWorkspace(true)
       setIsCompact(false)

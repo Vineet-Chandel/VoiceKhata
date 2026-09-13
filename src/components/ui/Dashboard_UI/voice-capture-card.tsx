@@ -16,6 +16,8 @@ import {
   User,
   IndianRupee,
   CheckCircle2,
+  AlertCircle,
+  Loader2,
 } from "lucide-react"
 import { useVoiceInput } from "@/components/hooks/use-voice-input"
 import { VoiceWaveform } from "@/components/ui/AIAssistant_UI/voice-waveform"
@@ -125,15 +127,20 @@ export function VoiceCaptureCard({
   const {
     voiceState,
     transcript,
+    errorMessage,
     startListening,
     stopListening,
     reset: resetVoice,
     analyserRef,
   } = useVoiceInput({
     onTranscript: handleVoiceTranscript,
+    onError: (err) => {
+      console.warn("[VoiceCaptureCard] Voice input error:", err)
+    },
   })
 
   const isListening = voiceState === "listening"
+  const isProcessing = voiceState === "processing"
 
   const handleSave = async () => {
     const numAmount = typeof amount === "number" ? amount : parseFloat(String(amount).replace(/,/g, ""))
@@ -249,25 +256,32 @@ export function VoiceCaptureCard({
                 )}
 
                 <button
+                  disabled={isProcessing}
                   onClick={() => {
                     if (isListening) {
                       stopListening()
-                    } else {
+                    } else if (!isProcessing) {
                       startListening()
                     }
                   }}
                   className={`relative size-28 md:size-32 rounded-full flex items-center justify-center transition-all duration-300 cursor-pointer shadow-2xl ${
                     isListening
                       ? "bg-red-500 text-white shadow-red-500/40 scale-105 ring-8 ring-red-500/20"
+                      : isProcessing
+                      ? "bg-indigo-600 text-white shadow-indigo-500/40 scale-100 ring-8 ring-indigo-500/20 animate-pulse cursor-wait"
                       : "bg-gradient-to-br from-indigo-500 via-indigo-600 to-blue-600 text-white hover:from-indigo-400 hover:to-indigo-500 hover:scale-105 shadow-indigo-500/30 ring-8 ring-indigo-500/10"
                   }`}
-                  title={isListening ? "Click to finish speaking" : "Click to speak"}
+                  title={isListening ? "Click to finish speaking" : isProcessing ? "Processing speech..." : "Click to speak"}
                 >
-                  <Mic size={44} className={isListening ? "animate-pulse" : ""} />
+                  {isProcessing ? (
+                    <Loader2 size={44} className="animate-spin text-white" />
+                  ) : (
+                    <Mic size={44} className={isListening ? "animate-pulse" : ""} />
+                  )}
                 </button>
               </div>
 
-              {/* Active Voice Waveform & Live Feedback */}
+              {/* Active Voice Waveform, Processing, or Live Feedback */}
               {isListening ? (
                 <div className="flex flex-col items-center gap-3 mt-4 w-full max-w-sm animate-in fade-in zoom-in-95">
                   <div className="h-8 flex items-center justify-center w-full">
@@ -304,11 +318,23 @@ export function VoiceCaptureCard({
                     </button>
                   </div>
                 </div>
+              ) : isProcessing ? (
+                <div className="flex flex-col items-center gap-3 mt-6 animate-in fade-in">
+                  <div className="flex items-center gap-2.5 px-4 py-2 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-indigo-300">
+                    <Loader2 size={16} className="animate-spin text-indigo-400" />
+                    <span className="text-xs md:text-sm font-medium">Processing speech... / प्रविष्टि तैयार हो रही है...</span>
+                  </div>
+                  {transcript && (
+                    <p className="text-xs text-slate-400 max-w-xs truncate italic">
+                      "{transcript}"
+                    </p>
+                  )}
+                </div>
               ) : (
                 /* Rotating Prompt Suggestions */
                 <div className="mt-8 flex flex-col items-center">
                   <span className="text-xs text-slate-500 uppercase tracking-wider font-semibold mb-1.5">
-                    Try saying
+                    Try saying / बोलकर देखें
                   </span>
                   <AnimatePresence mode="wait">
                     <motion.div
@@ -326,6 +352,29 @@ export function VoiceCaptureCard({
                       "{TRY_SAYING_PROMPTS[promptIndex]}"
                     </motion.div>
                   </AnimatePresence>
+                </div>
+              )}
+
+              {/* Insecure context or microphone permission error notice */}
+              {errorMessage && (
+                <div className="mt-6 p-4 rounded-2xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800/60 text-left max-w-md mx-auto animate-in fade-in">
+                  <div className="flex items-start gap-3">
+                    <AlertCircle className="size-5 text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
+                    <div className="space-y-1">
+                      <p className="text-xs font-semibold text-red-900 dark:text-red-200 leading-relaxed">
+                        {errorMessage}
+                      </p>
+                      <button
+                        onClick={() => {
+                          resetVoice()
+                          startListening()
+                        }}
+                        className="text-xs text-indigo-600 dark:text-indigo-400 font-semibold underline hover:text-indigo-700 cursor-pointer pt-1 inline-block"
+                      >
+                        Try Again / पुनः प्रयास करें
+                      </button>
+                    </div>
+                  </div>
                 </div>
               )}
             </motion.div>

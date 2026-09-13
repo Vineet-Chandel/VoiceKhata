@@ -118,21 +118,19 @@ export function useVoiceInput(options?: UseVoiceInputOptions) {
 
     let finalText = spokenTranscriptRef.current.trim()
 
-    // Always prefer Whisper on recorded audio blob for highest accuracy (especially for Hinglish)
-    if (audioChunksRef.current.length > 0) {
+    // If WebSpeech already captured clear spoken text, use it directly with 0ms latency.
+    // If WebSpeech didn't capture text (e.g. Firefox or Brave blocking SpeechRecognition), use Groq Whisper fallback.
+    if (!finalText && audioChunksRef.current.length > 0) {
       try {
         const mimeType = mediaRecorderRef.current?.mimeType || audioChunksRef.current[0]?.type || "audio/webm"
         const audioBlob = new Blob(audioChunksRef.current, { type: mimeType })
 
-        if (audioBlob.size > 2000) {
-          console.log("[useVoiceInput] Transcribing audio blob via Whisper for highest accuracy...")
+        if (audioBlob.size > 1000) {
+          console.log("[useVoiceInput] WebSpeech empty, transcribing audio blob via Whisper fallback...")
           const whisperResult = await transcribeAudioBlob(audioBlob)
           if (whisperResult && whisperResult.trim()) {
             finalText = whisperResult.trim()
             console.log("[useVoiceInput] Using Whisper transcript:", finalText)
-          } else {
-            // Whisper returned empty (e.g. rejected Urdu/Latin gibberish) - keep WebSpeech text
-            console.log("[useVoiceInput] Whisper returned empty, using WebSpeech transcript:", finalText)
           }
         }
       } catch (err) {
@@ -142,15 +140,15 @@ export function useVoiceInput(options?: UseVoiceInputOptions) {
 
     cleanupHardware()
 
-    // Filter out single-word stopword hallucinations
-    const cleaned = finalText.toLowerCase().replace(/[^\w\s]/g, "").trim()
+    // Filter out single-word stopword hallucinations (CRITICAL: preserve Devanagari Unicode \u0900-\u097F)
+    const cleaned = finalText.toLowerCase().replace(/[^\w\s\u0900-\u097F]/g, "").trim()
     const silenceStopwords = new Set([
       "the", "a", "an", "you", "so", "and", "or", "it", "to", "in", "is", "of",
       "bye", "goodbye", "thank you", "thanks", "subtitles by", "watching", "music",
       "thank you for watching", "please subscribe"
     ])
 
-    if (!finalText || silenceStopwords.has(cleaned) || cleaned.length <= 1) {
+    if (!finalText || silenceStopwords.has(cleaned) || cleaned.length === 0) {
       console.log("[useVoiceInput] Discarded silence or empty speech artifact:", finalText)
       setVoiceState("idle")
       setTranscript("")
@@ -179,7 +177,9 @@ export function useVoiceInput(options?: UseVoiceInputOptions) {
       } catch {}
     }
 
-    handleFinalSpeech()
+    setTimeout(() => {
+      handleFinalSpeech()
+    }, 100)
   }, [clearSilenceTimer, handleFinalSpeech])
 
   const startListening = useCallback(async () => {
@@ -193,9 +193,21 @@ export function useVoiceInput(options?: UseVoiceInputOptions) {
     audioChunksRef.current = []
 
     try {
+      // 0. Check for insecure origin (e.g. testing over LAN IP http://192.168.x.x without HTTPS)
+      if (
+        typeof window !== "undefined" &&
+        !window.isSecureContext &&
+        window.location.hostname !== "localhost" &&
+        window.location.hostname !== "127.0.0.1"
+      ) {
+        throw new Error(
+          "Microphone requires HTTPS or http://localhost. Browsers block audio capture on HTTP IP addresses (e.g. 192.168.x.x). Please test on your PC at http://localhost:5173 or use an HTTPS tunnel (e.g., Cloudflare Tunnel / ngrok)."
+        )
+      }
+
       // 1. Initialize microphone stream
       if (!navigator.mediaDevices?.getUserMedia) {
-        throw new Error("Microphone access is not supported by your browser.")
+        throw new Error("Microphone access is not supported by your browser or is blocked by security settings.")
       }
 
       const stream = await navigator.mediaDevices.getUserMedia({
@@ -304,11 +316,15 @@ export function useVoiceInput(options?: UseVoiceInputOptions) {
           console.warn("[useVoiceInput] SpeechRecognition error:", event.error)
           if (event.error === "network") {
             webSpeechFailedRef.current = true
-          } else if (event.error === "not-allowed") {
-            setErrorMessage("Microphone access denied. Please allow microphone permission.")
+          } else if (event.error === "not-allowed" || event.error === "service-not-allowed") {
+            const msg = "Microphone access denied. Please click the lock icon in your browser address bar to allow microphone."
+            setErrorMessage(msg)
             setVoiceState("error")
             cleanupHardware()
-            optionsRef.current?.onError?.("Microphone access denied.")
+            optionsRef.current?.onError?.(msg)
+          } else if (event.error === "no-speech") {
+            // Chrome fires no-speech when silent for a few seconds; keep listening via MediaRecorder / onend restart
+            console.log("[useVoiceInput] SpeechRecognition no-speech detected, staying active.")
           }
         }
 
@@ -322,10 +338,16 @@ export function useVoiceInput(options?: UseVoiceInputOptions) {
           if (spokenTranscriptRef.current.trim()) {
             handleFinalSpeech()
           } else if (streamRef.current && streamRef.current.active) {
-            // If browser ended before user started speaking, safely resume recognition
-            try {
-              recognition.start()
-            } catch {}
+            // Delay 100ms before restarting to prevent Chrome InvalidStateError
+            setTimeout(() => {
+              if (streamRef.current && streamRef.current.active && !isManualStopRef.current && !isCleaningUpRef.current) {
+                try {
+                  recognition.start()
+                } catch (e) {
+                  console.warn("[useVoiceInput] Recognition restart skipped:", e)
+                }
+              }
+            }, 100)
           }
         }
 

@@ -73,8 +73,8 @@ export function ChatInput({ onSend, loading, guidedStep, replyingTo, onCancelRep
 
   const handleVoiceTranscript = React.useCallback((finalText: string) => {
     const trimmed = finalText.trim()
-    const cleaned = trimmed.toLowerCase().replace(/[^\w\s]/g, "")
-    if (trimmed && trimmed.length > 2 && !/^(the|a|an|you|bye)$/i.test(cleaned)) {
+    const cleaned = trimmed.toLowerCase().replace(/[^\w\s\u0900-\u097F]/g, "")
+    if (trimmed && trimmed.length >= 2 && !/^(the|a|an|you|bye)$/i.test(cleaned)) {
       const fullMessage = (value ? value + " " + trimmed : trimmed).trim()
       onSend(fullMessage)
       setValue("")
