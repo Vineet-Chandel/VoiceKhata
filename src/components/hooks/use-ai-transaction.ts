@@ -203,7 +203,7 @@ export function useAITransaction() {
 
       // 2. Fallback to Groq if OpenRouter fails or wasn't attempted
       if (!content && groqApiKey) {
-        const models = ["llama-3.3-70b-versatile", "llama-3.1-8b-instant"]
+        const models = ["llama-3.3-70b-versatile", "qwen/qwen3.6-27b"]
         for (const model of models) {
           try {
             const res = await fetch(GROQ_API_URL, {

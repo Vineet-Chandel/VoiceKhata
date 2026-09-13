@@ -1,7 +1,7 @@
 "use client"
 
 import React from "react"
-import { Outlet } from "react-router-dom"
+import { Outlet, useLocation } from "react-router-dom"
 
 import { AppSidebar } from "@/components/ui/Dashboard_UI/app-sidebar"
 import { SiteHeader } from "@/components/ui/Dashboard_UI/site-header"
@@ -13,6 +13,9 @@ import {
 } from "@/components/ui/Dashboard_UI/sidebar"
 
 export default function DashboardPage() {
+  const location = useLocation()
+  const isAIPage = location.pathname.includes("/ai-assistant")
+
   return (
     <SidebarProvider
       className="h-screen w-full overflow-hidden pt-2 "
@@ -28,7 +31,7 @@ export default function DashboardPage() {
       <SidebarInset className="flex flex-col h-full overflow-hidden ">
         <SiteHeader />
 
-        <div className="flex-1 overflow-y-auto relative z-10 scroll-smooth pt-4 lg:pt-6 mt-[10px] pb-28 lg:pb-32">
+        <div className={`flex-1 overflow-y-auto relative z-10 scroll-smooth ${isAIPage ? "" : "pt-4 lg:pt-6 mt-[10px] pb-28 lg:pb-32"}`}>
           <Outlet />
         </div>
       </SidebarInset>

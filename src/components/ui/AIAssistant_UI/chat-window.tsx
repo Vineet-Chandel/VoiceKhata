@@ -263,10 +263,54 @@ export function ChatWindow({
                 </div>
               )}
 
-              {m.role === "assistant"
-                ? <div className="flex flex-col gap-0.5 w-full min-w-0 overflow-hidden break-words">{renderMarkdown(m.content)}</div>
-                : <p className="leading-relaxed whitespace-pre-wrap break-words">{m.content}</p>
-              }
+              {m.role === "assistant" ? (
+                <div className="flex flex-col w-full min-w-0 overflow-hidden break-words">
+                  {(() => {
+                    const content = m.content
+                    const thinkStartMatch = content.match(/<think>([\s\S]*)/)
+                    if (thinkStartMatch) {
+                      const innerContent = thinkStartMatch[1]
+                      const closingIndex = innerContent.indexOf("</think>")
+                      let thinkText = ""
+                      let mainText = ""
+                      let isThinking = false
+                      
+                      if (closingIndex !== -1) {
+                        thinkText = innerContent.substring(0, closingIndex).trim()
+                        mainText = content.replace(/<think>[\s\S]*?<\/think>/, "").trim()
+                      } else {
+                        thinkText = innerContent.trim()
+                        mainText = ""
+                        isThinking = true
+                      }
+
+                      return (
+                        <div className="flex flex-col gap-2">
+                          {(thinkText || isThinking) && (
+                            <details className="group border border-black/10 rounded-xl bg-black/10 overflow-hidden shadow-inner mt-1">
+                              <summary className="flex items-center gap-2 px-3.5 py-2.5 text-[13px] font-medium text-text-secondary cursor-pointer hover:bg-black/5 transition-colors select-none list-none [&::-webkit-details-marker]:hidden outline-none">
+                                <ChevronRight size={14} className="group-open:rotate-90 transition-transform text-text-muted shrink-0" />
+                                <Bot size={14} className={isThinking ? "animate-pulse text-indigo-400 shrink-0" : "text-text-muted shrink-0"} />
+                                <span>{isThinking ? "Thinking..." : "Thought Process"}</span>
+                              </summary>
+                              <div className="px-3.5 py-3 border-t border-black/10 bg-black/5">
+                                <div className="flex flex-col gap-1 text-text-secondary opacity-90">
+                                  {thinkText ? renderMarkdown(thinkText) : <span className="italic text-xs">Processing...</span>}
+                                </div>
+                              </div>
+                            </details>
+                          )}
+                          {mainText && <div className="flex flex-col gap-0.5">{renderMarkdown(mainText)}</div>}
+                        </div>
+                      )
+                    }
+                    
+                    return <div className="flex flex-col gap-0.5">{renderMarkdown(content)}</div>
+                  })()}
+                </div>
+              ) : (
+                <p className="leading-relaxed whitespace-pre-wrap break-words">{m.content}</p>
+              )}
             </div>
           </div>
 
