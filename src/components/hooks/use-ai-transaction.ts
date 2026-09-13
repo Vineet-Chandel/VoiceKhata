@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { format } from "date-fns"
 import { parseVoiceKhataInput } from "@/lib/voice-khata-parser"
+import { cleanAndExtractJson } from "@/lib/scan-receipt"
 
 export type AITransactionResult = {
   transaction: string
@@ -61,6 +62,7 @@ Khata & Indian Bookkeeping Rules:
 
 General Rules:
 - Understand Devanagari Hindi, Hinglish, English, slang, and numbers in words ("do hazaar" -> 2000, "paanch sau" -> 500).
+- If the amount is spoken in Lakhs or Crores (e.g., "1 lakh", "1.5 lakh", "dedh lakh", "1 crore"), convert it to an exact number (e.g. 100000, 150000, 10000000) for the amount field. 1 lakh = 100,000. 1 crore = 10,000,000.
 - Extract customer/party name cleanly (remove 'ko', 'ne', 'se', 'bhai', 'ji' prefixes/suffixes from the name).
 - If method is mentioned ("UPI", "GPay", "Cash", "PhonePe", "Paytm", "nagad", "bank transfer"), populate method accordingly. If not mentioned, default to "Cash" or "UPI".
 - date must be yyyy-MM-dd if present (default to today).
@@ -126,11 +128,12 @@ export function useAITransaction() {
     const today = format(new Date(), "yyyy-MM-dd")
 
     try {
-      const apiKey = (import.meta.env.VITE_GROQ_API_KEY as string | undefined)?.trim()
+      const groqApiKey = (import.meta.env.VITE_GROQ_API_KEY as string | undefined)?.trim()
+      const openRouterApiKey = (import.meta.env.VITE_OPENROUTER_API_KEY as string | undefined)?.trim()
       
-      // If Groq API key is not configured locally, immediately use local VoiceKhata parser
-      if (!apiKey) {
-        console.log("[useAITransaction] No VITE_GROQ_API_KEY found, using local VoiceKhata ledger engine...")
+      // If no API keys are configured locally, immediately use local VoiceKhata parser
+      if (!groqApiKey && !openRouterApiKey) {
+        console.log("[useAITransaction] No AI API keys found, using local VoiceKhata ledger engine...")
         const localParsed = parseVoiceKhataInput(message)
         if (localParsed) {
           const isParty = localParsed.person && localParsed.person !== "Customer / Party"
@@ -151,44 +154,79 @@ export function useAITransaction() {
         return null
       }
 
-      const models = [
-        "llama-3.3-70b-versatile",
-        "llama-3.1-8b-instant",
-      ]
-
       let data: any = null
+      let content = ""
 
-      for (const model of models) {
+      // 1. Try Gemini via OpenRouter
+      if (openRouterApiKey) {
         try {
-          const res = await fetch(GROQ_API_URL, {
+          const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
-              Authorization: `Bearer ${apiKey}`,
+              Authorization: `Bearer ${openRouterApiKey}`,
             },
             body: JSON.stringify({
-              model,
+              model: "google/gemini-2.5-flash",
               messages: [
                 { role: "system", content: `${SYSTEM_PROMPT}\nToday's date is ${today}.` },
                 { role: "user", content: message },
               ],
               temperature: 0.1,
               max_tokens: 350,
-              response_format: { type: "json_object" },
             }),
           })
-
           if (res.ok) {
             data = await res.json()
-            break
+            content = data?.choices?.[0]?.message?.content ?? ""
+            if (content) {
+              console.log("[useAITransaction] Successfully parsed with Gemini via OpenRouter")
+            }
           }
-        } catch {
-          continue
+        } catch (err) {
+          console.warn("[useAITransaction] OpenRouter Gemini failed:", err)
         }
       }
 
-      if (!data) {
-        console.warn("[useAITransaction] All Groq models failed. Falling back to local VoiceKhata parser...")
+      // 2. Fallback to Groq if OpenRouter fails or wasn't attempted
+      if (!content && groqApiKey) {
+        const models = ["llama-3.3-70b-versatile", "llama-3.1-8b-instant"]
+        for (const model of models) {
+          try {
+            const res = await fetch(GROQ_API_URL, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${groqApiKey}`,
+              },
+              body: JSON.stringify({
+                model,
+                messages: [
+                  { role: "system", content: `${SYSTEM_PROMPT}\nToday's date is ${today}.` },
+                  { role: "user", content: message },
+                ],
+                temperature: 0.1,
+                max_tokens: 350,
+                response_format: { type: "json_object" },
+              }),
+            })
+
+            if (res.ok) {
+              data = await res.json()
+              content = data?.choices?.[0]?.message?.content ?? ""
+              if (content) {
+                 console.log("[useAITransaction] Successfully parsed with Groq LLaMA")
+                 break
+              }
+            }
+          } catch {
+            continue
+          }
+        }
+      }
+
+      if (!content) {
+        console.warn("[useAITransaction] All AI models failed. Falling back to local VoiceKhata parser...")
         const localParsed = parseVoiceKhataInput(message)
         if (localParsed) {
           const isParty = localParsed.person && localParsed.person !== "Customer / Party"
@@ -208,8 +246,9 @@ export function useAITransaction() {
         }
         return null
       }
-      const content = data?.choices?.[0]?.message?.content ?? "{}"
-      const parsed = JSON.parse(content)
+      
+      const cleanJsonStr = cleanAndExtractJson(content)
+      const parsed = JSON.parse(cleanJsonStr || "{}")
 
       return {
         transaction: typeof parsed.transaction === "string" && parsed.transaction.trim()

@@ -116,18 +116,27 @@ export function parseVoiceKhataInput(transcript: string, knownCustomers?: string
   let amount: number | null = null
 
   const amountMatch =
-    lower.match(/(?:(?:rs\.?|inr|₹|rupaye|rupees)\s*)?([0-9]+(?:,[0-9]+)*(?:\.[0-9]{1,2})?|\b[0-9]+k\b)(?:\s*(?:rs\.?|inr|₹|rupaye|rupees))?/i) ||
-    lowerTrans.match(/(?:(?:rs\.?|inr|₹|rupaye|rupees)\s*)?([0-9]+(?:,[0-9]+)*(?:\.[0-9]{1,2})?|\b[0-9]+k\b)(?:\s*(?:rs\.?|inr|₹|rupaye|rupees))?/i)
+    lower.match(/(?:(?:rs\.?|inr|₹|rupaye|rupees)\s*)?([0-9]+(?:,[0-9]+)*(?:\.[0-9]+)?(?:\s*(?:k|lakh|lac|crore|cr|लाख|करोड़)(?![a-z\u0900-\u097F]))?)(?:\s*(?:rs\.?|inr|₹|rupaye|rupees))?/i) ||
+    lowerTrans.match(/(?:(?:rs\.?|inr|₹|rupaye|rupees)\s*)?([0-9]+(?:,[0-9]+)*(?:\.[0-9]+)?(?:\s*(?:k|lakh|lac|crore|cr|लाख|करोड़)(?![a-z\u0900-\u097F]))?)(?:\s*(?:rs\.?|inr|₹|rupaye|rupees))?/i)
 
   if (amountMatch && amountMatch[1]) {
-    let rawNum = amountMatch[1].replace(/,/g, "")
-    if (rawNum.endsWith("k")) {
-      amount = parseFloat(rawNum.replace("k", "")) * 1000
-    } else {
-      const parsed = parseFloat(rawNum)
-      if (!isNaN(parsed) && parsed > 0) {
-        amount = parsed
-      }
+    let rawNum = amountMatch[1].replace(/,/g, "").toLowerCase()
+    let multiplier = 1
+    
+    if (rawNum.includes("k")) {
+      multiplier = 1000
+      rawNum = rawNum.replace("k", "").trim()
+    } else if (rawNum.match(/lakh|lac|लाख/)) {
+      multiplier = 100000
+      rawNum = rawNum.replace(/lakh|lac|लाख/g, "").trim()
+    } else if (rawNum.match(/crore|cr|करोड़/)) {
+      multiplier = 10000000
+      rawNum = rawNum.replace(/crore|cr|करोड़/g, "").trim()
+    }
+
+    const parsed = parseFloat(rawNum)
+    if (!isNaN(parsed) && parsed > 0) {
+      amount = parsed * multiplier
     }
   }
 

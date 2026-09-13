@@ -52,7 +52,7 @@ export function VoiceCaptureCard({
   className = "",
 }: VoiceCaptureCardProps) {
   const { addTransaction, transactions } = useTransactions()
-  const { parseAITransaction, isParsing: isAIParsing } = useAITransaction()
+  const { parseTransaction: parseAITransaction, loading: isAIParsing } = useAITransaction()
   const { appMode } = useAppMode()
   const { language } = useLanguage()
 
@@ -139,7 +139,7 @@ export function VoiceCaptureCard({
         if (aiResult.transaction && aiResult.transaction !== "Unknown" && (defaultPerson === "General Expense" || defaultPerson === "Payment Received")) {
           setPerson(aiResult.transaction)
         }
-        if (aiResult.amount && (parsed.amount === null || Number.isNaN(parsed.amount))) {
+        if (aiResult.amount !== null && !Number.isNaN(aiResult.amount)) {
           setAmount(aiResult.amount)
         }
         if (aiResult.category && activeCategories.includes(aiResult.category)) {
@@ -508,6 +508,30 @@ export function VoiceCaptureCard({
                   Record again
                 </button>
               </div>
+
+              {/* AI Refining Preloader */}
+              <AnimatePresence>
+                {isAIParsing && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0, marginBottom: 0 }}
+                    animate={{ opacity: 1, height: 'auto', marginBottom: 24 }}
+                    exit={{ opacity: 0, height: 0, marginBottom: 0 }}
+                    className="overflow-hidden"
+                  >
+                    <div className="flex items-center gap-3 p-3.5 rounded-xl bg-indigo-50/50 dark:bg-indigo-500/10 border border-indigo-200/60 dark:border-indigo-500/20 text-indigo-700 dark:text-indigo-300 shadow-sm backdrop-blur-sm">
+                      <Loader2 size={18} className="animate-spin shrink-0 text-indigo-500" />
+                      <div className="flex flex-col">
+                        <span className="text-sm font-semibold tracking-wide">
+                          AI is refining your entry...
+                        </span>
+                        <span className="text-xs opacity-80 font-medium">
+                          Hold on, extracting details precisely.
+                        </span>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
 
               {/* Direction Selector (Credit / Debit) */}
               <div className="grid grid-cols-2 gap-3 mb-4">
