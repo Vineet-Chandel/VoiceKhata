@@ -93,9 +93,13 @@ export function VoiceCaptureCard({
       ? (parsed.type === "Debit" ? "Inventory/Purchases" : "Sales")
       : (parsed.type === "Debit" ? "Shopping" : "Income")
 
-    setPerson(parsed.person === "Customer / Party" ? "" : parsed.person)
+    const defaultPerson = (parsed.person && parsed.person !== "Customer / Party")
+      ? parsed.person
+      : (parsed.type === "Credit" ? "Payment Received" : "General Expense")
+
+    setPerson(defaultPerson)
     setAmount(parsed.amount !== null ? parsed.amount : "")
-    setType(parsed.type || "Credit")
+    setType(parsed.type || (parsed.category === "Income" ? "Credit" : "Debit"))
     setCategory(parsed.category || defaultCat)
     setMethod(parsed.method || "UPI")
     setDate(parsed.date || format(new Date(), "yyyy-MM-dd"))

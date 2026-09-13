@@ -98,16 +98,18 @@ export function VoiceActionBanner({
       }
     }
 
+    const resolvedPerson = (parsed.person && parsed.person !== "Customer / Party")
+      ? parsed.person
+      : (parsed.type === "Credit" ? "Payment Received" : "General Expense")
+
     setParsedTx(parsed)
-    setEditPerson(parsed.person === "Customer / Party" ? "" : parsed.person)
+    setEditPerson(resolvedPerson)
     setEditAmount(parsed.amount || "")
-    setEditType(parsed.type || "Credit")
+    setEditType(parsed.type || (parsed.category === "Income" ? "Credit" : "Debit"))
     setEditMethod(parsed.method || "UPI")
     setEditDate(parsed.date)
 
-    if (parsed.amount && parsed.isAmbiguousPerson) {
-      setFlowState("ambiguous_person")
-    } else if (parsed.amount && parsed.isAmbiguousDirection) {
+    if (parsed.amount && parsed.isAmbiguousDirection) {
       setFlowState("ambiguous_direction")
     } else {
       setFlowState("review")

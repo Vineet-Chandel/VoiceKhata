@@ -982,13 +982,30 @@ function fillDraftFromReply(reply: string, draft: Partial<TransactionDraft>): Pa
     }
   }
 
+  // 1. Identify Direction / Type FIRST before touching payment method
+  const isDebit =
+    /\b(?:debit|debited|diye|diya|de diya|de diye|kharcha|kharch|expense|spent|paid|दिए|दिया|डेबिट|खर्च)\b/i.test(r) ||
+    r.includes("दिए") || r.includes("दिया") || r.includes("डेबिट") || r.includes("खर्च")
+  const isCredit =
+    /\b(?:credit|credited|liye|liya|le liye|se liye|income|salary|mila|mile|jama|vasool|received|लिए|लिया|क्रेडिट|जमा|मिला)\b/i.test(r) ||
+    r.includes("लिए") || r.includes("लिया") || r.includes("क्रेडिट") || r.includes("जमा") || r.includes("मिला")
+
+  if (isCredit && !isDebit) {
+    updated.type = "Credit"
+    if (!updated.category || updated.category === "Other") updated.category = "Income"
+  } else if (isDebit && !isCredit) {
+    updated.type = "Debit"
+    if (!updated.category || updated.category === "Income") updated.category = "Shopping"
+  }
+
+  // 2. Identify Payment Method only when specifically mentioned (never lone "credit" or lone "debit")
   if (!updated.method) {
-    if (r.includes("cash") || r === "1") updated.method = "Cash"
-    else if (r.includes("upi") || r.includes("gpay") || r.includes("phonepe") || r.includes("paytm") || r === "2") updated.method = "UPI"
-    else if (r.includes("credit") || r === "3") updated.method = "Credit Card"
-    else if (r.includes("debit") || r === "4") updated.method = "Debit Card"
-    else if (r.includes("bank") || r.includes("transfer") || r.includes("neft") || r.includes("imps") || r === "5") updated.method = "Bank Transfer"
-    else if (r.includes("net") || r.includes("netbanking") || r === "6") updated.method = "Net Banking"
+    if (/\b(?:cash|nagad|cash in hand|rokar|नकद|कैश)\b/i.test(r) || r === "1") updated.method = "Cash"
+    else if (/\b(?:upi|gpay|google pay|phonepe|paytm|online)\b/i.test(r) || r === "2") updated.method = "UPI"
+    else if (/\b(?:credit\s*card|creditcard)\b/i.test(r) || r === "3") updated.method = "Credit Card"
+    else if (/\b(?:debit\s*card|debitcard)\b/i.test(r) || r === "4") updated.method = "Debit Card"
+    else if (/\b(?:bank|transfer|neft|imps|rtgs)\b/i.test(r) || r === "5") updated.method = "Bank Transfer"
+    else if (/\b(?:net\s*banking|netbanking)\b/i.test(r) || r === "6") updated.method = "Net Banking"
   }
 
   if (!updated.category) {
@@ -996,9 +1013,12 @@ function fillDraftFromReply(reply: string, draft: Partial<TransactionDraft>): Pa
     if (found) updated.category = found
   }
 
-  if (!updated.type) {
-    if (r.includes("debit") || r.includes("expense")) updated.type = "Debit"
-    if (r.includes("credit") || r.includes("income")) updated.type = "Credit"
+  // 3. Fallbacks to avoid lingering prompts
+  if (typeof updated.amount === "number") {
+    if (!updated.type) updated.type = "Debit"
+    if (!updated.method) updated.method = "Cash"
+    if (!updated.category) updated.category = updated.type === "Credit" ? "Income" : "Shopping"
+    if (!updated.transaction) updated.transaction = updated.type === "Credit" ? "Payment Received" : "General Expense"
   }
 
   return updated
@@ -1010,10 +1030,10 @@ function guidedCategoryFromReply(reply: string): string {
 
 function guidedMethodFromReply(reply: string): string {
   const l = reply.toLowerCase()
-  if (l.includes("cash") || l === "1") return "Cash"
+  if (l.includes("cash") || l.includes("nagad") || l === "1") return "Cash"
   if (l.includes("upi") || l.includes("gpay") || l.includes("phonepe") || l.includes("paytm") || l === "2") return "UPI"
-  if (l.includes("credit") || l === "3") return "Credit Card"
-  if (l.includes("debit") || l === "4") return "Debit Card"
+  if (l.includes("credit card") || l.includes("creditcard") || l === "3") return "Credit Card"
+  if (l.includes("debit card") || l.includes("debitcard") || l === "4") return "Debit Card"
   if (l.includes("bank") || l.includes("transfer") || l === "5") return "Bank Transfer"
   if (l.includes("net") || l === "6") return "Net Banking"
   return "Cash"
@@ -1046,8 +1066,20 @@ function detectCorrection(input: string): FieldCorrection | null {
     return { field: "category", value: category }
   }
 
-  if (/(?:type\s+(?:is|should be)|make\s+it)\s+credit/i.test(l)) return { field: "type", value: "Credit" }
-  if (/(?:type\s+(?:is|should be)|make\s+it)\s+debit/i.test(l)) return { field: "type", value: "Debit" }
+  if (
+    /(?:type\s+(?:is|should be)|make\s+it)\s+credit/i.test(l) ||
+    /^(?:credit|credited|liye|liya|jama|income|salary|क्रेडिट|लिए|लिया|जमा)(?:\s+(?:karo|kar do|hai))?$/i.test(l) ||
+    l.includes("क्रेडिट") || l.includes("लिए")
+  ) {
+    return { field: "type", value: "Credit" }
+  }
+  if (
+    /(?:type\s+(?:is|should be)|make\s+it)\s+debit/i.test(l) ||
+    /^(?:debit|debited|diye|diya|kharch|kharcha|expense|spent|डेबिट|दिए|दिया|खर्च)(?:\s+(?:karo|kar do|hai))?$/i.test(l) ||
+    l.includes("डेबिट") || l.includes("दिए")
+  ) {
+    return { field: "type", value: "Debit" }
+  }
 
   const methodMatch = s.match(/(?:method\s+(?:is|should be|=)|(?:paid|pay)\s+(?:via|with|by)|change\s+method\s+to)\s+(.+)/i)
   if (methodMatch) return { field: "method", value: guidedMethodFromReply(methodMatch[1]) }
@@ -1605,18 +1637,23 @@ export function useAIChat({
 
       if (multiState.step === "setup") {
         let nextState = { ...multiState }
-        if (reply === "credit all") {
+        const isCreditAll = /credit\s*all|liye\s*all|sab\s*credit/i.test(reply) || reply === "credit" || reply.includes("क्रेडिट") || reply.includes("लिए")
+        const isDebitAll = /debit\s*all|diye\s*all|sab\s*debit/i.test(reply) || reply === "debit" || reply.includes("डेबिट") || reply.includes("दिए")
+
+        if (isCreditAll && !isDebitAll) {
           nextState = { ...nextState, step: "queue" }
           nextState.drafts = nextState.drafts.map(d => {
              const newD = !d.type ? { ...d, type: "Credit" } : { ...d }
-             if ((newD.transaction || nextState.skipNames) && newD.type) newD.status = "completed"
+             if (!newD.transaction) newD.transaction = "Payment Received"
+             newD.status = "completed"
              return newD as typeof d
           })
-        } else if (reply === "debit all") {
+        } else if (isDebitAll && !isCreditAll) {
           nextState = { ...nextState, step: "queue" }
           nextState.drafts = nextState.drafts.map(d => {
              const newD = !d.type ? { ...d, type: "Debit" } : { ...d }
-             if ((newD.transaction || nextState.skipNames) && newD.type) newD.status = "completed"
+             if (!newD.transaction) newD.transaction = "General Expense"
+             newD.status = "completed"
              return newD as typeof d
           })
         } else if (reply === "set individually") {
@@ -1640,8 +1677,8 @@ export function useAIChat({
 
           if (!d.transaction && !nextState.skipNames) {
             if (reply === "skip name" || reply === "skip") {
-              d.transaction = `₹${d.amount} transaction`
-              d.category = "Other"
+              d.transaction = d.type === "Credit" ? "Payment Received" : "General Expense"
+              d.category = d.type === "Credit" ? "Income" : "Other"
             } else {
               setLoading(true)
               const aiResult = await parseTransaction(content.trim())
@@ -1650,9 +1687,16 @@ export function useAIChat({
               d.category = safeCategory(aiResult?.category)
             }
           } else if (!d.type) {
-            if (reply.includes("debit")) {
+            const isDebitReply =
+              /\b(?:debit|debited|diye|diya|de diya|spent|paid|kharch|kharcha|expense|दिए|दिया|डेबिट|खर्च)\b/i.test(reply) ||
+              reply.includes("दिए") || reply.includes("दिया") || reply.includes("डेबिट") || reply.includes("खर्च")
+            const isCreditReply =
+              /\b(?:credit|credited|liye|liya|le liye|se liye|income|salary|mila|mile|jama|vasool|received|लिए|लिया|क्रेडिट|जमा|मिला)\b/i.test(reply) ||
+              reply.includes("लिए") || reply.includes("लिया") || reply.includes("क्रेडिट") || reply.includes("जमा") || reply.includes("मिला")
+
+            if (isDebitReply && !isCreditReply) {
               d.type = "Debit"
-            } else if (reply.includes("credit")) {
+            } else if (isCreditReply && !isDebitReply) {
               d.type = "Credit"
             } else {
               d.type = "Debit"
@@ -1660,7 +1704,10 @@ export function useAIChat({
           }
 
           // Evaluate if completed
-          if (nextState.skipNames && !d.transaction) { d.transaction = `₹${d.amount} transaction`; d.category = "Other"; }
+          if (nextState.skipNames && !d.transaction) { 
+            d.transaction = d.type === "Credit" ? "Payment Received" : "General Expense"
+            d.category = d.type === "Credit" ? "Income" : "Other"
+          }
           if (d.transaction && d.type) {
             d.status = "completed"
           }
@@ -1669,8 +1716,8 @@ export function useAIChat({
         // Auto-complete any that are fully populated but still marked pending
         nextState.drafts.forEach(d => {
           if (d.status === "pending" && nextState.skipNames && !d.transaction) {
-            d.transaction = `₹${d.amount} transaction`
-            d.category = "Other"
+            d.transaction = d.type === "Credit" ? "Payment Received" : "General Expense"
+            d.category = d.type === "Credit" ? "Income" : "Other"
           }
           if (d.status === "pending" && d.transaction && d.type) {
             d.status = "completed"
@@ -1707,16 +1754,28 @@ export function useAIChat({
           if (!Number.isNaN(amount) && amount > 0) {
             let rest = part.replace(match[0], "").trim()
             let type: "Debit" | "Credit" | undefined
-            
-            if (/\bdebit\b/i.test(rest)) {
+
+            const isDebitKw =
+              /\b(?:debit|debited|diye|diya|de diya|de diye|spent|paid|kharcha|kharch|expense|दिए|दिया|डेबिट|खर्च)\b/i.test(rest) ||
+              rest.includes("दिए") || rest.includes("दिया") || rest.includes("डेबिट") || rest.includes("खर्च")
+            const isCreditKw =
+              /\b(?:credit|credited|liye|liya|le liye|se liye|mila|mile|jama|vasool|salary|income|received|लिए|लिया|क्रेडिट|जमा|मिला)\b/i.test(rest) ||
+              rest.includes("लिए") || rest.includes("लिया") || rest.includes("क्रेडिट") || rest.includes("जमा") || rest.includes("मिला")
+
+            if (isDebitKw && !isCreditKw) {
               type = "Debit"
-              rest = rest.replace(/\bdebit\b/i, "").trim()
-            } else if (/\bcredit\b/i.test(rest)) {
+              rest = rest.replace(/\b(?:debit|debited|diye|diya|de diya|de diye|spent|paid|kharcha|kharch|expense|दिए|दिया|डेबिट|खर्च)\b/gi, "").trim()
+            } else if (isCreditKw && !isDebitKw) {
               type = "Credit"
-              rest = rest.replace(/\bcredit\b/i, "").trim()
+              rest = rest.replace(/\b(?:credit|credited|liye|liya|le liye|se liye|mila|mile|jama|vasool|salary|income|received|लिए|लिया|क्रेडिट|जमा|मिला)\b/gi, "").trim()
+            } else if (isDebitKw && isCreditKw) {
+              type = "Debit"
             }
             
             let transaction = rest.replace(/^[-\s]+|[-\s]+$/g, "").trim()
+            if (!transaction) {
+              transaction = type === "Credit" ? "Payment Received" : "General Expense"
+            }
             
             let status: DraftItem["status"] = "pending"
             const dedupKey = `${amount}-${transaction.toLowerCase()}`
@@ -2074,25 +2133,30 @@ export function useAIChat({
                 )
               : fallbackMerchantResolution(merchantInput)
 
-            const category = aiResult.category !== "Other" ? safeCategory(aiResult.category) : safeCategory(merchant.category)
-            const inferredType =
-              aiResult.type ?? (category === "Income" ? "Credit" : "Debit")
-            const type =
-              category === "Income"
-                ? "Credit"
-                : inferredType === "Credit" && !/\b(salary|income|refund|cashback|bonus|interest|received|diye|diya|jama|mila|mile|payment|vasool|चुकता|जमा|दिए|दिया|मिला)\b/i.test(content)
-                  ? "Debit"
-                  : inferredType
+            const isExplicitCredit =
+              /\b(credit|credited|salary|income|refund|cashback|bonus|interest|received|liye|liya|le liye|se liye|jama|mila|mile|payment|vasool|चुकता|जमा|लिए|लिया|मिला|मिले|क्रेडिट)\b/i.test(content) ||
+              content.includes("लिए") || content.includes("लिया") || content.includes("क्रेडिट") || content.includes("जमा") || content.includes("मिला")
+            const isExplicitDebit =
+              /\b(debit|debited|diye|diya|de diya|de diye|spent|paid|kharch|kharcha|expense|उधार|खर्चा|खर्च|दिए|दिया|डेबिट)\b/i.test(content) ||
+              content.includes("दिए") || content.includes("दिया") || content.includes("डेबिट") || content.includes("खर्च")
+
+            const inferredType = isExplicitCredit ? "Credit" : isExplicitDebit ? "Debit" : (aiResult.type ?? "Debit")
+            const category = aiResult.category !== "Other" ? safeCategory(aiResult.category) : (inferredType === "Credit" ? "Income" : safeCategory(merchant.category))
+            const type = category === "Income" ? "Credit" : inferredType
 
             const previousAmount = pendingDraft && typeof (pendingDraft as any).amount === "number" ? (pendingDraft as any).amount : undefined
             const amount = typeof aiResult.amount === "number" ? aiResult.amount : previousAmount
-            const method = isValidMethod(aiResult.method) ? aiResult.method : undefined
+            const method = isValidMethod(aiResult.method) ? aiResult.method : "Cash"
             const date = aiResult.date ?? format(new Date(), "yyyy-MM-dd")
+            const transactionName = (merchant.normalizedName && merchant.normalizedName !== "Customer / Party") 
+              ? merchant.normalizedName 
+              : (type === "Credit" ? "Payment Received" : "General Expense")
 
             const draft: Partial<TransactionDraft> = {
-              transaction: merchant.normalizedName,
+              transaction: transactionName,
               category,
               type,
+              method,
               date,
               status: "Completed",
               merchantType: merchant.merchantType,
@@ -2100,9 +2164,21 @@ export function useAIChat({
               merchantConfidence: merchant.confidence,
               app_mode: aiResult.app_mode,
               ...(amount !== undefined ? { amount } : {}),
-              ...(method ? { method } : {}),
             }
             setPendingDraft(draft)
+
+            if (amount !== undefined) {
+              setGuidedStep("confirm")
+              addMessage({
+                role: "assistant",
+                content: localizeByMode(nextLanguageMode, {
+                  english: `Got it - ${transactionName} for Rs.${amount.toLocaleString("en-IN")}.\n\n${buildConfirmCard(draft, nextLanguageMode)}`,
+                  hinglish: `Done - ${transactionName} ka Rs.${amount.toLocaleString("en-IN")}.\n\n${buildConfirmCard(draft, nextLanguageMode)}`,
+                  hindi: "",
+                }),
+              })
+              break
+            }
 
             const mergedConfidence = Math.max(parseConfidence, merchant.confidence)
             if (mergedConfidence >= 0.4 && mergedConfidence < 0.7) {
@@ -2131,37 +2207,15 @@ export function useAIChat({
             }
 
             const autoTag = category !== "Other" ? `\n\nAuto-detected: ${category} / ${type}.` : ""
-            if (amount !== undefined && method) {
-              setGuidedStep("confirm")
-              addMessage({
-                role: "assistant",
-                content: localizeByMode(nextLanguageMode, {
-                  english: `Got it - ${merchant.normalizedName} for Rs.${amount.toLocaleString("en-IN")} via ${method}.${autoTag}\n\n${buildConfirmCard(draft, nextLanguageMode)}`,
-                  hinglish: `Done - ${merchant.normalizedName} ka Rs.${amount.toLocaleString("en-IN")} ${method} se.${autoTag}\n\n${buildConfirmCard(draft, nextLanguageMode)}`,
-                  hindi: "",
-                }),
-              })
-            } else if (amount !== undefined) {
-              setGuidedStep("method")
-              addMessage({
-                role: "assistant",
-                content: localizeByMode(nextLanguageMode, {
-                  english: `Got it - ${merchant.normalizedName} for Rs.${amount.toLocaleString("en-IN")}.${autoTag}\n\nHow did you pay or receive?\n- Cash\n- UPI\n- Credit Card\n- Debit Card\n- Bank Transfer\n- Net Banking`,
-                  hinglish: `Theek hai - ${merchant.normalizedName} ka Rs.${amount.toLocaleString("en-IN")} note kar liya.${autoTag}\n\nPayment kaise hua?\n- Cash\n- UPI\n- Credit Card\n- Debit Card\n- Bank Transfer\n- Net Banking`,
-                  hindi: "",
-                }),
-              })
-            } else {
-              setGuidedStep("amount")
-              addMessage({
-                role: "assistant",
-                content: localizeByMode(nextLanguageMode, {
-                  english: `Got it - ${merchant.normalizedName}.${autoTag}\n\nHow much?`,
-                  hinglish: `Theek hai - ${merchant.normalizedName}.${autoTag}\n\nKitne ka tha?`,
-                  hindi: "",
-                }),
-              })
-            }
+            setGuidedStep("amount")
+            addMessage({
+              role: "assistant",
+              content: localizeByMode(nextLanguageMode, {
+                english: `Got it - ${merchant.normalizedName}.${autoTag}\n\nHow much?`,
+                hinglish: `Theek hai - ${merchant.normalizedName}.${autoTag}\n\nKitne ka tha?`,
+                hindi: "",
+              }),
+            })
             break
           }
 
@@ -2570,12 +2624,26 @@ if (isLikelyUnrelated(trimmedContent)) {
               )
             : fallbackMerchantResolution(merchantInput)
 
-          const category = aiTx.category !== "Other" ? safeCategory(aiTx.category) : safeCategory(merchant.category)
-          const type = category === "Income" ? "Credit" : (aiTx.type ?? "Debit")
+          const isExplicitCredit =
+            /\b(credit|credited|salary|income|refund|cashback|bonus|interest|received|liye|liya|le liye|se liye|jama|mila|mile|payment|vasool|चुकता|जमा|लिए|लिया|मिला|मिले|क्रेडिट)\b/i.test(trimmedContent) ||
+            trimmedContent.includes("लिए") || trimmedContent.includes("लिया") || trimmedContent.includes("क्रेडिट") || trimmedContent.includes("जमा") || trimmedContent.includes("मिला")
+          const isExplicitDebit =
+            /\b(debit|debited|diye|diya|de diya|de diye|spent|paid|kharch|kharcha|expense|उधार|खर्चा|खर्च|दिए|दिया|डेबिट)\b/i.test(trimmedContent) ||
+            trimmedContent.includes("दिए") || trimmedContent.includes("दिया") || trimmedContent.includes("डेबिट") || trimmedContent.includes("खर्च")
+
+          const inferredType = isExplicitCredit ? "Credit" : isExplicitDebit ? "Debit" : (aiTx.type ?? "Debit")
+          const category = aiTx.category !== "Other" ? safeCategory(aiTx.category) : (inferredType === "Credit" ? "Income" : safeCategory(merchant.category))
+          const type = category === "Income" ? "Credit" : inferredType
+          const method = isValidMethod(aiTx.method) ? aiTx.method : "Cash"
+          const transactionName = (merchant.normalizedName && merchant.normalizedName !== "Customer / Party") 
+            ? merchant.normalizedName 
+            : (type === "Credit" ? "Payment Received" : "General Expense")
+
           const draft: Partial<TransactionDraft> = {
-            transaction: merchant.normalizedName,
+            transaction: transactionName,
             category,
             type,
+            method,
             date: aiTx.date ?? format(new Date(), "yyyy-MM-dd"),
             status: "Completed",
             merchantRawInput: merchantInput,
@@ -2583,11 +2651,19 @@ if (isLikelyUnrelated(trimmedContent)) {
             merchantTags: merchant.tags,
             merchantConfidence: merchant.confidence,
             ...(typeof aiTx.amount === "number" ? { amount: aiTx.amount } : {}),
-            ...(isValidMethod(aiTx.method) ? { method: aiTx.method } : {}),
           }
 
           setPendingDraft(draft)
           setAssistantMode("expense_logging")
+
+          // When amount is provided, immediately display confirmation card!
+          if (typeof draft.amount === "number") {
+            setGuidedStep("confirm")
+            addMessage({ role: "assistant", content: buildConfirmCard(draft, nextLanguageMode) })
+            setLoading(false)
+            return
+          }
+
           const missing = getMissingFields(draft)
           const mergedConfidence = Math.max(aiTx.confidence, merchant.confidence)
 
