@@ -37,22 +37,26 @@ Return ONLY valid JSON with this shape:
 }
 
 Khata & Indian Bookkeeping Rules:
-- Credit (Inflow / Money Received / Income):
-  * Markers: "credit", "credited", "liye", "liya", "le liye", "se liye", "ne diya", "ne diye", "se mila", "se mile", "received", "received from", "paid me", "sent me", "salary", "jama", "jama kiya", "vasool", "cashback", "refund", "aaye", "aaya", "क्रेडिट", "लिए", "लिया", "जमा", "मिला", "भुगतान प्राप्त", "आया", "से मिला", "ने दिया", "ने दिए"
+- Credit (Inflow / Money Received / Income / Customer Paid / Udhaar Repaid):
+  * Markers: "credit", "credited", "liye", "liya", "le liye", "se liye", "ne diya", "ne diye", "se mila", "se mile", "received", "received from", "paid by", "paid me", "sent me", "salary", "jama", "jama kiya", "vasool", "cashback", "refund", "aaye", "aaya", "क्रेडिट", "लिए", "लिया", "जमा", "मिला", "भुगतान प्राप्त", "आया", "से मिला", "ने दिया", "ने दिए", "वसूल"
+  * RULE: "Ramesh paid 1200" or "Ramesh paid 1200 via UPI" -> Ramesh paid money to shopkeeper -> type: "Credit", transaction: "Ramesh", reasoning: "Ramesh paid payment via UPI"
+  * RULE: "Paid by Ramesh 500" -> Ramesh paid money -> type: "Credit", transaction: "Ramesh"
   * RULE: "500 credit" -> type: "Credit", category: "Income", transaction: "Payment Received"
   * RULE: "500 liye" -> type: "Credit", category: "Income", transaction: "Payment Received"
   * RULE: "Ramesh ne 500 diye" -> Ramesh gave me money -> type: "Credit", transaction: "Ramesh"
   * RULE: "Ramesh se 500 liye" -> Took/received money from Ramesh -> type: "Credit", transaction: "Ramesh"
+  * RULE: "Ramesh se 500 vasool hua" / "udhar wapas mila" -> type: "Credit", transaction: "Ramesh", reasoning: "Customer repaid udhar/loan"
   * RULE: "Received 1200 from Suresh" -> Money received -> type: "Credit", transaction: "Suresh"
   * RULE: "Salary 50000" -> type: "Credit", category: "Income", transaction: "Salary"
-- Debit (Outflow / Money Paid Out / Expense / Udhaar Given):
-  * Markers: "debit", "debited", "diye", "diya", "de diya", "de diye", "ko diya", "ko diye", "paid for", "paid to", "paid", "spent", "udhar diya", "samaan liya", "karza diya", "bill bhar diya", "petrol bharwaya", "kharcha", "kharch", "डेबिट", "दिए", "दिया", "दे दिया", "उधार दिया", "कर्ज", "खर्चा", "को दिया", "भुगतान किया", "खर्च"
-  * RULE: "500 debit" -> type: "Debit", category: "Shopping", transaction: "General Expense"
-  * RULE: "500 diye" -> type: "Debit", category: "Shopping", transaction: "General Expense"
+- Debit (Outflow / Money Paid Out / Expense / Udhaar Given To Customer):
+  * Markers: "debit", "debited", "diye", "diya", "de diya", "de diye", "ko diya", "ko diye", "paid for", "paid to", "spent", "udhar diya", "samaan liya", "karza diya", "bill bhar diya", "petrol bharwaya", "kharcha", "kharch", "डेबिट", "दिए", "दिया", "दे दिया", "उधार दिया", "कर्ज", "खर्चा", "को दिया", "भुगतान किया", "खर्च"
+  * RULE: "Paid Ramesh 500" or "Paid to Ramesh 500" -> Shopkeeper paid Ramesh -> type: "Debit", transaction: "Ramesh"
+  * RULE: "Ramesh ko 500 diye" -> Money given TO Ramesh -> type: "Debit", transaction: "Ramesh"
+  * RULE: "Ramesh ko 500 udhar diya" or "Ramesh udhar 500" -> Credit/udhar given to customer -> type: "Debit", category: "Debt", transaction: "Ramesh"
   * RULE: "Paid 450 for groceries" -> Money spent -> type: "Debit", category: "Food", transaction: "Groceries"
   * RULE: "Spent 350 on petrol" -> Money spent -> type: "Debit", category: "Transport", transaction: "Petrol"
-  * RULE: "Suresh ko 1200 diye" -> Money given TO Suresh -> type: "Debit", transaction: "Suresh"
-  * RULE: "Ramesh ko 500 udhar diya" -> Credit given to customer -> type: "Debit", category: "Debt", transaction: "Ramesh"
+  * RULE: "500 debit" -> type: "Debit", category: "Shopping", transaction: "General Expense"
+  * RULE: "500 diye" -> type: "Debit", category: "Shopping", transaction: "General Expense"
   * RULE: If no counterparty/party name is provided (e.g. "500 debit", "500 credit", "500 diye", "500 liye"), return "transaction": type === "Credit" ? "Payment Received" : "General Expense", NEVER leave it empty or ask the user to fill it in!
 
 General Rules:
@@ -115,7 +119,11 @@ function sanitizeConfidence(input: unknown): number {
 export function useAITransaction() {
   const [loading, setLoading] = useState(false)
 
-  const parseTransaction = async (message: string): Promise<AITransactionResult | null> => {
+  const parseTransaction = async (
+    message: string,
+    appMode?: "BUSINESS" | "PERSONAL" | "COMBO" | string,
+    existingTransactions?: any[]
+  ): Promise<AITransactionResult | null> => {
     if (!message.trim()) return null
     setLoading(true)
 
@@ -124,10 +132,14 @@ export function useAITransaction() {
     try {
       const apiKey = (import.meta.env.VITE_GROQ_API_KEY as string | undefined)?.trim()
       
+      const knownParties = existingTransactions && Array.isArray(existingTransactions)
+        ? Array.from(new Set(existingTransactions.map((t: any) => t.transaction))).filter(Boolean)
+        : undefined
+
       // If Groq API key is not configured locally, immediately use local VoiceKhata parser
       if (!apiKey) {
         console.log("[useAITransaction] No VITE_GROQ_API_KEY found, using local VoiceKhata ledger engine...")
-        const localParsed = parseVoiceKhataInput(message)
+        const localParsed = parseVoiceKhataInput(message, knownParties)
         if (localParsed) {
           const isParty = localParsed.person && localParsed.person !== "Customer / Party"
           return {
@@ -141,7 +153,7 @@ export function useAITransaction() {
             reasoning: "Parsed deterministically using VoiceKhata local ledger engine.",
             merchant_type: isParty ? "customer" : "retail",
             tags: ["khata", "local_engine"],
-            app_mode: "BUSINESS",
+            app_mode: appMode === "PERSONAL" ? "PERSONAL" : "BUSINESS",
           }
         }
         return null
@@ -165,7 +177,12 @@ export function useAITransaction() {
             body: JSON.stringify({
               model,
               messages: [
-                { role: "system", content: `${SYSTEM_PROMPT}\nToday's date is ${today}.` },
+                {
+                  role: "system",
+                  content: `${SYSTEM_PROMPT}\nToday's date is ${today}.${appMode ? ` Mode: ${appMode}.` : ""}${
+                    knownParties?.length ? ` Known counterparties/customers: ${knownParties.slice(0, 15).join(", ")}.` : ""
+                  }`,
+                },
                 { role: "user", content: message },
               ],
               temperature: 0.1,
@@ -185,7 +202,7 @@ export function useAITransaction() {
 
       if (!data) {
         console.warn("[useAITransaction] All Groq models failed. Falling back to local VoiceKhata parser...")
-        const localParsed = parseVoiceKhataInput(message)
+        const localParsed = parseVoiceKhataInput(message, knownParties)
         if (localParsed) {
           const isParty = localParsed.person && localParsed.person !== "Customer / Party"
           return {
@@ -199,7 +216,7 @@ export function useAITransaction() {
             reasoning: "Local VoiceKhata parser fallback.",
             merchant_type: isParty ? "customer" : "retail",
             tags: ["khata", "local_fallback"],
-            app_mode: "BUSINESS",
+            app_mode: appMode === "PERSONAL" ? "PERSONAL" : "BUSINESS",
           }
         }
         return null
@@ -220,11 +237,14 @@ export function useAITransaction() {
         reasoning: typeof parsed.reasoning === "string" ? parsed.reasoning : "",
         merchant_type: typeof parsed.merchant_type === "string" ? parsed.merchant_type.trim() : undefined,
         tags: Array.isArray(parsed.tags) ? parsed.tags.filter((tag: unknown) => typeof tag === "string") : undefined,
-        app_mode: parsed.app_mode === "PERSONAL" ? "PERSONAL" : "BUSINESS",
+        app_mode: parsed.app_mode === "PERSONAL" || appMode === "PERSONAL" ? "PERSONAL" : "BUSINESS",
       }
     } catch (err) {
       console.error("[useAITransaction] Fetch error, attempting local parse:", err)
-      const localParsed = parseVoiceKhataInput(message)
+      const knownParties = existingTransactions && Array.isArray(existingTransactions)
+        ? Array.from(new Set(existingTransactions.map((t: any) => t.transaction))).filter(Boolean)
+        : undefined
+      const localParsed = parseVoiceKhataInput(message, knownParties)
       if (localParsed) {
         const isParty = localParsed.person && localParsed.person !== "Customer / Party"
         return {
@@ -238,7 +258,7 @@ export function useAITransaction() {
           reasoning: "Local VoiceKhata parser fallback.",
           merchant_type: isParty ? "customer" : "retail",
           tags: ["khata", "local_fallback"],
-          app_mode: "BUSINESS",
+          app_mode: appMode === "PERSONAL" ? "PERSONAL" : "BUSINESS",
         }
       }
       return null
@@ -247,5 +267,10 @@ export function useAITransaction() {
     }
   }
 
-  return { parseTransaction, loading }
+  return {
+    parseTransaction,
+    parseAITransaction: parseTransaction,
+    loading,
+    isParsing: loading,
+  }
 }

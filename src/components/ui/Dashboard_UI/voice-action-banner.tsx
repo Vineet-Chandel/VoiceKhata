@@ -34,8 +34,11 @@ export function VoiceActionBanner({
     }
   }
 
+  const [liveTranscript, setLiveTranscript] = useState("")
+
   const { voiceState, transcript, startListening, stopListening, reset } = useVoiceInput({
     lang: language === "hi" ? "hi-IN" : "en-IN",
+    onLiveTranscript: (text) => setLiveTranscript(text),
     onTranscript: handleVoiceTranscript,
     onError: () => setFlowState("error"),
   })
@@ -192,6 +195,7 @@ export function VoiceActionBanner({
 
   const handleTryAgain = () => {
     reset()
+    setLiveTranscript("")
     setIsEditing(false)
     setFlowState("idle")
   }
@@ -238,7 +242,10 @@ export function VoiceActionBanner({
             <motion.button
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.96 }}
-              onClick={startListening}
+              onClick={() => {
+                setLiveTranscript("")
+                startListening()
+              }}
               className="flex items-center justify-center gap-2.5 h-11 px-5 rounded-[10px] bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold shadow-lg shadow-blue-600/20 transition-all w-full sm:w-auto cursor-pointer"
             >
               <Mic size={18} />
@@ -285,9 +292,9 @@ export function VoiceActionBanner({
               <div className="mt-1 flex items-center gap-2">
                 <span className="text-[11px] font-semibold text-emerald-400 uppercase tracking-wide">Live:</span>
                 <p className="text-xs sm:text-sm font-semibold text-white max-w-md break-words">
-                  {transcript ? (
+                  {(liveTranscript || transcript) ? (
                     <>
-                      "{transcript}"
+                      "{liveTranscript || transcript}"
                       <span className="inline-block w-1.5 h-3.5 ml-1 bg-emerald-400 align-middle animate-pulse rounded-xs" />
                     </>
                   ) : (
@@ -297,6 +304,7 @@ export function VoiceActionBanner({
               </div>
             </div>
           </div>
+
 
           <div className="flex items-center gap-2.5 w-full sm:w-auto justify-end">
             <motion.button

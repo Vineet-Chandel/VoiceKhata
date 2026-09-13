@@ -23,6 +23,7 @@ import { useVoiceInput } from "@/components/hooks/use-voice-input"
 import { VoiceWaveform } from "@/components/ui/AIAssistant_UI/voice-waveform"
 import { parseVoiceKhataInput, type ParsedVoiceTransaction } from "@/lib/voice-khata-parser"
 import { useTransactions } from "@/components/hooks/use-transactions"
+import { useAITransaction } from "@/components/hooks/use-ai-transaction"
 import { useAppMode } from "@/context/AppModeContext"
 import { useLanguage } from "@/context/LanguageContext"
 import { getCategories } from "@/lib/categories"
@@ -60,6 +61,7 @@ export function VoiceCaptureCard({
   className = "",
 }: VoiceCaptureCardProps) {
   const { addTransaction, transactions } = useTransactions()
+  const { parseAITransaction, isParsing: isAIParsing } = useAITransaction()
   const { appMode } = useAppMode()
   const { language } = useLanguage()
 
@@ -79,6 +81,7 @@ export function VoiceCaptureCard({
   const [method, setMethod] = useState("UPI")
   const [date, setDate] = useState(format(new Date(), "yyyy-MM-dd"))
   const [rawSpokenText, setRawSpokenText] = useState("")
+  const [aiReasoning, setAiReasoning] = useState("")
   const [isSaving, setIsSaving] = useState(false)
   const [saveSuccessMsg, setSaveSuccessMsg] = useState("")
 
@@ -100,55 +103,77 @@ export function VoiceCaptureCard({
     return Array.from(new Set(transactions.map((t) => t.transaction))).filter(Boolean)
   }, [transactions])
 
-  const handleVoiceTranscript = (finalText: string) => {
+  const handleVoiceTranscript = async (finalText: string) => {
     if (!finalText.trim()) return
-    setRawSpokenText(finalText.trim())
+    const text = finalText.trim()
+    setRawSpokenText(text)
+    setAiReasoning("")
 
-    try {
-      // Parse with deterministic VoiceKhata parser
-      const parsed: ParsedVoiceTransaction = parseVoiceKhataInput(finalText.trim(), existingCustomers)
+    // 1. Instant deterministic parsing with enhanced Khata rules
+    const parsed: ParsedVoiceTransaction = parseVoiceKhataInput(text, existingCustomers)
+    let parsedType: "Credit" | "Debit" = parsed.type || (parsed.category === "Income" ? "Credit" : "Debit")
 
-      const parsedType: "Credit" | "Debit" = parsed.type || (parsed.category === "Income" ? "Credit" : "Debit")
+    const defaultCat = appMode === "BUSINESS"
+      ? (parsedType === "Credit" ? "Sales" : "Inventory/Purchases")
+      : (parsedType === "Credit" ? "Income" : "Shopping")
 
-      const defaultCat = appMode === "BUSINESS"
-        ? (parsedType === "Credit" ? "Sales" : "Inventory/Purchases")
-        : (parsedType === "Credit" ? "Income" : "Shopping")
+    const defaultPerson = (parsed.person && parsed.person !== "Customer / Party")
+      ? parsed.person
+      : (parsedType === "Credit" ? "Payment Received" : "General Expense")
 
-      const defaultPerson = (parsed.person && parsed.person !== "Customer / Party")
-        ? parsed.person
-        : (parsedType === "Credit" ? "Payment Received" : "General Expense")
-
-      // Ensure category is valid for active appMode
-      let targetCat = parsed.category || defaultCat
-      if (appMode === "BUSINESS") {
-        if (targetCat === "Income" || !activeCategories.includes(targetCat)) {
-          targetCat = parsedType === "Credit" ? "Sales" : "Inventory/Purchases"
-        }
-      } else if (appMode === "PERSONAL") {
-        if (targetCat === "Sales" || !activeCategories.includes(targetCat)) {
-          targetCat = parsedType === "Credit" ? "Income" : "Shopping"
-        }
+    let targetCat = parsed.category || defaultCat
+    if (appMode === "BUSINESS") {
+      if (targetCat === "Income" || !activeCategories.includes(targetCat)) {
+        targetCat = parsedType === "Credit" ? "Sales" : "Inventory/Purchases"
       }
-
-      setPerson(defaultPerson)
-      setAmount(parsed.amount !== null ? parsed.amount : "")
-      setType(parsedType)
-      setCategory(targetCat)
-      setMethod(parsed.method || "UPI")
-      setDate(parsed.date || format(new Date(), "yyyy-MM-dd"))
-    } catch (err) {
-      console.error("[VoiceCaptureCard] Error parsing voice entry:", err)
-      setPerson(finalText.trim().slice(0, 30))
-      setAmount("")
-      setType("Credit")
-      setCategory(appMode === "BUSINESS" ? "Sales" : "Income")
-      setMethod("UPI")
-      setDate(format(new Date(), "yyyy-MM-dd"))
+    } else if (appMode === "PERSONAL") {
+      if (targetCat === "Sales" || !activeCategories.includes(targetCat)) {
+        targetCat = parsedType === "Credit" ? "Income" : "Shopping"
+      }
     }
 
-    // Always transition to Review state
+    setPerson(defaultPerson)
+    setAmount(parsed.amount !== null ? parsed.amount : "")
+    setType(parsedType)
+    setCategory(targetCat)
+    setMethod(parsed.method || "UPI")
+    setDate(parsed.date || format(new Date(), "yyyy-MM-dd"))
+    setAiReasoning(parsed.directionLabel ? `Detected: ${parsed.directionLabel}` : "")
+
+    // Always transition to Review state immediately
     setStep("review")
+
+    // 2. Parallel semantic AI refinement via Llama 3.3 on Groq
+    try {
+      const aiResult = await parseAITransaction(text, appMode, transactions)
+      if (aiResult) {
+        if (aiResult.type === "Credit" || aiResult.type === "Debit") {
+          setType(aiResult.type)
+        }
+        if (aiResult.transaction && aiResult.transaction !== "Unknown" && (defaultPerson === "General Expense" || defaultPerson === "Payment Received")) {
+          setPerson(aiResult.transaction)
+        }
+        if (aiResult.amount && (parsed.amount === null || Number.isNaN(parsed.amount))) {
+          setAmount(aiResult.amount)
+        }
+        if (aiResult.category && activeCategories.includes(aiResult.category)) {
+          setCategory(aiResult.category)
+        }
+        if (aiResult.method) {
+          setMethod(aiResult.method)
+        }
+        if (aiResult.reasoning) {
+          setAiReasoning(aiResult.reasoning)
+        }
+      }
+    } catch (e) {
+      console.warn("[VoiceCaptureCard] AI background refinement skipped:", e)
+    }
   }
+
+  const [liveSpeech, setLiveSpeech] = useState("")
+  const [voiceLang, setVoiceLang] = useState<"en-IN" | "hi-IN">(language === "hi" ? "hi-IN" : "en-IN")
+
 
   const {
     voiceState,
@@ -159,13 +184,15 @@ export function VoiceCaptureCard({
     reset: resetVoice,
     analyserRef,
   } = useVoiceInput({
-    lang: language === "hi" ? "hi-IN" : "en-IN",
+    lang: voiceLang,
+    onLiveTranscript: (text) => setLiveSpeech(text),
     onTranscript: handleVoiceTranscript,
     onError: (err) => {
       console.warn("[VoiceCaptureCard] Voice input error:", err)
     },
   })
 
+  const displayedSpeech = liveSpeech || transcript
   const isListening = voiceState === "listening"
   const isProcessing = voiceState === "processing"
 
@@ -203,6 +230,7 @@ export function VoiceCaptureCard({
 
   const handleResetForAnother = () => {
     resetVoice()
+    setLiveSpeech("")
     setPerson("")
     setAmount("")
     setType("Credit")
@@ -243,7 +271,7 @@ export function VoiceCaptureCard({
       )}
 
       {/* Main Container */}
-      <div className="relative rounded-3xl border border-slate-200 dark:border-slate-800/80 bg-white dark:bg-gradient-to-b dark:from-slate-900/95 dark:via-[#0E1528] dark:to-slate-950 p-6 md:p-12 shadow-md dark:shadow-2xl overflow-hidden">
+      <div className="relative rounded-3xl border border-slate-200 dark:border-slate-800/80 bg-white dark:bg-gradient-to-b dark:from-slate-900/95 dark:via-[#0E1528] dark:to-slate-950 p-6 md:p-8 shadow-md dark:shadow-2xl overflow-hidden">
         {/* Soft center ambient radial glow */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[340px] md:w-[480px] h-[340px] md:h-[480px] bg-indigo-500/5 dark:bg-indigo-600/10 rounded-full blur-3xl pointer-events-none" />
 
@@ -256,29 +284,66 @@ export function VoiceCaptureCard({
               exit={{ opacity: 0, y: -10 }}
               className="flex flex-col items-center text-center relative z-10"
             >
-              {/* Top Badge */}
-              <div className="inline-flex items-center justify-center size-12 rounded-2xl bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-200 dark:border-indigo-500/20 text-indigo-600 dark:text-indigo-400 mb-4 shadow-xs dark:shadow-inner">
-                <Mic size={22} />
-              </div>
+              {/* Top Header - changes smoothly based on listening state */}
+              {!isListening && !isProcessing ? (
+                <>
+                  <div className="inline-flex items-center justify-center size-11 rounded-2xl bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-200 dark:border-indigo-500/20 text-indigo-600 dark:text-indigo-400 mb-3 shadow-xs">
+                    <Mic size={20} />
+                  </div>
 
-              {/* Tag & Title */}
-              <p className="text-[11px] font-bold tracking-[0.25em] text-indigo-600 dark:text-indigo-400 uppercase mb-2">
-                VOICE ENTRY
-              </p>
-              <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white mb-2">
-                Say what happened
-              </h2>
-              <p className="text-sm md:text-base text-slate-600 dark:text-slate-400 max-w-md mx-auto mb-8">
-                VoiceKhata will prepare the entry for your review.
-              </p>
+                  <p className="text-[11px] font-bold tracking-[0.25em] text-indigo-600 dark:text-indigo-400 uppercase mb-1">
+                    VOICE ENTRY
+                  </p>
+                  <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white mb-1.5">
+                    Say what happened
+                  </h2>
+                  <p className="text-xs md:text-sm text-slate-500 dark:text-slate-400 max-w-md mx-auto mb-5">
+                    Speak naturally in Hindi, English, or Hinglish.
+                  </p>
+
+                  {/* Language Selector Pill */}
+                  <div className="inline-flex items-center gap-1.5 p-1 rounded-full bg-slate-100 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700/80 mb-4 shadow-xs">
+                    <button
+                      type="button"
+                      onClick={() => setVoiceLang("en-IN")}
+                      className={`px-3.5 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer ${
+                        voiceLang === "en-IN"
+                          ? "bg-indigo-600 text-white shadow-xs"
+                          : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                      }`}
+                    >
+                      English (India)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setVoiceLang("hi-IN")}
+                      className={`px-3.5 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer ${
+                        voiceLang === "hi-IN"
+                          ? "bg-indigo-600 text-white shadow-xs"
+                          : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                      }`}
+                    >
+                      🇮🇳 हिंदी / Hinglish
+                    </button>
+                  </div>
+                </>
+              ) : isListening ? (
+                /* Sleek listening header */
+                <div className="flex items-center gap-3 px-4 py-1.5 rounded-full bg-red-500/10 border border-red-500/25 text-red-600 dark:text-red-400 text-xs font-semibold mb-3 shadow-xs animate-in fade-in">
+                  <span className="relative flex size-2.5">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75" />
+                    <span className="relative inline-flex rounded-full size-2.5 bg-red-500" />
+                  </span>
+                  <span>Listening live ({voiceLang === "hi-IN" ? "हिंदी/Hinglish" : "English"})</span>
+                </div>
+              ) : null}
 
               {/* Hero Circular Mic Button */}
-              <div className="relative flex items-center justify-center my-4">
-                {/* Listening wave ripples */}
+              <div className="relative flex items-center justify-center my-2">
                 {isListening && (
                   <>
-                    <span className="absolute size-44 rounded-full border-2 border-indigo-500/40 animate-ping pointer-events-none" />
-                    <span className="absolute size-36 rounded-full border border-indigo-500/30 animate-pulse pointer-events-none" />
+                    <span className="absolute size-40 rounded-full border-2 border-indigo-500/30 animate-ping pointer-events-none" />
+                    <span className="absolute size-32 rounded-full border border-indigo-500/25 animate-pulse pointer-events-none" />
                   </>
                 )}
 
@@ -288,10 +353,11 @@ export function VoiceCaptureCard({
                     if (isListening) {
                       stopListening()
                     } else if (!isProcessing) {
+                      setLiveSpeech("")
                       startListening()
                     }
                   }}
-                  className={`relative size-28 md:size-32 rounded-full flex items-center justify-center transition-all duration-300 cursor-pointer shadow-2xl ${
+                  className={`relative size-24 md:size-28 rounded-full flex items-center justify-center transition-all duration-300 cursor-pointer shadow-2xl ${
                     isListening
                       ? "bg-red-500 text-white shadow-red-500/40 scale-105 ring-8 ring-red-500/20"
                       : isProcessing
@@ -301,73 +367,60 @@ export function VoiceCaptureCard({
                   title={isListening ? "Click to finish speaking" : isProcessing ? "Processing speech..." : "Click to speak"}
                 >
                   {isProcessing ? (
-                    <Loader2 size={44} className="animate-spin text-white" />
+                    <Loader2 size={38} className="animate-spin text-white" />
                   ) : (
-                    <Mic size={44} className={isListening ? "animate-pulse" : ""} />
+                    <Mic size={38} className={isListening ? "animate-pulse" : ""} />
                   )}
                 </button>
               </div>
 
               {/* Active Voice Waveform, Live Transcription & Feedback */}
               {isListening ? (
-                <div className="flex flex-col items-center gap-4 mt-3 w-full max-w-xl mx-auto animate-in fade-in zoom-in-95 duration-200">
-                  {/* Live Status Pill & Waveform */}
-                  <div className="flex items-center gap-3 px-4 py-1.5 rounded-full bg-red-500/10 border border-red-500/20 text-red-600 dark:text-red-400 text-xs font-semibold shadow-xs">
-                    <span className="relative flex size-2.5">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75" />
-                      <span className="relative inline-flex rounded-full size-2.5 bg-red-500" />
-                    </span>
-                    <span>Listening & writing live...</span>
-                    <div className="h-5 w-24 sm:w-32 flex items-center justify-center overflow-hidden">
-                      <VoiceWaveform analyserRef={analyserRef} isListening={true} color="rgba(239, 68, 68, 0.9)" />
-                    </div>
+                <div className="flex flex-col items-center gap-3 mt-3 w-full max-w-lg mx-auto animate-in fade-in zoom-in-95 duration-200">
+                  {/* Subtle Waveform */}
+                  <div className="h-6 w-32 flex items-center justify-center overflow-hidden">
+                    <VoiceWaveform analyserRef={analyserRef} isListening={true} color="rgba(99, 102, 241, 0.9)" />
                   </div>
 
-                  {/* Real-Time Live Spoken Text Transcription Box */}
-                  <div className="w-full rounded-2xl border border-indigo-200 dark:border-indigo-500/30 bg-slate-50/90 dark:bg-slate-900/90 p-5 sm:p-6 shadow-xl backdrop-blur-md text-left transition-all duration-150">
-                    <div className="flex items-center justify-between gap-2 mb-2 pb-2 border-b border-slate-200/80 dark:border-slate-800 text-[11px] font-bold text-indigo-600 dark:text-indigo-400 tracking-wider uppercase">
-                      <span className="flex items-center gap-1.5">
-                        <Sparkles size={14} className="text-indigo-500" />
-                        Speaking now / जो आप बोल रहे हैं:
-                      </span>
-                      <span className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-indigo-100 dark:bg-indigo-950/80 text-indigo-700 dark:text-indigo-300 font-normal">
-                        {transcript ? "writing live..." : "waiting for voice..."}
-                      </span>
-                    </div>
-
-                    <div className="min-h-[68px] flex items-center justify-center">
-                      {transcript ? (
-                        <p className="text-base sm:text-lg md:text-xl font-semibold text-slate-900 dark:text-white leading-relaxed text-center break-words w-full">
-                          "{transcript}"
-                          <span className="inline-block w-2 h-5 ml-1.5 bg-indigo-600 dark:bg-indigo-400 align-middle animate-pulse rounded-xs" />
-                        </p>
-                      ) : (
-                        <p className="text-sm sm:text-base text-slate-500 dark:text-slate-400 italic text-center animate-pulse">
-                          Say your transaction... e.g. "Paid 250 for groceries" or "रमेश को ₹500 दिए"
-                        </p>
-                      )}
-                    </div>
+                  {/* Real-Time Live Spoken Text Display */}
+                  <div className="w-full rounded-2xl border border-indigo-200/80 dark:border-indigo-500/20 bg-slate-50/90 dark:bg-slate-900/80 p-5 shadow-lg backdrop-blur-md text-center transition-all duration-150 min-h-[72px] flex items-center justify-center">
+                    {displayedSpeech ? (
+                      <p className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white leading-relaxed break-words w-full">
+                        "{displayedSpeech}"
+                        <span className="inline-block w-2 h-4.5 ml-1 bg-indigo-600 dark:bg-indigo-400 align-middle animate-pulse rounded-xs" />
+                      </p>
+                    ) : (
+                      <p className="text-sm sm:text-base text-slate-400 dark:text-slate-400 italic text-center animate-pulse">
+                        🎙️ Listening... start speaking now
+                      </p>
+                    )}
                   </div>
 
                   {/* Controls */}
-                  <div className="flex items-center gap-3 mt-1">
+                  <div className="flex items-center gap-3 mt-2">
                     <button
+                      type="button"
                       onClick={() => {
                         stopListening()
+                        setLiveSpeech("")
                         setTimeout(resetVoice, 50)
                       }}
-                      className="px-4 py-2 rounded-full text-xs font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white bg-slate-100 dark:bg-slate-800/80 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-700 transition-colors cursor-pointer shadow-xs"
+                      className="px-4 py-2 rounded-full text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white bg-slate-100 dark:bg-slate-800/80 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-700 transition-colors cursor-pointer shadow-xs"
                     >
                       Cancel
                     </button>
                     <button
+                      type="button"
                       onClick={stopListening}
-                      className="px-5 py-2 rounded-full text-xs font-semibold text-white bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 border border-indigo-400/40 transition-all cursor-pointer flex items-center gap-1.5 shadow-md shadow-indigo-600/30 hover:scale-[1.02]"
+                      className="px-5 py-2 rounded-full text-xs font-bold text-white bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 border border-indigo-400/30 transition-all cursor-pointer flex items-center gap-1.5 shadow-md shadow-indigo-600/30 hover:scale-[1.02]"
                     >
                       <Check size={15} strokeWidth={3} />
-                      Done speaking
+                      Done Speaking
                     </button>
                   </div>
+                  <span className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">
+                    Pausing for 3 seconds will automatically finalize
+                  </span>
                 </div>
               ) : isProcessing ? (
                 <div className="flex flex-col items-center gap-3 mt-4 w-full max-w-md mx-auto animate-in fade-in duration-200">
@@ -375,11 +428,11 @@ export function VoiceCaptureCard({
                     <Loader2 size={16} className="animate-spin text-indigo-600 dark:text-indigo-400" />
                     <span className="text-xs sm:text-sm font-medium">Preparing your transaction review...</span>
                   </div>
-                  {transcript && (
+                  {displayedSpeech && (
                     <div className="w-full p-3 rounded-xl bg-slate-100 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-center">
                       <p className="text-xs text-slate-500 dark:text-slate-400 uppercase font-semibold mb-1">Heard:</p>
                       <p className="text-sm font-semibold text-slate-800 dark:text-slate-200 break-words">
-                        "{transcript}"
+                        "{displayedSpeech}"
                       </p>
                     </div>
                   )}
@@ -471,33 +524,51 @@ export function VoiceCaptureCard({
               </div>
 
               {/* Direction Selector (Credit / Debit) */}
-              <div className="grid grid-cols-2 gap-3 mb-5">
+              <div className="grid grid-cols-2 gap-3 mb-4">
                 <button
                   type="button"
                   onClick={() => setType("Credit")}
-                  className={`flex items-center justify-center gap-2.5 p-3.5 rounded-xl border text-sm font-semibold transition-all cursor-pointer ${
+                  className={`flex flex-col items-center justify-center p-3 rounded-xl border transition-all cursor-pointer text-center ${
                     type === "Credit"
-                      ? "bg-emerald-500/15 border-emerald-500 text-emerald-700 dark:text-emerald-300 ring-2 ring-emerald-500/30 shadow-sm"
+                      ? "bg-emerald-500/15 border-emerald-500 text-emerald-800 dark:text-emerald-200 ring-2 ring-emerald-500/30 shadow-xs"
                       : "bg-slate-50 border-slate-200 text-slate-500 hover:border-slate-300 dark:bg-slate-900/50 dark:border-slate-800 dark:text-slate-400"
                   }`}
                 >
-                  <span className={`size-2.5 rounded-full transition-transform ${type === "Credit" ? "bg-emerald-500 scale-125 ring-2 ring-emerald-400/40" : "bg-slate-300 dark:bg-slate-600"}`} />
-                  Credit (Money Received / Inflow)
+                  <div className="flex items-center gap-2 font-bold text-sm">
+                    <span className={`size-2.5 rounded-full transition-transform ${type === "Credit" ? "bg-emerald-500 scale-125 ring-2 ring-emerald-400/40" : "bg-slate-300 dark:bg-slate-600"}`} />
+                    <span>+ ₹ Received / जमा मिला (Credit)</span>
+                  </div>
+                  <span className="text-[10px] mt-0.5 opacity-80">
+                    Payment from customer / Income
+                  </span>
                 </button>
 
                 <button
                   type="button"
                   onClick={() => setType("Debit")}
-                  className={`flex items-center justify-center gap-2.5 p-3.5 rounded-xl border text-sm font-semibold transition-all cursor-pointer ${
+                  className={`flex flex-col items-center justify-center p-3 rounded-xl border transition-all cursor-pointer text-center ${
                     type === "Debit"
-                      ? "bg-rose-500/15 border-rose-500 text-rose-700 dark:text-rose-300 ring-2 ring-rose-500/30 shadow-sm"
+                      ? "bg-rose-500/15 border-rose-500 text-rose-800 dark:text-rose-200 ring-2 ring-rose-500/30 shadow-xs"
                       : "bg-slate-50 border-slate-200 text-slate-500 hover:border-slate-300 dark:bg-slate-900/50 dark:border-slate-800 dark:text-slate-400"
                   }`}
                 >
-                  <span className={`size-2.5 rounded-full transition-transform ${type === "Debit" ? "bg-rose-500 scale-125 ring-2 ring-rose-400/40" : "bg-slate-300 dark:bg-slate-600"}`} />
-                  Debit (Money Paid / Udhaar)
+                  <div className="flex items-center gap-2 font-bold text-sm">
+                    <span className={`size-2.5 rounded-full transition-transform ${type === "Debit" ? "bg-rose-500 scale-125 ring-2 ring-rose-400/40" : "bg-slate-300 dark:bg-slate-600"}`} />
+                    <span>- ₹ Paid / उधार दिया (Debit)</span>
+                  </div>
+                  <span className="text-[10px] mt-0.5 opacity-80">
+                    Udhaar to customer / Expense
+                  </span>
                 </button>
               </div>
+
+              {/* AI Reasoning / Classification Chip */}
+              {aiReasoning && (
+                <div className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-200/80 dark:border-indigo-800/60 text-indigo-700 dark:text-indigo-300 text-xs font-medium mb-4">
+                  <Sparkles size={14} className="text-indigo-500 shrink-0" />
+                  <span>{aiReasoning}</span>
+                </div>
+              )}
 
               {/* Editable Fields Grid */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
