@@ -191,7 +191,7 @@ function BudgetRow({
 export function BudgetList({
   budgets, selectedMonth, onAddTemplateBudget, onDelete, onEdit, existingCategories = [],
 }: Props) {
-  const { t } = useLanguage()
+  const { t, language } = useLanguage()
   const [templateLoading, setTemplateLoading] = React.useState<string | null>(null)
   const [templateFeedback, setTemplateFeedback] = React.useState<string | null>(null)
 

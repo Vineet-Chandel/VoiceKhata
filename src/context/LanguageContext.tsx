@@ -72,27 +72,12 @@ export const translations: Record<string, Record<Language, string>> = {
   "tx.addNew":              { en: "Add New",          hi: "नया जोड़ें" },
   "tx.search":              { en: "Search transactions...", hi: "लेन-देन खोजें..." },
   "tx.filter":              { en: "Filter",           hi: "फ़िल्टर" },
-  "tx.date":                { en: "Date",             hi: "तारीख" },
   "tx.description":         { en: "Description",      hi: "विवरण" },
-  "tx.amount":              { en: "Amount",           hi: "राशि" },
-  "tx.type":                { en: "Type",             hi: "प्रकार" },
-  "tx.credit":              { en: "Credit",           hi: "जमा" },
-  "tx.debit":               { en: "Debit",            hi: "नामे" },
 
   // ── Reports Page ──
-  "reports.title":          { en: "Reports",          hi: "रिपोर्ट" },
-  "reports.income":         { en: "Income",           hi: "आय" },
-  "reports.expense":        { en: "Expense",          hi: "खर्च" },
-  "reports.balance":        { en: "Balance",          hi: "बकाया" },
   "reports.monthly":        { en: "Monthly",          hi: "मासिक" },
   "reports.weekly":         { en: "Weekly",           hi: "साप्ताहिक" },
   "reports.yearly":         { en: "Yearly",           hi: "वार्षिक" },
-
-  // ── Budget Page ──
-  "budget.title":           { en: "Budget & Investment", hi: "बजट और निवेश" },
-  "budget.totalBudget":     { en: "Total Budget",     hi: "कुल बजट" },
-  "budget.spent":           { en: "Spent",            hi: "खर्च" },
-  "budget.remaining":       { en: "Remaining",        hi: "बाकी" },
 
   // ── AI Assistant ──
   "ai.title":               { en: "AI Assistant",     hi: "AI सहायक" },

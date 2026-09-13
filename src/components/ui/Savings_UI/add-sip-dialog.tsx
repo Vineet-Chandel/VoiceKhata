@@ -16,6 +16,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 import { type SIPPlan } from "@/lib/savings";
 import { useLanguage } from "@/context/LanguageContext";
