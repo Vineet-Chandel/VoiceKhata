@@ -169,7 +169,7 @@ export function VoiceCaptureCard({
           {onBack ? (
             <button
               onClick={onBack}
-              className="inline-flex items-center gap-2 text-sm font-medium text-slate-400 hover:text-white transition-colors cursor-pointer"
+              className="inline-flex items-center gap-2 text-sm font-medium text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors cursor-pointer"
             >
               <ArrowLeft size={16} />
               Back to overview
@@ -179,11 +179,11 @@ export function VoiceCaptureCard({
           )}
 
           <div className="flex items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-indigo-500/10 border border-indigo-500/20 text-indigo-400">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-200 dark:border-indigo-500/20 text-indigo-700 dark:text-indigo-400">
               <Sparkles size={12} />
               Voice-first capture
             </span>
-            <span className="text-xs text-slate-400">
+            <span className="text-xs text-slate-500 dark:text-slate-400">
               {step === "capture" ? "Step 1 of 1 · Review before saving" : "Review entry"}
             </span>
           </div>
@@ -191,9 +191,9 @@ export function VoiceCaptureCard({
       )}
 
       {/* Main Container */}
-      <div className="relative rounded-3xl border border-slate-800/80 bg-gradient-to-b from-slate-900/95 via-[#0E1528] to-slate-950 p-6 md:p-12 shadow-2xl overflow-hidden">
+      <div className="relative rounded-3xl border border-slate-200 dark:border-slate-800/80 bg-white dark:bg-gradient-to-b dark:from-slate-900/95 dark:via-[#0E1528] dark:to-slate-950 p-6 md:p-12 shadow-md dark:shadow-2xl overflow-hidden">
         {/* Soft center ambient radial glow */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[340px] md:w-[480px] h-[340px] md:h-[480px] bg-indigo-600/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[340px] md:w-[480px] h-[340px] md:h-[480px] bg-indigo-500/5 dark:bg-indigo-600/10 rounded-full blur-3xl pointer-events-none" />
 
         <AnimatePresence mode="wait">
           {step === "capture" ? (
@@ -205,18 +205,18 @@ export function VoiceCaptureCard({
               className="flex flex-col items-center text-center relative z-10"
             >
               {/* Top Badge */}
-              <div className="inline-flex items-center justify-center size-12 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 mb-4 shadow-inner">
+              <div className="inline-flex items-center justify-center size-12 rounded-2xl bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-200 dark:border-indigo-500/20 text-indigo-600 dark:text-indigo-400 mb-4 shadow-xs dark:shadow-inner">
                 <Mic size={22} />
               </div>
 
               {/* Tag & Title */}
-              <p className="text-[11px] font-bold tracking-[0.25em] text-indigo-400 uppercase mb-2">
+              <p className="text-[11px] font-bold tracking-[0.25em] text-indigo-600 dark:text-indigo-400 uppercase mb-2">
                 VOICE ENTRY
               </p>
-              <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight text-white mb-2">
+              <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white mb-2">
                 Say what happened
               </h2>
-              <p className="text-sm md:text-base text-slate-400 max-w-md mx-auto mb-8">
+              <p className="text-sm md:text-base text-slate-600 dark:text-slate-400 max-w-md mx-auto mb-8">
                 VoiceKhata will prepare the entry for your review.
               </p>
 
@@ -320,21 +320,21 @@ export function VoiceCaptureCard({
               exit={{ opacity: 0, scale: 0.98 }}
               className="flex flex-col relative z-10"
             >
-              <div className="flex items-center justify-between pb-4 border-b border-slate-800 mb-6">
+              <div className="flex items-center justify-between pb-4 border-b border-slate-200 dark:border-slate-800 mb-6">
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="text-[11px] font-bold tracking-[0.2em] text-indigo-400 uppercase">
+                    <span className="text-[11px] font-bold tracking-[0.2em] text-indigo-600 dark:text-indigo-400 uppercase">
                       REVIEW ENTRY
                     </span>
-                    <span className="text-[10px] font-medium px-2 py-0.5 rounded-full border border-blue-500/30 bg-blue-500/10 text-blue-300">
+                    <span className="text-[10px] font-medium px-2 py-0.5 rounded-full border border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-500/30 dark:bg-blue-500/10 dark:text-blue-300">
                       {appMode === "BUSINESS" ? "Business Mode" : appMode === "PERSONAL" ? "Personal Mode" : "Combo Mode"}
                     </span>
                   </div>
-                  <h3 className="text-2xl font-bold text-white">
+                  <h3 className="text-2xl font-bold text-slate-900 dark:text-white">
                     Review before saving
                   </h3>
                   {rawSpokenText && (
-                    <p className="text-xs text-slate-400 mt-0.5 italic">
+                    <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5 italic">
                       Heard: "{rawSpokenText}"
                     </p>
                   )}
@@ -342,7 +342,7 @@ export function VoiceCaptureCard({
 
                 <button
                   onClick={handleResetForAnother}
-                  className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-400 hover:text-white px-3 py-1.5 rounded-lg hover:bg-white/5 transition-colors cursor-pointer"
+                  className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white px-3 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-white/5 transition-colors cursor-pointer"
                 >
                   <RotateCcw size={14} />
                   Record again
@@ -356,11 +356,11 @@ export function VoiceCaptureCard({
                   onClick={() => setType("Credit")}
                   className={`flex items-center justify-center gap-2 p-3.5 rounded-xl border text-sm font-semibold transition-all cursor-pointer ${
                     type === "Credit"
-                      ? "bg-emerald-500/15 border-emerald-500/40 text-emerald-400 shadow-md shadow-emerald-500/10"
-                      : "bg-slate-900/60 border-slate-800 text-slate-400 hover:border-slate-700"
+                      ? "bg-emerald-50 border-emerald-300 text-emerald-700 shadow-xs dark:bg-emerald-500/15 dark:border-emerald-500/40 dark:text-emerald-400 dark:shadow-md dark:shadow-emerald-500/10"
+                      : "bg-slate-50 border-slate-200 text-slate-600 hover:border-slate-300 dark:bg-slate-900/60 dark:border-slate-800 dark:text-slate-400 dark:hover:border-slate-700"
                   }`}
                 >
-                  <span className="size-2 rounded-full bg-emerald-400" />
+                  <span className="size-2 rounded-full bg-emerald-500" />
                   Credit (Money Received / Inflow)
                 </button>
 
@@ -369,11 +369,11 @@ export function VoiceCaptureCard({
                   onClick={() => setType("Debit")}
                   className={`flex items-center justify-center gap-2 p-3.5 rounded-xl border text-sm font-semibold transition-all cursor-pointer ${
                     type === "Debit"
-                      ? "bg-rose-500/15 border-rose-500/40 text-rose-400 shadow-md shadow-rose-500/10"
-                      : "bg-slate-900/60 border-slate-800 text-slate-400 hover:border-slate-700"
+                      ? "bg-rose-50 border-rose-300 text-rose-700 shadow-xs dark:bg-rose-500/15 dark:border-rose-500/40 dark:text-rose-400 dark:shadow-md dark:shadow-rose-500/10"
+                      : "bg-slate-50 border-slate-200 text-slate-600 hover:border-slate-300 dark:bg-slate-900/60 dark:border-slate-800 dark:text-slate-400 dark:hover:border-slate-700"
                   }`}
                 >
-                  <span className="size-2 rounded-full bg-rose-400" />
+                  <span className="size-2 rounded-full bg-rose-500" />
                   Debit (Money Paid / Udhaar)
                 </button>
               </div>
@@ -382,8 +382,8 @@ export function VoiceCaptureCard({
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                 {/* Party / Customer Name */}
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
-                    <User size={14} className="text-indigo-400" />
+                  <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+                    <User size={14} className="text-indigo-600 dark:text-indigo-400" />
                     Customer / Party Name
                   </label>
                   <input
@@ -391,14 +391,14 @@ export function VoiceCaptureCard({
                     value={person}
                     onChange={(e) => setPerson(e.target.value)}
                     placeholder="e.g. Ramesh, Suresh Kirana, Salary"
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900/80 border border-slate-800 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors text-sm"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 placeholder:text-slate-400 focus:bg-white focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 dark:bg-slate-900/80 dark:border-slate-800 dark:text-white dark:placeholder:text-slate-500 transition-colors text-sm"
                   />
                 </div>
 
                 {/* Amount */}
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
-                    <IndianRupee size={14} className="text-indigo-400" />
+                  <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+                    <IndianRupee size={14} className="text-indigo-600 dark:text-indigo-400" />
                     Amount (₹)
                   </label>
                   <input
@@ -406,23 +406,23 @@ export function VoiceCaptureCard({
                     value={amount}
                     onChange={(e) => setAmount(e.target.value)}
                     placeholder="0"
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900/80 border border-slate-800 text-white font-semibold text-base placeholder:text-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 font-semibold text-base placeholder:text-slate-400 focus:bg-white focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 dark:bg-slate-900/80 dark:border-slate-800 dark:text-white dark:placeholder:text-slate-500 transition-colors"
                   />
                 </div>
 
                 {/* Category */}
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
-                    <Tag size={14} className="text-indigo-400" />
+                  <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+                    <Tag size={14} className="text-indigo-600 dark:text-indigo-400" />
                     Category
                   </label>
                   <select
                     value={category}
                     onChange={(e) => setCategory(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900/80 border border-slate-800 text-white focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors text-sm"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 focus:bg-white focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 dark:bg-slate-900/80 dark:border-slate-800 dark:text-white transition-colors text-sm"
                   >
                     {activeCategories.map((cat) => (
-                      <option key={cat} value={cat} className="bg-slate-900 text-white">
+                      <option key={cat} value={cat} className="bg-white text-slate-900 dark:bg-slate-900 dark:text-white">
                         {cat}
                       </option>
                     ))}
@@ -431,17 +431,17 @@ export function VoiceCaptureCard({
 
                 {/* Payment Method */}
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
-                    <CreditCard size={14} className="text-indigo-400" />
+                  <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+                    <CreditCard size={14} className="text-indigo-600 dark:text-indigo-400" />
                     Payment Method
                   </label>
                   <select
                     value={method}
                     onChange={(e) => setMethod(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900/80 border border-slate-800 text-white focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors text-sm"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 focus:bg-white focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 dark:bg-slate-900/80 dark:border-slate-800 dark:text-white transition-colors text-sm"
                   >
                     {METHODS.map((m) => (
-                      <option key={m} value={m} className="bg-slate-900 text-white">
+                      <option key={m} value={m} className="bg-white text-slate-900 dark:bg-slate-900 dark:text-white">
                         {m}
                       </option>
                     ))}
@@ -450,15 +450,15 @@ export function VoiceCaptureCard({
 
                 {/* Date */}
                 <div className="flex flex-col gap-1.5 md:col-span-2">
-                  <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
-                    <Calendar size={14} className="text-indigo-400" />
+                  <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+                    <Calendar size={14} className="text-indigo-600 dark:text-indigo-400" />
                     Transaction Date
                   </label>
                   <input
                     type="date"
                     value={date}
                     onChange={(e) => setDate(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900/80 border border-slate-800 text-white focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors text-sm"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 focus:bg-white focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 dark:bg-slate-900/80 dark:border-slate-800 dark:text-white transition-colors text-sm"
                   />
                 </div>
               </div>
@@ -468,7 +468,7 @@ export function VoiceCaptureCard({
                 <button
                   type="button"
                   onClick={handleResetForAnother}
-                  className="px-5 py-2.5 rounded-xl border border-slate-800 text-slate-400 hover:text-white hover:bg-slate-800/50 transition-colors text-sm font-medium cursor-pointer"
+                  className="px-5 py-2.5 rounded-xl border border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-50 dark:border-slate-800 dark:text-slate-400 dark:hover:text-white dark:hover:bg-slate-800/50 transition-colors text-sm font-medium cursor-pointer"
                 >
                   Cancel
                 </button>
@@ -476,7 +476,7 @@ export function VoiceCaptureCard({
                   type="button"
                   disabled={isSaving}
                   onClick={handleSave}
-                  className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white font-semibold text-sm shadow-lg shadow-indigo-500/20 transition-all cursor-pointer flex items-center gap-2 disabled:opacity-50"
+                  className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white font-semibold text-sm shadow-md shadow-indigo-500/20 transition-all cursor-pointer flex items-center gap-2 disabled:opacity-50"
                 >
                   {isSaving ? (
                     <span>Saving...</span>

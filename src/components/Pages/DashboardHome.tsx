@@ -353,26 +353,34 @@ export default function DashboardHome() {
               <VoiceCaptureCard onBack={() => setShowInlineVoice(false)} showBackLink={true} />
             </div>
           ) : (
-            <div className="relative overflow-hidden rounded-2xl border border-slate-700/60 bg-gradient-to-r from-card via-slate-900 to-card p-5 shadow-lg shadow-slate-950/20">
+            <div className="relative overflow-hidden rounded-2xl border border-blue-200/80 dark:border-slate-800 bg-gradient-to-r from-blue-50/70 via-indigo-50/40 to-card dark:from-slate-900/90 dark:via-slate-800/80 dark:to-slate-900/90 p-5 shadow-xs dark:shadow-lg dark:shadow-slate-950/20">
               <div className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-blue-500/10 blur-3xl" />
               <div className="pointer-events-none absolute -left-12 -bottom-12 h-36 w-36 rounded-full bg-indigo-500/10 blur-2xl" />
 
               <div className="relative z-10 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                 <div className="flex items-start gap-4">
-                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-blue-600/20 border border-blue-500/30 text-blue-400 shadow-inner">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-blue-100 border border-blue-200 text-blue-600 shadow-xs dark:bg-blue-600/20 dark:border-blue-500/30 dark:text-blue-400 dark:shadow-inner">
                     <Mic className="h-6 w-6 animate-pulse" />
                   </div>
                   <div className="flex flex-col gap-1.5">
                     <div className="flex items-center gap-2">
-                      <span className="text-[11px] font-bold uppercase tracking-wider text-blue-400 bg-blue-500/10 px-2.5 py-0.5 rounded-full border border-blue-500/20">
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-blue-700 dark:text-blue-400 bg-blue-100/90 dark:bg-blue-500/10 px-2.5 py-0.5 rounded-full border border-blue-200/80 dark:border-blue-500/20">
                         Add Transaction
                       </span>
                     </div>
-                    <h3 className="text-lg font-semibold text-foreground tracking-tight">
+                    <h3 className="text-lg font-semibold text-slate-900 dark:text-foreground tracking-tight">
                       Speak → Review → Save
                     </h3>
-                    <p className="text-xs sm:text-sm text-muted-foreground">
-                      Say what happened in Hindi, English, or Hinglish (e.g. <span className="text-blue-300 font-mono">"रमेश ने 500 रुपये दिए"</span> or <span className="text-blue-300 font-mono">"Paid ₹450 for groceries"</span>).
+                    <p className="text-xs sm:text-sm text-slate-600 dark:text-muted-foreground leading-relaxed">
+                      Say what happened in Hindi, English, or Hinglish (e.g.{" "}
+                      <span className="inline-block font-medium text-blue-700 dark:text-blue-300 font-mono bg-blue-100/70 dark:bg-blue-950/40 px-1.5 py-0.5 rounded border border-blue-200/70 dark:border-blue-800/40">
+                        "रमेश ने 500 रुपये दिए"
+                      </span>{" "}
+                      or{" "}
+                      <span className="inline-block font-medium text-blue-700 dark:text-blue-300 font-mono bg-blue-100/70 dark:bg-blue-950/40 px-1.5 py-0.5 rounded border border-blue-200/70 dark:border-blue-800/40">
+                        "Paid ₹450 for groceries"
+                      </span>
+                      ).
                     </p>
                   </div>
                 </div>
@@ -380,14 +388,14 @@ export default function DashboardHome() {
                 <div className="flex items-center gap-3 shrink-0">
                   <button
                     onClick={() => setShowInlineVoice(true)}
-                    className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-4 py-2.5 text-sm font-medium text-white shadow-md shadow-blue-600/25 hover:from-blue-500 hover:to-indigo-500 transition-all active:scale-[0.98] cursor-pointer"
+                    className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-4 py-2.5 text-sm font-medium text-white shadow-md shadow-blue-600/20 hover:from-blue-700 hover:to-indigo-700 dark:shadow-blue-600/25 dark:hover:from-blue-500 dark:hover:to-indigo-500 transition-all active:scale-[0.98] cursor-pointer"
                   >
                     <Mic className="h-4 w-4" />
                     Record by Voice
                   </button>
                   <Link
                     to="/dashboard/voice-capture"
-                    className="flex items-center gap-1.5 rounded-xl border border-blue-500/30 bg-blue-500/10 px-3.5 py-2.5 text-sm font-medium text-blue-200 hover:bg-blue-500/20 hover:text-white transition-all"
+                    className="flex items-center gap-1.5 rounded-xl border border-blue-200 bg-white text-blue-700 hover:bg-blue-50 hover:text-blue-800 shadow-xs dark:border-blue-500/30 dark:bg-blue-500/10 dark:text-blue-200 dark:hover:bg-blue-500/20 dark:hover:text-white px-3.5 py-2.5 text-sm font-medium transition-all"
                   >
                     Full View
                     <ArrowRight className="h-3.5 w-3.5" />
