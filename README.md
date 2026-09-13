@@ -37,9 +37,19 @@
 
 <br/><br/>
 
+<p>
+  <a href="https://voicekhaata-frontend.onrender.com/" target="_blank">
+    <img src="https://img.shields.io/badge/Live_Demo-voicekhaata--frontend.onrender.com-blue?style=for-the-badge&logo=render&logoColor=white" alt="Live Demo" />
+  </a>
+</p>
+
 </div>
 
 ---
+
+## 🌐 Live Application
+🔗 **Production URL:** [https://voicekhaata-frontend.onrender.com/](https://voicekhaata-frontend.onrender.com/)  
+🔗 **Backend API:** [https://voicekhata-tif3.onrender.com/](https://voicekhata-tif3.onrender.com/)
 
 ## 👥 Team Details
 
