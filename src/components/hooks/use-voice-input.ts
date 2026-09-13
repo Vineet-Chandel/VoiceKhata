@@ -118,15 +118,14 @@ export function useVoiceInput(options?: UseVoiceInputOptions) {
 
     let finalText = spokenTranscriptRef.current.trim()
 
-    // If WebSpeech already captured clear spoken text, use it directly with 0ms latency.
-    // If WebSpeech didn't capture text (e.g. Firefox or Brave blocking SpeechRecognition), use Groq Whisper fallback.
+    // If WebSpeech didn't capture text (e.g. Firefox, Brave, or SpeechRecognition network failure), use Groq Whisper fallback
     if (!finalText && audioChunksRef.current.length > 0) {
       try {
         const mimeType = mediaRecorderRef.current?.mimeType || audioChunksRef.current[0]?.type || "audio/webm"
         const audioBlob = new Blob(audioChunksRef.current, { type: mimeType })
 
-        if (audioBlob.size > 1000) {
-          console.log("[useVoiceInput] WebSpeech empty, transcribing audio blob via Whisper fallback...")
+        if (audioBlob.size > 200) {
+          console.log(`[useVoiceInput] WebSpeech empty, transcribing audio blob (${audioBlob.size} bytes) via Whisper fallback...`)
           const whisperResult = await transcribeAudioBlob(audioBlob)
           if (whisperResult && whisperResult.trim()) {
             finalText = whisperResult.trim()
@@ -150,7 +149,8 @@ export function useVoiceInput(options?: UseVoiceInputOptions) {
 
     if (!finalText || silenceStopwords.has(cleaned) || cleaned.length === 0) {
       console.log("[useVoiceInput] Discarded silence or empty speech artifact:", finalText)
-      setVoiceState("idle")
+      setErrorMessage("No clear speech detected. Please speak clearly into your microphone and try again. / आवाज़ साफ़ सुनाई नहीं दी, कृपया पुनः बोलें।")
+      setVoiceState("error")
       setTranscript("")
       return
     }
@@ -161,25 +161,50 @@ export function useVoiceInput(options?: UseVoiceInputOptions) {
     optionsRef.current?.onTranscript?.(finalText)
   }, [cleanupHardware, clearSilenceTimer])
 
-  const stopListening = useCallback(() => {
+  const stopListening = useCallback(async () => {
     isManualStopRef.current = true
     clearSilenceTimer()
+    setVoiceState("processing")
 
-    if (recognitionRef.current) {
-      try {
-        recognitionRef.current.stop()
-      } catch {}
-    }
+    // Stop MediaRecorder and wait for final chunks to flush
+    const recorder = mediaRecorderRef.current
+    const recorderPromise = new Promise<void>((resolve) => {
+      if (recorder && recorder.state === "recording") {
+        recorder.addEventListener("stop", () => resolve(), { once: true })
+        try {
+          recorder.stop()
+        } catch {
+          resolve()
+        }
+        // Fallback timeout in case onstop doesn't fire
+        setTimeout(resolve, 500)
+      } else {
+        resolve()
+      }
+    })
 
-    if (mediaRecorderRef.current && mediaRecorderRef.current.state === "recording") {
-      try {
-        mediaRecorderRef.current.stop()
-      } catch {}
-    }
+    // Stop WebSpeech recognition gracefully
+    const recognition = recognitionRef.current
+    const recognitionPromise = new Promise<void>((resolve) => {
+      if (recognition) {
+        // If we already have a transcript, wait 200ms for any final punctuation
+        // If transcript is empty, wait up to 600ms for Google speech server to return final text
+        const waitMs = spokenTranscriptRef.current.trim() ? 200 : 600
+        const timer = setTimeout(resolve, waitMs)
 
-    setTimeout(() => {
-      handleFinalSpeech()
-    }, 100)
+        try {
+          recognition.stop()
+        } catch {
+          clearTimeout(timer)
+          resolve()
+        }
+      } else {
+        resolve()
+      }
+    })
+
+    await Promise.all([recorderPromise, recognitionPromise])
+    await handleFinalSpeech()
   }, [clearSilenceTimer, handleFinalSpeech])
 
   const startListening = useCallback(async () => {

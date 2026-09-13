@@ -88,39 +88,49 @@ export function VoiceCaptureCard({
     if (!finalText.trim()) return
     setRawSpokenText(finalText.trim())
 
-    // Parse with deterministic VoiceKhata parser
-    const parsed: ParsedVoiceTransaction = parseVoiceKhataInput(finalText.trim(), existingCustomers)
+    try {
+      // Parse with deterministic VoiceKhata parser
+      const parsed: ParsedVoiceTransaction = parseVoiceKhataInput(finalText.trim(), existingCustomers)
 
-    const parsedType: "Credit" | "Debit" = parsed.type || (parsed.category === "Income" ? "Credit" : "Debit")
+      const parsedType: "Credit" | "Debit" = parsed.type || (parsed.category === "Income" ? "Credit" : "Debit")
 
-    const defaultCat = appMode === "BUSINESS"
-      ? (parsedType === "Credit" ? "Sales" : "Inventory/Purchases")
-      : (parsedType === "Credit" ? "Income" : "Shopping")
+      const defaultCat = appMode === "BUSINESS"
+        ? (parsedType === "Credit" ? "Sales" : "Inventory/Purchases")
+        : (parsedType === "Credit" ? "Income" : "Shopping")
 
-    const defaultPerson = (parsed.person && parsed.person !== "Customer / Party")
-      ? parsed.person
-      : (parsedType === "Credit" ? "Payment Received" : "General Expense")
+      const defaultPerson = (parsed.person && parsed.person !== "Customer / Party")
+        ? parsed.person
+        : (parsedType === "Credit" ? "Payment Received" : "General Expense")
 
-    // Ensure category is valid for active appMode
-    let targetCat = parsed.category || defaultCat
-    if (appMode === "BUSINESS") {
-      if (targetCat === "Income" || !activeCategories.includes(targetCat)) {
-        targetCat = parsedType === "Credit" ? "Sales" : "Inventory/Purchases"
+      // Ensure category is valid for active appMode
+      let targetCat = parsed.category || defaultCat
+      if (appMode === "BUSINESS") {
+        if (targetCat === "Income" || !activeCategories.includes(targetCat)) {
+          targetCat = parsedType === "Credit" ? "Sales" : "Inventory/Purchases"
+        }
+      } else if (appMode === "PERSONAL") {
+        if (targetCat === "Sales" || !activeCategories.includes(targetCat)) {
+          targetCat = parsedType === "Credit" ? "Income" : "Shopping"
+        }
       }
-    } else if (appMode === "PERSONAL") {
-      if (targetCat === "Sales" || !activeCategories.includes(targetCat)) {
-        targetCat = parsedType === "Credit" ? "Income" : "Shopping"
-      }
+
+      setPerson(defaultPerson)
+      setAmount(parsed.amount !== null ? parsed.amount : "")
+      setType(parsedType)
+      setCategory(targetCat)
+      setMethod(parsed.method || "UPI")
+      setDate(parsed.date || format(new Date(), "yyyy-MM-dd"))
+    } catch (err) {
+      console.error("[VoiceCaptureCard] Error parsing voice entry:", err)
+      setPerson(finalText.trim().slice(0, 30))
+      setAmount("")
+      setType("Credit")
+      setCategory(appMode === "BUSINESS" ? "Sales" : "Income")
+      setMethod("UPI")
+      setDate(format(new Date(), "yyyy-MM-dd"))
     }
 
-    setPerson(defaultPerson)
-    setAmount(parsed.amount !== null ? parsed.amount : "")
-    setType(parsedType)
-    setCategory(targetCat)
-    setMethod(parsed.method || "UPI")
-    setDate(parsed.date || format(new Date(), "yyyy-MM-dd"))
-
-    // Transition to Review state
+    // Always transition to Review state
     setStep("review")
   }
 
