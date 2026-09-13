@@ -37,22 +37,26 @@ Return ONLY valid JSON with this shape:
 }
 
 Khata & Indian Bookkeeping Rules:
-- Credit (Inflow / Money Received / Income):
-  * Markers: "credit", "credited", "liye", "liya", "le liye", "se liye", "ne diya", "ne diye", "se mila", "se mile", "received", "received from", "paid me", "sent me", "salary", "jama", "jama kiya", "vasool", "cashback", "refund", "aaye", "aaya", "क्रेडिट", "लिए", "लिया", "जमा", "मिला", "भुगतान प्राप्त", "आया", "से मिला", "ने दिया", "ने दिए"
+- Credit (Inflow / Money Received / Income / Customer Paid / Udhaar Repaid):
+  * Markers: "credit", "credited", "liye", "liya", "le liye", "se liye", "ne diya", "ne diye", "se mila", "se mile", "received", "received from", "paid by", "paid me", "sent me", "salary", "jama", "jama kiya", "vasool", "cashback", "refund", "aaye", "aaya", "क्रेडिट", "लिए", "लिया", "जमा", "मिला", "भुगतान प्राप्त", "आया", "से मिला", "ने दिया", "ने दिए", "वसूल"
+  * RULE: "Ramesh paid 1200" or "Ramesh paid 1200 via UPI" -> Ramesh paid money to shopkeeper -> type: "Credit", transaction: "Ramesh", reasoning: "Ramesh paid payment via UPI"
+  * RULE: "Paid by Ramesh 500" -> Ramesh paid money -> type: "Credit", transaction: "Ramesh"
   * RULE: "500 credit" -> type: "Credit", category: "Income", transaction: "Payment Received"
   * RULE: "500 liye" -> type: "Credit", category: "Income", transaction: "Payment Received"
   * RULE: "Ramesh ne 500 diye" -> Ramesh gave me money -> type: "Credit", transaction: "Ramesh"
   * RULE: "Ramesh se 500 liye" -> Took/received money from Ramesh -> type: "Credit", transaction: "Ramesh"
+  * RULE: "Ramesh se 500 vasool hua" / "udhar wapas mila" -> type: "Credit", transaction: "Ramesh", reasoning: "Customer repaid udhar/loan"
   * RULE: "Received 1200 from Suresh" -> Money received -> type: "Credit", transaction: "Suresh"
   * RULE: "Salary 50000" -> type: "Credit", category: "Income", transaction: "Salary"
-- Debit (Outflow / Money Paid Out / Expense / Udhaar Given):
-  * Markers: "debit", "debited", "diye", "diya", "de diya", "de diye", "ko diya", "ko diye", "paid for", "paid to", "paid", "spent", "udhar diya", "samaan liya", "karza diya", "bill bhar diya", "petrol bharwaya", "kharcha", "kharch", "डेबिट", "दिए", "दिया", "दे दिया", "उधार दिया", "कर्ज", "खर्चा", "को दिया", "भुगतान किया", "खर्च"
-  * RULE: "500 debit" -> type: "Debit", category: "Shopping", transaction: "General Expense"
-  * RULE: "500 diye" -> type: "Debit", category: "Shopping", transaction: "General Expense"
+- Debit (Outflow / Money Paid Out / Expense / Udhaar Given To Customer):
+  * Markers: "debit", "debited", "diye", "diya", "de diya", "de diye", "ko diya", "ko diye", "paid for", "paid to", "spent", "udhar diya", "samaan liya", "karza diya", "bill bhar diya", "petrol bharwaya", "kharcha", "kharch", "डेबिट", "दिए", "दिया", "दे दिया", "उधार दिया", "कर्ज", "खर्चा", "को दिया", "भुगतान किया", "खर्च"
+  * RULE: "Paid Ramesh 500" or "Paid to Ramesh 500" -> Shopkeeper paid Ramesh -> type: "Debit", transaction: "Ramesh"
+  * RULE: "Ramesh ko 500 diye" -> Money given TO Ramesh -> type: "Debit", transaction: "Ramesh"
+  * RULE: "Ramesh ko 500 udhar diya" or "Ramesh udhar 500" -> Credit/udhar given to customer -> type: "Debit", category: "Debt", transaction: "Ramesh"
   * RULE: "Paid 450 for groceries" -> Money spent -> type: "Debit", category: "Food", transaction: "Groceries"
   * RULE: "Spent 350 on petrol" -> Money spent -> type: "Debit", category: "Transport", transaction: "Petrol"
-  * RULE: "Suresh ko 1200 diye" -> Money given TO Suresh -> type: "Debit", transaction: "Suresh"
-  * RULE: "Ramesh ko 500 udhar diya" -> Credit given to customer -> type: "Debit", category: "Debt", transaction: "Ramesh"
+  * RULE: "500 debit" -> type: "Debit", category: "Shopping", transaction: "General Expense"
+  * RULE: "500 diye" -> type: "Debit", category: "Shopping", transaction: "General Expense"
   * RULE: If no counterparty/party name is provided (e.g. "500 debit", "500 credit", "500 diye", "500 liye"), return "transaction": type === "Credit" ? "Payment Received" : "General Expense", NEVER leave it empty or ask the user to fill it in!
 
 General Rules:

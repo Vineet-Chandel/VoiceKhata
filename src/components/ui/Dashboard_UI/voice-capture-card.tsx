@@ -23,6 +23,7 @@ import { useVoiceInput } from "@/components/hooks/use-voice-input"
 import { VoiceWaveform } from "@/components/ui/AIAssistant_UI/voice-waveform"
 import { parseVoiceKhataInput, type ParsedVoiceTransaction } from "@/lib/voice-khata-parser"
 import { useTransactions } from "@/components/hooks/use-transactions"
+import { useAITransaction } from "@/components/hooks/use-ai-transaction"
 import { useAppMode } from "@/context/AppModeContext"
 import { useLanguage } from "@/context/LanguageContext"
 import { getCategories } from "@/lib/categories"
@@ -51,6 +52,7 @@ export function VoiceCaptureCard({
   className = "",
 }: VoiceCaptureCardProps) {
   const { addTransaction, transactions } = useTransactions()
+  const { parseAITransaction, isParsing: isAIParsing } = useAITransaction()
   const { appMode } = useAppMode()
   const { language } = useLanguage()
 
@@ -70,6 +72,7 @@ export function VoiceCaptureCard({
   const [method, setMethod] = useState("UPI")
   const [date, setDate] = useState(format(new Date(), "yyyy-MM-dd"))
   const [rawSpokenText, setRawSpokenText] = useState("")
+  const [aiReasoning, setAiReasoning] = useState("")
   const [isSaving, setIsSaving] = useState(false)
   const [saveSuccessMsg, setSaveSuccessMsg] = useState("")
 
@@ -86,58 +89,77 @@ export function VoiceCaptureCard({
     return Array.from(new Set(transactions.map((t) => t.transaction))).filter(Boolean)
   }, [transactions])
 
-  const handleVoiceTranscript = (finalText: string) => {
+  const handleVoiceTranscript = async (finalText: string) => {
     if (!finalText.trim()) return
-    setRawSpokenText(finalText.trim())
+    const text = finalText.trim()
+    setRawSpokenText(text)
+    setAiReasoning("")
 
-    try {
-      // Parse with deterministic VoiceKhata parser
-      const parsed: ParsedVoiceTransaction = parseVoiceKhataInput(finalText.trim(), existingCustomers)
+    // 1. Instant deterministic parsing with enhanced Khata rules
+    const parsed: ParsedVoiceTransaction = parseVoiceKhataInput(text, existingCustomers)
+    let parsedType: "Credit" | "Debit" = parsed.type || (parsed.category === "Income" ? "Credit" : "Debit")
 
-      const parsedType: "Credit" | "Debit" = parsed.type || (parsed.category === "Income" ? "Credit" : "Debit")
+    const defaultCat = appMode === "BUSINESS"
+      ? (parsedType === "Credit" ? "Sales" : "Inventory/Purchases")
+      : (parsedType === "Credit" ? "Income" : "Shopping")
 
-      const defaultCat = appMode === "BUSINESS"
-        ? (parsedType === "Credit" ? "Sales" : "Inventory/Purchases")
-        : (parsedType === "Credit" ? "Income" : "Shopping")
+    const defaultPerson = (parsed.person && parsed.person !== "Customer / Party")
+      ? parsed.person
+      : (parsedType === "Credit" ? "Payment Received" : "General Expense")
 
-      const defaultPerson = (parsed.person && parsed.person !== "Customer / Party")
-        ? parsed.person
-        : (parsedType === "Credit" ? "Payment Received" : "General Expense")
-
-      // Ensure category is valid for active appMode
-      let targetCat = parsed.category || defaultCat
-      if (appMode === "BUSINESS") {
-        if (targetCat === "Income" || !activeCategories.includes(targetCat)) {
-          targetCat = parsedType === "Credit" ? "Sales" : "Inventory/Purchases"
-        }
-      } else if (appMode === "PERSONAL") {
-        if (targetCat === "Sales" || !activeCategories.includes(targetCat)) {
-          targetCat = parsedType === "Credit" ? "Income" : "Shopping"
-        }
+    let targetCat = parsed.category || defaultCat
+    if (appMode === "BUSINESS") {
+      if (targetCat === "Income" || !activeCategories.includes(targetCat)) {
+        targetCat = parsedType === "Credit" ? "Sales" : "Inventory/Purchases"
       }
-
-      setPerson(defaultPerson)
-      setAmount(parsed.amount !== null ? parsed.amount : "")
-      setType(parsedType)
-      setCategory(targetCat)
-      setMethod(parsed.method || "UPI")
-      setDate(parsed.date || format(new Date(), "yyyy-MM-dd"))
-    } catch (err) {
-      console.error("[VoiceCaptureCard] Error parsing voice entry:", err)
-      setPerson(finalText.trim().slice(0, 30))
-      setAmount("")
-      setType("Credit")
-      setCategory(appMode === "BUSINESS" ? "Sales" : "Income")
-      setMethod("UPI")
-      setDate(format(new Date(), "yyyy-MM-dd"))
+    } else if (appMode === "PERSONAL") {
+      if (targetCat === "Sales" || !activeCategories.includes(targetCat)) {
+        targetCat = parsedType === "Credit" ? "Income" : "Shopping"
+      }
     }
 
-    // Always transition to Review state
+    setPerson(defaultPerson)
+    setAmount(parsed.amount !== null ? parsed.amount : "")
+    setType(parsedType)
+    setCategory(targetCat)
+    setMethod(parsed.method || "UPI")
+    setDate(parsed.date || format(new Date(), "yyyy-MM-dd"))
+    setAiReasoning(parsed.directionLabel ? `Detected: ${parsed.directionLabel}` : "")
+
+    // Always transition to Review state immediately
     setStep("review")
+
+    // 2. Parallel semantic AI refinement via Llama 3.3 on Groq
+    try {
+      const aiResult = await parseAITransaction(text, appMode, transactions)
+      if (aiResult) {
+        if (aiResult.type === "Credit" || aiResult.type === "Debit") {
+          setType(aiResult.type)
+        }
+        if (aiResult.transaction && aiResult.transaction !== "Unknown" && (defaultPerson === "General Expense" || defaultPerson === "Payment Received")) {
+          setPerson(aiResult.transaction)
+        }
+        if (aiResult.amount && (parsed.amount === null || Number.isNaN(parsed.amount))) {
+          setAmount(aiResult.amount)
+        }
+        if (aiResult.category && activeCategories.includes(aiResult.category)) {
+          setCategory(aiResult.category)
+        }
+        if (aiResult.method) {
+          setMethod(aiResult.method)
+        }
+        if (aiResult.reasoning) {
+          setAiReasoning(aiResult.reasoning)
+        }
+      }
+    } catch (e) {
+      console.warn("[VoiceCaptureCard] AI background refinement skipped:", e)
+    }
   }
 
   const [liveSpeech, setLiveSpeech] = useState("")
   const [voiceLang, setVoiceLang] = useState<"en-IN" | "hi-IN">(language === "hi" ? "hi-IN" : "en-IN")
+
 
   const {
     voiceState,
@@ -488,33 +510,51 @@ export function VoiceCaptureCard({
               </div>
 
               {/* Direction Selector (Credit / Debit) */}
-              <div className="grid grid-cols-2 gap-3 mb-5">
+              <div className="grid grid-cols-2 gap-3 mb-4">
                 <button
                   type="button"
                   onClick={() => setType("Credit")}
-                  className={`flex items-center justify-center gap-2.5 p-3.5 rounded-xl border text-sm font-semibold transition-all cursor-pointer ${
+                  className={`flex flex-col items-center justify-center p-3 rounded-xl border transition-all cursor-pointer text-center ${
                     type === "Credit"
-                      ? "bg-emerald-500/15 border-emerald-500 text-emerald-700 dark:text-emerald-300 ring-2 ring-emerald-500/30 shadow-sm"
+                      ? "bg-emerald-500/15 border-emerald-500 text-emerald-800 dark:text-emerald-200 ring-2 ring-emerald-500/30 shadow-xs"
                       : "bg-slate-50 border-slate-200 text-slate-500 hover:border-slate-300 dark:bg-slate-900/50 dark:border-slate-800 dark:text-slate-400"
                   }`}
                 >
-                  <span className={`size-2.5 rounded-full transition-transform ${type === "Credit" ? "bg-emerald-500 scale-125 ring-2 ring-emerald-400/40" : "bg-slate-300 dark:bg-slate-600"}`} />
-                  Credit (Money Received / Inflow)
+                  <div className="flex items-center gap-2 font-bold text-sm">
+                    <span className={`size-2.5 rounded-full transition-transform ${type === "Credit" ? "bg-emerald-500 scale-125 ring-2 ring-emerald-400/40" : "bg-slate-300 dark:bg-slate-600"}`} />
+                    <span>+ ₹ Received / जमा मिला (Credit)</span>
+                  </div>
+                  <span className="text-[10px] mt-0.5 opacity-80">
+                    Payment from customer / Income
+                  </span>
                 </button>
 
                 <button
                   type="button"
                   onClick={() => setType("Debit")}
-                  className={`flex items-center justify-center gap-2.5 p-3.5 rounded-xl border text-sm font-semibold transition-all cursor-pointer ${
+                  className={`flex flex-col items-center justify-center p-3 rounded-xl border transition-all cursor-pointer text-center ${
                     type === "Debit"
-                      ? "bg-rose-500/15 border-rose-500 text-rose-700 dark:text-rose-300 ring-2 ring-rose-500/30 shadow-sm"
+                      ? "bg-rose-500/15 border-rose-500 text-rose-800 dark:text-rose-200 ring-2 ring-rose-500/30 shadow-xs"
                       : "bg-slate-50 border-slate-200 text-slate-500 hover:border-slate-300 dark:bg-slate-900/50 dark:border-slate-800 dark:text-slate-400"
                   }`}
                 >
-                  <span className={`size-2.5 rounded-full transition-transform ${type === "Debit" ? "bg-rose-500 scale-125 ring-2 ring-rose-400/40" : "bg-slate-300 dark:bg-slate-600"}`} />
-                  Debit (Money Paid / Udhaar)
+                  <div className="flex items-center gap-2 font-bold text-sm">
+                    <span className={`size-2.5 rounded-full transition-transform ${type === "Debit" ? "bg-rose-500 scale-125 ring-2 ring-rose-400/40" : "bg-slate-300 dark:bg-slate-600"}`} />
+                    <span>- ₹ Paid / उधार दिया (Debit)</span>
+                  </div>
+                  <span className="text-[10px] mt-0.5 opacity-80">
+                    Udhaar to customer / Expense
+                  </span>
                 </button>
               </div>
+
+              {/* AI Reasoning / Classification Chip */}
+              {aiReasoning && (
+                <div className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-200/80 dark:border-indigo-800/60 text-indigo-700 dark:text-indigo-300 text-xs font-medium mb-4">
+                  <Sparkles size={14} className="text-indigo-500 shrink-0" />
+                  <span>{aiReasoning}</span>
+                </div>
+              )}
 
               {/* Editable Fields Grid */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
