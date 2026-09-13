@@ -89,18 +89,32 @@ export function VoiceCaptureCard({
     // Parse with deterministic VoiceKhata parser
     const parsed: ParsedVoiceTransaction = parseVoiceKhataInput(finalText.trim(), existingCustomers)
 
+    const parsedType: "Credit" | "Debit" = parsed.type || (parsed.category === "Income" ? "Credit" : "Debit")
+
     const defaultCat = appMode === "BUSINESS"
-      ? (parsed.type === "Debit" ? "Inventory/Purchases" : "Sales")
-      : (parsed.type === "Debit" ? "Shopping" : "Income")
+      ? (parsedType === "Credit" ? "Sales" : "Inventory/Purchases")
+      : (parsedType === "Credit" ? "Income" : "Shopping")
 
     const defaultPerson = (parsed.person && parsed.person !== "Customer / Party")
       ? parsed.person
-      : (parsed.type === "Credit" ? "Payment Received" : "General Expense")
+      : (parsedType === "Credit" ? "Payment Received" : "General Expense")
+
+    // Ensure category is valid for active appMode
+    let targetCat = parsed.category || defaultCat
+    if (appMode === "BUSINESS") {
+      if (targetCat === "Income" || !activeCategories.includes(targetCat)) {
+        targetCat = parsedType === "Credit" ? "Sales" : "Inventory/Purchases"
+      }
+    } else if (appMode === "PERSONAL") {
+      if (targetCat === "Sales" || !activeCategories.includes(targetCat)) {
+        targetCat = parsedType === "Credit" ? "Income" : "Shopping"
+      }
+    }
 
     setPerson(defaultPerson)
     setAmount(parsed.amount !== null ? parsed.amount : "")
-    setType(parsed.type || (parsed.category === "Income" ? "Credit" : "Debit"))
-    setCategory(parsed.category || defaultCat)
+    setType(parsedType)
+    setCategory(targetCat)
     setMethod(parsed.method || "UPI")
     setDate(parsed.date || format(new Date(), "yyyy-MM-dd"))
 
@@ -158,7 +172,7 @@ export function VoiceCaptureCard({
     setPerson("")
     setAmount("")
     setType("Credit")
-    setCategory("Income")
+    setCategory(appMode === "BUSINESS" ? "Sales" : "Income")
     setMethod("UPI")
     setDate(format(new Date(), "yyyy-MM-dd"))
     setRawSpokenText("")
@@ -358,26 +372,26 @@ export function VoiceCaptureCard({
                 <button
                   type="button"
                   onClick={() => setType("Credit")}
-                  className={`flex items-center justify-center gap-2 p-3.5 rounded-xl border text-sm font-semibold transition-all cursor-pointer ${
+                  className={`flex items-center justify-center gap-2.5 p-3.5 rounded-xl border text-sm font-semibold transition-all cursor-pointer ${
                     type === "Credit"
-                      ? "bg-emerald-50 border-emerald-300 text-emerald-700 shadow-xs dark:bg-emerald-500/15 dark:border-emerald-500/40 dark:text-emerald-400 dark:shadow-md dark:shadow-emerald-500/10"
-                      : "bg-slate-50 border-slate-200 text-slate-600 hover:border-slate-300 dark:bg-slate-900/60 dark:border-slate-800 dark:text-slate-400 dark:hover:border-slate-700"
+                      ? "bg-emerald-500/15 border-emerald-500 text-emerald-700 dark:text-emerald-300 ring-2 ring-emerald-500/30 shadow-sm"
+                      : "bg-slate-50 border-slate-200 text-slate-500 hover:border-slate-300 dark:bg-slate-900/50 dark:border-slate-800 dark:text-slate-400"
                   }`}
                 >
-                  <span className="size-2 rounded-full bg-emerald-500" />
+                  <span className={`size-2.5 rounded-full transition-transform ${type === "Credit" ? "bg-emerald-500 scale-125 ring-2 ring-emerald-400/40" : "bg-slate-300 dark:bg-slate-600"}`} />
                   Credit (Money Received / Inflow)
                 </button>
 
                 <button
                   type="button"
                   onClick={() => setType("Debit")}
-                  className={`flex items-center justify-center gap-2 p-3.5 rounded-xl border text-sm font-semibold transition-all cursor-pointer ${
+                  className={`flex items-center justify-center gap-2.5 p-3.5 rounded-xl border text-sm font-semibold transition-all cursor-pointer ${
                     type === "Debit"
-                      ? "bg-rose-50 border-rose-300 text-rose-700 shadow-xs dark:bg-rose-500/15 dark:border-rose-500/40 dark:text-rose-400 dark:shadow-md dark:shadow-rose-500/10"
-                      : "bg-slate-50 border-slate-200 text-slate-600 hover:border-slate-300 dark:bg-slate-900/60 dark:border-slate-800 dark:text-slate-400 dark:hover:border-slate-700"
+                      ? "bg-rose-500/15 border-rose-500 text-rose-700 dark:text-rose-300 ring-2 ring-rose-500/30 shadow-sm"
+                      : "bg-slate-50 border-slate-200 text-slate-500 hover:border-slate-300 dark:bg-slate-900/50 dark:border-slate-800 dark:text-slate-400"
                   }`}
                 >
-                  <span className="size-2 rounded-full bg-rose-500" />
+                  <span className={`size-2.5 rounded-full transition-transform ${type === "Debit" ? "bg-rose-500 scale-125 ring-2 ring-rose-400/40" : "bg-slate-300 dark:bg-slate-600"}`} />
                   Debit (Money Paid / Udhaar)
                 </button>
               </div>

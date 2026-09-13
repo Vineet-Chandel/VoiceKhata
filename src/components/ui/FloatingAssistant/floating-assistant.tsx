@@ -111,8 +111,8 @@ export function FloatingAssistant() {
   const isMobile = useIsMobile()
   const { user } = useAuth()
 
-  // ── Don't render on the AI assistant page ──────────────────────────────────
-  const isOnAssistantPage = location.pathname === "/dashboard/ai-assistant"
+  // ── Don't render on the AI assistant or dedicated Voice Capture page ───────
+  const isOnAssistantPage = location.pathname === "/dashboard/ai-assistant" || location.pathname.startsWith("/dashboard/voice-capture")
 
   // ── Page-aware config ──────────────────────────────────────────────────────
   const pageConfig = PAGE_CONFIG[location.pathname] ?? DEFAULT_CONFIG
