@@ -66,13 +66,10 @@ export function ChartAreaInteractive({ data }: { data: ChartData[] }) {
             <XAxis
               dataKey="date"
               type="category"
-              interval="preserveStartEnd"
               tickLine={false}
               axisLine={false}
               tickMargin={8}
-              angle={-35}
-              textAnchor="end"
-              height={60}
+              minTickGap={28}
               tickFormatter={(value) => {
                 const d = new Date(value)
                 return d.toLocaleDateString("en-US", {
