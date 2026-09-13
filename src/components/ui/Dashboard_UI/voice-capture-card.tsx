@@ -136,6 +136,9 @@ export function VoiceCaptureCard({
     setStep("review")
   }
 
+  const [liveSpeech, setLiveSpeech] = useState("")
+  const [voiceLang, setVoiceLang] = useState<"en-IN" | "hi-IN">(language === "hi" ? "hi-IN" : "en-IN")
+
   const {
     voiceState,
     transcript,
@@ -145,13 +148,15 @@ export function VoiceCaptureCard({
     reset: resetVoice,
     analyserRef,
   } = useVoiceInput({
-    lang: language === "hi" ? "hi-IN" : "en-IN",
+    lang: voiceLang,
+    onLiveTranscript: (text) => setLiveSpeech(text),
     onTranscript: handleVoiceTranscript,
     onError: (err) => {
       console.warn("[VoiceCaptureCard] Voice input error:", err)
     },
   })
 
+  const displayedSpeech = liveSpeech || transcript
   const isListening = voiceState === "listening"
   const isProcessing = voiceState === "processing"
 
@@ -189,6 +194,7 @@ export function VoiceCaptureCard({
 
   const handleResetForAnother = () => {
     resetVoice()
+    setLiveSpeech("")
     setPerson("")
     setAmount("")
     setType("Credit")
@@ -254,12 +260,50 @@ export function VoiceCaptureCard({
               <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white mb-2">
                 Say what happened
               </h2>
-              <p className="text-sm md:text-base text-slate-600 dark:text-slate-400 max-w-md mx-auto mb-8">
-                VoiceKhata will prepare the entry for your review.
+              <p className="text-sm md:text-base text-slate-600 dark:text-slate-400 max-w-md mx-auto mb-6">
+                VoiceKhata will transcribe live and prepare your entry.
               </p>
 
+              {/* Language Selector Pill */}
+              <div className="inline-flex items-center gap-1.5 p-1 rounded-full bg-slate-100 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700/80 mb-6 shadow-xs">
+                <button
+                  type="button"
+                  disabled={isProcessing}
+                  onClick={() => {
+                    setVoiceLang("en-IN")
+                    if (isListening) {
+                      stopListening()
+                    }
+                  }}
+                  className={`px-3.5 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer ${
+                    voiceLang === "en-IN"
+                      ? "bg-indigo-600 text-white shadow-xs"
+                      : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                  }`}
+                >
+                  English (India)
+                </button>
+                <button
+                  type="button"
+                  disabled={isProcessing}
+                  onClick={() => {
+                    setVoiceLang("hi-IN")
+                    if (isListening) {
+                      stopListening()
+                    }
+                  }}
+                  className={`px-3.5 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer ${
+                    voiceLang === "hi-IN"
+                      ? "bg-indigo-600 text-white shadow-xs"
+                      : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                  }`}
+                >
+                  🇮🇳 हिंदी / Hinglish
+                </button>
+              </div>
+
               {/* Hero Circular Mic Button */}
-              <div className="relative flex items-center justify-center my-4">
+              <div className="relative flex items-center justify-center my-2">
                 {/* Listening wave ripples */}
                 {isListening && (
                   <>
@@ -274,6 +318,7 @@ export function VoiceCaptureCard({
                     if (isListening) {
                       stopListening()
                     } else if (!isProcessing) {
+                      setLiveSpeech("")
                       startListening()
                     }
                   }}
@@ -296,40 +341,42 @@ export function VoiceCaptureCard({
 
               {/* Active Voice Waveform, Live Transcription & Feedback */}
               {isListening ? (
-                <div className="flex flex-col items-center gap-4 mt-3 w-full max-w-xl mx-auto animate-in fade-in zoom-in-95 duration-200">
+                <div className="flex flex-col items-center gap-4 mt-4 w-full max-w-xl mx-auto animate-in fade-in zoom-in-95 duration-200">
                   {/* Live Status Pill & Waveform */}
                   <div className="flex items-center gap-3 px-4 py-1.5 rounded-full bg-red-500/10 border border-red-500/20 text-red-600 dark:text-red-400 text-xs font-semibold shadow-xs">
                     <span className="relative flex size-2.5">
                       <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75" />
                       <span className="relative inline-flex rounded-full size-2.5 bg-red-500" />
                     </span>
-                    <span>Listening & writing live...</span>
+                    <span>Listening & writing live ({voiceLang === "hi-IN" ? "हिंदी/Hinglish" : "English"})...</span>
                     <div className="h-5 w-24 sm:w-32 flex items-center justify-center overflow-hidden">
                       <VoiceWaveform analyserRef={analyserRef} isListening={true} color="rgba(239, 68, 68, 0.9)" />
                     </div>
                   </div>
 
                   {/* Real-Time Live Spoken Text Transcription Box */}
-                  <div className="w-full rounded-2xl border border-indigo-200 dark:border-indigo-500/30 bg-slate-50/90 dark:bg-slate-900/90 p-5 sm:p-6 shadow-xl backdrop-blur-md text-left transition-all duration-150">
+                  <div className="w-full rounded-2xl border border-indigo-200 dark:border-indigo-500/30 bg-slate-50/95 dark:bg-slate-900/95 p-5 sm:p-6 shadow-xl backdrop-blur-md text-left transition-all duration-150">
                     <div className="flex items-center justify-between gap-2 mb-2 pb-2 border-b border-slate-200/80 dark:border-slate-800 text-[11px] font-bold text-indigo-600 dark:text-indigo-400 tracking-wider uppercase">
                       <span className="flex items-center gap-1.5">
                         <Sparkles size={14} className="text-indigo-500" />
                         Speaking now / जो आप बोल रहे हैं:
                       </span>
                       <span className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-indigo-100 dark:bg-indigo-950/80 text-indigo-700 dark:text-indigo-300 font-normal">
-                        {transcript ? "writing live..." : "waiting for voice..."}
+                        {displayedSpeech ? "writing live..." : "waiting for voice..."}
                       </span>
                     </div>
 
                     <div className="min-h-[68px] flex items-center justify-center">
-                      {transcript ? (
+                      {displayedSpeech ? (
                         <p className="text-base sm:text-lg md:text-xl font-semibold text-slate-900 dark:text-white leading-relaxed text-center break-words w-full">
-                          "{transcript}"
+                          "{displayedSpeech}"
                           <span className="inline-block w-2 h-5 ml-1.5 bg-indigo-600 dark:bg-indigo-400 align-middle animate-pulse rounded-xs" />
                         </p>
                       ) : (
                         <p className="text-sm sm:text-base text-slate-500 dark:text-slate-400 italic text-center animate-pulse">
-                          Say your transaction... e.g. "Paid 250 for groceries" or "रमेश को ₹500 दिए"
+                          {voiceLang === "hi-IN"
+                            ? "बोलना शुरू कीजिए... जैसे 'रमेश को ₹500 दिए' या 'Paid ₹250 cash'"
+                            : "Speak now... e.g. 'Paid 250 for groceries' or 'Received 1200 from Ramesh via UPI'"}
                         </p>
                       )}
                     </div>
@@ -340,6 +387,7 @@ export function VoiceCaptureCard({
                     <button
                       onClick={() => {
                         stopListening()
+                        setLiveSpeech("")
                         setTimeout(resetVoice, 50)
                       }}
                       className="px-4 py-2 rounded-full text-xs font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white bg-slate-100 dark:bg-slate-800/80 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-700 transition-colors cursor-pointer shadow-xs"
@@ -361,11 +409,11 @@ export function VoiceCaptureCard({
                     <Loader2 size={16} className="animate-spin text-indigo-600 dark:text-indigo-400" />
                     <span className="text-xs sm:text-sm font-medium">Preparing your transaction review...</span>
                   </div>
-                  {transcript && (
+                  {displayedSpeech && (
                     <div className="w-full p-3 rounded-xl bg-slate-100 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-center">
                       <p className="text-xs text-slate-500 dark:text-slate-400 uppercase font-semibold mb-1">Heard:</p>
                       <p className="text-sm font-semibold text-slate-800 dark:text-slate-200 break-words">
-                        "{transcript}"
+                        "{displayedSpeech}"
                       </p>
                     </div>
                   )}
