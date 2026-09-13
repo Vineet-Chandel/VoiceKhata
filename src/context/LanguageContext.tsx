@@ -15,7 +15,7 @@ const LanguageContext = createContext<LanguageContextValue | null>(null);
 export const translations: Record<string, Record<Language, string>> = {
   // ── Navigation / Sidebar ──
   "nav.dashboard":        { en: "Dashboard",          hi: "डैशबोर्ड" },
-  "nav.voiceCapture":     { en: "Voice Capture",      hi: "आवाज़ दर्ज करें" },
+  "nav.voiceCapture":     { en: "Add Transaction",   hi: "लेन-देन जोड़ें" },
   "nav.transaction":      { en: "Transaction",        hi: "लेन-देन" },
   "nav.budget":           { en: "Budget & Investment", hi: "बजट और निवेश" },
   "nav.reports":          { en: "Reports",            hi: "रिपोर्ट" },
@@ -46,8 +46,8 @@ export const translations: Record<string, Record<Language, string>> = {
   "home.totalIncome":       { en: "Total Income",     hi: "कुल आय" },
   "home.savingsRate":       { en: "Savings Rate",     hi: "बचत दर" },
 
-  // ── Voice Capture Page ──
-  "voice.title":            { en: "Voice Capture",    hi: "आवाज़ दर्ज करें" },
+  // ── Add Transaction Page ──
+  "voice.title":            { en: "Add Transaction",   hi: "लेन-देन जोड़ें" },
   "voice.reviewEntry":      { en: "REVIEW ENTRY",     hi: "प्रविष्टि की समीक्षा" },
   "voice.reviewBeforeSaving": { en: "Review before saving", hi: "सेव करने से पहले देखें" },
   "voice.recordAgain":      { en: "Record again",     hi: "फिर से रिकॉर्ड करें" },
