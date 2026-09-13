@@ -235,7 +235,7 @@ export function VoiceCaptureCard({
       )}
 
       {/* Main Container */}
-      <div className="relative rounded-3xl border border-slate-200 dark:border-slate-800/80 bg-white dark:bg-gradient-to-b dark:from-slate-900/95 dark:via-[#0E1528] dark:to-slate-950 p-6 md:p-12 shadow-md dark:shadow-2xl overflow-hidden">
+      <div className="relative rounded-3xl border border-slate-200 dark:border-slate-800/80 bg-white dark:bg-gradient-to-b dark:from-slate-900/95 dark:via-[#0E1528] dark:to-slate-950 p-6 md:p-8 shadow-md dark:shadow-2xl overflow-hidden">
         {/* Soft center ambient radial glow */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[340px] md:w-[480px] h-[340px] md:h-[480px] bg-indigo-500/5 dark:bg-indigo-600/10 rounded-full blur-3xl pointer-events-none" />
 
@@ -248,67 +248,66 @@ export function VoiceCaptureCard({
               exit={{ opacity: 0, y: -10 }}
               className="flex flex-col items-center text-center relative z-10"
             >
-              {/* Top Badge */}
-              <div className="inline-flex items-center justify-center size-12 rounded-2xl bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-200 dark:border-indigo-500/20 text-indigo-600 dark:text-indigo-400 mb-4 shadow-xs dark:shadow-inner">
-                <Mic size={22} />
-              </div>
+              {/* Top Header - changes smoothly based on listening state */}
+              {!isListening && !isProcessing ? (
+                <>
+                  <div className="inline-flex items-center justify-center size-11 rounded-2xl bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-200 dark:border-indigo-500/20 text-indigo-600 dark:text-indigo-400 mb-3 shadow-xs">
+                    <Mic size={20} />
+                  </div>
 
-              {/* Tag & Title */}
-              <p className="text-[11px] font-bold tracking-[0.25em] text-indigo-600 dark:text-indigo-400 uppercase mb-2">
-                VOICE ENTRY
-              </p>
-              <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white mb-2">
-                Say what happened
-              </h2>
-              <p className="text-sm md:text-base text-slate-600 dark:text-slate-400 max-w-md mx-auto mb-6">
-                VoiceKhata will transcribe live and prepare your entry.
-              </p>
+                  <p className="text-[11px] font-bold tracking-[0.25em] text-indigo-600 dark:text-indigo-400 uppercase mb-1">
+                    VOICE ENTRY
+                  </p>
+                  <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white mb-1.5">
+                    Say what happened
+                  </h2>
+                  <p className="text-xs md:text-sm text-slate-500 dark:text-slate-400 max-w-md mx-auto mb-5">
+                    Speak naturally in Hindi, English, or Hinglish.
+                  </p>
 
-              {/* Language Selector Pill */}
-              <div className="inline-flex items-center gap-1.5 p-1 rounded-full bg-slate-100 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700/80 mb-6 shadow-xs">
-                <button
-                  type="button"
-                  disabled={isProcessing}
-                  onClick={() => {
-                    setVoiceLang("en-IN")
-                    if (isListening) {
-                      stopListening()
-                    }
-                  }}
-                  className={`px-3.5 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer ${
-                    voiceLang === "en-IN"
-                      ? "bg-indigo-600 text-white shadow-xs"
-                      : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
-                  }`}
-                >
-                  English (India)
-                </button>
-                <button
-                  type="button"
-                  disabled={isProcessing}
-                  onClick={() => {
-                    setVoiceLang("hi-IN")
-                    if (isListening) {
-                      stopListening()
-                    }
-                  }}
-                  className={`px-3.5 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer ${
-                    voiceLang === "hi-IN"
-                      ? "bg-indigo-600 text-white shadow-xs"
-                      : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
-                  }`}
-                >
-                  🇮🇳 हिंदी / Hinglish
-                </button>
-              </div>
+                  {/* Language Selector Pill */}
+                  <div className="inline-flex items-center gap-1.5 p-1 rounded-full bg-slate-100 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700/80 mb-4 shadow-xs">
+                    <button
+                      type="button"
+                      onClick={() => setVoiceLang("en-IN")}
+                      className={`px-3.5 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer ${
+                        voiceLang === "en-IN"
+                          ? "bg-indigo-600 text-white shadow-xs"
+                          : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                      }`}
+                    >
+                      English (India)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setVoiceLang("hi-IN")}
+                      className={`px-3.5 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer ${
+                        voiceLang === "hi-IN"
+                          ? "bg-indigo-600 text-white shadow-xs"
+                          : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                      }`}
+                    >
+                      🇮🇳 हिंदी / Hinglish
+                    </button>
+                  </div>
+                </>
+              ) : isListening ? (
+                /* Sleek listening header */
+                <div className="flex items-center gap-3 px-4 py-1.5 rounded-full bg-red-500/10 border border-red-500/25 text-red-600 dark:text-red-400 text-xs font-semibold mb-3 shadow-xs animate-in fade-in">
+                  <span className="relative flex size-2.5">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75" />
+                    <span className="relative inline-flex rounded-full size-2.5 bg-red-500" />
+                  </span>
+                  <span>Listening live ({voiceLang === "hi-IN" ? "हिंदी/Hinglish" : "English"})</span>
+                </div>
+              ) : null}
 
               {/* Hero Circular Mic Button */}
               <div className="relative flex items-center justify-center my-2">
-                {/* Listening wave ripples */}
                 {isListening && (
                   <>
-                    <span className="absolute size-44 rounded-full border-2 border-indigo-500/40 animate-ping pointer-events-none" />
-                    <span className="absolute size-36 rounded-full border border-indigo-500/30 animate-pulse pointer-events-none" />
+                    <span className="absolute size-40 rounded-full border-2 border-indigo-500/30 animate-ping pointer-events-none" />
+                    <span className="absolute size-32 rounded-full border border-indigo-500/25 animate-pulse pointer-events-none" />
                   </>
                 )}
 
@@ -322,7 +321,7 @@ export function VoiceCaptureCard({
                       startListening()
                     }
                   }}
-                  className={`relative size-28 md:size-32 rounded-full flex items-center justify-center transition-all duration-300 cursor-pointer shadow-2xl ${
+                  className={`relative size-24 md:size-28 rounded-full flex items-center justify-center transition-all duration-300 cursor-pointer shadow-2xl ${
                     isListening
                       ? "bg-red-500 text-white shadow-red-500/40 scale-105 ring-8 ring-red-500/20"
                       : isProcessing
@@ -332,76 +331,60 @@ export function VoiceCaptureCard({
                   title={isListening ? "Click to finish speaking" : isProcessing ? "Processing speech..." : "Click to speak"}
                 >
                   {isProcessing ? (
-                    <Loader2 size={44} className="animate-spin text-white" />
+                    <Loader2 size={38} className="animate-spin text-white" />
                   ) : (
-                    <Mic size={44} className={isListening ? "animate-pulse" : ""} />
+                    <Mic size={38} className={isListening ? "animate-pulse" : ""} />
                   )}
                 </button>
               </div>
 
               {/* Active Voice Waveform, Live Transcription & Feedback */}
               {isListening ? (
-                <div className="flex flex-col items-center gap-4 mt-4 w-full max-w-xl mx-auto animate-in fade-in zoom-in-95 duration-200">
-                  {/* Live Status Pill & Waveform */}
-                  <div className="flex items-center gap-3 px-4 py-1.5 rounded-full bg-red-500/10 border border-red-500/20 text-red-600 dark:text-red-400 text-xs font-semibold shadow-xs">
-                    <span className="relative flex size-2.5">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75" />
-                      <span className="relative inline-flex rounded-full size-2.5 bg-red-500" />
-                    </span>
-                    <span>Listening & writing live ({voiceLang === "hi-IN" ? "हिंदी/Hinglish" : "English"})...</span>
-                    <div className="h-5 w-24 sm:w-32 flex items-center justify-center overflow-hidden">
-                      <VoiceWaveform analyserRef={analyserRef} isListening={true} color="rgba(239, 68, 68, 0.9)" />
-                    </div>
+                <div className="flex flex-col items-center gap-3 mt-3 w-full max-w-lg mx-auto animate-in fade-in zoom-in-95 duration-200">
+                  {/* Subtle Waveform */}
+                  <div className="h-6 w-32 flex items-center justify-center overflow-hidden">
+                    <VoiceWaveform analyserRef={analyserRef} isListening={true} color="rgba(99, 102, 241, 0.9)" />
                   </div>
 
-                  {/* Real-Time Live Spoken Text Transcription Box */}
-                  <div className="w-full rounded-2xl border border-indigo-200 dark:border-indigo-500/30 bg-slate-50/95 dark:bg-slate-900/95 p-5 sm:p-6 shadow-xl backdrop-blur-md text-left transition-all duration-150">
-                    <div className="flex items-center justify-between gap-2 mb-2 pb-2 border-b border-slate-200/80 dark:border-slate-800 text-[11px] font-bold text-indigo-600 dark:text-indigo-400 tracking-wider uppercase">
-                      <span className="flex items-center gap-1.5">
-                        <Sparkles size={14} className="text-indigo-500" />
-                        Speaking now / जो आप बोल रहे हैं:
-                      </span>
-                      <span className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-indigo-100 dark:bg-indigo-950/80 text-indigo-700 dark:text-indigo-300 font-normal">
-                        {displayedSpeech ? "writing live..." : "waiting for voice..."}
-                      </span>
-                    </div>
-
-                    <div className="min-h-[68px] flex items-center justify-center">
-                      {displayedSpeech ? (
-                        <p className="text-base sm:text-lg md:text-xl font-semibold text-slate-900 dark:text-white leading-relaxed text-center break-words w-full">
-                          "{displayedSpeech}"
-                          <span className="inline-block w-2 h-5 ml-1.5 bg-indigo-600 dark:bg-indigo-400 align-middle animate-pulse rounded-xs" />
-                        </p>
-                      ) : (
-                        <p className="text-sm sm:text-base text-slate-500 dark:text-slate-400 italic text-center animate-pulse">
-                          {voiceLang === "hi-IN"
-                            ? "बोलना शुरू कीजिए... जैसे 'रमेश को ₹500 दिए' या 'Paid ₹250 cash'"
-                            : "Speak now... e.g. 'Paid 250 for groceries' or 'Received 1200 from Ramesh via UPI'"}
-                        </p>
-                      )}
-                    </div>
+                  {/* Real-Time Live Spoken Text Display */}
+                  <div className="w-full rounded-2xl border border-indigo-200/80 dark:border-indigo-500/20 bg-slate-50/90 dark:bg-slate-900/80 p-5 shadow-lg backdrop-blur-md text-center transition-all duration-150 min-h-[72px] flex items-center justify-center">
+                    {displayedSpeech ? (
+                      <p className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white leading-relaxed break-words w-full">
+                        "{displayedSpeech}"
+                        <span className="inline-block w-2 h-4.5 ml-1 bg-indigo-600 dark:bg-indigo-400 align-middle animate-pulse rounded-xs" />
+                      </p>
+                    ) : (
+                      <p className="text-sm sm:text-base text-slate-400 dark:text-slate-400 italic text-center animate-pulse">
+                        🎙️ Listening... start speaking now
+                      </p>
+                    )}
                   </div>
 
                   {/* Controls */}
-                  <div className="flex items-center gap-3 mt-1">
+                  <div className="flex items-center gap-3 mt-2">
                     <button
+                      type="button"
                       onClick={() => {
                         stopListening()
                         setLiveSpeech("")
                         setTimeout(resetVoice, 50)
                       }}
-                      className="px-4 py-2 rounded-full text-xs font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white bg-slate-100 dark:bg-slate-800/80 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-700 transition-colors cursor-pointer shadow-xs"
+                      className="px-4 py-2 rounded-full text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white bg-slate-100 dark:bg-slate-800/80 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-700 transition-colors cursor-pointer shadow-xs"
                     >
                       Cancel
                     </button>
                     <button
+                      type="button"
                       onClick={stopListening}
-                      className="px-5 py-2 rounded-full text-xs font-semibold text-white bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 border border-indigo-400/40 transition-all cursor-pointer flex items-center gap-1.5 shadow-md shadow-indigo-600/30 hover:scale-[1.02]"
+                      className="px-5 py-2 rounded-full text-xs font-bold text-white bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 border border-indigo-400/30 transition-all cursor-pointer flex items-center gap-1.5 shadow-md shadow-indigo-600/30 hover:scale-[1.02]"
                     >
                       <Check size={15} strokeWidth={3} />
-                      Done speaking
+                      Done Speaking
                     </button>
                   </div>
+                  <span className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">
+                    Pausing for 3 seconds will automatically finalize
+                  </span>
                 </div>
               ) : isProcessing ? (
                 <div className="flex flex-col items-center gap-3 mt-4 w-full max-w-md mx-auto animate-in fade-in duration-200">

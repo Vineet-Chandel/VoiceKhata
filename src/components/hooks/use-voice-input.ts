@@ -260,7 +260,7 @@ export function useVoiceInput(options?: UseVoiceInputOptions) {
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: {
           echoCancellation: true,
-          noiseSuppression: true,
+          noiseSuppression: false,
           autoGainControl: true,
         },
       })
@@ -344,7 +344,9 @@ export function useVoiceInput(options?: UseVoiceInputOptions) {
           const recognition = new SpeechRecognitionClass()
           recognition.lang = optionsRef.current?.lang || "en-IN"
           recognition.interimResults = true
-          recognition.continuous = true
+          // continuous = false delivers instant zero-latency interim results per word/syllable;
+          // onend seamlessly chains with finalizedPrefixRef
+          recognition.continuous = false
           recognition.maxAlternatives = 1
 
           recognition.onresult = (event: any) => {
