@@ -6,9 +6,9 @@ import type { FinancialMetrics } from "@/lib/financial-metrics"
 import type { AppMode } from "@/context/AppModeContext"
 
 const GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
-const GROQ_FALLBACK_MODELS = [
-  "llama-3.3-70b-versatile",
-  "qwen/qwen3.6-27b",
+const GEMINI_MODELS = [
+  "gemini-2.0-flash",
+  "gemini-1.5-flash",
 ] as const
 const CACHE_KEY = "voicekhata_ai_suggestions"
 
@@ -190,7 +190,24 @@ Output Rules:
       })
 
       if (!res.ok) {
-        continue
+        const errorPayload = await res.json().catch(() => ({}))
+        let errMsg = `Gemini API error: ${res.status}`
+        if (Array.isArray(errorPayload) && errorPayload[0]?.error?.message) {
+          errMsg = errorPayload[0].error.message
+        } else if (errorPayload?.error?.message) {
+          errMsg = errorPayload.error.message
+        }
+        
+        if (errMsg.toLowerCase().includes("api key") || errMsg.toLowerCase().includes("valid api key")) {
+          throw new Error(errMsg)
+        }
+
+        if (res.status === 404 || res.status === 400 || errMsg.toLowerCase().includes("does not exist") || errMsg.toLowerCase().includes("not found")) {
+          lastError = new Error(errMsg)
+          continue
+        }
+        
+        throw new Error(errMsg)
       }
       const data = await res.json()
       const content = data?.choices?.[0]?.message?.content ?? ""

@@ -121,12 +121,11 @@ const VALID_METHODS = [
   "Net Banking",
 ] as const
 
-const GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
-const GROQ_FALLBACK_MODELS = [
-  "llama-3.3-70b-versatile",
-  "qwen/qwen3.6-27b",
+const GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"
+const GEMINI_MODELS = [
+  "gemini-2.0-flash",
+  "gemini-1.5-flash",
 ] as const
-const GROQ_MODEL = GROQ_FALLBACK_MODELS[0]
 
 function formatAmount(amount: number): string {
   return `Rs.${amount.toLocaleString("en-IN")}`
@@ -1467,12 +1466,12 @@ function getSoftRedirectMessage(input: string, languageMode: LanguageMode): stri
   return null
 }
 
-async function callGroq(apiKey: string, systemPrompt: string, history: Message[]): Promise<string> {
+async function callGemini(apiKey: string, systemPrompt: string, history: Message[]): Promise<string> {
   let lastError: Error | null = null
 
-  for (const model of GROQ_FALLBACK_MODELS) {
+  for (const model of GEMINI_MODELS) {
     try {
-      const response = await fetch(GROQ_API_URL, {
+      const response = await fetch(GEMINI_API_URL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -1488,8 +1487,20 @@ async function callGroq(apiKey: string, systemPrompt: string, history: Message[]
 
       if (!response.ok) {
         const errorPayload = await response.json().catch(() => ({}))
-        const errMsg = errorPayload?.error?.message ?? `Groq error (${response.status})`
-        if (response.status === 404 || errMsg.toLowerCase().includes("does not exist") || errMsg.toLowerCase().includes("access")) {
+        
+        let errMsg = `Gemini error (${response.status})`
+        if (Array.isArray(errorPayload) && errorPayload[0]?.error?.message) {
+          errMsg = errorPayload[0].error.message
+        } else if (errorPayload?.error?.message) {
+          errMsg = errorPayload.error.message
+        }
+
+        // If the API key is completely invalid, don't keep trying fallback models
+        if (errMsg.toLowerCase().includes("api key") || errMsg.toLowerCase().includes("valid api key")) {
+          throw new Error(errMsg)
+        }
+
+        if (response.status === 404 || response.status === 400 || errMsg.toLowerCase().includes("does not exist") || errMsg.toLowerCase().includes("not found") || errMsg.toLowerCase().includes("access")) {
           lastError = new Error(errMsg)
           continue
         }
@@ -1507,7 +1518,7 @@ async function callGroq(apiKey: string, systemPrompt: string, history: Message[]
     }
   }
 
-  throw lastError ?? new Error("Groq request failed with all available models.")
+  throw lastError ?? new Error("Gemini request failed with all available models.")
 }
 
 async function addDrafts(
@@ -2950,7 +2961,7 @@ if (isLikelyUnrelated(trimmedContent)) {
         return
       }
 
-      const text = await callGroq(
+      const text = await callGemini(
         apiKey,
         buildSystemPrompt(transactions, budgets, nextLanguageMode, appMode),
         [...messages, userMsg]
