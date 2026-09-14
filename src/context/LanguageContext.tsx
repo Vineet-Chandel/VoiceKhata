@@ -14,15 +14,23 @@ const LanguageContext = createContext<LanguageContextValue | null>(null);
 // ─── Translations ─────────────────────────────────────────────────────────────
 export const translations: Record<string, Record<Language, string>> = {
   // ── Navigation / Sidebar ──
-  "nav.dashboard":        { en: "Dashboard",          hi: "डैशबोर्ड" },
-  "nav.voiceCapture":     { en: "Add Transaction",   hi: "लेन-देन जोड़ें" },
-  "nav.transaction":      { en: "Transaction",        hi: "लेन-देन" },
-  "nav.budget":           { en: "Budget & Investment", hi: "बजट और निवेश" },
-  "nav.reports":          { en: "Reports",            hi: "रिपोर्ट" },
-  "nav.aiAssistant":      { en: "AI Assistant",       hi: "AI सहायक" },
-  "nav.moneyGrowth":      { en: "Money Growth",       hi: "पैसे की बढ़त" },
-  "nav.settings":         { en: "Settings",           hi: "सेटिंग्स" },
-  "nav.notifications":    { en: "Notifications",      hi: "सूचनाएं" },
+  "nav.dashboard":              { en: "Dashboard",                hi: "डैशबोर्ड" },
+  "nav.khata":                  { en: "Customer Khata (Udhaar)",  hi: "ग्राहक खाता (उधार)" },
+  "nav.addTransactionBusiness": { en: "Add Transaction / Billing",hi: "लेन-देन / बिलिंग जोड़ें" },
+  "nav.cashBook":               { en: "Cash Book / Transactions", hi: "रोकड़ बही / लेन-देन" },
+  "nav.reportsBusiness":        { en: "Reports & Analytics",      hi: "रिपोर्ट्स और एनालिटिक्स" },
+  "nav.businessGrowth":         { en: "Business Growth Hub",      hi: "व्यापार विकास हब" },
+  "nav.voiceCapture":           { en: "Add Transaction",          hi: "लेन-देन जोड़ें" },
+  "nav.transaction":            { en: "Transactions",             hi: "लेन-देन" },
+  "nav.addExpensePersonal":     { en: "Add Expense/Income",       hi: "खर्च / आय जोड़ें" },
+  "nav.budget":                 { en: "Budget & Investment",      hi: "बजट और निवेश" },
+  "nav.budgetPersonal":         { en: "Budgets & Wealth Goals",   hi: "बजट और बचत लक्ष्य" },
+  "nav.reports":                { en: "Reports",                  hi: "रिपोर्ट" },
+  "nav.reportsPersonal":        { en: "Spending Reports",         hi: "खर्च रिपोर्ट" },
+  "nav.aiAssistant":            { en: "AI Assistant",             hi: "AI सहायक" },
+  "nav.moneyGrowth":            { en: "Money Growth",             hi: "पैसे की बढ़त" },
+  "nav.settings":               { en: "Settings",                 hi: "सेटिंग्स" },
+  "nav.notifications":          { en: "Notifications",            hi: "सूचनाएं" },
 
   // ── Header ──
   "header.yourChats":     { en: "Your Chats",         hi: "आपकी चैट" },
@@ -121,6 +129,8 @@ export const translations: Record<string, Record<Language, string>> = {
   "quicklinks.txDesc":      { en: "Manage your income & expenses", hi: "आय और खर्च प्रबंधित करें" },
   "quicklinks.budgets":     { en: "Budgets",          hi: "बजट" },
   "quicklinks.budgetsDesc": { en: "Set and track your limits", hi: "अपनी सीमाएं निर्धारित करें" },
+  "quicklinks.khata":       { en: "Customer Khata",   hi: "ग्राहक खाता" },
+  "quicklinks.khataDesc":   { en: "Track customer credit & Udhaar", hi: "ग्राहक उधार और हिसाब ट्रैक करें" },
   "quicklinks.reportsDesc": { en: "Deep dive into your analytics", hi: "अपने विश्लेषण में गहराई से जाएं" },
 
   // ── Common ──
