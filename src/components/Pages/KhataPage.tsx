@@ -7,7 +7,7 @@ import {
   Users, Search, Filter, Plus, ArrowUpRight, ArrowDownRight, 
   ChevronRight, ArrowLeft, Phone, Calendar, MessageSquare, 
   Check, Mic, Clock, FileText, AlertTriangle, ShieldCheck,
-  MoveHorizontal, Sparkles
+  Sparkles
 } from "lucide-react"
 import { useTransactions, type Transaction } from "@/components/hooks/use-transactions"
 import { useAuth } from "@/components/hooks/use-auth"
@@ -466,16 +466,6 @@ export default function KhataPage() {
             </div>
           </div>
 
-          {/* Gesture Guidance Banner */}
-          <div className="flex items-center justify-between px-3.5 py-2.5 rounded-[8px] bg-[#0E1322] border border-blue-500/30 text-xs text-[#60A5FA]">
-            <div className="flex items-center gap-2">
-              <MoveHorizontal size={14} className="animate-pulse text-[#60A5FA]" />
-              <span>
-                <strong>Interactive Gestures:</strong> Swipe customer row <strong>Right 👉</strong> to quickly record payment, or <strong>Left 👈</strong> for instant WhatsApp reminder.
-              </span>
-            </div>
-            <span className="text-[10px] text-[#94A3B8] hidden sm:inline">Drag with mouse or touchscreen</span>
-          </div>
 
           {/* Swipe Toast Feedback */}
           <AnimatePresence>
