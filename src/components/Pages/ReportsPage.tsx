@@ -20,6 +20,7 @@ import {
   ResponsiveContainer,
   Scatter,
   ScatterChart,
+  Sector,
   Tooltip,
   XAxis,
   YAxis,
@@ -647,7 +648,33 @@ export default function ReportsPage() {
   const loading = txLoading || extraLoading
 
 
-  // ── STRATEGIC INSIGHTS ──────────────────────────────────────────────────────
+  
+// ─── Active Shape for Donut Chart ─────────────────────────────────────────────
+const renderActiveShape = (props: any) => {
+  const { cx, cy, innerRadius, outerRadius, startAngle, endAngle, fill, payload, value } = props
+  return (
+    <g>
+      <text x={cx} y={cy - 10} dy={8} textAnchor="middle" fill="#fff" fontSize={14} fontWeight={600}>
+        {payload.name}
+      </text>
+      <text x={cx} y={cy + 10} dy={8} textAnchor="middle" fill="#9ca3af" fontSize={12}>
+        {fmt(value)}
+      </text>
+      <Sector
+        cx={cx}
+        cy={cy}
+        innerRadius={innerRadius}
+        outerRadius={outerRadius + 6}
+        startAngle={startAngle}
+        endAngle={endAngle}
+        fill={fill}
+        style={{ filter: `drop-shadow(0px 0px 8px ${fill}80)` }}
+      />
+    </g>
+  )
+}
+
+// ── STRATEGIC INSIGHTS ──────────────────────────────────────────────────────
   function StrategicInsights({ mode }: { mode: "PERSONAL" | "BUSINESS" }) {
     let insightText = ""
     let iconColor = "text-emerald-400"
@@ -691,6 +718,9 @@ export default function ReportsPage() {
 
   // ── PERSONAL LAYOUT ─────────────────────────────────────────────────────────
   function PersonalLayout() {
+    const [activeIndex, setActiveIndex] = React.useState(0)
+    const onPieEnter = (_: any, index: number) => { setActiveIndex(index) }
+
     return (
       <>
         <StrategicInsights mode="PERSONAL" />
@@ -703,36 +733,34 @@ export default function ReportsPage() {
           <KpiCard label={t("reports.budgetUsed")} value={`${budgetUtilPct.toFixed(1)}%`} positive={budgetUtilPct <= 80} sub={`${fmt(budgetSpent)} of ${fmt(budgetTotal)}`} />
         </div>
 
-        {/* Charts & Breakdown */}
+        {/* Charts: Overview & Interactive Donut */}
         <div className="grid grid-cols-1 gap-4 px-4 lg:px-6 xl:grid-cols-2">
-          <SurfaceCard title={t("reports.monthlyOverview")} subtitle="12-month income vs expense · net savings line">
+          <SurfaceCard title={t("reports.monthlyOverview")} subtitle="Income vs Expense with Net Savings">
             <div className="h-[240px]">
               <ResponsiveContainer width="100%" height="100%">
                 <ComposedChart data={monthlyOverview} barGap={4} barCategoryGap="30%" style={{ backgroundColor: "transparent" }}>
                   <defs>
-                    <linearGradient id="incG" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#ffffff" stopOpacity={0.9} />
-                      <stop offset="100%" stopColor="#ffffff" stopOpacity={0.2} />
+                    <linearGradient id="incG2" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#60a5fa" stopOpacity={0.8} />
+                      <stop offset="100%" stopColor="#60a5fa" stopOpacity={0.1} />
                     </linearGradient>
-                    <linearGradient id="expG" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#9ca3af" stopOpacity={0.8} />
-                      <stop offset="100%" stopColor="#9ca3af" stopOpacity={0.2} />
+                    <linearGradient id="expG2" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#9ca3af" stopOpacity={0.5} />
+                      <stop offset="100%" stopColor="#9ca3af" stopOpacity={0.1} />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
-                  <XAxis dataKey="label" tick={{ fill: "#fff", fontSize: 11 }} axisLine={false} tickLine={false} />
-                  <YAxis tick={{ fill: "#fff", fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={(v) => `₹${v >= 1000 ? `${(v / 1000).toFixed(0)}k` : v}`} />
-                  <Tooltip content={<ChartTooltip />} cursor={{ fill: "transparent" }} />
-                  <Legend wrapperStyle={{ color: "#9ca3af", fontSize: 12 }} />
-                  <Bar dataKey="income" name={t("reports.income")} fill="url(#incG)" radius={[6, 6, 0, 0]} />
-                  <Bar dataKey="expense" name={t("reports.expense")} fill="url(#expG)" radius={[6, 6, 0, 0]} />
-                  <Line type="monotone" dataKey="savings" name={t("reports.netSavings")} stroke="#34d399" strokeWidth={2} dot={false} />
+                  <XAxis dataKey="label" tick={{ fill: "#9ca3af", fontSize: 11 }} axisLine={false} tickLine={false} dy={10} />
+                  <YAxis tick={false} axisLine={false} tickLine={false} width={0} />
+                  <Tooltip content={<ChartTooltip />} cursor={{ fill: "rgba(255,255,255,0.02)" }} />
+                  <Bar dataKey="income" name={t("reports.income")} fill="url(#incG2)" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="expense" name={t("reports.expense")} fill="url(#expG2)" radius={[4, 4, 0, 0]} />
+                  <Line type="monotone" dataKey="savings" name={t("reports.netSavings")} stroke="#34d399" strokeWidth={3} dot={false} style={{ filter: "drop-shadow(0px 4px 6px rgba(52,211,153,0.3))" }} />
                 </ComposedChart>
               </ResponsiveContainer>
             </div>
           </SurfaceCard>
 
-          <SurfaceCard title={t("reports.categoryBreakdown")} subtitle="Donut chart of expenses">
+          <SurfaceCard title={t("reports.categoryBreakdown")} subtitle="Top expense categories">
             {categoryDonut.length === 0 ? (
               <div className="flex items-center justify-center h-[240px] text-sm text-muted-foreground">{t("reports.noExpenseData")}</div>
             ) : (
@@ -740,18 +768,31 @@ export default function ReportsPage() {
                 <div className="h-full">
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart style={{ backgroundColor: "transparent" }}>
-                      <Pie data={categoryDonut.slice(0, 6)} dataKey="value" nameKey="name" innerRadius={45} outerRadius={75}>
+                      <Pie 
+                        activeIndex={activeIndex}
+                        activeShape={renderActiveShape}
+                        data={categoryDonut.slice(0, 6)} 
+                        dataKey="value" 
+                        nameKey="name" 
+                        innerRadius={50} 
+                        outerRadius={75}
+                        onMouseEnter={onPieEnter}
+                        stroke="none"
+                      >
                         {categoryDonut.slice(0, 6).map((entry, idx) => (
                           <Cell key={entry.name} fill={DONUT_COLORS[idx % DONUT_COLORS.length]} />
                         ))}
                       </Pie>
-                      <Tooltip content={<ChartTooltip />} />
                     </PieChart>
                   </ResponsiveContainer>
                 </div>
-                <div className="flex flex-col justify-center gap-2">
+                <div className="flex flex-col justify-center gap-2 pr-2">
                   {categoryDonut.slice(0, 6).map((cat, idx) => (
-                    <div key={cat.name} className="flex items-center gap-2 text-xs">
+                    <div 
+                      key={cat.name} 
+                      className={`flex items-center gap-2 text-xs p-1.5 rounded-md transition-all cursor-pointer ${activeIndex === idx ? 'bg-white/10 shadow-sm' : 'hover:bg-white/5'}`}
+                      onMouseEnter={() => setActiveIndex(idx)}
+                    >
                       <div className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: DONUT_COLORS[idx % DONUT_COLORS.length] }} />
                       <span className="text-text-primary truncate flex-1">{cat.name}</span>
                       <span className="text-muted-foreground shrink-0">{fmt(cat.value)}</span>
@@ -763,33 +804,43 @@ export default function ReportsPage() {
           </SurfaceCard>
         </div>
 
-        {/* Goals & Budget */}
+        {/* Wealth Builder & Health */}
         <div className="grid grid-cols-1 gap-4 px-4 lg:px-6 xl:grid-cols-2">
-          <SurfaceCard title={t("reports.financialHealth")} subtitle="Overall performance indicator" icon={Zap}>
-            <div className="flex items-center justify-center h-[160px]">
-              <div className="w-[160px] h-[160px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <RadialBarChart innerRadius="65%" outerRadius="95%" data={healthScoreData} startAngle={180} endAngle={0} style={{ backgroundColor: "transparent" }}>
-                    <PolarAngleAxis type="number" domain={[0, 100]} tick={false} />
-                    <RadialBar dataKey="value" cornerRadius={10} fill={healthScores.composite >= 70 ? "#34d399" : healthScores.composite >= 40 ? "#f59e0b" : "#f87171"} />
-                    <text x="50%" y="65%" textAnchor="middle" fill="#fff" fontSize={32} fontWeight={600}>{healthScores.composite}</text>
-                    <text x="50%" y="80%" textAnchor="middle" fill="#9ca3af" fontSize={12}>/ 100 Health Score</text>
-                  </RadialBarChart>
-                </ResponsiveContainer>
-              </div>
+          <SurfaceCard title="Wealth Builder Projection" subtitle={`12-month projection at current run rate (${fmt(projection.pmt)}/mo)`} icon={Target}>
+            <div className="h-[200px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={projection.rows} style={{ backgroundColor: "transparent" }}>
+                  <defs>
+                    <linearGradient id="corpusGF2" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#a78bfa" stopOpacity={0.4} />
+                      <stop offset="100%" stopColor="#a78bfa" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <XAxis dataKey="month" tick={{ fill: "#9ca3af", fontSize: 11 }} axisLine={false} tickLine={false} dy={5} />
+                  <YAxis tick={false} axisLine={false} tickLine={false} width={0} />
+                  <Tooltip content={<ChartTooltip />} cursor={{ stroke: "rgba(255,255,255,0.1)", strokeWidth: 1, strokeDasharray: "3 3" }} />
+                  <Area type="monotone" dataKey="corpus" name="Projected Wealth" stroke="#a78bfa" fill="url(#corpusGF2)" strokeWidth={3} style={{ filter: "drop-shadow(0px 4px 10px rgba(167,139,250,0.3))" }} />
+                  <Line type="monotone" dataKey="simple" name="Simple Savings" stroke="#9ca3af" strokeDasharray="4 4" strokeWidth={1.5} dot={false} />
+                </AreaChart>
+              </ResponsiveContainer>
             </div>
           </SurfaceCard>
-
-          <SurfaceCard title={t("reports.budgetUtilisation")} subtitle={`${fmt(budgetSpent)} of ${fmt(budgetTotal)} spent`}>
-            {budgetRows.length === 0 ? (
-              <p className="text-sm text-muted-foreground text-center py-6">{t("reports.noBudgets")}</p>
-            ) : (
-              <div className="space-y-2 h-[160px] overflow-auto pr-2">
-                {budgetRows.map((row) => (
-                  <BudgetRow key={row.id} label={row.category} spent={row.spent} total={toNumber(row.amount)} pct={row.pct} />
-                ))}
+          
+          <SurfaceCard title={t("reports.financialHealth")} subtitle="Overall performance indicator" icon={Zap}>
+            <div className="flex items-center justify-center h-[200px]">
+              <div className="w-[180px] h-[180px] relative">
+                <ResponsiveContainer width="100%" height="100%">
+                  <RadialBarChart innerRadius="70%" outerRadius="100%" data={healthScoreData} startAngle={180} endAngle={0} style={{ backgroundColor: "transparent" }}>
+                    <PolarAngleAxis type="number" domain={[0, 100]} tick={false} />
+                    <RadialBar dataKey="value" cornerRadius={10} fill={healthScores.composite >= 70 ? "#34d399" : healthScores.composite >= 40 ? "#f59e0b" : "#f87171"} />
+                  </RadialBarChart>
+                </ResponsiveContainer>
+                <div className="absolute inset-0 flex flex-col items-center justify-center pt-8">
+                    <span className="text-4xl font-bold text-white">{healthScores.composite}</span>
+                    <span className="text-xs text-muted-foreground mt-1 uppercase tracking-wider">Health Score</span>
+                </div>
               </div>
-            )}
+            </div>
           </SurfaceCard>
         </div>
       </>
@@ -810,64 +861,90 @@ export default function ReportsPage() {
           <KpiCard label={"Net Position"} value={fmt(receivableStats.total - payableStats.total)} positive={(receivableStats.total - payableStats.total) >= 0} />
         </div>
 
-        {/* Cash Flow vs Profit */}
+        {/* Advanced Business Charts */}
         <div className="grid grid-cols-1 gap-4 px-4 lg:px-6 xl:grid-cols-2">
-          <SurfaceCard title={t("reports.revenueVsCosts")} subtitle={`12-month trend · net profit line`}>
+          
+          <SurfaceCard title={t("reports.revenueVsCosts")} subtitle="Performance Margin Overview">
             <div className="h-[240px]">
               <ResponsiveContainer width="100%" height="100%">
-                <ComposedChart data={monthlyOverview} barGap={4} barCategoryGap="30%" style={{ backgroundColor: "transparent" }}>
+                <ComposedChart data={monthlyOverview} barGap={0} style={{ backgroundColor: "transparent" }}>
                   <defs>
-                    <linearGradient id="revG" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#34d399" stopOpacity={0.9} />
-                      <stop offset="100%" stopColor="#34d399" stopOpacity={0.2} />
+                    <linearGradient id="revSolid" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#34d399" stopOpacity={0.8} />
+                      <stop offset="100%" stopColor="#34d399" stopOpacity={0.3} />
                     </linearGradient>
-                    <linearGradient id="costG" x1="0" y1="0" x2="0" y2="1">
+                    <linearGradient id="costSolid" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="0%" stopColor="#f87171" stopOpacity={0.7} />
-                      <stop offset="100%" stopColor="#f87171" stopOpacity={0.15} />
+                      <stop offset="100%" stopColor="#f87171" stopOpacity={0.2} />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
-                  <XAxis dataKey="label" tick={{ fill: "#fff", fontSize: 11 }} axisLine={false} tickLine={false} />
-                  <YAxis tick={{ fill: "#fff", fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={(v) => `₹${v >= 1000 ? `${(v / 1000).toFixed(0)}k` : v}`} />
-                  <Tooltip content={<ChartTooltip />} cursor={{ fill: "transparent" }} />
-                  <Legend wrapperStyle={{ color: "#9ca3af", fontSize: 12 }} />
-                  <Bar dataKey="income" name={t("reports.revenue")} fill="url(#revG)" radius={[6, 6, 0, 0]} />
-                  <Bar dataKey="expense" name={t("reports.operatingCosts")} fill="url(#costG)" radius={[6, 6, 0, 0]} />
-                  <Line type="monotone" dataKey="savings" name={t("reports.netProfit")} stroke="#60a5fa" strokeWidth={2} dot={false} />
+                  <XAxis dataKey="label" tick={{ fill: "#9ca3af", fontSize: 11 }} axisLine={false} tickLine={false} dy={8} />
+                  <YAxis tick={false} axisLine={false} tickLine={false} width={0} />
+                  <Tooltip content={<ChartTooltip />} cursor={{ fill: "rgba(255,255,255,0.02)" }} />
+                  <Bar dataKey="income" name={t("reports.revenue")} fill="url(#revSolid)" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="expense" name={t("reports.operatingCosts")} fill="url(#costSolid)" radius={[4, 4, 0, 0]} />
+                  <Line type="monotone" dataKey="savings" name={t("reports.netProfit")} stroke="#60a5fa" strokeWidth={3} dot={{ r: 3, fill: "#60a5fa", strokeWidth: 0 }} style={{ filter: "drop-shadow(0px 4px 6px rgba(96,165,250,0.4))" }} />
                 </ComposedChart>
               </ResponsiveContainer>
             </div>
           </SurfaceCard>
 
+          <SurfaceCard title="Daily Cash Flow Velocity" subtitle="Burn rate and reserves timeline">
+            {cashFlow.series.length === 0 ? (
+              <div className="flex items-center justify-center h-[240px] text-sm text-muted-foreground">{t("reports.noTransactions")}</div>
+            ) : (
+              <div className="h-[240px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <ComposedChart style={{ backgroundColor: "transparent" }}>
+                    <defs>
+                      <linearGradient id="cfG" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#22d3ee" stopOpacity={0.3} />
+                        <stop offset="100%" stopColor="#22d3ee" stopOpacity={0} />
+                      </linearGradient>
+                    </defs>
+                    <XAxis dataKey="day" tick={{ fill: "#9ca3af", fontSize: 11 }} axisLine={false} tickLine={false} dy={8} />
+                    <YAxis tick={false} axisLine={false} tickLine={false} width={0} />
+                    <Tooltip content={<ChartTooltip />} cursor={{ stroke: "rgba(255,255,255,0.1)", strokeWidth: 1, strokeDasharray: "3 3" }} />
+                    <Area data={cashFlow.series} type="monotone" dataKey="balance" name="Balance" stroke="#22d3ee" fill="url(#cfG)" strokeWidth={3} style={{ filter: "drop-shadow(0px 4px 8px rgba(34,211,238,0.25))" }} />
+                    <Scatter data={cashFlow.expensePoints} dataKey="balance" name="Expense Event" fill="#f87171" />
+                  </ComposedChart>
+                </ResponsiveContainer>
+              </div>
+            )}
+          </SurfaceCard>
+          
+        </div>
+
+        <div className="px-4 lg:px-6 mb-4">
           <SurfaceCard title={t("reports.receivablesPayables")} subtitle="Current Outstanding Dues">
-            <div className="flex flex-col gap-6 h-[240px] justify-center px-4">
+            <div className="flex flex-col gap-8 py-4 px-2">
               {/* Receivables Bar */}
               <div>
-                <div className="flex justify-between text-sm mb-2">
+                <div className="flex justify-between text-sm mb-3">
                   <span className="text-emerald-400 font-medium">{t("reports.outstandingReceivables")}</span>
-                  <span className="text-emerald-400 font-bold">{fmt(receivableStats.total)}</span>
+                  <span className="text-emerald-400 font-bold text-lg">{fmt(receivableStats.total)}</span>
                 </div>
-                <div className="h-3 w-full bg-surface-secondary rounded-full overflow-hidden flex">
-                  <div className="h-full bg-emerald-500 rounded-l-full" style={{ width: `${receivableStats.total > 0 ? ((receivableStats.total - receivableStats.overdueAmt) / receivableStats.total * 100) : 0}%` }} />
-                  <div className="h-full bg-red-400" style={{ width: `${receivableStats.total > 0 ? (receivableStats.overdueAmt / receivableStats.total * 100) : 0}%` }} title="Overdue" />
+                <div className="h-4 w-full bg-surface-secondary rounded-full overflow-hidden flex">
+                  <div className="h-full bg-emerald-500 transition-all duration-700 ease-out" style={{ width: `${receivableStats.total > 0 ? ((receivableStats.total - receivableStats.overdueAmt) / receivableStats.total * 100) : 0}%` }} />
+                  <div className="h-full bg-red-400 transition-all duration-700 ease-out" style={{ width: `${receivableStats.total > 0 ? (receivableStats.overdueAmt / receivableStats.total * 100) : 0}%` }} title="Overdue" />
                 </div>
                 {receivableStats.overdueCount > 0 && (
-                  <p className="text-xs text-red-400 mt-1.5 text-right">{receivableStats.overdueCount} overdue ({fmt(receivableStats.overdueAmt)})</p>
+                  <p className="text-xs text-red-400 mt-2 text-right font-medium">{receivableStats.overdueCount} overdue ({fmt(receivableStats.overdueAmt)})</p>
                 )}
               </div>
 
               {/* Payables Bar */}
               <div>
-                <div className="flex justify-between text-sm mb-2">
+                <div className="flex justify-between text-sm mb-3">
                   <span className="text-red-400 font-medium">{t("reports.outstandingPayables")}</span>
-                  <span className="text-red-400 font-bold">{fmt(payableStats.total)}</span>
+                  <span className="text-red-400 font-bold text-lg">{fmt(payableStats.total)}</span>
                 </div>
-                <div className="h-3 w-full bg-surface-secondary rounded-full overflow-hidden flex">
-                  <div className="h-full bg-red-400 rounded-l-full" style={{ width: `${payableStats.total > 0 ? ((payableStats.total - payableStats.overdueAmt) / payableStats.total * 100) : 0}%` }} />
-                  <div className="h-full bg-red-600" style={{ width: `${payableStats.total > 0 ? (payableStats.overdueAmt / payableStats.total * 100) : 0}%` }} title="Overdue" />
+                <div className="h-4 w-full bg-surface-secondary rounded-full overflow-hidden flex">
+                  <div className="h-full bg-red-400 transition-all duration-700 ease-out" style={{ width: `${payableStats.total > 0 ? ((payableStats.total - payableStats.overdueAmt) / payableStats.total * 100) : 0}%` }} />
+                  <div className="h-full bg-red-600 transition-all duration-700 ease-out" style={{ width: `${payableStats.total > 0 ? (payableStats.overdueAmt / payableStats.total * 100) : 0}%` }} title="Overdue" />
                 </div>
                 {payableStats.overdueCount > 0 && (
-                  <p className="text-xs text-red-500 mt-1.5 text-right">{payableStats.overdueCount} overdue ({fmt(payableStats.overdueAmt)})</p>
+                  <p className="text-xs text-red-500 mt-2 text-right font-medium">{payableStats.overdueCount} overdue ({fmt(payableStats.overdueAmt)})</p>
                 )}
               </div>
             </div>
