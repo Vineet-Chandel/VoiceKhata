@@ -706,6 +706,10 @@ function buildDatabaseAnswer(
     (/\b(who|kiska)\b/i.test(text) && /\b(owes?|baaki|baki|udhaar|udhar)\b/i.test(text))
 
   if (asksWhoOwes) {
+    if (appMode !== "BUSINESS") {
+      return "You are currently in Personal Mode. Customer khata and Udhaar (pending dues) are tracked in Business Mode (Digital Munim). Please switch to Business Mode to view customer dues."
+    }
+
     const partyMap = new Map<string, { name: string; balance: number; debitTotal: number; creditTotal: number; count: number; lastDate: string }>()
     for (const t of transactions) {
       const rawName = (t.transaction || "").trim()
@@ -756,7 +760,7 @@ function buildDatabaseAnswer(
     text.match(/(?:balance|ledger|khata)\s+(?:of|for)\s+([a-zA-Z\s]+)/i) ||
     text.match(/([a-zA-Z\s]+?)\s+(?:ka\s+balance|balance|ledger|khata)/i)
 
-  if (specificPartyMatch && specificPartyMatch[1]) {
+  if (specificPartyMatch && specificPartyMatch[1] && appMode === "BUSINESS") {
     const rawTarget = specificPartyMatch[1].trim().toLowerCase()
     const stopWords = ["i", "you", "we", "he", "she", "they", "my", "me", "all", "total", "category", "this", "last", "month", "today", "money"]
     if (!stopWords.includes(rawTarget) && rawTarget.length > 1) {
@@ -791,6 +795,10 @@ function buildDatabaseAnswer(
     /\b(how much did i sell today|show today('?s)? sales|today('?s)? sales|aaj kitni bikri hui)\b/i.test(text)
 
   if (asksTodaySales) {
+    if (appMode !== "BUSINESS") {
+      return "Today's sales tracking is available in Business Mode. In Personal Mode, you can ask about your personal income, spending, or budgets."
+    }
+
     const todaySalesTxs = transactions.filter(
       (t) => t.date === todayStr && (t.type === "Credit" || t.category === "Sales")
     )
@@ -818,6 +826,9 @@ function buildDatabaseAnswer(
     /\b(today('?s)? credit|aaj kitna udhar diya)\b/i.test(text)
 
   if (asksTodayCredit) {
+    if (appMode !== "BUSINESS") {
+      return "Customer credit (Udhaar) tracking is available in Business Mode."
+    }
     const todayCreditTxs = transactions.filter(
       (t) => t.date === todayStr && t.type === "Debit"
     )
@@ -1523,7 +1534,8 @@ async function callGemini(apiKey: string, systemPrompt: string, history: Message
 
 async function addDrafts(
   drafts: Partial<TransactionDraft>[],
-  onAddTransaction: Props["onAddTransaction"]
+  onAddTransaction: Props["onAddTransaction"],
+  appMode: AppMode = "BUSINESS"
 ): Promise<{ added: Partial<TransactionDraft>[]; failed: string[] }> {
   const added: Partial<TransactionDraft>[] = []
   const failed: string[] = []
@@ -1539,6 +1551,7 @@ async function addDrafts(
         type: draft.type || "Debit",
         method: safeMethod(draft.method),
         status: "Completed",
+        app_mode: (draft.app_mode || (appMode === "COMBO" ? "BUSINESS" : appMode)) as any,
       })
       if (result?.error) failed.push(draft.transaction)
       else added.push(draftPartial)
@@ -1750,7 +1763,7 @@ export function useAIChat({
     if (!multiState || multiState.step !== "review") return
     
     setLoading(true)
-    const { added, failed } = await addDrafts(multiState.drafts, onAddTransaction)
+    const { added, failed } = await addDrafts(multiState.drafts, onAddTransaction, appMode)
     
     setMultiState(null)
     setAssistantMode("conversation")
@@ -2093,7 +2106,7 @@ export function useAIChat({
         if (bulkState.step === "preview") {
           if (isYes) {
             if (bulkState.unique.length > 0) {
-              const { added, failed } = await addDrafts(bulkState.unique, onAddTransaction)
+              const { added, failed } = await addDrafts(bulkState.unique, onAddTransaction, appMode)
               const parts: string[] = []
               if (added.length > 0) {
                 parts.push(
@@ -2126,7 +2139,7 @@ export function useAIChat({
 
         if (bulkState.step === "dup-ask") {
           if (isYes) {
-            const { added, failed } = await addDrafts(bulkState.duplicates, onAddTransaction)
+            const { added, failed } = await addDrafts(bulkState.duplicates, onAddTransaction, appMode)
             setBulkState(null)
             const parts: string[] = []
             if (added.length > 0) {
@@ -2664,6 +2677,7 @@ export function useAIChat({
             type: draft.type,
             method: safeMethod(draft.method),
             status: "Completed",
+            app_mode: (draft.app_mode || (appMode === "COMBO" ? "BUSINESS" : appMode)) as any,
           })
 
           if (!result?.error) {

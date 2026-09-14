@@ -168,8 +168,8 @@ export function FloatingAssistant() {
   } = useChatStore()
 
   // ── Financial data ─────────────────────────────────────────────────────────
-  const { allTransactions, addTransaction } = useTransactions()
-  const { allBudgets, addBudget } = useBudgets()
+  const { transactions, addTransaction } = useTransactions()
+  const { budgets, addBudget } = useBudgets()
   const { language } = useLanguage()
 
   // ── AI Chat engine ─────────────────────────────────────────────────────────
@@ -183,8 +183,8 @@ export function FloatingAssistant() {
     confirmMultiTransactions,
     cancelMultiTransactions
   } = useAIChat({
-    transactions: allTransactions,
-    budgets: allBudgets,
+    transactions,
+    budgets,
     appMode,
     onAddTransaction: addTransaction,
     onAddBudget: addBudget,

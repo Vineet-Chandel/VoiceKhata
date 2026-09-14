@@ -21,8 +21,8 @@ import { useAppMode } from "@/context/AppModeContext"
 export default function AIAssistantPage() {
   const { t } = useLanguage()
   const { appMode } = useAppMode()
-  const { allTransactions, addTransaction } = useTransactions()
-  const { allBudgets, addBudget } = useBudgets()
+  const { transactions, addTransaction } = useTransactions()
+  const { budgets, addBudget } = useBudgets()
   const { user } = useAuth()
   const location = useLocation()
   // Ref guard so the seed fires exactly once even in React StrictMode double-invoke
@@ -44,8 +44,8 @@ export default function AIAssistantPage() {
   const isCreatingChatRef = useRef(false)
 
   const { loading, sendMessage, clearChat, startGuidedFlow, startBudgetFlow, cancelGuidedFlow, confirmMultiTransactions, cancelMultiTransactions } = useAIChat({
-    transactions: allTransactions,
-    budgets: allBudgets,
+    transactions,
+    budgets,
     appMode,
     onAddTransaction: addTransaction,
     onAddBudget: addBudget,
