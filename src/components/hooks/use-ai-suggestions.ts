@@ -6,9 +6,9 @@ import type { FinancialMetrics } from "@/lib/financial-metrics"
 import type { AppMode } from "@/context/AppModeContext"
 
 const GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
-const GEMINI_MODELS = [
-  "gemini-2.0-flash",
-  "gemini-1.5-flash",
+const GROQ_FALLBACK_MODELS = [
+  "llama-3.3-70b-versatile",
+  "llama-3.1-8b-instant",
 ] as const
 const CACHE_KEY = "voicekhata_ai_suggestions"
 
@@ -169,6 +169,8 @@ Output Rules:
 - Separate each suggestion with "|" only.
 - Return no extra wrapper text.`
   }
+
+  let lastError: Error | null = null
 
   for (const model of GROQ_FALLBACK_MODELS) {
     try {
