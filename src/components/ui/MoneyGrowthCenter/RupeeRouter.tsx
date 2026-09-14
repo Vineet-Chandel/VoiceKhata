@@ -1,17 +1,24 @@
 import { Shuffle } from "lucide-react"
 
-export function RupeeRouter({ router }: { router: any }) {
+export function RupeeRouter({ router, mode = "PERSONAL" }: { router: any; mode?: "PERSONAL" | "BUSINESS" }) {
   if (!router) return null;
+  const isBiz = mode === "BUSINESS";
 
   return (
-    <div className="bg-surface-secondary/50 border border-border rounded-2xl p-5 md:p-6 mb-6">
+    <div id="rupee-router" className="bg-surface-secondary/50 border border-border rounded-2xl p-5 md:p-6 mb-6">
       <div className="flex items-center gap-3 mb-6">
-        <div className="size-10 rounded-full bg-emerald-500/10 flex items-center justify-center shrink-0">
-          <Shuffle size={18} className="text-emerald-400" />
+        <div className={`size-10 rounded-full ${isBiz ? 'bg-blue-500/10' : 'bg-emerald-500/10'} flex items-center justify-center shrink-0`}>
+          <Shuffle size={18} className={isBiz ? 'text-blue-400' : 'text-emerald-400'} />
         </div>
         <div>
-          <h2 className="text-lg font-semibold text-text-primary mb-1">AI Rupee Router</h2>
-          <p className="text-sm text-text-muted">Dynamic allocation of your monthly surplus.</p>
+          <h2 className="text-lg font-semibold text-text-primary mb-1">
+            {isBiz ? "Store Capital Router" : "AI Rupee Router"}
+          </h2>
+          <p className="text-sm text-text-muted">
+            {isBiz 
+              ? "Optimal deployment of your monthly store cash surplus." 
+              : "Dynamic compounding allocation of your monthly savings surplus."}
+          </p>
         </div>
       </div>
 

@@ -1,7 +1,35 @@
 import { ArrowRight, Lightbulb } from "lucide-react"
+import { useNavigate } from "react-router-dom"
 
-export function NextBestMove({ data }: { data: any }) {
+export function NextBestMove({ data, onAction }: { data: any; onAction?: () => void }) {
   if (!data) return null;
+  const navigate = useNavigate();
+
+  const handleAction = () => {
+    if (onAction) {
+      onAction();
+      return;
+    }
+
+    const text = (data.actionText || "").toLowerCase();
+    if (text.includes("route") || text.includes("surplus") || text.includes("router")) {
+      const el = document.getElementById("rupee-router");
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "center" });
+        return;
+      }
+      navigate("/dashboard/budget");
+    } else if (text.includes("emergency") || text.includes("scenario") || text.includes("target")) {
+      const el = document.getElementById("what-if-simulator");
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "center" });
+        return;
+      }
+      navigate("/dashboard/budget");
+    } else {
+      navigate("/dashboard/budget");
+    }
+  };
 
   return (
     <div className="bg-gradient-to-br from-violet-500/10 to-emerald-500/10 border border-violet-500/20 rounded-2xl p-6 md:p-8 mb-6 relative overflow-hidden">
@@ -43,7 +71,10 @@ export function NextBestMove({ data }: { data: any }) {
           </div>
         </div>
 
-        <button className="flex items-center gap-2 bg-white text-black px-5 py-2.5 rounded-xl font-medium text-sm hover:bg-white/90 transition-colors shadow-[0_0_20px_rgba(255,255,255,0.1)]">
+        <button 
+          onClick={handleAction}
+          className="flex items-center gap-2 bg-white text-black px-5 py-2.5 rounded-xl font-medium text-sm hover:bg-white/90 active:scale-95 transition-all shadow-[0_0_20px_rgba(255,255,255,0.15)] cursor-pointer"
+        >
           {data.actionText || "Take Action"}
           <ArrowRight size={16} />
         </button>
