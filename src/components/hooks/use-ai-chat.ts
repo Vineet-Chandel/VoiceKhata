@@ -707,7 +707,7 @@ function buildDatabaseAnswer(
 
   if (asksWhoOwes) {
     if (appMode !== "BUSINESS") {
-      return "You are currently in Personal Mode. Customer khata and Udhaar (pending dues) are tracked in Business Mode (Digital Munim). Please switch to Business Mode to view customer dues."
+      return "You are currently in Personal Mode. Customer khata and Udhaar (pending dues) are tracked in Business Mode. Please switch to Business Mode to view customer dues."
     }
 
     const partyMap = new Map<string, { name: string; balance: number; debitTotal: number; creditTotal: number; count: number; lastDate: string }>()
@@ -2986,10 +2986,10 @@ if (isLikelyUnrelated(trimmedContent)) {
       const safeText = looksOffTopic
         ? localizeByMode(nextLanguageMode, {
             english: appMode === "BUSINESS"
-              ? "I'm VoiceKhata AI — your Digital Munim. I'm here to help with your shop's transactions, customers, and business finances. Want to log a transaction or check pending dues?"
+              ? "I'm VoiceKhata AI — your AI Assistant. I'm here to help with your shop's transactions, customers, and business finances. Want to log a transaction or check pending dues?"
               : "I'm VoiceKhata AI — I'm here to help with your finances only. Want to log a transaction, check your budget, or review your spending?",
             hinglish: appMode === "BUSINESS"
-              ? "Main VoiceKhata AI hoon — aapka Digital Munim. Sirf vyaparik len-den, customers, aur khata ke liye hoon. Transaction log karein ya baaki udhaar check karein?"
+              ? "Main VoiceKhata AI hoon — aapka AI Assistant. Sirf vyaparik len-den, customers, aur khata ke liye hoon. Transaction log karein ya baaki udhaar check karein?"
               : "Main VoiceKhata AI hoon — sirf finance ke liye hoon. Transaction log karein, budget check karein, ya spending review karein?",
             hindi: "",
           })

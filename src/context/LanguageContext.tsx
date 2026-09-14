@@ -688,7 +688,7 @@ export const translations: Record<string, Record<Language, string>> = {
   "ai.howCanIHelpBusiness": { en: "How can I help with your business today?", hi: "आज मैं आपके व्यापार में क्या सहायता कर सकता हूँ?" },
   "ai.askPrompt":           { en: "Ask about your finances or say", hi: "अपने वित्त के बारे में पूछें या कहें" },
   "ai.askPromptBusiness":   { en: "Ask about customers, transactions, sales or payments, or say", hi: "ग्राहकों, लेन-देन, बिक्री या भुगतान के बारे में पूछें या कहें" },
-  "ai.titleBusiness":       { en: "Digital Munim AI", hi: "डिजिटल मुनीम AI" },
+  "ai.titleBusiness":       { en: "AI Assistant",    hi: "एआई सहायक" },
   "ai.replyingTo":          { en: "Replying to",      hi: "जवाब दे रहे हैं" },
   "ai.you":                 { en: "You",              hi: "आप" },
   "ai.enterToSend":         { en: "Enter to send",    hi: "भेजने के लिए Enter दबाएं" },
