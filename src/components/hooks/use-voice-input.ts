@@ -1,5 +1,5 @@
 // src/components/hooks/use-voice-input.ts
-// Aligned dual-pipeline speech recognition engine (WebSpeech + Groq Whisper fallback)
+// Robust dual-pipeline speech recognition engine (WebSpeech + Groq Whisper fallback)
 import { useState, useRef, useCallback, useEffect } from "react"
 import { transcribeAudioBlob } from "@/lib/groq-whisper"
 
@@ -31,16 +31,13 @@ export function useVoiceInput(options?: UseVoiceInputOptions) {
   const audioChunksRef = useRef<Blob[]>([])
   const recognitionRef = useRef<any>(null)
   const spokenTranscriptRef = useRef("")
-  const finalizedPrefixRef = useRef("")
-  const webSpeechFailedRef = useRef(false)
-  const hasSpokenWebSpeechRef = useRef(false)
   const isManualStopRef = useRef(false)
   const isCleaningUpRef = useRef(false)
+  const hasSoundActivityRef = useRef(false)
+  const maxVolumeRef = useRef(0)
   const silenceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const safetyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const volumeIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
-  const liveWhisperTimerRef = useRef<ReturnType<typeof setInterval> | null>(null)
-  const maxVolumeRef = useRef(0)
   const optionsRef = useRef(options)
 
   useEffect(() => {
@@ -66,11 +63,6 @@ export function useVoiceInput(options?: UseVoiceInputOptions) {
     if (volumeIntervalRef.current) {
       clearInterval(volumeIntervalRef.current)
       volumeIntervalRef.current = null
-    }
-
-    if (liveWhisperTimerRef.current) {
-      clearInterval(liveWhisperTimerRef.current)
-      liveWhisperTimerRef.current = null
     }
 
     if (streamRef.current) {
@@ -115,30 +107,31 @@ export function useVoiceInput(options?: UseVoiceInputOptions) {
     setTranscript("")
     setErrorMessage("")
     spokenTranscriptRef.current = ""
-    finalizedPrefixRef.current = ""
-    webSpeechFailedRef.current = false
-    hasSpokenWebSpeechRef.current = false
     isManualStopRef.current = false
+    hasSoundActivityRef.current = false
     maxVolumeRef.current = 0
     audioChunksRef.current = []
     optionsRef.current?.onLiveTranscript?.("")
   }, [cleanupHardware])
 
-  // Finalize processing: delivers speech text via WebSpeech or Whisper fallback
+  // Finalize processing: delivers verified speech text
   const handleFinalSpeech = useCallback(async () => {
     clearSilenceTimer()
     setVoiceState("processing")
 
     let finalText = spokenTranscriptRef.current.trim()
 
-    // Transcribe audio blob via Groq Whisper fallback if WebSpeech did not capture text (e.g. Brave, Firefox, or SpeechRecognition failure)
-    if (!finalText && audioChunksRef.current.length > 0) {
+    // Transcribe audio blob via Groq Whisper fallback ONLY IF:
+    // 1. WebSpeech did not capture any text (e.g. Brave shields, Firefox, or SpeechRecognition failure)
+    // 2. The user actually made sound into the microphone (hasSoundActivityRef or maxVolumeRef >= 12)
+    const madeSound = hasSoundActivityRef.current || maxVolumeRef.current >= 12
+    if (!finalText && audioChunksRef.current.length > 0 && madeSound) {
       try {
         const mimeType = mediaRecorderRef.current?.mimeType || audioChunksRef.current[0]?.type || "audio/webm"
         const audioBlob = new Blob(audioChunksRef.current, { type: mimeType })
 
-        if (audioBlob.size > 200) {
-          console.log(`[useVoiceInput] WebSpeech empty, transcribing audio blob (${audioBlob.size} bytes) via Whisper fallback...`)
+        if (audioBlob.size > 1500) {
+          console.log(`[useVoiceInput] WebSpeech empty, transcribing audio blob (${audioBlob.size} bytes, maxVol=${maxVolumeRef.current}) via Whisper fallback...`)
           const whisperResult = await transcribeAudioBlob(audioBlob)
           if (whisperResult && whisperResult.trim()) {
             finalText = whisperResult.trim()
@@ -157,7 +150,8 @@ export function useVoiceInput(options?: UseVoiceInputOptions) {
     const silenceStopwords = new Set([
       "the", "a", "an", "you", "so", "and", "or", "it", "to", "in", "is", "of",
       "bye", "goodbye", "thank you", "thanks", "subtitles by", "watching", "music",
-      "thank you for watching", "please subscribe"
+      "thank you for watching", "please subscribe", "amaraorg", "silence",
+      "i hope you enjoyed the video", "see you next time", "thank you very much"
     ])
 
     if (!finalText || silenceStopwords.has(cleaned) || cleaned.length === 0) {
@@ -178,11 +172,6 @@ export function useVoiceInput(options?: UseVoiceInputOptions) {
     isManualStopRef.current = true
     clearSilenceTimer()
 
-    if (liveWhisperTimerRef.current) {
-      clearInterval(liveWhisperTimerRef.current)
-      liveWhisperTimerRef.current = null
-    }
-
     setVoiceState("processing")
 
     // Stop MediaRecorder and wait for final chunks to flush
@@ -195,8 +184,7 @@ export function useVoiceInput(options?: UseVoiceInputOptions) {
         } catch {
           resolve()
         }
-        // Fallback timeout in case onstop doesn't fire
-        setTimeout(resolve, 500)
+        setTimeout(resolve, 400)
       } else {
         resolve()
       }
@@ -206,9 +194,7 @@ export function useVoiceInput(options?: UseVoiceInputOptions) {
     const recognition = recognitionRef.current
     const recognitionPromise = new Promise<void>((resolve) => {
       if (recognition) {
-        // If we already have a transcript, wait 200ms for any final punctuation
-        // If transcript is empty, wait up to 600ms for Google speech server to return final text
-        const waitMs = spokenTranscriptRef.current.trim() ? 200 : 600
+        const waitMs = spokenTranscriptRef.current.trim() ? 150 : 500
         const timer = setTimeout(resolve, waitMs)
 
         try {
@@ -231,10 +217,8 @@ export function useVoiceInput(options?: UseVoiceInputOptions) {
     setErrorMessage("")
     setTranscript("")
     spokenTranscriptRef.current = ""
-    finalizedPrefixRef.current = ""
-    webSpeechFailedRef.current = false
-    hasSpokenWebSpeechRef.current = false
     isManualStopRef.current = false
+    hasSoundActivityRef.current = false
     maxVolumeRef.current = 0
     audioChunksRef.current = []
     optionsRef.current?.onLiveTranscript?.("")
@@ -248,7 +232,7 @@ export function useVoiceInput(options?: UseVoiceInputOptions) {
         window.location.hostname !== "127.0.0.1"
       ) {
         throw new Error(
-          "Microphone requires HTTPS or http://localhost. Browsers block audio capture on HTTP IP addresses (e.g. 192.168.x.x). Please test on your PC at http://localhost:5173 or use an HTTPS tunnel (e.g., Cloudflare Tunnel / ngrok)."
+          "Microphone requires HTTPS or http://localhost. Browsers block audio capture on HTTP IP addresses (e.g. 192.168.x.x). Please test on your PC at http://localhost:5173 or use an HTTPS tunnel."
         )
       }
 
@@ -260,13 +244,13 @@ export function useVoiceInput(options?: UseVoiceInputOptions) {
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: {
           echoCancellation: true,
-          noiseSuppression: false,
+          noiseSuppression: true,
           autoGainControl: true,
         },
       })
       streamRef.current = stream
 
-      // 2. Setup Web Audio visualizer
+      // 2. Setup Web Audio visualizer & Voice Activity Level
       try {
         const AudioCtx = window.AudioContext || (window as any).webkitAudioContext
         if (AudioCtx) {
@@ -289,13 +273,16 @@ export function useVoiceInput(options?: UseVoiceInputOptions) {
             if (avg > maxVolumeRef.current) {
               maxVolumeRef.current = avg
             }
+            if (avg > 14) {
+              hasSoundActivityRef.current = true
+            }
           }, 80)
         }
       } catch (e) {
         console.warn("[useVoiceInput] AudioContext visualizer init failed:", e)
       }
 
-      // 3. Setup MediaRecorder for continuous fallback capture
+      // 3. Setup MediaRecorder for fallback capture
       let mimeType = ""
       if (typeof MediaRecorder !== "undefined") {
         if (MediaRecorder.isTypeSupported("audio/webm;codecs=opus")) {
@@ -319,18 +306,16 @@ export function useVoiceInput(options?: UseVoiceInputOptions) {
       recorder.start(200) // Collect chunks every 200ms
       setVoiceState("listening")
 
-      // 4. Initialize Web Speech API & Continuous Auto-Recreation
+      // 4. Initialize Web Speech API
       const SpeechRecognitionClass = window.SpeechRecognition || window.webkitSpeechRecognition
 
       const createAndStartRecognition = () => {
         if (isManualStopRef.current || isCleaningUpRef.current) return
         if (!SpeechRecognitionClass) {
-          webSpeechFailedRef.current = true
           return
         }
 
         try {
-          // Abort previous instance if any
           if (recognitionRef.current) {
             try {
               recognitionRef.current.onresult = null
@@ -344,59 +329,51 @@ export function useVoiceInput(options?: UseVoiceInputOptions) {
           const recognition = new SpeechRecognitionClass()
           recognition.lang = optionsRef.current?.lang || "en-IN"
           recognition.interimResults = true
-          // continuous = false delivers instant zero-latency interim results per word/syllable;
-          // onend seamlessly chains with finalizedPrefixRef
-          recognition.continuous = false
+          recognition.continuous = true
           recognition.maxAlternatives = 1
 
           recognition.onresult = (event: any) => {
-            let sessionFinal = ""
-            let sessionInterim = ""
+            let fullFinal = ""
+            let interim = ""
 
-            // Accumulate all finalized and interim segments in current recognition session
             for (let i = 0; i < event.results.length; i++) {
               const res = event.results[i]
               const segment = res[0]?.transcript || ""
               if (res.isFinal) {
-                sessionFinal += (sessionFinal ? " " : "") + segment.trim()
+                fullFinal += (fullFinal ? " " : "") + segment.trim()
               } else {
-                sessionInterim += (sessionInterim ? " " : "") + segment.trim()
+                interim += (interim ? " " : "") + segment.trim()
               }
             }
 
-            const prefix = finalizedPrefixRef.current.trim()
-            const combinedFinal = (prefix ? prefix + " " : "") + sessionFinal
-            const current = (combinedFinal + (sessionInterim ? " " + sessionInterim : "")).trim().replace(/\s+/g, " ")
+            const current = (fullFinal + (interim ? " " + interim : "")).trim().replace(/\s+/g, " ")
 
             if (current) {
-              hasSpokenWebSpeechRef.current = true
+              hasSoundActivityRef.current = true
               spokenTranscriptRef.current = current
               setTranscript(current)
               optionsRef.current?.onLiveTranscript?.(current)
 
-              // Reset silence timer on every spoken syllable/word:
-              // Gives the user a generous 3 seconds pause after speaking before auto-finalizing
+              // Reset silence timer on every spoken word:
+              // Gives 2.5 seconds pause after speaking before auto-finalizing
               clearSilenceTimer()
               silenceTimerRef.current = setTimeout(() => {
-                console.log("[useVoiceInput] 3s silence detected. Auto-finalizing speech...")
+                console.log("[useVoiceInput] 2.5s silence detected after speaking. Auto-finalizing...")
                 stopListening()
-              }, 3000)
+              }, 2500)
             }
           }
 
           recognition.onerror = (event: any) => {
             console.warn("[useVoiceInput] SpeechRecognition error:", event.error)
-            if (event.error === "network") {
-              webSpeechFailedRef.current = true
-            } else if (event.error === "not-allowed" || event.error === "service-not-allowed") {
+            if (event.error === "not-allowed" || event.error === "service-not-allowed") {
               const msg = "Microphone access denied. Please click the lock icon in your browser address bar to allow microphone."
               setErrorMessage(msg)
               setVoiceState("error")
               cleanupHardware()
               optionsRef.current?.onError?.(msg)
-            } else if (event.error === "no-speech") {
-              // Normal silence detection in Chrome; stay listening
             }
+            // "no-speech" or network glitches are expected during silent periods; remain active
           }
 
           recognition.onend = () => {
@@ -405,18 +382,16 @@ export function useVoiceInput(options?: UseVoiceInputOptions) {
               return
             }
 
-            // Save current accumulated text into prefix so restart seamless builds on top
+            // If speech was already accumulated, finalize it
             if (spokenTranscriptRef.current.trim()) {
-              finalizedPrefixRef.current = spokenTranscriptRef.current.trim()
-            }
-
-            // Seamlessly restart with a FRESH SpeechRecognition instance if user has NOT stopped and mic is alive
-            if (streamRef.current && streamRef.current.active) {
+              handleFinalSpeech()
+            } else if (streamRef.current && streamRef.current.active) {
+              // Seamless restart if user hasn't spoken yet and mic is active
               setTimeout(() => {
                 if (streamRef.current && streamRef.current.active && !isManualStopRef.current && !isCleaningUpRef.current) {
                   createAndStartRecognition()
                 }
-              }, 40)
+              }, 100)
             }
           }
 
@@ -424,42 +399,12 @@ export function useVoiceInput(options?: UseVoiceInputOptions) {
           recognition.start()
         } catch (err) {
           console.warn("[useVoiceInput] Recognition start error:", err)
-          webSpeechFailedRef.current = true
         }
       }
 
       createAndStartRecognition()
 
-      // 5. Live Whisper Background Fallback:
-      // If WebSpeech is not supported or fails (Brave/Firefox/network error),
-      // periodically transcribe recorded audio chunks so live speech STILL writes on screen in real time!
-      let whisperBusy = false
-      liveWhisperTimerRef.current = setInterval(async () => {
-        if (isManualStopRef.current || isCleaningUpRef.current) return
-        // If WebSpeech is actively transcribing, let WebSpeech handle live updates
-        if (hasSpokenWebSpeechRef.current && !webSpeechFailedRef.current) return
-        if (whisperBusy || audioChunksRef.current.length === 0) return
-
-        try {
-          whisperBusy = true
-          const curMime = mediaRecorderRef.current?.mimeType || audioChunksRef.current[0]?.type || "audio/webm"
-          const currentBlob = new Blob(audioChunksRef.current, { type: curMime })
-          if (currentBlob.size > 800) {
-            const liveText = await transcribeAudioBlob(currentBlob)
-            if (liveText && liveText.trim() && !hasSpokenWebSpeechRef.current) {
-              spokenTranscriptRef.current = liveText.trim()
-              setTranscript(liveText.trim())
-              optionsRef.current?.onLiveTranscript?.(liveText.trim())
-            }
-          }
-        } catch (e) {
-          console.warn("[useVoiceInput] Live Whisper tick error:", e)
-        } finally {
-          whisperBusy = false
-        }
-      }, 1800)
-
-      // Safety timeout: 35s max continuous session
+      // Safety timeout: 35s max continuous listening session
       safetyTimeoutRef.current = setTimeout(() => {
         stopListening()
       }, 35000)

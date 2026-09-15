@@ -35,8 +35,8 @@ export async function transcribeAudioBlob(blob: Blob): Promise<string> {
     formData.append("model", "whisper-large-v3-turbo")
     formData.append("response_format", "json")
     formData.append("temperature", "0")
-    // Financial keywords prompt: preserves English for English speech, Devanagari for Hindi speech
-    formData.append("prompt", "₹, Rs, rupees, UPI, Cash, udhar, jama, khata, Ramesh, Suresh")
+    // Generic formatting prompt: avoids specific names that cause silence hallucinations
+    formData.append("prompt", "Financial transaction: ₹, rupees, UPI, cash, credit, debit.")
 
     const response = await fetch("https://api.groq.com/openai/v1/audio/transcriptions", {
       method: "POST",
@@ -69,7 +69,9 @@ export async function transcribeAudioBlob(blob: Blob): Promise<string> {
     const silenceStopwords = new Set([
       "the", "a", "an", "you", "so", "and", "or", "it", "to", "in", "is", "of",
       "bye", "goodbye", "thank you", "thanks", "thank you for watching", "subtitles by",
-      "amaraorg", "subscribe", "please subscribe", "watching", "silence", "music"
+      "amaraorg", "subscribe", "please subscribe", "watching", "silence", "music",
+      "i hope you enjoyed the video", "see you next time", "thank you very much",
+      "closed captions", "transcription by", "translated by", "all rights reserved"
     ])
 
     if (silenceStopwords.has(cleaned) || cleaned.length <= 2) {
@@ -77,7 +79,7 @@ export async function transcribeAudioBlob(blob: Blob): Promise<string> {
       return ""
     }
 
-    if (text.length < 35 && ["subtitles by", "thank you for watching", "amara.org"].some((h) => text.toLowerCase().includes(h))) {
+    if (text.length < 40 && ["subtitles by", "thank you for watching", "amara.org", "please subscribe", "enjoyed the video"].some((h) => text.toLowerCase().includes(h))) {
       console.log("[GroqWhisper] Ignored silence hallucination:", text)
       return ""
     }
