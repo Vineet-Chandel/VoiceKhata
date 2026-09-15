@@ -17,12 +17,6 @@
   <img src="https://img.shields.io/badge/Firebase-Auth-FFCA28?style=for-the-badge&logo=firebase&logoColor=black" alt="Firebase" />
 </p>
 
-<p>
-  <img src="https://img.shields.io/github/license/Vineet-Chandel/VoiceKhata?style=flat-square&color=6366F1" alt="License" />
-  <img src="https://img.shields.io/github/stars/Vineet-Chandel/VoiceKhata?style=flat-square&color=8B5CF6" alt="Stars" />
-  <img src="https://img.shields.io/github/forks/Vineet-Chandel/VoiceKhata?style=flat-square&color=A78BFA" alt="Forks" />
-  <img src="https://img.shields.io/github/last-commit/Vineet-Chandel/VoiceKhata?style=flat-square&color=C4B5FD" alt="Last Commit" />
-</p>
 
 <br/>
 
