@@ -11,9 +11,10 @@ import { useChatStore } from "@/components/hooks/use-chat-store"
 import { useTransactions } from "@/components/hooks/use-transactions"
 import { useBudgets } from "@/components/hooks/use-budgets"
 import { useAuth } from "@/components/hooks/use-auth"
-import { Bot } from "lucide-react"
+import { Bot, History, Plus } from "lucide-react"
 import { createChat, saveMessages, generateChatTitle } from "@/lib/api-chat"
 import { ChatHistoryModal } from "@/components/ui/AIAssistant_UI/chat-history-modal"
+import { PreviousChatsSidebar } from "@/components/ui/AIAssistant_UI/previous-chats-sidebar"
 import type { Message } from "@/components/hooks/use-ai-chat"
 import { useLanguage } from "@/context/LanguageContext"
 import { useAppMode } from "@/context/AppModeContext"
@@ -28,6 +29,8 @@ export default function AIAssistantPage() {
   // Ref guard so the seed fires exactly once even in React StrictMode double-invoke
   const seedFiredRef = useRef(false)
   const [replyingTo, setReplyingTo] = useState<Message | null>(null)
+  const [sidebarOpen, setSidebarOpen] = useState(true)
+  const [refreshTrigger, setRefreshTrigger] = useState(0)
 
   const {
     messages, setMessages,
@@ -99,10 +102,13 @@ export default function AIAssistantPage() {
           if (newMessages.length > 0) {
             await saveMessages(chat.id, newMessages)
             syncedMessageCountRef.current += newMessages.length
+            setRefreshTrigger(p => p + 1)
           }
 
           // Trigger title generation if this was the first user message
-          generateChatTitle(chat.id).catch(console.error)
+          generateChatTitle(chat.id)
+            .then(() => setRefreshTrigger(p => p + 1))
+            .catch(console.error)
         } catch (err) {
           console.error("Failed to create chat:", err)
         } finally {
@@ -121,6 +127,7 @@ export default function AIAssistantPage() {
 
         try {
           await saveMessages(activeChatId, newMessages)
+          setRefreshTrigger(p => p + 1)
         } catch (err) {
           console.error("Failed to save messages:", err)
           // Revert count if failed so it can retry next render
@@ -136,7 +143,32 @@ export default function AIAssistantPage() {
     }
   }, [messages, activeChatId, setActiveChatId])
 
+  // Auto-restore latest conversation on initial mount if empty
+  useEffect(() => {
+    if (messages.length === 0 && !activeChatId && !(location.state as any)?.seedMessage) {
+      fetchChats(1, 1).then(res => {
+        if (res.data && res.data.length > 0) {
+          const latest = res.data[0]
+          fetchChatMessages(latest.id).then(msgRes => {
+            if (msgRes.messages && msgRes.messages.length > 0) {
+              setActiveChatId(latest.id)
+              setMessages(msgRes.messages)
+              syncedMessageCountRef.current = msgRes.messages.length
+            }
+          }).catch(console.error)
+        }
+      }).catch(console.error)
+    }
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
   const handleClearChat = () => {
+    clearChat()
+    setActiveChatId(null)
+    syncedMessageCountRef.current = 0
+    setRefreshTrigger(p => p + 1)
+  }
+
+  const handleNewChat = () => {
     clearChat()
     setActiveChatId(null)
     syncedMessageCountRef.current = 0
@@ -147,34 +179,76 @@ export default function AIAssistantPage() {
     .split(" ").map((w) => w[0]).slice(0, 2).join("").toUpperCase()
 
   return (
-    <div className="@container/main flex flex-1 flex-col h-full overflow-hidden w-full min-w-0">
-      <div className="flex flex-col h-full max-h-[calc(100vh-var(--header-height))] w-full min-w-0">
+    <div className="@container/main flex flex-1 h-full overflow-hidden w-full min-w-0 bg-[#0B0F19] text-[#F8FAFC]">
+      
+      {/* 1. Left Previous Chats Sidebar */}
+      <PreviousChatsSidebar
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+        activeChatId={activeChatId}
+        onSelectChat={(chatId, historyMessages) => {
+          setActiveChatId(chatId)
+          setMessages(historyMessages)
+          syncedMessageCountRef.current = historyMessages.length
+        }}
+        onNewChat={handleNewChat}
+        refreshTrigger={refreshTrigger}
+      />
+
+      {/* 2. Main Chat Interface */}
+      <div className="flex flex-col flex-1 h-full max-h-[calc(100vh-var(--header-height))] w-full min-w-0 overflow-hidden">
 
         {/* Header */}
-        <div className="flex items-center justify-between px-4 lg:px-6 py-3.5 border-b border-border shrink-0">
-          <div className="flex items-center gap-3">
-            <div className="size-8 rounded-full bg-violet-500/10 border border-violet-500/20 flex items-center justify-center">
-              <Bot size={15} className="text-violet-400" />
+        <div className="flex items-center justify-between px-4 lg:px-6 py-3 border-b border-slate-700/40 shrink-0 bg-[#080D1A]/80 backdrop-blur-md">
+          <div className="flex items-center gap-2 sm:gap-3">
+            {/* Toggle Previous Chats Button */}
+            <button
+              onClick={() => setSidebarOpen(prev => !prev)}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border transition-all cursor-pointer text-xs font-semibold ${
+                sidebarOpen 
+                  ? "bg-blue-600/20 border-blue-500/40 text-blue-300 shadow-sm"
+                  : "bg-[#0E1528] border-slate-700/60 hover:bg-[#131C31] text-slate-300 hover:text-white"
+              }`}
+              title={t("ai.previousChats")}
+            >
+              <History size={14} className="text-blue-400" />
+              <span className="hidden sm:inline">{t("ai.previousChats")}</span>
+            </button>
+
+            <div className="size-8 rounded-xl bg-blue-600/15 border border-blue-500/30 flex items-center justify-center">
+              <Bot size={16} className="text-blue-400" />
             </div>
+
             <div>
-              <h1 className="text-sm font-medium text-text-primary leading-tight">
+              <h1 className="text-sm font-semibold text-text-primary leading-tight">
                 {appMode === "BUSINESS" ? t("ai.titleBusiness") : t("ai.title")}
               </h1>
               <div className="flex items-center gap-1.5 mt-0.5">
-                <span className="size-1.5 rounded-full bg-emerald-400" />
-                <span className="text-[11px] text-white/35">{t("common.online")}</span>
+                <span className="size-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                <span className="text-[10px] text-slate-400 font-mono">{t("common.online")}</span>
               </div>
             </div>
           </div>
 
-          {messages.length > 0 && (
+          <div className="flex items-center gap-2">
             <button
-              onClick={handleClearChat}
-              className="text-[11px] text-text-muted hover:text-text-secondary transition-colors"
+              onClick={handleNewChat}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 active:scale-[0.98] text-white text-xs font-semibold shadow-sm transition-all cursor-pointer"
+              title={t("ai.newChat")}
             >
-              {t("ai.clearChat")}
+              <Plus size={14} />
+              <span className="hidden sm:inline">{t("ai.newChat")}</span>
             </button>
-          )}
+
+            {messages.length > 0 && (
+              <button
+                onClick={handleClearChat}
+                className="text-xs text-slate-400 hover:text-slate-200 border border-slate-700/50 hover:border-slate-600 px-2.5 py-1.5 rounded-xl transition-colors cursor-pointer"
+              >
+                {t("ai.clearChat")}
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Body */}
@@ -211,7 +285,7 @@ export default function AIAssistantPage() {
           )}
 
           {/* Input */}
-          <div className="px-4 lg:px-6 py-3 border-t border-border shrink-0">
+          <div className="px-4 lg:px-6 py-3 border-t border-slate-700/40 shrink-0 bg-[#080D1A]/50">
             <ChatInput
               onSend={(msg) => {
                 sendMessage(msg, replyingTo ? { id: replyingTo.id, role: replyingTo.role, content: replyingTo.content } : undefined)
@@ -240,7 +314,7 @@ export default function AIAssistantPage() {
           setChatHistoryOpen(false)
         }}
         onNewChat={() => {
-          handleClearChat()
+          handleNewChat()
           setChatHistoryOpen(false)
         }}
       />

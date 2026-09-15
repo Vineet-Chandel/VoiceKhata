@@ -55,11 +55,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const businessNav = [
     { title: t("nav.dashboard"),                url: "/dashboard",               icon: IconDashboard },
     { 
-      title: t("nav.khata"),                     url: "/dashboard/khata",         icon: Users,
+      title: t("nav.udhaarBook"),                url: "/dashboard/khata",         icon: Users,
       badge: pendingDebtorCount > 0 ? pendingDebtorCount : undefined,
     },
     { title: t("nav.addTransactionBusiness"),   url: "/dashboard/voice-capture", icon: IconMicrophone },
-    { title: t("nav.cashBook"),                 url: "/dashboard/transactions",  icon: IconWallet },
+    { title: t("nav.transactionHistory"),       url: "/dashboard/transactions",  icon: IconWallet },
     { title: t("nav.reportsBusiness"),          url: "/dashboard/reports",       icon: IconReport },
     { title: t("nav.businessGrowth"),           url: "/dashboard/growth",        icon: IconFlame },
     { title: t("nav.aiAssistant"),              url: "/dashboard/ai-assistant",  icon: IconRobot },

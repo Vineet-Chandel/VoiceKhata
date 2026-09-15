@@ -15,11 +15,13 @@ const LanguageContext = createContext<LanguageContextValue | null>(null);
 export const translations: Record<string, Record<Language, string>> = {
   // ── Navigation / Sidebar ──
   "nav.dashboard":              { en: "Dashboard",                hi: "डैशबोर्ड" },
+  "nav.udhaarBook":             { en: "Udhaar Book",              hi: "उधार बही" },
   "nav.khata":                  { en: "Customer Khata (Udhaar)",  hi: "ग्राहक खाता (उधार)" },
-  "nav.addTransactionBusiness": { en: "Add Transaction / Billing",hi: "लेन-देन / बिलिंग जोड़ें" },
-  "nav.cashBook":               { en: "Cash Book / Transactions", hi: "रोकड़ बही / लेन-देन" },
-  "nav.reportsBusiness":        { en: "Reports & Analytics",      hi: "रिपोर्ट्स और एनालिटिक्स" },
-  "nav.businessGrowth":         { en: "Business Growth Hub",      hi: "व्यापार विकास हब" },
+  "nav.addTransactionBusiness": { en: "Add Transaction",          hi: "लेन-देन जोड़ें" },
+  "nav.transactionHistory":     { en: "Transaction History",      hi: "लेन-देन इतिहास" },
+  "nav.cashBook":               { en: "Transaction History",      hi: "लेन-देन इतिहास" },
+  "nav.reportsBusiness":        { en: "Report and Analytics",     hi: "रिपोर्ट और एनालिटिक्स" },
+  "nav.businessGrowth":         { en: "Business Growth Hub",      hi: "बिजनेस ग्रोथ हब" },
   "nav.voiceCapture":           { en: "Add Transaction",          hi: "लेन-देन जोड़ें" },
   "nav.transaction":            { en: "Transactions",             hi: "लेन-देन" },
   "nav.addExpensePersonal":     { en: "Add Expense/Income",       hi: "खर्च / आय जोड़ें" },
@@ -31,6 +33,17 @@ export const translations: Record<string, Record<Language, string>> = {
   "nav.moneyGrowth":            { en: "Money Growth",             hi: "पैसे की बढ़त" },
   "nav.settings":               { en: "Settings",                 hi: "सेटिंग्स" },
   "nav.notifications":          { en: "Notifications",            hi: "सूचनाएं" },
+
+  // ── AI Assistant & Previous Chats ──
+  "ai.title":                   { en: "AI Assistant",             hi: "एआई सहायक" },
+  "ai.titleBusiness":           { en: "Business AI Assistant",    hi: "बिजनेस एआई सहायक" },
+  "ai.previousChats":           { en: "Previous Chats",           hi: "पिछली चैट" },
+  "ai.pastConversations":       { en: "Past Conversations",       hi: "पिछली बातचीत" },
+  "ai.newChat":                 { en: "New Chat",                 hi: "नई चैट" },
+  "ai.clearChat":               { en: "Clear Chat",               hi: "चैट साफ़ करें" },
+  "ai.searchChats":             { en: "Search your chats...",     hi: "अपनी चैट खोजें..." },
+  "ai.noChats":                 { en: "No previous chats found",  hi: "कोई पिछली चैट नहीं मिली" },
+  "ai.deleteChatConfirm":       { en: "Delete this conversation? This cannot be undone.", hi: "क्या आप यह बातचीत हटाना चाहते हैं? इसे वापस नहीं लाया जा सकेगा।" },
 
   // ── Header ──
   "header.yourChats":     { en: "Your Chats",         hi: "आपकी चैट" },

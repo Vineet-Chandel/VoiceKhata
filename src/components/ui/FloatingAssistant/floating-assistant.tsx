@@ -6,7 +6,7 @@ import { useLocation, useNavigate } from "react-router-dom"
 import {
   Mic, X, ArrowUp, Plus, Square, Check,
   TrendingUp, Wallet, PiggyBank, BarChart3, RefreshCw, Lightbulb, Bot, Minus, ExternalLink,
-  Users, Clock, ArrowUpRight
+  Users, Clock, ArrowUpRight, History
 } from "lucide-react"
 import { useVoiceInput } from "@/components/hooks/use-voice-input"
 import { useChatStore } from "@/components/hooks/use-chat-store"
@@ -505,6 +505,14 @@ export function FloatingAssistant() {
             <>
               {/* Floating Controls */}
               <div className="absolute top-4 right-4 z-10 flex items-center gap-1 bg-[#0E1322]/90 backdrop-blur-md border border-slate-700/40 shadow-sm rounded-full p-1">
+                <button
+                  onClick={navigateToFull}
+                  className="size-8 rounded-full flex items-center justify-center hover:bg-white/10 text-white/60 hover:text-white transition-colors cursor-pointer"
+                  title="Previous Chats"
+                >
+                  <History size={14} />
+                </button>
+                <div className="w-px h-4 bg-slate-800" />
                 <button
                   onClick={navigateToFull}
                   className="size-8 rounded-full flex items-center justify-center hover:bg-white/10 text-white/60 hover:text-white transition-colors cursor-pointer"

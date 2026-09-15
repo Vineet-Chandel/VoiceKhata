@@ -92,7 +92,7 @@ export function ShopkeeperFeedback() {
         <div className="rounded-[16px] border border-slate-700/40 bg-[#131B2E] p-6 sm:p-8 shadow-xl">
           {isSubmitted ? (
             <div className="py-12 text-center space-y-4 max-w-md mx-auto">
-              <div className="size-14 rounded-full bg-[#10B981]/20 border border-[#10B981]/30 flex items-center justify-center mx-auto text-[#10B981]">
+              <div className="size-14 rounded-full bg-blue-600/20 border border-blue-500/30 flex items-center justify-center mx-auto text-blue-400">
                 <CheckCircle2 size={32} />
               </div>
               <h3 className="text-xl font-bold text-[#F8FAFC]">Thank You for Your Feedback!</h3>

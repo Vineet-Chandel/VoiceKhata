@@ -76,7 +76,7 @@ export function ShopkeeperTestimonials() {
                     {/* Crisp white user names */}
                     <h4 className="text-sm font-bold text-[#F8FAFC] flex items-center gap-1.5">
                       {rev.name}
-                      <CheckCircle2 className="size-3.5 text-[#34D399]" />
+                      <CheckCircle2 className="size-3.5 text-blue-400" />
                     </h4>
                     <p className="text-xs text-[#94A3B8]">{rev.shop}</p>
                     <p className="text-[11px] text-blue-400 font-medium">{rev.city}</p>

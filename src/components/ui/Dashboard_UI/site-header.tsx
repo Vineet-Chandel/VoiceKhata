@@ -13,23 +13,29 @@ import { ThemeToggle } from "@/components/ui/ThemeToggle"
 import { LanguageToggle } from "@/components/ui/LanguageToggle"
 import { useLanguage } from "@/context/LanguageContext"
 
+import { useAppMode } from "@/context/AppModeContext"
+
 export function SiteHeader() {
   const location = useLocation()
   const navigate = useNavigate()
   const { user } = useAuth()
   const { setChatHistoryOpen } = useChatStore()
   const { t } = useLanguage()
+  const { appMode } = useAppMode()
   const path = location.pathname
 
+  const isBusiness = appMode === "BUSINESS"
+
   const routes: Record<string, string> = {
-    "/dashboard/settings":     t("nav.settings"),
-    "/dashboard/transactions":  t("nav.transaction"),
-    "/dashboard/budget":       t("nav.budget"),
-    "/dashboard/reports":      t("nav.reports"),
-    "/dashboard/growth":       t("nav.moneyGrowth"),
-    "/dashboard/ai-assistant": t("nav.aiAssistant"),
-    "/dashboard/voice-capture":t("nav.voiceCapture"),
-    "/dashboard/notifications":t("nav.notifications"),
+    "/dashboard/settings":      t("nav.settings"),
+    "/dashboard/khata":         isBusiness ? t("nav.udhaarBook") : t("nav.khata"),
+    "/dashboard/transactions":  isBusiness ? t("nav.transactionHistory") : t("nav.transaction"),
+    "/dashboard/budget":        isBusiness ? t("nav.budget") : t("nav.budgetPersonal"),
+    "/dashboard/reports":       isBusiness ? t("nav.reportsBusiness") : t("nav.reportsPersonal"),
+    "/dashboard/growth":        isBusiness ? t("nav.businessGrowth") : t("nav.moneyGrowth"),
+    "/dashboard/ai-assistant":  t("nav.aiAssistant"),
+    "/dashboard/voice-capture": isBusiness ? t("nav.addTransactionBusiness") : t("nav.addExpensePersonal"),
+    "/dashboard/notifications": t("nav.notifications"),
   }
 
   let title = t("nav.dashboard")

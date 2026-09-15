@@ -1,5 +1,8 @@
 // src/components/ui/Shopkeeper/ShopkeeperPainPoints.tsx
+"use client"
+
 import React from "react";
+import { motion } from "framer-motion";
 import { 
   X, 
   Check, 
@@ -7,110 +10,182 @@ import {
   Globe2, 
   WifiOff, 
   Clock, 
-  ShieldCheck 
+  ShieldCheck,
+  CheckCircle2,
+  XCircle
 } from "lucide-react";
 import logoImg from "@/assets/logo.png";
 
 export function ShopkeeperPainPoints() {
-  const comparisonItems = [
+  const capabilities = [
     {
-      pain: "During rush hours with customers waiting, you have no time to write in a paper diary — transactions get missed.",
-      solution: "Log in 3 seconds flat: Just say 'Ramesh ne ₹200 diye'. Your ledger updates in front of the customer without touching a pen.",
-      icon: <Clock className="size-4 text-blue-400" />,
-      tag: "Rush Hour Speed"
+      feature: "Rush Hour Speed (<3 Seconds)",
+      desc: "Speak and record while handing over items to customers",
+      voicekhata: "Instant (Voice)",
+      legacy: "Missed / Postponed"
     },
     {
-      pain: "Searching customer names on small phone keyboards is slow, clumsy, and frustrating with shop-dusted hands.",
-      solution: "Zero Typing! Just speak the customer name and amount. VoiceKhata matches the account and logs the entry.",
-      icon: <Zap className="size-4 text-blue-400" />,
-      tag: "Zero Typing"
+      feature: "Zero Typing Requirement",
+      desc: "No small phone keyboard struggles with shop-dusted hands",
+      voicekhata: "100% Voice First",
+      legacy: "Tedious Typing / Pen"
     },
     {
-      pain: "Physical red paper bahi-khata books get torn, water-damaged, or lost, causing unrecoverable losses.",
-      solution: "100% automated secure cloud backup. Switch or lose your phone, your entire ledger is restored in 60 seconds.",
-      icon: <ShieldCheck className="size-4 text-blue-400" />,
-      tag: "Bank-Grade Backup"
+      feature: "Indian Retail Dialects (Hindi / Hinglish)",
+      desc: "Understands udhar, jama, baki, cash and customer names naturally",
+      voicekhata: "Native Support",
+      legacy: "English-Only / Rigid"
     },
     {
-      pain: "Poor mobile network or internet blackouts freeze conventional accounting apps.",
-      solution: "Offline-first capability: Keep speaking and recording entries even without internet. Everything auto-syncs when online.",
-      icon: <WifiOff className="size-4 text-blue-400" />,
-      tag: "Works Offline"
+      feature: "Automated Cloud & Offline Sync",
+      desc: "Works without active internet, auto-syncs when signal restores",
+      voicekhata: "Protected 100%",
+      legacy: "Paper Tears / Water Damage"
     },
     {
-      pain: "Complicated English financial apps are confusing to operate and don't understand Indian accent nuances.",
-      solution: "Engineered specifically for Indian English, Hinglish, and retail speech patterns. Speaks and understands like you do.",
-      icon: <Globe2 className="size-4 text-blue-400" />,
-      tag: "Natural Dialects"
+      feature: "1-Tap WhatsApp Payment Reminders",
+      desc: "Recover customer dues 3x faster with gentle payment links",
+      voicekhata: "Included",
+      legacy: "Awkward Phone Calls"
     }
   ];
 
   return (
-    <section id="benefits" className="py-16 sm:py-20 bg-[#0B0F19] border-b border-slate-700/40">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+    <section id="benefits" className="py-20 sm:py-28 bg-[#060913] border-b border-[#1E2D4A]/80 font-sans relative overflow-hidden">
+      
+      {/* Background radial glow */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-blue-600/8 blur-[160px] pointer-events-none rounded-full" />
+
+      <div className="mx-auto max-w-6xl px-4 sm:px-6 relative z-10">
         
-        {/* Header */}
-        <div className="text-center max-w-3xl mx-auto mb-12">
-          <span className="text-xs font-semibold uppercase tracking-wider text-blue-300 bg-blue-600/20 border border-blue-500/30 px-3 py-1 rounded-full">
-            Why VoiceKhata
+        {/* Synex Section Header with Blur-Reveal */}
+        <motion.div 
+          initial={{ opacity: 0, y: 30, filter: "blur(12px)" }}
+          whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+          viewport={{ once: true, amount: 0.1 }}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+          className="text-center max-w-3xl mx-auto mb-16 space-y-4"
+        >
+          <span className="text-[11px] font-bold uppercase tracking-[0.25em] text-blue-400 bg-blue-600/15 border border-blue-500/30 px-3.5 py-1.5 rounded-full">
+            WHY VOICEKHATA
           </span>
-          <h2 className="mt-3 text-2xl sm:text-4xl font-bold text-[#F8FAFC] tracking-tight">
-            Say Goodbye to Slow Paper Diaries & Manual Typing
+          <h2 className="text-3xl sm:text-5xl font-black text-[#F8FAFC] tracking-tight leading-[1.1]">
+            Built for modern capital. <br />
+            <span className="text-slate-400 font-medium">Not legacy systems.</span>
           </h2>
-          <p className="mt-2 text-xs sm:text-sm text-[#94A3B8]">
-            See why modern shopkeepers and business owners are switching from manual notebooks to hands-free voice accounting.
+          <p className="text-xs sm:text-sm text-slate-300 max-w-xl mx-auto leading-relaxed">
+            Connect speech, credit ledger, and payments — all synchronized in one unified counter system for real-time visibility and control.
           </p>
-        </div>
+        </motion.div>
 
-        {/* Comparison Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          
-          {/* Old Way Column */}
-          <div className="rounded-[14px] border border-slate-700/40 bg-[#131B2E] p-6 sm:p-7 space-y-5 shadow-sm">
-            <div className="flex items-center gap-3 border-b border-slate-700/40 pb-4">
-              <div className="flex size-9 items-center justify-center rounded-[8px] bg-[#7F1D1D]/30 text-[#F87171]">
-                <X className="size-5" />
+        {/* Synex 3-Column Comparison Table with Floating VoiceKhata Highlight Card */}
+        <motion.div 
+          initial={{ opacity: 0.5, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+          className="rounded-[28px] border border-[#1E2D4A] bg-[#0A0F1D]/90 p-6 sm:p-10 backdrop-blur-xl shadow-2xl overflow-hidden"
+        >
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+            
+            {/* Column 1: Core Capabilities (md:col-span-5) */}
+            <div className="md:col-span-5 space-y-6">
+              <div className="border-b border-[#1E2D4A] pb-4">
+                <span className="text-xs font-bold uppercase tracking-[0.2em] text-slate-400 block">
+                  Core Capabilities
+                </span>
+                <p className="text-[11px] text-slate-400 mt-1">
+                  Essential features for busy Indian shop counters
+                </p>
               </div>
-              <div>
-                <h3 className="text-base font-bold text-[#F8FAFC]">The Old Way: Paper Registers & Clunky Apps</h3>
-                <p className="text-xs text-[#94A3B8]">Time wasted, missed credit, awkward collection calls</p>
+
+              <div className="space-y-6">
+                {capabilities.map((cap, idx) => (
+                  <div key={idx} className="space-y-1">
+                    <h4 className="text-sm font-bold text-white">{cap.feature}</h4>
+                    <p className="text-xs text-slate-400 leading-relaxed">{cap.desc}</p>
+                  </div>
+                ))}
               </div>
             </div>
 
-            <div className="space-y-3.5">
-              {comparisonItems.map((item, idx) => (
-                <div key={idx} className="flex items-start gap-3 text-xs text-[#94A3B8]">
-                  <span className="text-[#F87171] font-bold text-sm shrink-0">✕</span>
-                  <p className="leading-relaxed">{item.pain}</p>
+            {/* Column 2: Floating Elevated VoiceKhata Card (md:col-span-4) */}
+            <div className="md:col-span-4">
+              <motion.div 
+                whileHover={{ y: -4 }}
+                className="rounded-3xl border-2 border-blue-500/60 bg-gradient-to-b from-[#0E172E] via-[#0B1224] to-[#0A0F1D] p-6 sm:p-8 shadow-[0_0_40px_rgba(59,130,246,0.25)] space-y-6 relative"
+              >
+                {/* VoiceKhata Top Pill */}
+                <div className="flex items-center gap-2.5 pb-4 border-b border-blue-500/30">
+                  <div className="size-8 rounded-xl bg-[#060A12] border border-blue-500/40 p-1.5 flex items-center justify-center">
+                    <img src={logoImg} alt="VoiceKhata" className="w-full h-full object-contain invert brightness-125" />
+                  </div>
+                  <div>
+                    <span className="text-sm font-black text-white tracking-wide flex items-center gap-1.5">
+                      VoiceKhata
+                      <span className="size-1.5 rounded-full bg-blue-400 animate-pulse" />
+                    </span>
+                    <span className="text-[10px] text-blue-300 font-semibold uppercase tracking-wider">
+                      Verified AI Ledger
+                    </span>
+                  </div>
                 </div>
-              ))}
-            </div>
-          </div>
 
-          {/* New Way Column */}
-          <div className="rounded-[14px] border border-blue-500/40 bg-[#131B2E] p-6 sm:p-7 space-y-5 shadow-sm relative">
-            <div className="flex items-center gap-3 border-b border-slate-700/40 pb-4">
-              {/* VoiceKhata Symbol / Logo */}
-              <div className="flex size-9 items-center justify-center rounded-[8px] bg-[#0E1322] border border-slate-800 p-1.5 shadow-xs">
-                <img src={logoImg} alt="VoiceKhata Logo" className="w-full h-full object-contain invert brightness-125" />
-              </div>
-              <div>
-                <h3 className="text-base font-bold text-[#F8FAFC]">The VoiceKhata Way: Speak & Settle</h3>
-                <p className="text-xs text-blue-400 font-medium">Fast, verified by voice, instant digital accuracy</p>
-              </div>
-            </div>
-
-            <div className="space-y-3.5">
-              {comparisonItems.map((item, idx) => (
-                <div key={idx} className="flex items-start gap-3 text-xs text-[#F8FAFC]">
-                  <span className="text-[#34D399] font-bold text-sm shrink-0">✓</span>
-                  <p className="leading-relaxed">{item.solution}</p>
+                {/* Capability Rows */}
+                <div className="space-y-6">
+                  {capabilities.map((cap, idx) => (
+                    <div key={idx} className="flex items-center gap-3">
+                      <div className="size-6 rounded-full bg-blue-500/20 border border-blue-500/40 flex items-center justify-center text-blue-400 shrink-0">
+                        <Check className="size-3.5 stroke-[3]" />
+                      </div>
+                      <span className="text-xs font-bold text-white">
+                        {cap.voicekhata}
+                      </span>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          </div>
 
-        </div>
+                {/* Footer Tag */}
+                <div className="pt-4 border-t border-blue-500/20 flex items-center justify-between text-[11px]">
+                  <span className="text-slate-400">Merchant Setup Cost</span>
+                  <span className="text-blue-400 font-black tracking-wide">₹ 0 · Free Forever</span>
+                </div>
+              </motion.div>
+            </div>
+
+            {/* Column 3: Legacy Platforms & Paper (md:col-span-3) */}
+            <div className="md:col-span-3 space-y-6 pl-0 md:pl-4 opacity-60">
+              <div className="border-b border-[#1E2D4A] pb-4">
+                <span className="text-xs font-bold uppercase tracking-[0.2em] text-slate-400 block">
+                  Paper & Clunky Apps
+                </span>
+                <p className="text-[11px] text-slate-400 mt-1">
+                  Traditional manual bookkeeping
+                </p>
+              </div>
+
+              <div className="space-y-6">
+                {capabilities.map((cap, idx) => (
+                  <div key={idx} className="flex items-center gap-3">
+                    <div className="size-6 rounded-full bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400 shrink-0">
+                      <X className="size-3.5" />
+                    </div>
+                    <span className="text-xs font-medium text-slate-400">
+                      {cap.legacy}
+                    </span>
+                  </div>
+                ))}
+              </div>
+
+              <div className="pt-4 border-t border-[#1E2D4A] flex items-center justify-between text-[11px]">
+                <span className="text-slate-400">Credit Leakage</span>
+                <span className="text-rose-400 font-bold">10-15% Uncollected</span>
+              </div>
+            </div>
+
+          </div>
+        </motion.div>
+
       </div>
     </section>
   );
