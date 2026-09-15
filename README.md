@@ -211,7 +211,7 @@ VoiceKhata is a simple voice-based **Khata management demo** for recording custo
 
 ## 🌐 Live Demo
 
-🔗 **[Launch VoiceKhata Live Demo](https://voicekhata-frontend-jjtk.onrender.com)**
+🔗 **[Launch VoiceKhata Live Demo](https://voicekhaata-frontend.onrender.com/)**
 
 ---
 
