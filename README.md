@@ -73,12 +73,6 @@
 <td>Govt. Guidelines Research · Architecture · Presentation · Testing</td>
 </tr>
 <tr>
-<td><strong>Vansh Raj</strong></td>
-<td align="center"><img src="https://img.shields.io/badge/🎨-Frontend-61DAFB?style=flat-square" /></td>
-<td><a href="mailto:vanshraj8858@gmail.com">vanshraj8858@gmail.com</a></td>
-<td>Frontend Development</td>
-</tr>
-<tr>
 <td><strong>Vansh Gupta</strong></td>
 <td align="center"><img src="https://img.shields.io/badge/⚙️-Backend-339933?style=flat-square" /></td>
 <td><a href="mailto:vanshgupta26112005@gmail.com">vanshgupta26112005@gmail.com</a></td>
@@ -138,26 +132,27 @@ VoiceKhata is a simple voice-based **Khata management demo** for recording custo
 ## ✨ Features & Capabilities
 
 ### 🎙️ Core Voice & Khata Management
-- 🎙️ **Voice and Manual Transaction Entry** — Record credits and payments seamlessly using natural speech input or quick manual forms.
-- 🌐 **Hindi/English Speech Recognition** — In-browser speech-to-text recognition supporting conversational Hindi and English commands without third-party plugins.
-- ⚡ **Automatic Transaction Extraction** — Intelligent NLP extracts customer name, transaction amount, and credit/debit intent automatically from spoken phrases.
-- 👥 **Customer Management** — Dedicated customer directory with contact information, credit limits, and individual account status.
-- ⚖️ **Credit and Payment Tracking (Udhar/Jama)** — Real-time ledger calculations for customer credit, partial repayments, and settled balances.
-- 📜 **Customer Transaction History** — Comprehensive chronological transaction logs and complete ledger audit trail per customer.
-- 📊 **Sales Reports & Summaries** — Summary reports of daily, weekly, and monthly sales, cash flows, and credit summaries.
-- 🤖 **Voice/Text Khata Assistant** — Conversational AI assistant to query customer balances, pending dues, and accounts via voice or text commands.
+- 🎙️ **Voice and Manual Transaction Entry** — Record credits and payments seamlessly using natural speech input with live real-time transcription, continuous speech recognition, and running balance previews.
+- 🌐 **Hindi/English Speech Recognition & Bilingual UI** — Browser speech recognition & Groq Whisper with Hindi (Devanagari) and English transcription, paired with a complete bilingual UI language switcher.
+- ⚡ **Automatic Transaction Extraction** — Intelligent NLP extracts customer name, transaction amount, and credit/debit (Jama/Udhar) intent automatically following Indian bookkeeping ledger rules.
+- 👥 **Customer Management** — Dedicated customer directory with contact information, credit limits, account status, and payment reminder workflows.
+- ⚖️ **Credit and Payment Tracking (Udhar/Jama)** — Real-time ledger calculations for customer credit, partial repayments, settled balances, and Cash Book bookkeeping.
+- 📜 **Customer Transaction History** — Comprehensive chronological transaction logs, complete ledger audit trail, and itemized customer statements.
+- 📊 **Sales Reports & Summaries** — Summary reports of daily, weekly, and monthly sales, cash flows, customer credit summaries, and exportable financial reports.
+- 🤖 **Voice/Text AI Assistant** — Conversational AI assistant powered by Groq Llama models with multi-session chat history and context isolation to query balances, pending dues, and accounts via voice or text.
 
 ### 💼 Smart Finance & Dashboard Capabilities
-- 💳 **Smart Transactions** — AI-powered expense and income tracking with automatic merchant categorization.
-- 🧠 **AI Financial Insights** — Personalized financial analysis, savings suggestions, and spending health scores powered by Meta Llama & GPT models.
+- 🏢 **Dual App Modes (Business & Personal)** — Toggle seamlessly between Business Mode (Vyapar/Shopkeeper Khata, Cash Book, billing) and Personal Mode (personal expenses, budgets, wealth goals) with dynamic sidebar navigation.
+- 💳 **Smart Transactions** — AI-powered expense and income tracking with automatic merchant categorization, cash book records, and mode-specific logging.
+- 🧠 **AI Financial Insights & Growth Hub** — Personalized financial analysis, savings suggestions, Business Growth Hub for shopkeepers, and Money Growth engine powered by Meta Llama & GPT models.
 - 🧾 **Smart Receipt Scanner** — Snap a photo of physical bills or receipts and let vision AI extract merchants, line items, and totals.
-- 📈 **Interactive Analytics Dashboard** — Dynamic charts, visual spending breakdowns, and month-over-month cash flow analysis.
-- 💰 **Budget Manager** — Set category-wise spending limits with real-time budget threshold warnings.
-- 🎯 **Savings Goals** — Create target-based savings milestones with visual progress indicators.
-- 📊 **Investment Tracker** — Monitor stocks, SIP plans, and manual assets with live market data feeds.
+- 📈 **Interactive Analytics Dashboard** — Dynamic charts, visual spending breakdowns, month-over-month cash flow analysis, and mode-tailored dashboard metrics.
+- 💰 **Budget Manager** — Set category-wise spending limits with real-time budget threshold warnings and wealth milestones.
+- 🎯 **Savings & Wealth Goals** — Create target-based savings milestones with visual progress indicators and growth projections.
+- 📊 **Investment & Growth Tracker** — Monitor stocks, SIP plans, manual assets, and business growth metrics with live market data feeds.
 - 📬 **Gmail Sync** — Securely import transaction records and receipts from bank alert emails via Google OAuth 2.0.
 - 🔄 **AutoPay & Recurring Tracking** — Monitor scheduled payments, active subscriptions, and recurring income.
-- 🔔 **Smart Alerts** — Configurable notification rules for overspending, low balances, and due dates.
+- 🔔 **Smart Alerts** — Configurable notification rules for overspending, low balances, customer payment dues, and budget limits.
 - 🖱️ **Drag & Drop Customization** — Reorder and customize dashboard analytics widgets using smooth drag-and-drop interactions.
 - 📱 **PWA Ready** — Installable on mobile and desktop devices with offline service worker support.
 
@@ -165,11 +160,11 @@ VoiceKhata is a simple voice-based **Khata management demo** for recording custo
 
 ## 🛠️ Tech Stack
 
-- **Frontend:** React 18, TypeScript, Vite, Tailwind CSS, Radix UI, Chart.js, Recharts, DnD Kit
+- **Frontend:** React 18, TypeScript, Vite, Tailwind CSS, Radix UI, Chart.js, Recharts, DnD Kit, i18n / Bilingual Localization
 - **Backend:** Node.js, Express, TypeScript, REST API
 - **Database & Storage:** Supabase (PostgreSQL), Row Level Security (RLS)
 - **Authentication:** Firebase Auth, Google OAuth 2.0
-- **Speech & AI:** Browser Web Speech API, Groq Cloud (Meta Llama 3.1 & 4 Scout), OpenAI GPT, Google Vision OCR
+- **Speech & AI:** Browser Web Speech API, Groq Whisper, Groq Cloud (Meta Llama 3.1 & 4 Scout), OpenAI GPT, Google Vision OCR
 - **APIs & Integrations:** Twelve Data API, Finnhub, Google Gmail API, Tavily Search
 - **DevOps & Tooling:** Vite PWA, Service Workers, ESLint
 
