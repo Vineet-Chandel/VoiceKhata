@@ -33,7 +33,7 @@
 <br/>
 
 <!-- Hero Screenshot -->
-<img width="960" alt="VoiceKhata Dashboard" src="https://github.com/user-attachments/assets/8171d8d4-bdad-488f-aad2-dba2caa70d43" style="border-radius: 12px;" />
+<img width="960" alt="VoiceKhata Landing Page" src="docs/landing-page.png" style="border-radius: 12px;" />
 
 <br/><br/>
 
