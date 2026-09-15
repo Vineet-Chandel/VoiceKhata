@@ -101,7 +101,6 @@ export const translations: Record<string, Record<Language, string>> = {
   "reports.yearly":         { en: "Yearly",           hi: "वार्षिक" },
 
   // ── AI Assistant ──
-  "ai.title":               { en: "AI Assistant",     hi: "AI सहायक" },
   "ai.placeholder":         { en: "Ask about your finances...", hi: "अपने वित्त के बारे में पूछें..." },
   "ai.send":                { en: "Send",             hi: "भेजें" },
   "ai.smartSuggestions":    { en: "Smart Suggestions", hi: "स्मार्ट सुझाव" },
@@ -706,12 +705,10 @@ export const translations: Record<string, Record<Language, string>> = {
   "growth.noData":          { en: "No financial data available yet. Start adding transactions to power your growth engine.", hi: "अभी कोई वित्तीय डेटा उपलब्ध नहीं है। अपने विकास इंजन को सक्रिय करने के लिए लेन-देन जोड़ना शुरू करें।" },
 
   // ── AI Assistant ──
-  "ai.clearChat":           { en: "Clear chat",       hi: "चैट साफ़ करें" },
   "ai.howCanIHelp":         { en: "How can I help you today?", hi: "आज मैं आपकी क्या सहायता कर सकता हूँ?" },
   "ai.howCanIHelpBusiness": { en: "How can I help with your business today?", hi: "आज मैं आपके व्यापार में क्या सहायता कर सकता हूँ?" },
   "ai.askPrompt":           { en: "Ask about your finances or say", hi: "अपने वित्त के बारे में पूछें या कहें" },
   "ai.askPromptBusiness":   { en: "Ask about customers, transactions, sales or payments, or say", hi: "ग्राहकों, लेन-देन, बिक्री या भुगतान के बारे में पूछें या कहें" },
-  "ai.titleBusiness":       { en: "AI Assistant",    hi: "एआई सहायक" },
   "ai.replyingTo":          { en: "Replying to",      hi: "जवाब दे रहे हैं" },
   "ai.you":                 { en: "You",              hi: "आप" },
   "ai.enterToSend":         { en: "Enter to send",    hi: "भेजने के लिए Enter दबाएं" },
