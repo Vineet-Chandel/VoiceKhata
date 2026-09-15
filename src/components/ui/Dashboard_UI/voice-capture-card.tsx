@@ -18,10 +18,11 @@ import {
   CheckCircle2,
   AlertCircle,
   Loader2,
+  Scale,
 } from "lucide-react"
 import { useVoiceInput } from "@/components/hooks/use-voice-input"
 import { VoiceWaveform } from "@/components/ui/AIAssistant_UI/voice-waveform"
-import { parseVoiceKhataInput, type ParsedVoiceTransaction } from "@/lib/voice-khata-parser"
+import { parseVoiceKhataInput, matchCustomerWithKnownList, type ParsedVoiceTransaction } from "@/lib/voice-khata-parser"
 import { useTransactions } from "@/components/hooks/use-transactions"
 import { useAITransaction } from "@/components/hooks/use-ai-transaction"
 import { useAppMode } from "@/context/AppModeContext"
@@ -102,6 +103,60 @@ export function VoiceCaptureCard({
   const existingCustomers = React.useMemo(() => {
     return Array.from(new Set(transactions.map((t) => t.transaction))).filter(Boolean)
   }, [transactions])
+
+  // Running customer ledger balance calculation for review screen
+  const customerLedger = React.useMemo(() => {
+    const cleanPerson = person.trim()
+    if (!cleanPerson || cleanPerson === "General Expense" || cleanPerson === "Payment Received" || cleanPerson === "Unknown") {
+      return null
+    }
+
+    // Match exact or known customer
+    const matchedName = existingCustomers.find(
+      (c) => c.toLowerCase().trim() === cleanPerson.toLowerCase()
+    ) || matchCustomerWithKnownList(cleanPerson, existingCustomers) || cleanPerson
+
+    // Filter all past transactions for this customer
+    const pastTx = transactions.filter((t) => {
+      const tName = (t.transaction || "").toLowerCase().trim()
+      return tName === cleanPerson.toLowerCase() || (matchedName && tName === matchedName.toLowerCase())
+    })
+
+    const hasHistory = pastTx.length > 0
+
+    // In Khata: Debit = Udhaar given (+), Credit = Payment received (-)
+    let previousBalance = 0
+    for (const tx of pastTx) {
+      if (tx.type === "Credit") {
+        previousBalance -= Number(tx.amount || 0)
+      } else if (tx.type === "Debit") {
+        previousBalance += Number(tx.amount || 0)
+      }
+    }
+
+    const currentNum = typeof amount === "number" ? amount : parseFloat(String(amount).replace(/,/g, "")) || 0
+
+    // If Credit (Payment Received): balance decreases
+    // If Debit (Udhaar Given): balance increases
+    let newBalance = previousBalance
+    if (type === "Credit") {
+      newBalance = previousBalance - currentNum
+    } else {
+      newBalance = previousBalance + currentNum
+    }
+
+    const isFullyClear = Math.abs(newBalance) < 0.01
+
+    return {
+      customerName: matchedName || cleanPerson,
+      hasHistory,
+      previousBalance,
+      currentNum,
+      newBalance,
+      isFullyClear,
+      pastCount: pastTx.length,
+    }
+  }, [person, amount, type, transactions, existingCustomers])
 
   const handleVoiceTranscript = async (finalText: string) => {
     if (!finalText.trim()) return
@@ -218,7 +273,18 @@ export function VoiceCaptureCard({
         app_mode: appMode === "COMBO" ? "BUSINESS" : appMode,
       })
 
-      setSaveSuccessMsg(`₹${numAmount.toLocaleString("en-IN")} ${type === "Credit" ? "received from" : "paid to"} ${txName}`)
+      let balanceSummary = ""
+      if (customerLedger) {
+        if (customerLedger.isFullyClear) {
+          balanceSummary = ` • Payment Clear (Hisaab Clear)`
+        } else if (customerLedger.newBalance > 0) {
+          balanceSummary = ` • Remaining Udhaar: ₹${customerLedger.newBalance.toLocaleString("en-IN")}`
+        } else if (customerLedger.newBalance < 0) {
+          balanceSummary = ` • Advance Balance: ₹${Math.abs(customerLedger.newBalance).toLocaleString("en-IN")}`
+        }
+      }
+
+      setSaveSuccessMsg(`₹${numAmount.toLocaleString("en-IN")} ${type === "Credit" ? "received from" : "paid to"} ${txName}${balanceSummary}`)
       setStep("success")
     } catch (err) {
       console.error("Save transaction error:", err)
@@ -678,6 +744,96 @@ export function VoiceCaptureCard({
                   />
                 </div>
               </div>
+
+              {/* Running Customer Balance Preview Card */}
+              {customerLedger && (
+                <div className="mb-6 rounded-2xl border border-indigo-200/80 dark:border-indigo-500/20 bg-gradient-to-br from-indigo-50/70 via-slate-50 to-blue-50/40 dark:from-indigo-950/30 dark:via-slate-900/60 dark:to-blue-950/20 p-4 shadow-sm backdrop-blur-sm">
+                  <div className="flex items-center justify-between gap-2 pb-2.5 mb-3 border-b border-indigo-100 dark:border-indigo-900/40">
+                    <div className="flex items-center gap-2">
+                      <div className="size-7 rounded-lg bg-indigo-600/10 dark:bg-indigo-400/10 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
+                        <Scale size={15} />
+                      </div>
+                      <span className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white">
+                        {customerLedger.customerName}'s Ledger
+                      </span>
+                    </div>
+                    {customerLedger.hasHistory ? (
+                      <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">
+                        {customerLedger.pastCount} past {customerLedger.pastCount === 1 ? "entry" : "entries"}
+                      </span>
+                    ) : (
+                      <span className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800/60">
+                        New Customer
+                      </span>
+                    )}
+                  </div>
+
+                  {customerLedger.hasHistory ? (
+                    <div className="space-y-2 text-xs">
+                      {/* Previous Balance Row */}
+                      <div className="flex items-center justify-between text-slate-600 dark:text-slate-400">
+                        <span>Previous Udhaar Balance:</span>
+                        <span className="font-semibold text-slate-800 dark:text-slate-200">
+                          {customerLedger.previousBalance === 0 ? (
+                            <span className="text-emerald-600 dark:text-emerald-400 font-bold">Payment Clear (₹0)</span>
+                          ) : customerLedger.previousBalance > 0 ? (
+                            `₹${customerLedger.previousBalance.toLocaleString("en-IN")} (Due from customer)`
+                          ) : (
+                            `₹${Math.abs(customerLedger.previousBalance).toLocaleString("en-IN")} (Advance)`
+                          )}
+                        </span>
+                      </div>
+
+                      {/* Current Transaction Row */}
+                      <div className="flex items-center justify-between text-slate-600 dark:text-slate-400">
+                        <span>
+                          {type === "Credit" ? "This Payment (Received):" : "This Udhaar (Given):"}
+                        </span>
+                        <span className={`font-bold ${type === "Credit" ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"}`}>
+                          {type === "Credit" ? "- " : "+ "}₹{customerLedger.currentNum.toLocaleString("en-IN")}
+                        </span>
+                      </div>
+
+                      {/* Divider & New Remaining Balance Row */}
+                      <div className="border-t border-dashed border-indigo-200 dark:border-indigo-800/60 pt-2 flex items-center justify-between font-bold text-sm">
+                        <span className="text-slate-700 dark:text-slate-300">
+                          Remaining Balance:
+                        </span>
+                        <span>
+                          {customerLedger.isFullyClear ? (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30 font-extrabold text-xs tracking-wide">
+                              <Check size={13} strokeWidth={3} />
+                              Payment Clear (Hisaab Clear)
+                            </span>
+                          ) : customerLedger.newBalance > 0 ? (
+                            <span className="text-rose-600 dark:text-rose-400">
+                              ₹{customerLedger.newBalance.toLocaleString("en-IN")}
+                              <span className="text-[11px] font-normal text-slate-500 ml-1">(Remaining Udhaar)</span>
+                            </span>
+                          ) : (
+                            <span className="text-blue-600 dark:text-blue-400">
+                              ₹{Math.abs(customerLedger.newBalance).toLocaleString("en-IN")}
+                              <span className="text-[11px] font-normal text-slate-500 ml-1">(Advance)</span>
+                            </span>
+                          )}
+                        </span>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-between text-xs py-1">
+                      <span className="text-slate-600 dark:text-slate-400">
+                        First entry for this customer. Starting balance will be:
+                      </span>
+                      <span className="font-bold text-sm text-indigo-600 dark:text-indigo-400">
+                        ₹{customerLedger.currentNum.toLocaleString("en-IN")}
+                        <span className="text-[11px] font-normal text-slate-500 ml-1">
+                          {type === "Credit" ? "(Advance / Received)" : "(Udhaar Due)"}
+                        </span>
+                      </span>
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* Action Buttons */}
               <div className="flex items-center justify-end gap-3 pt-2">
