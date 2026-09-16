@@ -121,10 +121,11 @@ const VALID_METHODS = [
   "Net Banking",
 ] as const
 
-const GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"
+const GEMINI_API_URL = "https://api.groq.com/openai/v1/chat/completions"
 const GEMINI_MODELS = [
-  "gemini-2.0-flash",
-  "gemini-1.5-flash",
+  "openai/gpt-oss-120b",
+  "openai/gpt-oss-20b",
+  "qwen/qwen3.8-27b",
 ] as const
 
 function formatAmount(amount: number): string {
