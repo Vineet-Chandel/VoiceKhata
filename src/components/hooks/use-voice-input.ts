@@ -32,6 +32,9 @@ export function useVoiceInput(options?: UseVoiceInputOptions) {
   const recognitionRef = useRef<any>(null)
   const spokenTranscriptRef = useRef("")
   const isManualStopRef = useRef(false)
+  // Browser speech events can race with a button press or the silence timer.
+  // Keep finalization single-shot so one recording produces one transaction.
+  const isFinalizingRef = useRef(false)
   const isCleaningUpRef = useRef(false)
   const hasSoundActivityRef = useRef(false)
   const maxVolumeRef = useRef(0)
@@ -108,6 +111,7 @@ export function useVoiceInput(options?: UseVoiceInputOptions) {
     setErrorMessage("")
     spokenTranscriptRef.current = ""
     isManualStopRef.current = false
+    isFinalizingRef.current = false
     hasSoundActivityRef.current = false
     maxVolumeRef.current = 0
     audioChunksRef.current = []
@@ -116,6 +120,8 @@ export function useVoiceInput(options?: UseVoiceInputOptions) {
 
   // Finalize processing: delivers verified speech text
   const handleFinalSpeech = useCallback(async () => {
+    if (isFinalizingRef.current) return
+    isFinalizingRef.current = true
     clearSilenceTimer()
     setVoiceState("processing")
 
@@ -159,6 +165,7 @@ export function useVoiceInput(options?: UseVoiceInputOptions) {
       setErrorMessage("No clear speech detected. Please speak clearly into your microphone and try again. / आवाज़ साफ़ सुनाई नहीं दी, कृपया पुनः बोलें।")
       setVoiceState("error")
       setTranscript("")
+      optionsRef.current?.onError?.("No clear speech detected. Please speak clearly into your microphone and try again.")
       return
     }
 
@@ -169,6 +176,7 @@ export function useVoiceInput(options?: UseVoiceInputOptions) {
   }, [cleanupHardware, clearSilenceTimer])
 
   const stopListening = useCallback(async () => {
+    if (isFinalizingRef.current) return
     isManualStopRef.current = true
     clearSilenceTimer()
 
@@ -218,6 +226,7 @@ export function useVoiceInput(options?: UseVoiceInputOptions) {
     setTranscript("")
     spokenTranscriptRef.current = ""
     isManualStopRef.current = false
+    isFinalizingRef.current = false
     hasSoundActivityRef.current = false
     maxVolumeRef.current = 0
     audioChunksRef.current = []
@@ -294,16 +303,21 @@ export function useVoiceInput(options?: UseVoiceInputOptions) {
         }
       }
 
-      const recorder = mimeType ? new MediaRecorder(stream, { mimeType }) : new MediaRecorder(stream)
-      mediaRecorderRef.current = recorder
+      // MediaRecorder is unavailable in a few browsers. Web Speech can still
+      // work there, so leave the Whisper fallback disabled instead of failing
+      // the entire voice experience.
+      if (typeof MediaRecorder !== "undefined") {
+        const recorder = mimeType ? new MediaRecorder(stream, { mimeType }) : new MediaRecorder(stream)
+        mediaRecorderRef.current = recorder
 
-      recorder.ondataavailable = (e) => {
-        if (e.data && e.data.size > 0) {
-          audioChunksRef.current.push(e.data)
+        recorder.ondataavailable = (e) => {
+          if (e.data && e.data.size > 0) {
+            audioChunksRef.current.push(e.data)
+          }
         }
-      }
 
-      recorder.start(200) // Collect chunks every 200ms
+        recorder.start(200) // Collect chunks every 200ms
+      }
       setVoiceState("listening")
 
       // 4. Initialize Web Speech API
@@ -382,9 +396,11 @@ export function useVoiceInput(options?: UseVoiceInputOptions) {
               return
             }
 
-            // If speech was already accumulated, finalize it
+            // Always use the controlled stop path. It waits for the recorder's
+            // last chunk before falling back to Whisper and prevents duplicate
+            // transcript delivery when recognition ends on its own.
             if (spokenTranscriptRef.current.trim()) {
-              handleFinalSpeech()
+              stopListening()
             } else if (streamRef.current && streamRef.current.active) {
               // Seamless restart if user hasn't spoken yet and mic is active
               setTimeout(() => {

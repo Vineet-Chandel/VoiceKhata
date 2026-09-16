@@ -1,6 +1,6 @@
 // src/components/ui/Shopkeeper/ShopkeeperFAQ.tsx
 import React, { useState } from "react";
-import { ChevronDown, HelpCircle } from "lucide-react";
+import { ChevronDown, HelpCircle, Plus, Minus } from "lucide-react";
 
 export function ShopkeeperFAQ() {
   const [openIdx, setOpenIdx] = useState<number | null>(0);
@@ -29,46 +29,54 @@ export function ShopkeeperFAQ() {
   ];
 
   return (
-    <section id="faqs" className="py-16 sm:py-20 bg-[#0B0F19] border-b border-slate-700/40">
+    <section id="faqs" className="py-16 sm:py-24 bg-slate-50/60 dark:bg-[#070A11] transition-colors border-t border-slate-200/80 dark:border-slate-800">
       <div className="mx-auto max-w-4xl px-4 sm:px-6">
         
-        <div className="text-center max-w-2xl mx-auto mb-10">
-          <span className="text-xs font-semibold uppercase tracking-wider text-blue-300 bg-blue-600/20 border border-blue-500/30 px-3 py-1 rounded-full">
+        {/* Header */}
+        <div className="text-center max-w-2xl mx-auto mb-14 space-y-3">
+          <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
             Frequently Asked Questions
           </span>
-          <h2 className="mt-3 text-2xl sm:text-4xl font-bold text-[#F8FAFC] tracking-tight">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#0B0F15] dark:text-white tracking-tight leading-[1.1]">
             Everything You Need to Know
           </h2>
-          <p className="mt-2 text-xs sm:text-sm text-[#94A3B8]">
+          <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300">
             Clear answers about voice recording, privacy, and khata management.
           </p>
         </div>
 
-        <div className="space-y-2.5">
+        {/* Accordion list */}
+        <div className="space-y-3">
           {faqs.map((faq, idx) => {
             const isOpen = openIdx === idx;
             return (
               <div
                 key={idx}
-                className="rounded-[12px] border border-slate-700/40 bg-[#131B2E] overflow-hidden shadow-sm transition-all"
+                className={`rounded-[20px] border transition-all duration-200 overflow-hidden ${
+                  isOpen
+                    ? "border-slate-300 dark:border-slate-700 bg-white dark:bg-[#0E1320] shadow-sm"
+                    : "border-slate-200 dark:border-slate-800 bg-white/70 dark:bg-[#0E1320]/70 hover:border-slate-300 dark:hover:border-slate-700"
+                }`}
               >
                 <button
                   onClick={() => setOpenIdx(isOpen ? null : idx)}
-                  className="flex w-full items-center justify-between p-4 sm:p-4.5 text-left text-xs sm:text-sm font-semibold text-[#F8FAFC] hover:text-blue-400 transition-colors cursor-pointer"
+                  className="flex w-full items-center justify-between p-5 sm:p-6 text-left text-sm sm:text-base font-bold text-[#0B0F15] dark:text-white transition-colors cursor-pointer"
                 >
-                  <span className="flex items-center gap-2.5">
-                    <HelpCircle className="size-4 text-blue-400 shrink-0" />
-                    {faq.q}
+                  <span className="flex items-center gap-3 pr-4">
+                    <span className="size-6 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-xs font-mono text-slate-500 shrink-0">
+                      0{idx + 1}
+                    </span>
+                    <span>{faq.q}</span>
                   </span>
-                  <ChevronDown
-                    className={`size-4 text-[#94A3B8] transition-transform duration-200 shrink-0 ml-2 ${
-                      isOpen ? "rotate-180 text-blue-400" : ""
-                    }`}
-                  />
+                  <div className={`size-8 rounded-full flex items-center justify-center shrink-0 transition-colors ${
+                    isOpen ? "bg-[#D2F832] text-[#0B0F15]" : "bg-slate-100 dark:bg-slate-800 text-slate-500"
+                  }`}>
+                    {isOpen ? <Minus className="size-4 stroke-[2.5]" /> : <Plus className="size-4 stroke-[2.5]" />}
+                  </div>
                 </button>
 
                 {isOpen && (
-                  <div className="border-t border-slate-700/40 p-4 text-xs sm:text-sm text-[#94A3B8] leading-relaxed bg-[#0B0F19]">
+                  <div className="px-5 pb-5 sm:px-6 sm:pb-6 pt-0 text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed pl-14">
                     {faq.a}
                   </div>
                 )}

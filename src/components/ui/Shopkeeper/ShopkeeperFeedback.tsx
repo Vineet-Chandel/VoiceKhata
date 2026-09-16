@@ -62,6 +62,18 @@ export function ShopkeeperFeedback() {
       if (error) {
         console.warn("Feedback submission notice:", error.message);
       }
+      try {
+        const stored = JSON.parse(localStorage.getItem("voicekhata_feedbacks_backup") || "[]");
+        stored.push({
+          type: category,
+          rating: rating || null,
+          title: title.trim() || "Landing Page Feedback",
+          description: description.trim(),
+          email: email.trim() || "anonymous@voicekhata.app",
+          created_at: new Date().toISOString()
+        });
+        localStorage.setItem("voicekhata_feedbacks_backup", JSON.stringify(stored.slice(-20)));
+      } catch {}
       setIsSubmitted(true);
     } catch {
       setIsSubmitted(true);
@@ -71,35 +83,34 @@ export function ShopkeeperFeedback() {
   };
 
   return (
-    <section id="feedback" className="py-16 sm:py-20 bg-[#0B0F19] border-b border-slate-700/40">
-      <div className="mx-auto max-w-5xl px-4 sm:px-6">
+    <section id="feedback" className="py-16 sm:py-24 bg-white dark:bg-[#070A11] transition-colors border-t border-slate-100 dark:border-slate-800">
+      <div className="mx-auto max-w-4xl px-4 sm:px-6">
         
         {/* Section Header */}
-        <div className="text-center max-w-2xl mx-auto mb-10">
-          <span className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-blue-300 bg-blue-600/20 px-3 py-1 rounded-full border border-blue-500/30">
-            <MessageSquare className="size-3.5 text-blue-400" />
-            <span>Community Feedback</span>
+        <div className="text-center max-w-2xl mx-auto mb-12 space-y-3">
+          <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+            Community Feedback
           </span>
-          <h2 className="mt-3 text-2xl sm:text-4xl font-bold text-[#F8FAFC] tracking-tight">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#0B0F15] dark:text-white tracking-tight leading-[1.1]">
             Help Us Build the Best Khata for India
           </h2>
-          <p className="mt-2 text-xs sm:text-sm text-[#94A3B8]">
+          <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300">
             Have an idea for a new feature, a dialect improvement, or UI suggestion? We review every submission.
           </p>
         </div>
 
         {/* Feedback Card Container */}
-        <div className="rounded-[16px] border border-slate-700/40 bg-[#131B2E] p-6 sm:p-8 shadow-xl">
+        <div className="rounded-[28px] border border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-[#0E1320] p-6 sm:p-10 shadow-xs">
           {isSubmitted ? (
             <div className="py-12 text-center space-y-4 max-w-md mx-auto">
-              <div className="size-14 rounded-full bg-[#10B981]/20 border border-[#10B981]/30 flex items-center justify-center mx-auto text-[#10B981]">
-                <CheckCircle2 size={32} />
+              <div className="size-14 rounded-full bg-[#D2F832] flex items-center justify-center mx-auto text-[#0B0F15]">
+                <CheckCircle2 size={30} className="stroke-[2.5]" />
               </div>
-              <h3 className="text-xl font-bold text-[#F8FAFC]">Thank You for Your Feedback!</h3>
-              <p className="text-xs sm:text-sm text-[#94A3B8] leading-relaxed">
+              <h3 className="text-xl font-bold text-[#0B0F15] dark:text-white">Thank You for Your Feedback!</h3>
+              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
                 Your thoughts have been logged directly into our product backlog. Together, we're making Indian business bookkeeping simpler and faster.
               </p>
-              <div className="pt-3 flex items-center justify-center gap-3">
+              <div className="pt-4 flex items-center justify-center gap-3">
                 <button
                   type="button"
                   onClick={() => {
@@ -107,13 +118,13 @@ export function ShopkeeperFeedback() {
                     setDescription("");
                     setTitle("");
                   }}
-                  className="px-4 py-2 rounded-[8px] bg-[#0E1322] border border-slate-700/40 text-xs font-medium text-[#94A3B8] hover:text-[#F8FAFC] hover:bg-white/5 transition-colors cursor-pointer"
+                  className="px-5 py-2.5 rounded-full bg-white dark:bg-[#070A11] border border-slate-200 dark:border-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:border-black transition-colors cursor-pointer"
                 >
                   Send another note
                 </button>
                 <Link
                   to="/review"
-                  className="px-4 py-2 rounded-[8px] bg-blue-600 hover:bg-blue-500 text-xs font-semibold text-white shadow-xs transition-all"
+                  className="px-5 py-2.5 rounded-full bg-[#0B0F15] text-white hover:bg-black text-xs font-semibold shadow-xs transition-all"
                 >
                   Write a public review →
                 </Link>
@@ -121,12 +132,13 @@ export function ShopkeeperFeedback() {
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-6">
+              
               {/* 1. Category Pills */}
               <div>
-                <label className="text-xs font-semibold text-[#94A3B8] uppercase tracking-wider block mb-2.5">
+                <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider block mb-3">
                   What would you like to share?
                 </label>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-2.5">
                   {feedbackCategories.map((cat) => {
                     const Icon = cat.icon;
                     const isSelected = category === cat.id;
@@ -135,13 +147,13 @@ export function ShopkeeperFeedback() {
                         type="button"
                         key={cat.id}
                         onClick={() => setCategory(cat.id)}
-                        className={`flex items-center gap-2 px-3.5 py-2 rounded-[8px] text-xs font-medium transition-all cursor-pointer ${
+                        className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold transition-all cursor-pointer ${
                           isSelected
-                            ? "bg-blue-600 text-white shadow-sm border border-blue-500"
-                            : "bg-[#0E1322] text-[#94A3B8] border border-slate-800 hover:border-slate-700 hover:text-[#F8FAFC]"
+                            ? "bg-[#0B0F15] text-white dark:bg-white dark:text-[#0B0F15] shadow-xs"
+                            : "bg-white dark:bg-[#070A11] text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800 hover:border-slate-300"
                         }`}
                       >
-                        <Icon size={14} className={isSelected ? "text-white" : "text-blue-400"} />
+                        <Icon className={`size-3.5 ${isSelected ? "text-[#D2F832] dark:text-[#0B0F15]" : "text-slate-500"}`} />
                         <span>{cat.label}</span>
                       </button>
                     );
@@ -149,90 +161,98 @@ export function ShopkeeperFeedback() {
                 </div>
               </div>
 
-              {/* 2. Rating Selector */}
+              {/* 2. Rating Stars */}
               <div>
-                <label className="text-xs font-semibold text-[#94A3B8] uppercase tracking-wider block mb-2">
-                  How would you rate your VoiceKhata experience?
+                <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider block mb-2">
+                  Your rating of VoiceKhata
                 </label>
                 <div className="flex items-center gap-1.5">
-                  {[1, 2, 3, 4, 5].map((star) => {
-                    const isFilled = star <= (hoverRating || rating);
-                    return (
-                      <button
-                        type="button"
-                        key={star}
-                        onMouseEnter={() => setHoverRating(star)}
-                        onMouseLeave={() => setHoverRating(0)}
-                        onClick={() => setRating(star)}
-                        className="p-1 text-slate-600 hover:scale-110 transition-transform cursor-pointer"
-                      >
-                        <Star
-                          size={24}
-                          className={isFilled ? "fill-amber-400 text-amber-400" : "text-slate-700"}
-                        />
-                      </button>
-                    );
-                  })}
-                  <span className="text-xs text-[#94A3B8] ml-2 font-medium">
-                    {rating === 5 ? "Loved it (5/5)" : `${rating}/5`}
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      type="button"
+                      key={star}
+                      onMouseEnter={() => setHoverRating(star)}
+                      onMouseLeave={() => setHoverRating(0)}
+                      onClick={() => setRating(star)}
+                      className="p-1 text-slate-300 dark:text-slate-700 hover:scale-110 transition-transform cursor-pointer"
+                    >
+                      <Star
+                        className={`size-6 ${
+                          (hoverRating || rating) >= star
+                            ? "fill-amber-400 text-amber-400"
+                            : "text-slate-300 dark:text-slate-700"
+                        }`}
+                      />
+                    </button>
+                  ))}
+                  <span className="text-xs font-bold text-slate-600 dark:text-slate-300 ml-2">
+                    {rating} / 5
                   </span>
                 </div>
               </div>
 
-              {/* 3. Description Field */}
+              {/* 3. Title */}
               <div>
-                <label className="text-xs font-semibold text-[#94A3B8] uppercase tracking-wider block mb-2">
-                  Feedback or Feature Suggestion
+                <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider block mb-2">
+                  Summary / Title (Optional)
                 </label>
-                <textarea
-                  rows={3}
-                  required
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  placeholder="e.g. It would be amazing to support voice inputs for Marathi dialects, or add automatic monthly PDF balance summaries..."
-                  className="w-full rounded-[8px] border border-slate-700/40 bg-[#0B0F19] p-3 text-xs sm:text-sm text-[#F8FAFC] placeholder:text-[#94A3B8]/60 focus:outline-none focus:border-blue-500 transition-colors resize-none"
+                <input
+                  type="text"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  placeholder="e.g. Add Gujarati voice recognition, or custom invoice PDF"
+                  className="w-full rounded-xl bg-white dark:bg-[#070A11] border border-slate-200 dark:border-slate-800 px-4 py-2.5 text-xs sm:text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-[#0B0F15] dark:focus:ring-white transition-all"
                 />
               </div>
 
-              {/* 4. Optional Email & Submit */}
-              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-1">
-                <div className="w-full sm:w-auto flex-1 max-w-sm">
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="Your email (optional, for reply)"
-                    className="w-full h-9 rounded-[8px] border border-slate-700/40 bg-[#0B0F19] px-3 text-xs text-[#F8FAFC] placeholder:text-[#94A3B8]/60 focus:outline-none focus:border-blue-500"
-                  />
-                </div>
+              {/* 4. Description */}
+              <div>
+                <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider block mb-2">
+                  Details / Suggestion <span className="text-red-500">*</span>
+                </label>
+                <textarea
+                  rows={4}
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder="Tell us what you'd like to see improved, any bugs encountered, or how VoiceKhata can better serve your retail shop..."
+                  className="w-full rounded-xl bg-white dark:bg-[#070A11] border border-slate-200 dark:border-slate-800 p-4 text-xs sm:text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-[#0B0F15] dark:focus:ring-white transition-all resize-none"
+                  required
+                />
+              </div>
 
-                <div className="w-full sm:w-auto flex items-center justify-end gap-3">
-                  <Link
-                    to="/feedback"
-                    className="text-xs text-[#94A3B8] hover:text-[#F8FAFC] hover:underline"
-                  >
-                    Open Full Feedback Portal →
-                  </Link>
-                  <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="flex items-center gap-2 h-9 px-5 rounded-[8px] bg-blue-600 hover:bg-blue-500 active:scale-[0.98] text-xs font-semibold text-white shadow-lg shadow-blue-600/20 transition-all cursor-pointer disabled:opacity-50"
-                  >
-                    {isSubmitting ? (
-                      <span>Sending...</span>
-                    ) : (
-                      <>
-                        <Send size={14} />
-                        <span>Send Feedback</span>
-                      </>
-                    )}
-                  </button>
-                </div>
+              {/* 5. Email */}
+              <div>
+                <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider block mb-2">
+                  Your Email (Optional, if you'd like us to update you)
+                </label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="shopkeeper@example.com"
+                  className="w-full rounded-xl bg-white dark:bg-[#070A11] border border-slate-200 dark:border-slate-800 px-4 py-2.5 text-xs sm:text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-[#0B0F15] dark:focus:ring-white transition-all"
+                />
               </div>
 
               {errorMsg && (
-                <p className="text-xs text-[#EF4444] pt-1">{errorMsg}</p>
+                <p className="text-xs text-red-500 font-medium">{errorMsg}</p>
               )}
+
+              {/* Submit Button */}
+              <div className="pt-2 flex items-center justify-between">
+                <p className="text-[11px] text-slate-400">
+                  Submissions go directly to our engineering team.
+                </p>
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="flex items-center gap-2 rounded-full bg-[#0B0F15] hover:bg-black text-white px-6 py-3 text-xs sm:text-sm font-semibold shadow-xs transition-all active:scale-[0.98] disabled:opacity-50 cursor-pointer"
+                >
+                  <span>{isSubmitting ? "Sending..." : "Submit Feedback"}</span>
+                  <Send className="size-3.5 text-[#D2F832]" />
+                </button>
+              </div>
+
             </form>
           )}
         </div>
