@@ -233,7 +233,7 @@ export default function AIAssistantPage() {
           <div className="flex items-center gap-2">
             <button
               onClick={handleNewChat}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 active:scale-[0.98] text-white text-xs font-semibold shadow-sm transition-all cursor-pointer"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#D2F832] hover:bg-[#c3ea23] active:scale-[0.98] text-black text-xs font-bold shadow-sm transition-all cursor-pointer"
               title={t("ai.newChat")}
             >
               <Plus size={14} />
@@ -243,7 +243,7 @@ export default function AIAssistantPage() {
             {messages.length > 0 && (
               <button
                 onClick={handleClearChat}
-                className="text-xs text-slate-400 hover:text-slate-200 border border-slate-700/50 hover:border-slate-600 px-2.5 py-1.5 rounded-xl transition-colors cursor-pointer"
+                className="text-xs text-muted-foreground hover:text-foreground border border-border hover:bg-surface-elevated px-2.5 py-1.5 rounded-xl transition-colors cursor-pointer"
               >
                 {t("ai.clearChat")}
               </button>
@@ -285,7 +285,7 @@ export default function AIAssistantPage() {
           )}
 
           {/* Input */}
-          <div className="px-4 lg:px-6 py-3 border-t border-slate-700/40 shrink-0 bg-[#080D1A]/50">
+          <div className="px-4 lg:px-6 py-3 border-t border-border/60 shrink-0 bg-background/80 backdrop-blur-sm">
             <ChatInput
               onSend={(msg) => {
                 sendMessage(msg, replyingTo ? { id: replyingTo.id, role: replyingTo.role, content: replyingTo.content } : undefined)

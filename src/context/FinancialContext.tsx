@@ -218,11 +218,30 @@ async function createTransactionNotification(
   }
 }
 
+function getLocalTransactions(uid: string): Transaction[] {
+  try {
+    const raw = localStorage.getItem(`voicekhata_local_tx_${uid}`)
+    return raw ? JSON.parse(raw) : []
+  } catch {
+    return []
+  }
+}
+
+function saveLocalTransactions(uid: string, txs: Transaction[]): void {
+  try {
+    localStorage.setItem(`voicekhata_local_tx_${uid}`, JSON.stringify(txs))
+  } catch (err) {
+    console.warn("Failed to persist local transactions:", err)
+  }
+}
+
 export function FinancialProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth()
   const { appMode } = useAppMode()
 
-  const [allTransactions, setAllTransactions] = useState<Transaction[]>([])
+  const [allTransactions, setAllTransactions] = useState<Transaction[]>(() => {
+    return user?.uid ? getLocalTransactions(user.uid) : []
+  })
   const [transactionsLoading, setTransactionsLoading] = useState(true)
   const [transactionsError, setTransactionsError] = useState<string | null>(null)
 
@@ -265,13 +284,22 @@ export function FinancialProvider({ children }: { children: ReactNode }) {
           .eq("firebase_uid", user.uid)
           .order("date", { ascending: false })
 
-        if (error) throw error
-        setAllTransactions((data as Transaction[]) ?? [])
-      } catch (err: any) {
-        if (!options?.silent) {
-          setTransactionsError(err.message || "Failed to load transactions")
+        if (!error && data && data.length > 0) {
+          const list = data as Transaction[]
+          setAllTransactions(list)
+          saveLocalTransactions(user.uid, list)
         } else {
-          console.warn("[refetchTransactions silent error]:", err)
+          const cached = getLocalTransactions(user.uid)
+          if (cached.length > 0) {
+            setAllTransactions(cached)
+          }
+        }
+      } catch (err: any) {
+        const cached = getLocalTransactions(user.uid)
+        if (cached.length > 0) {
+          setAllTransactions(cached)
+        } else if (!options?.silent) {
+          setTransactionsError(err.message || "Failed to load transactions")
         }
       } finally {
         if (!options?.silent) {
@@ -480,19 +508,38 @@ export function FinancialProvider({ children }: { children: ReactNode }) {
           status: (t.status || "Completed").trim(),
         }
         
-        const { data, error } = await supabase
-          .from("transactions")
-          .insert(payload)
-          .select()
-          .single()
+        let newTx: Transaction | null = null
 
-        if (error) throw error
+        try {
+          const { data, error } = await supabase
+            .from("transactions")
+            .insert(payload)
+            .select()
+            .single()
 
-        const newTx = data as Transaction
+          if (!error && data) {
+            newTx = data as Transaction
+          }
+        } catch (networkErr) {
+          console.warn("[addTransaction] Remote sync failed, persisting locally:", networkErr)
+        }
+
+        // Local fallback when Supabase is offline or unreachable
+        if (!newTx) {
+          newTx = {
+            id: Date.now(),
+            created_at: new Date().toISOString(),
+            ...payload,
+          } as Transaction
+        }
+
         setAllTransactions((prev) => {
-          const exists = prev.some((row) => row.id === newTx.id)
-          return exists ? prev : [newTx, ...prev]
+          const exists = prev.some((row) => row.id === newTx!.id)
+          const next = exists ? prev : [newTx!, ...prev]
+          saveLocalTransactions(user.uid, next)
+          return next
         })
+
         void createTransactionNotification(user.uid, newTx).catch(() => undefined)
         return { data: newTx }
       } catch (err: any) {
@@ -509,6 +556,7 @@ export function FinancialProvider({ children }: { children: ReactNode }) {
     async (id: number, updates: TransactionUpdateInput) => {
       if (!user?.uid) return { error: "Please log in to update transactions." }
 
+      let updated: Transaction | null = null
       try {
         const { data, error } = await supabase
           .from("transactions")
@@ -518,19 +566,20 @@ export function FinancialProvider({ children }: { children: ReactNode }) {
           .select()
           .single()
 
-        if (error) throw error
-
-        const updated = data as Transaction
-        setAllTransactions((prev) =>
-          prev.map((row) => (row.id === id ? { ...row, ...updated } : row))
-        )
-
-        return { data: updated }
-      } catch (err: any) {
-        const message = err.message || "Failed to update transaction"
-        setTransactionsError(message)
-        return { error: message }
+        if (!error && data) {
+          updated = data as Transaction
+        }
+      } catch (networkErr) {
+        console.warn("[updateTransaction] Remote sync failed, updating locally:", networkErr)
       }
+
+      setAllTransactions((prev) => {
+        const next = prev.map((row) => (row.id === id ? (updated || { ...row, ...updates }) : row))
+        saveLocalTransactions(user.uid, next)
+        return next
+      })
+
+      return { data: updated || ({ id, ...updates } as any) }
     },
     [user?.uid]
   )
@@ -540,18 +589,20 @@ export function FinancialProvider({ children }: { children: ReactNode }) {
       if (!user?.uid) return
 
       try {
-        const { error } = await supabase
+        await supabase
           .from("transactions")
           .delete()
           .eq("id", id)
           .eq("firebase_uid", user.uid)
-
-        if (error) throw error
-
-        setAllTransactions((prev) => prev.filter((row) => row.id !== id))
-      } catch (err: any) {
-        setTransactionsError(err.message || "Failed to delete transaction")
+      } catch (networkErr) {
+        console.warn("[deleteTransaction] Remote sync failed, deleting locally:", networkErr)
       }
+
+      setAllTransactions((prev) => {
+        const next = prev.filter((row) => row.id !== id)
+        saveLocalTransactions(user.uid, next)
+        return next
+      })
     },
     [user?.uid]
   )

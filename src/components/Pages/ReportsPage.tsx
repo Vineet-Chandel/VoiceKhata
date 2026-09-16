@@ -120,8 +120,8 @@ type ReportsData = {
 // ─── Constants ────────────────────────────────────────────────────────────────
 
 const DONUT_COLORS = [
-  "#60a5fa", "#34d399", "#f59e0b", "#f87171",
-  "#a78bfa", "#22d3ee", "#9ca3af", "#fb923c",
+  "#10B981", "#EA580C", "#06B6D4", "#F59E0B",
+  "#8B5CF6", "#F43F5E", "#64748B", "#D2F832",
 ]
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -219,17 +219,17 @@ function SurfaceCard({
   return (
     <div
       className={[
-        "rounded-xl border border-[rgba(255,255,255,0.06)] bg-[var(--surface-card)] p-4 flex flex-col gap-3",
-        "transition-all duration-200 ease-[cubic-bezier(0.4,0,0.2,1)]",
-        "hover:border-border-secondary hover:bg-[#1d1d1d]",
-        "active:scale-[0.995] active:border-border-secondary",
+        "rounded-2xl border border-border/70 bg-card p-4 flex flex-col gap-3",
+        "transition-all duration-200 ease-[cubic-bezier(0.4,0,0.2,1)] shadow-sm",
+        "hover:border-border hover:bg-surface-elevated",
+        "active:scale-[0.995]",
         className,
       ].join(" ")}
     >
       <div className="flex items-center gap-2">
         {Icon && <Icon size={14} className="text-muted-foreground shrink-0" />}
         <div>
-          <p className="text-sm font-semibold text-[#979797]">{title}</p>
+          <p className="text-sm font-semibold text-text-primary">{title}</p>
           {subtitle && <p className="text-xs text-muted-foreground mt-0.5">{subtitle}</p>}
         </div>
       </div>
@@ -255,17 +255,17 @@ function KpiCard({
   sub?: string
 }) {
   const Icon = positive ? TrendingUp : TrendingDown
-  const color = positive ? "text-emerald-400" : "text-red-400"
+  const color = positive ? "text-emerald-400" : "text-rose-400"
 
   return (
     <div
       className={[
-        "group relative rounded-xl border border-[rgba(255,255,255,0.06)] bg-[var(--surface-card)] p-3",
+        "group relative rounded-2xl border border-border/70 bg-card p-3.5",
         "flex flex-col gap-2 min-h-[130px] overflow-hidden",
-        "transition-all duration-200 ease-[cubic-bezier(0.4,0,0.2,1)]",
-        "hover:-translate-y-0.5 hover:border-border-secondary hover:bg-[#1d1d1d]",
-        "hover:shadow-[0_12px_32px_rgba(0,0,0,0.45)]",
-        "active:translate-y-0 active:scale-[0.985] active:border-border-secondary active:bg-[#1d1d1d]",
+        "transition-all duration-200 ease-[cubic-bezier(0.4,0,0.2,1)] shadow-sm",
+        "hover:-translate-y-0.5 hover:border-border hover:bg-surface-elevated",
+        "hover:shadow-md",
+        "active:translate-y-0 active:scale-[0.985]",
       ].join(" ")}
     >
       {/* Radial glow on hover */}
@@ -985,16 +985,24 @@ const renderActiveShape = (props: any) => {
             <>
               {isCombo && (
                 <div className="px-4 lg:px-6 mb-2">
-                  <div className="inline-flex items-center p-1 bg-[var(--surface-card)] rounded-lg border border-white/5">
+                  <div className="inline-flex items-center p-1 bg-surface-secondary/80 rounded-xl border border-border">
                     <button
                       onClick={() => setComboTab("PERSONAL")}
-                      className={`px-4 py-1.5 text-xs font-medium rounded-md transition-all ${comboTab === "PERSONAL" ? "bg-[#333] text-white shadow-sm" : "text-muted-foreground hover:text-white"}`}
+                      className={`px-4 py-1.5 text-xs font-semibold rounded-lg transition-all ${
+                        comboTab === "PERSONAL"
+                          ? "bg-surface-elevated text-emerald-400 border border-emerald-500/25 shadow-sm"
+                          : "text-muted-foreground hover:text-foreground"
+                      }`}
                     >
                       {t("reports.personalSection")}
                     </button>
                     <button
                       onClick={() => setComboTab("BUSINESS")}
-                      className={`px-4 py-1.5 text-xs font-medium rounded-md transition-all ${comboTab === "BUSINESS" ? "bg-[#333] text-white shadow-sm" : "text-muted-foreground hover:text-white"}`}
+                      className={`px-4 py-1.5 text-xs font-semibold rounded-lg transition-all ${
+                        comboTab === "BUSINESS"
+                          ? "bg-surface-elevated text-slate-900 dark:text-white border border-border shadow-sm"
+                          : "text-muted-foreground hover:text-foreground"
+                      }`}
                     >
                       {t("reports.businessSection")}
                     </button>

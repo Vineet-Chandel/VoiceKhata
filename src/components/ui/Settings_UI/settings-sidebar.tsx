@@ -206,7 +206,7 @@ export function SettingsSidebar({
             <span className="font-medium">{getNavLabel(id)}</span>
 
             {active && (
-              <div className={`ml-auto size-1.5 rounded-full ${isDanger ? "bg-red-400" : "bg-text-primary/40"}`} />
+              <div className={`ml-auto size-1.5 rounded-full ${isDanger ? "bg-red-400" : "bg-[#D2F832]"}`} />
             )}
           </button>
         )

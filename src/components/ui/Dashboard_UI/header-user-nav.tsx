@@ -37,24 +37,24 @@ export function HeaderUserNav() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button className="relative flex items-center justify-center rounded-full outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 hover:opacity-90 transition-opacity p-0.5 bg-gradient-to-tr from-blue-600 via-blue-400 to-cyan-400 shadow-[0_0_12px_rgba(59,130,246,0.4)]">
-          <div className="rounded-full overflow-hidden border-2 border-background">
+        <button className="relative flex items-center justify-center rounded-full outline-none focus:ring-2 focus:ring-[#D2F832] focus:ring-offset-1 hover:opacity-95 transition-all p-0.5 border border-slate-200 dark:border-slate-700 bg-white dark:bg-[#0E1320] shadow-2xs cursor-pointer">
+          <div className="rounded-full overflow-hidden">
             <Avatar className="h-8 w-8">
               <AvatarImage src={avatar} alt={name} />
-              <AvatarFallback>{name[0]}</AvatarFallback>
+              <AvatarFallback className="bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white font-bold text-xs">{name[0]}</AvatarFallback>
             </Avatar>
           </div>
           {unreadCount > 0 && (
             <div className="absolute -top-1 -right-1 flex h-3 w-3">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500 border-2 border-background shadow-sm"></span>
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-3 w-3 bg-rose-500 border-2 border-white dark:border-[#070A11] shadow-2xs"></span>
             </div>
           )}
         </button>
       </DropdownMenuTrigger>
 
       <DropdownMenuContent
-        className="w-56 rounded-xl shadow-lg border-border/50 bg-background/95 backdrop-blur-md"
+        className="w-56 rounded-xl shadow-lg border border-slate-200 dark:border-slate-800 bg-white/95 dark:bg-[#0B0F15]/95 backdrop-blur-md"
         align="end"
         sideOffset={8}
       >

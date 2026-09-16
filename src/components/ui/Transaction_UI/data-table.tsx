@@ -202,32 +202,39 @@ function buildColumns(callbacks: TableCallbacks, t: (key: string) => string): Co
     },
     {
       accessorKey: "amount",
-      header:      () => <div className="text-right w-[120px]">{t("tx.amount")}</div>,
-      cell:        ({ row }) => (
-        <div className="text-right w-[120px] font-medium">
-          {"₹" + row.original.amount.toLocaleString()}
-        </div>
-      ),
+      header:      () => <div className="text-right w-[120px] font-semibold">{t("tx.amount")}</div>,
+      cell:        ({ row }) => {
+        const isCredit = row.original.type === "Credit"
+        return (
+          <div className={`text-right w-[120px] font-bold tabular-nums ${
+            isCredit ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"
+          }`}>
+            {isCredit ? "+" : "-"}₹{row.original.amount.toLocaleString("en-IN")}
+          </div>
+        )
+      },
     },
     {
       accessorKey: "date",
-      header:      () => <div className="pl-6">{t("tx.date")}</div>,
-      cell:        ({ row }) => <div className="pl-6">{row.original.date}</div>,
+      header:      () => <div className="pl-6 font-semibold">{t("tx.date")}</div>,
+      cell:        ({ row }) => <div className="pl-6 text-xs text-slate-600 dark:text-slate-400">{row.original.date}</div>,
     },
     {
       accessorKey: "type",
       header:      t("tx.type"),
       cell:        ({ row }) => {
         const type = row.original.type
+        const isCredit = type === "Credit"
         return (
           <Badge
-            className={
-              type === "Debit"
-                ? "bg-red-500/10 text-red-400 border-red-500/20"
-                : "bg-green-500/10 text-green-400 border-green-500/20"
-            }
+            variant="outline"
+            className={`font-semibold text-xs px-2 py-0.5 rounded-full ${
+              isCredit
+                ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/30"
+                : "bg-rose-500/10 text-rose-700 dark:text-rose-400 border-rose-500/30"
+            }`}
           >
-            {type}
+            {isCredit ? "+ Received" : "- Paid"}
           </Badge>
         )
       },

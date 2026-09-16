@@ -571,7 +571,7 @@ export function FloatingAssistant() {
             <>
               {/* Listening pulse ring */}
               {isListening && (
-                <span className="absolute inset-0 border-2 border-blue-500/30 listening-pulse-ring pointer-events-none" />
+                <span className="absolute inset-0 border-2 border-[#D2F832]/40 listening-pulse-ring rounded-2xl pointer-events-none" />
               )}
 
               <div className={`flex items-center transition-all duration-[250ms] ${isCompact && !isActive ? "px-3 py-2" : "px-3 py-2.5"}`}>
@@ -585,11 +585,11 @@ export function FloatingAssistant() {
                         <X size={16} />
                       </button>
                       <div className="flex-1 h-8 flex items-center justify-center overflow-hidden">
-                        <VoiceWaveform analyserRef={analyserRef} isListening={true} color="rgba(59, 130, 246, 0.9)" />
+                        <VoiceWaveform analyserRef={analyserRef} isListening={true} color="#D2F832" />
                       </div>
                       <button
                         onClick={stopListening}
-                        className="size-8 rounded-xl bg-blue-600 flex items-center justify-center text-white hover:bg-blue-500 transition-all cursor-pointer shrink-0 shadow-sm"
+                        className="size-8 rounded-xl bg-[#D2F832] flex items-center justify-center text-black hover:opacity-90 transition-all cursor-pointer shrink-0 shadow-sm font-bold"
                       >
                         <Check size={15} strokeWidth={3} />
                       </button>
@@ -599,8 +599,8 @@ export function FloatingAssistant() {
                         "{transcript}"
                       </p>
                     ) : (
-                      <p className="text-[10px] text-white/50 text-center animate-pulse">
-                        Listening... Speak naturally in Hindi or English
+                      <p className="text-[10px] text-[#D2F832] text-center animate-pulse">
+                        Sun rahe hain... Bolte hi likha jaayega
                       </p>
                     )}
                   </div>
@@ -631,18 +631,22 @@ export function FloatingAssistant() {
                           : isListening
                           ? "Listening... speaking is typed live"
                           : isCompact && !isActive
-                          ? "Ask AI…"
+                          ? "Ask Digital Munim…"
                           : pageConfig.placeholder
                       }
                       disabled={isProcessing}
-                      className={`flex-1 bg-transparent text-[13px] text-[#F8FAFC] placeholder:text-[#64748B] focus:outline-none disabled:opacity-40 transition-all duration-200 min-w-0 ${isCompact && !isActive ? "text-[12px]" : ""}`}
+                      className={`flex-1 bg-transparent text-[13px] text-[#F8FAFC] placeholder:text-slate-400 focus:outline-none disabled:opacity-40 transition-all duration-200 min-w-0 ${isCompact && !isActive ? "text-[12px]" : ""}`}
                     />
 
                     <button
                       onClick={(e) => { e.stopPropagation(); handleMicClick() }}
                       disabled={loading || isProcessing}
                       title={isListening ? "Stop listening" : "Speak to mic"}
-                      className={`size-8 shrink-0 rounded-xl flex items-center justify-center transition-all duration-150 cursor-pointer ${isListening ? "bg-red-500 text-white shadow-md shadow-red-500/40 animate-pulse" : "bg-white/5 text-white/70 hover:bg-white/10 hover:text-white"} disabled:opacity-30 active:scale-90`}
+                      className={`size-8 shrink-0 rounded-xl flex items-center justify-center transition-all duration-150 cursor-pointer ${
+                        isListening
+                          ? "bg-[#D2F832] text-black shadow-md shadow-[#D2F832]/40 animate-pulse font-bold"
+                          : "bg-white/10 text-white/80 hover:bg-white/15 hover:text-white border border-white/10"
+                      } disabled:opacity-30 active:scale-90`}
                     >
                       {isProcessing ? (
                         <svg className="size-3.5 cmdbar-spinner" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" strokeDasharray="32" strokeDashoffset="12" /></svg>
@@ -654,7 +658,7 @@ export function FloatingAssistant() {
                     {canSend && (
                       <button
                         onClick={(e) => { e.stopPropagation(); handleSend() }}
-                        className="size-8 shrink-0 rounded-xl flex items-center justify-center bg-blue-600 text-white hover:bg-blue-500 transition-all duration-150 cursor-pointer active:scale-90 shadow-sm"
+                        className="size-8 shrink-0 rounded-xl flex items-center justify-center bg-white text-[#0B0F15] hover:bg-slate-100 transition-all duration-150 cursor-pointer active:scale-90 shadow-sm"
                       >
                         {loading ? (
                           <svg className="size-3.5 cmdbar-spinner" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" strokeDasharray="32" strokeDashoffset="12" /></svg>

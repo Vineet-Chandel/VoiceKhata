@@ -32,8 +32,8 @@ export function QuickLinks() {
       subtitle: t("quicklinks.aiDesc"),
       icon: Mic,
       href: "/dashboard/ai-assistant",
-      color: "from-amber-500/30 to-orange-600/10",
-      iconColor: "text-amber-500",
+      color: "from-[#D2F832]/20 to-transparent",
+      iconColor: "text-[#D2F832]",
       isPrimary: true,
     },
     {
@@ -70,8 +70,8 @@ export function QuickLinks() {
       subtitle: t("quicklinks.aiDesc"),
       icon: Mic,
       href: "/dashboard/ai-assistant",
-      color: "from-amber-500/30 to-orange-600/10",
-      iconColor: "text-amber-500",
+      color: "from-[#D2F832]/20 to-transparent",
+      iconColor: "text-[#D2F832]",
       isPrimary: true,
     },
     {
@@ -112,31 +112,23 @@ export function QuickLinks() {
           <Link
             key={link.title}
             to={link.href}
-            className={`group relative flex items-center gap-3 overflow-hidden rounded-xl border p-3 transition-all ${
-              link.isPrimary
-                ? "border-amber-500/30 bg-gradient-to-r from-amber-500/10 to-transparent hover:border-amber-500/50 hover:shadow-[0_0_15px_rgba(245,158,11,0.15)] dark:hover:shadow-[0_0_15px_rgba(245,158,11,0.15)]"
-                : "border-border/50 bg-card hover:border-border hover:shadow-sm dark:hover:shadow-none"
-            }`}
+            className="group relative flex items-center gap-3 overflow-hidden rounded-xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-[#0B0F15] p-3 transition-all hover:border-slate-400 dark:hover:border-slate-700 shadow-2xs hover:shadow-xs"
           >
-            <div className={`absolute inset-0 bg-gradient-to-r ${link.color} opacity-0 transition-opacity duration-500 group-hover:opacity-100`} />
-            {link.isPrimary && (
-              <div className="absolute inset-0 rounded-xl ring-1 ring-inset ring-amber-500/20 animate-pulse pointer-events-none" />
-            )}
-            <div className={`relative z-10 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-background shadow-sm ${link.iconColor} border ${link.isPrimary ? 'border-amber-500/30' : 'border-border/50'} transition-transform duration-300 group-hover:scale-110`}>
-              <link.icon className="h-4 w-4" />
+            <div className={`relative z-10 flex size-9 shrink-0 items-center justify-center rounded-lg bg-slate-50 dark:bg-slate-800/80 ${link.iconColor} border border-slate-200/80 dark:border-slate-700 transition-transform duration-200 group-hover:scale-105`}>
+              <link.icon className="size-4" />
             </div>
             <div className="relative z-10 flex flex-1 items-center justify-between min-w-0">
               <div className="min-w-0">
-                <h4 className={`font-semibold text-sm truncate ${link.isPrimary ? 'bg-gradient-to-br from-amber-500 to-orange-400 bg-clip-text text-transparent group-hover:from-amber-400 group-hover:to-orange-300 transition-all' : 'text-foreground'}`}>
+                <h4 className="font-semibold text-xs sm:text-sm text-slate-900 dark:text-white truncate">
                   {link.title}
                 </h4>
                 {link.subtitle && (
-                  <p className="text-[11px] text-muted-foreground truncate mt-0.5">
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate mt-0.5">
                     {link.subtitle}
                   </p>
                 )}
               </div>
-              <ArrowUpRight className={`h-4 w-4 shrink-0 opacity-0 transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 ${link.isPrimary ? 'text-amber-500' : 'text-muted-foreground'}`} />
+              <ArrowUpRight className="size-3.5 shrink-0 text-slate-400 dark:text-slate-500 opacity-0 transition-all duration-200 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
             </div>
           </Link>
         ))}

@@ -17,7 +17,7 @@ export function BusinessSnapshot({ data }: { data: BusinessSnapshotData }) {
           <span className="text-sm font-medium">{title}</span>
         </div>
         {confidence < 0.5 ? (
-          <span className="text-xs px-2 py-1 rounded-full bg-orange-500/10 text-orange-400 border border-orange-500/20">Estimated</span>
+          <span className="text-xs px-2 py-1 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20">Estimated</span>
         ) : (
           <span className="text-xs px-2 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Confirmed</span>
         )}

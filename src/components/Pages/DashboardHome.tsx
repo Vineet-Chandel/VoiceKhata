@@ -237,7 +237,7 @@ export default function DashboardHome() {
     [transactions, budgets]
   )
 
-  const receivables = useMemo(() => {
+  const { receivables, payables } = useMemo(() => {
     const map = new Map<string, number>()
     transactions.forEach((t) => {
       const party = (t.transaction || "Customer").trim().toLowerCase()
@@ -245,11 +245,13 @@ export default function DashboardHome() {
       if (t.type === "Credit") map.set(party, current - Number(t.amount || 0))
       else map.set(party, current + Number(t.amount || 0))
     })
-    let total = 0
+    let rec = 0
+    let pay = 0
     for (const bal of map.values()) {
-      if (bal > 0) total += bal
+      if (bal > 0) rec += bal
+      else if (bal < 0) pay += Math.abs(bal)
     }
-    return total
+    return { receivables: rec, payables: pay }
   }, [transactions])
 
   // ── Notification firing — guarded to fire once per session ────────────────
@@ -356,7 +358,7 @@ export default function DashboardHome() {
 
   return (
     <div className="@container/main flex flex-1 flex-col gap-2">
-      <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
+      <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6 pb-28 md:pb-36">
         
         {/* Greeting Section */}
         <div className="px-4 lg:px-6">
@@ -366,35 +368,34 @@ export default function DashboardHome() {
         {/* Voice Capture Hero Banner */}
         <div className="px-4 lg:px-6">
           {showInlineVoice ? (
-            <div className="rounded-2xl border border-slate-700/60 bg-card p-4 shadow-xl shadow-slate-950/30">
+            <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-[#0B0F15] p-4 shadow-xl">
               <VoiceCaptureCard onBack={() => setShowInlineVoice(false)} showBackLink={true} />
             </div>
           ) : (
-            <div className="relative overflow-hidden rounded-2xl border border-blue-200/80 dark:border-slate-800 bg-gradient-to-r from-blue-50/70 via-indigo-50/40 to-card dark:from-slate-900/90 dark:via-slate-800/80 dark:to-slate-900/90 p-5 shadow-xs dark:shadow-lg dark:shadow-slate-950/20">
-              <div className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-blue-500/10 blur-3xl" />
-              <div className="pointer-events-none absolute -left-12 -bottom-12 h-36 w-36 rounded-full bg-indigo-500/10 blur-2xl" />
-
+            <div className="relative overflow-hidden rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-[#0B0F15] p-5 shadow-xs transition-colors">
               <div className="relative z-10 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                <div className="flex items-start gap-4">
-                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-blue-100 border border-blue-200 text-blue-600 shadow-xs dark:bg-blue-600/20 dark:border-blue-500/30 dark:text-blue-400 dark:shadow-inner">
-                    <Mic className="h-6 w-6 animate-pulse" />
+                <div className="flex items-start gap-3.5">
+                  <div className="relative flex size-12 shrink-0 items-center justify-center rounded-2xl bg-[#D2F832]/10 border border-[#D2F832]/30 text-slate-900 dark:text-[#D2F832]">
+                    <Mic className="size-6 animate-pulse text-[#D2F832]" />
+                    <span className="absolute -top-1 -right-1 size-2 rounded-full bg-[#D2F832]" />
                   </div>
-                  <div className="flex flex-col gap-1.5">
+                  <div className="flex flex-col gap-1">
                     <div className="flex items-center gap-2">
-                      <span className="text-[11px] font-bold uppercase tracking-wider text-blue-700 dark:text-blue-400 bg-blue-100/90 dark:bg-blue-500/10 px-2.5 py-0.5 rounded-full border border-blue-200/80 dark:border-blue-500/20">
-                        {t("home.addTransaction")}
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800/70 px-2.5 py-0.5 rounded-full border border-slate-200 dark:border-slate-700/60 flex items-center gap-1.5">
+                        <span className="size-1.5 rounded-full bg-[#D2F832]" />
+                        {t("home.addTransaction")} • Voice-First
                       </span>
                     </div>
-                    <h3 className="text-lg font-semibold text-slate-900 dark:text-foreground tracking-tight">
+                    <h3 className="text-base sm:text-lg font-bold text-[#0B0F15] dark:text-white tracking-tight">
                       {t("home.speakReviewSave")}
                     </h3>
-                    <p className="text-xs sm:text-sm text-slate-600 dark:text-muted-foreground leading-relaxed">
+                    <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed max-w-2xl">
                       Say what happened in Hindi, English, or Hinglish (e.g.{" "}
-                      <span className="inline-block font-medium text-blue-700 dark:text-blue-300 font-mono bg-blue-100/70 dark:bg-blue-950/40 px-1.5 py-0.5 rounded border border-blue-200/70 dark:border-blue-800/40">
+                      <span className="inline-block font-semibold text-slate-700 dark:text-slate-200 font-mono bg-slate-100 dark:bg-[#0E1320] px-2 py-0.5 rounded-md border border-slate-200 dark:border-slate-800">
                         {appMode === "BUSINESS" ? '"रमेश ने 500 रुपये जमा किए"' : '"Paid ₹450 for groceries"'}
                       </span>{" "}
                       or{" "}
-                      <span className="inline-block font-medium text-blue-700 dark:text-blue-300 font-mono bg-blue-100/70 dark:bg-blue-950/40 px-1.5 py-0.5 rounded border border-blue-200/70 dark:border-blue-800/40">
+                      <span className="inline-block font-semibold text-slate-700 dark:text-slate-200 font-mono bg-slate-100 dark:bg-[#0E1320] px-2 py-0.5 rounded-md border border-slate-200 dark:border-slate-800">
                         {appMode === "BUSINESS" ? '"Sharma ji ko ₹1,200 ka maal udhaar diya"' : '"Spent ₹350 on petrol"'}
                       </span>
                       ).
@@ -402,21 +403,21 @@ export default function DashboardHome() {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3 shrink-0">
-                    <button
-                      onClick={() => setShowInlineVoice(true)}
-                      className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-4 py-2.5 text-sm font-medium text-white shadow-md shadow-blue-600/20 hover:from-blue-700 hover:to-indigo-700 dark:shadow-blue-600/25 dark:hover:from-blue-500 dark:hover:to-indigo-500 transition-all active:scale-[0.98] cursor-pointer"
-                    >
-                      <Mic className="h-4 w-4" />
-                      {t("home.recordByVoice")}
-                    </button>
-                    <Link
-                      to="/dashboard/voice-capture"
-                      className="flex items-center gap-1.5 rounded-xl border border-blue-200 bg-white text-blue-700 hover:bg-blue-50 hover:text-blue-800 shadow-xs dark:border-blue-500/30 dark:bg-blue-500/10 dark:text-blue-200 dark:hover:bg-blue-500/20 dark:hover:text-white px-3.5 py-2.5 text-sm font-medium transition-all"
-                    >
-                      {t("home.fullView")}
-                      <ArrowRight className="h-3.5 w-3.5" />
-                    </Link>
+                <div className="flex items-center gap-2.5 shrink-0">
+                  <button
+                    onClick={() => setShowInlineVoice(true)}
+                    className="flex items-center gap-2 rounded-xl bg-[#D2F832] hover:bg-[#c3ea23] px-4 py-2.5 text-xs sm:text-sm font-semibold text-black shadow-md shadow-[#D2F832]/20 transition-all active:scale-[0.98] cursor-pointer"
+                  >
+                    <Mic className="size-4 text-black" />
+                    <span>{t("home.recordByVoice")}</span>
+                  </button>
+                  <Link
+                    to="/dashboard/voice-capture"
+                    className="flex items-center gap-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-[#0E1320] text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 px-3.5 py-2.5 text-xs sm:text-sm font-semibold transition-all"
+                  >
+                    <span>{t("home.fullView")}</span>
+                    <ArrowRight className="size-3.5" />
+                  </Link>
                 </div>
               </div>
             </div>
@@ -430,6 +431,7 @@ export default function DashboardHome() {
           savingsRate={metrics.savingsRate}
           appMode={appMode}
           receivables={receivables}
+          payables={payables}
         />
 
         {/* Carry-forward banner — new feature from Codex */}

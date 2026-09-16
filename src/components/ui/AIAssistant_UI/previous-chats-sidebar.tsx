@@ -155,12 +155,12 @@ export function PreviousChatsSidebar({
       />
 
       {/* Sidebar Panel Container */}
-      <aside className="fixed inset-y-0 left-0 z-50 md:static w-72 sm:w-80 shrink-0 flex flex-col h-full bg-[#080D1A] dark:bg-[#070B16] border-r border-[#1E2D4A]/80 shadow-2xl md:shadow-none transition-all duration-300">
+      <aside className="fixed inset-y-0 left-0 z-50 md:static w-72 sm:w-80 shrink-0 flex flex-col h-full bg-[#0B0F15] border-r border-slate-800 shadow-2xl md:shadow-none transition-all duration-300">
         
         {/* Top Header */}
-        <div className="p-4 border-b border-[#1E2D4A] flex items-center justify-between gap-2">
+        <div className="p-4 border-b border-slate-800 flex items-center justify-between gap-2">
           <div className="flex items-center gap-2">
-            <div className="size-8 rounded-xl bg-blue-600/15 border border-blue-500/30 flex items-center justify-center text-blue-400">
+            <div className="size-8 rounded-xl bg-[#D2F832]/10 border border-[#D2F832]/30 flex items-center justify-center text-[#D2F832]">
               <History size={16} />
             </div>
             <div>
@@ -191,7 +191,7 @@ export function PreviousChatsSidebar({
               onNewChat()
               if (window.innerWidth < 768) onClose()
             }}
-            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 active:scale-[0.98] text-white text-xs font-semibold shadow-lg shadow-blue-600/20 transition-all cursor-pointer"
+            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#D2F832] hover:bg-[#c3ea23] active:scale-[0.98] text-black text-xs font-bold shadow-md shadow-[#D2F832]/20 transition-all cursor-pointer"
           >
             <Plus size={15} />
             <span>{t("ai.newChat")}</span>
@@ -207,7 +207,7 @@ export function PreviousChatsSidebar({
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
               placeholder={t("ai.searchChats")}
-              className="w-full h-8 pl-8 pr-7 text-xs rounded-lg bg-[#0F172A] border border-[#1E2D4A] text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-blue-500 transition-colors"
+              className="w-full h-8 pl-8 pr-7 text-xs rounded-xl bg-[#0E1320] border border-slate-800 text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-[#D2F832]/50 transition-colors"
             />
             {searchQuery && (
               <button
@@ -260,13 +260,13 @@ export function PreviousChatsSidebar({
                         }}
                         className={`group relative flex items-start gap-2.5 p-2.5 rounded-xl text-left cursor-pointer transition-all ${
                           isActive
-                            ? "bg-blue-600/20 border border-blue-500/40 text-white shadow-sm"
+                            ? "bg-slate-800/80 border border-slate-700 text-white shadow-sm"
                             : "border border-transparent hover:bg-slate-800/40 hover:border-slate-700/50 text-slate-300"
                         }`}
                       >
                         <MessageSquare
                           size={15}
-                          className={`shrink-0 mt-0.5 ${isActive ? "text-blue-400" : "text-slate-500 group-hover:text-slate-400"}`}
+                          className={`shrink-0 mt-0.5 ${isActive ? "text-[#D2F832]" : "text-slate-500 group-hover:text-slate-400"}`}
                         />
 
                         <div className="flex-1 min-w-0 pr-12">
@@ -281,11 +281,11 @@ export function PreviousChatsSidebar({
                                 type="text"
                                 value={editTitle}
                                 onChange={e => setEditTitle(e.target.value)}
-                                className="w-full text-xs bg-slate-900 border border-blue-500 rounded px-1.5 py-0.5 text-white focus:outline-none"
+                                className="w-full text-xs bg-slate-900 border border-[#D2F832]/50 rounded px-1.5 py-0.5 text-white focus:outline-none"
                               />
                               <button
                                 type="submit"
-                                className="size-5 rounded bg-blue-600 text-white flex items-center justify-center hover:bg-blue-500"
+                                className="size-5 rounded bg-[#D2F832] text-black flex items-center justify-center hover:bg-[#c3ea23]"
                               >
                                 <Check size={11} />
                               </button>

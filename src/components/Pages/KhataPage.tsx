@@ -196,7 +196,7 @@ export default function KhataPage() {
   }
 
   return (
-    <div className="@container/main flex flex-1 flex-col gap-6 py-6 px-4 lg:px-8 bg-[#0B0F19] text-[#F8FAFC]">
+    <div className="@container/main flex flex-1 flex-col gap-6 py-4 px-4 lg:px-8 bg-background text-foreground transition-colors">
       {/* ── DETAIL VIEW ────────────────────────────────────────────────────────── */}
       {selectedCustomer ? (
         <div className="max-w-4xl mx-auto w-full space-y-6">
@@ -204,7 +204,7 @@ export default function KhataPage() {
           <div className="flex items-center justify-between">
             <button
               onClick={() => setSelectedCustomerId(null)}
-              className="flex items-center gap-2 text-xs font-semibold text-[#94A3B8] hover:text-[#F8FAFC] bg-[#131B2E] border border-slate-700/40 px-3.5 py-2 rounded-[8px] transition-all cursor-pointer"
+              className="flex items-center gap-2 text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white bg-slate-100 dark:bg-[#0E1320] border border-slate-200 dark:border-slate-800 px-3.5 py-2 rounded-xl transition-all cursor-pointer"
             >
               <ArrowLeft size={16} />
               <span>{t("khata.backToKhata")}</span>
@@ -214,7 +214,7 @@ export default function KhataPage() {
                 href={`https://wa.me/91${selectedCustomer.phone.replace(/\s+/g, "")}?text=Namaste%20${encodeURIComponent(selectedCustomer.name)},%20aapka%20VoiceKhata%20par%20balance%20Rs.%20${Math.abs(selectedCustomer.balance)}%20hai.`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-1.5 text-xs font-semibold text-[#10B981] bg-[#064E3B]/30 border border-[#10B981]/30 px-3 py-2 rounded-[8px] hover:bg-[#064E3B]/50 transition-all"
+                className="flex items-center gap-1.5 text-xs font-semibold text-emerald-700 dark:text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-3.5 py-2 rounded-full hover:bg-emerald-500/20 transition-all shadow-2xs"
               >
                 <MessageSquare size={14} />
                 <span>{t("khata.whatsappReminder")}</span>
@@ -223,130 +223,126 @@ export default function KhataPage() {
           </div>
 
           {/* Customer Balance Banner */}
-          <div className="rounded-[12px] border border-slate-700/40 bg-[#131B2E] p-6 shadow-xs">
+          <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-[#0B0F15] p-6 shadow-xs">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
                 <div className="flex items-center gap-2.5">
-                  <h2 className="text-xl font-bold text-[#F8FAFC]">{selectedCustomer.name}</h2>
-                  <span className={`text-[10px] font-semibold uppercase tracking-wider px-2.5 py-0.5 rounded-full ${
-                    selectedCustomer.type === "customer" ? "bg-blue-600/20 text-blue-400 border border-blue-500/30" : "bg-[#0E1322] text-[#94A3B8]"
+                  <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">{selectedCustomer.name}</h2>
+                  <span className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full ${
+                    selectedCustomer.type === "customer" ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20" : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300"
                   }`}>
                     {selectedCustomer.type === "customer" ? t("khata.customer") : t("khata.supplier")}
                   </span>
                 </div>
-                <p className="text-xs text-[#94A3B8] mt-1 flex items-center gap-1.5">
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-1.5">
                   <Phone size={12} />
                   <span>+91 {selectedCustomer.phone}</span>
                 </p>
               </div>
 
               <div className="text-left sm:text-right">
-                <p className="text-xs font-semibold tracking-wider uppercase text-[#64748B]">
+                <p className="text-xs font-bold tracking-wider uppercase text-slate-500 dark:text-slate-400">
                   {selectedCustomer.balance >= 0 ? t("khata.youWillReceive") : t("khata.youWillPay")}
                 </p>
                 <div className="flex items-center sm:justify-end gap-1.5 mt-0.5">
                   {selectedCustomer.balance >= 0 ? (
-                    <ArrowDownRight size={26} className="text-[#10B981]" />
+                    <ArrowDownRight size={26} className="text-emerald-500" />
                   ) : (
-                    <ArrowUpRight size={26} className="text-[#EF4444]" />
+                    <ArrowUpRight size={26} className="text-rose-500" />
                   )}
-                  <p className={`text-3xl font-extrabold tabular-nums ${
-                    selectedCustomer.balance >= 0 ? "text-[#10B981]" : "text-[#EF4444]"
+                  <p className={`text-3xl sm:text-4xl font-black tabular-nums ${
+                    selectedCustomer.balance >= 0 ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"
                   }`}>
                     ₹{Math.abs(selectedCustomer.balance).toLocaleString("en-IN")}
                   </p>
                 </div>
                 {selectedCustomer.overdue && (
-                  <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#F59E0B] bg-[#451A03]/30 border border-[#F59E0B]/30 px-2 py-0.5 rounded-full mt-1">
-                    <AlertTriangle size={11} /> {t("khata.overdue")}
+                  <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-600 dark:text-amber-400 bg-amber-500/10 border border-amber-500/30 px-2 py-0.5 rounded-full mt-1">
+                    <AlertTriangle size={12} />
+                    <span>{t("khata.overdueNotice")}</span>
                   </span>
                 )}
               </div>
             </div>
 
-            {/* Quick action buttons */}
-            <div className="flex flex-wrap items-center gap-3 pt-5 mt-5 border-t border-slate-700/40">
+            {/* Quick Action Trays */}
+            <div className="grid grid-cols-2 gap-3 mt-6 pt-6 border-t border-slate-100 dark:border-slate-800/80">
               <button
-                onClick={() => setShowVoiceInCustomer(!showVoiceInCustomer)}
-                className="flex items-center gap-2 h-9 px-4 rounded-[8px] bg-[#2563EB] hover:bg-[#4F46E5] text-white text-xs font-semibold shadow-xs transition-all cursor-pointer"
+                onClick={() => {
+                  setEntryType("Credit")
+                  setShowAddEntry(true)
+                }}
+                className="flex items-center justify-center gap-2 py-2.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20 font-bold text-xs transition-all cursor-pointer"
               >
-                <Mic size={14} />
-                <span>{t("khata.recordByVoice")}</span>
+                <Check size={14} />
+                <span>+ ₹ {t("khata.recordPayment")} (Got Money)</span>
               </button>
               <button
-                onClick={() => setShowAddEntry(true)}
-                className="flex items-center gap-1.5 h-9 px-4 rounded-[8px] border border-slate-700/40 bg-[#0E1322] hover:bg-[#131B2E] text-xs font-semibold text-[#F8FAFC] shadow-xs transition-all cursor-pointer"
+                onClick={() => {
+                  setEntryType("Debit")
+                  setShowAddEntry(true)
+                }}
+                className="flex items-center justify-center gap-2 py-2.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-700 dark:text-rose-400 border border-rose-500/20 font-bold text-xs transition-all cursor-pointer"
               >
-                <Plus size={14} />
-                <span>{t("khata.addEntryManually")}</span>
+                <ArrowUpRight size={14} />
+                <span>- ₹ {t("khata.giveCredit")} (Gave Udhaar)</span>
               </button>
             </div>
-
-            {/* In-ledger Voice Action Banner */}
-            {showVoiceInCustomer && (
-              <div className="mt-4 pt-4 border-t border-slate-700/40">
-                <VoiceActionBanner
-                  onAddTransaction={addTransaction}
-                  onDeleteTransaction={deleteTransaction}
-                  existingCustomers={customerList.map((c) => c.name)}
-                />
-              </div>
-            )}
           </div>
 
-          {/* Chronological Ledger */}
-          <div className="rounded-[12px] border border-slate-700/40 bg-[#131B2E] p-6 shadow-xs space-y-4">
-            <div className="flex items-center justify-between">
+          {/* Customer Ledger History */}
+          <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-[#0B0F15] p-5 shadow-xs">
+            <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800/80">
               <div>
-                <h3 className="text-base font-semibold text-[#F8FAFC]">{t("khata.ledger")}</h3>
-                <p className="text-xs text-[#64748B] mt-0.5">
+                <h3 className="text-base font-bold text-slate-900 dark:text-white">{t("khata.ledger")}</h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                   {t("khata.ledgerDesc")}
                 </p>
               </div>
-              <span className="text-xs font-medium text-[#94A3B8]">
-                {selectedCustomer.transactions.length}
+              <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
+                {selectedCustomer.transactions.length} entries
               </span>
             </div>
 
             {selectedCustomer.transactions.length === 0 ? (
-              <div className="py-12 text-center text-xs text-[#7C889A] space-y-3">
-                <FileText size={32} className="mx-auto text-[#7C889A]/40" />
-                <p className="text-sm font-medium text-[#526078]">{t("khata.noTx")}</p>
+              <div className="py-12 text-center text-xs text-slate-500 dark:text-slate-400 space-y-3">
+                <FileText size={32} className="mx-auto text-slate-300 dark:text-slate-600" />
+                <p className="text-sm font-semibold text-slate-700 dark:text-slate-300">{t("khata.noTx")}</p>
                 <p className="max-w-xs mx-auto text-xs">
                   {t("khata.noTxDesc")}
                 </p>
               </div>
             ) : (
-              <div className="divide-y divide-[#E1E6ED]">
+              <div className="divide-y divide-slate-100 dark:divide-slate-800/80">
                 {selectedCustomer.transactions.map((tx) => (
                   <div key={tx.id} className="py-3.5 flex items-center justify-between gap-4">
                     <div className="flex items-center gap-3">
-                      <div className={`flex items-center justify-center size-9 rounded-[8px] ${
-                        tx.type === "Credit" ? "bg-[#E8F6F1] text-[#16856A]" : "bg-[#FDECEE] text-[#C2414B]"
+                      <div className={`flex items-center justify-center size-9 rounded-xl ${
+                        tx.type === "Credit" ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400" : "bg-rose-500/10 text-rose-600 dark:text-rose-400"
                       }`}>
                         {tx.type === "Credit" ? <ArrowDownRight size={18} /> : <ArrowUpRight size={18} />}
                       </div>
                       <div>
-                        <p className="text-xs font-semibold text-[#172033]">
+                        <p className="text-xs font-bold text-slate-900 dark:text-white">
                           {tx.type === "Credit" ? t("khata.receivedPayment") : t("khata.gaveCredit")}
                         </p>
-                        <div className="flex items-center gap-2 text-[11px] text-[#7C889A] mt-0.5">
+                        <div className="flex items-center gap-2 text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
                           <span>{tx.date || t("khata.today")}</span>
                           <span>•</span>
                           <span>{tx.method || "UPI"}</span>
                           <span>•</span>
-                          <span className="text-[#16856A] font-medium">{t("khata.completed")}</span>
+                          <span className="text-emerald-600 dark:text-emerald-400 font-medium">{t("khata.completed")}</span>
                         </div>
                       </div>
                     </div>
 
                     <div className="text-right">
-                      <p className={`text-sm font-bold tabular-nums ${
-                        tx.type === "Credit" ? "text-[#16856A]" : "text-[#C2414B]"
+                      <p className={`text-sm font-black tabular-nums ${
+                        tx.type === "Credit" ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"
                       }`}>
                         {tx.type === "Credit" ? "+" : "-"}₹{Number(tx.amount || 0).toLocaleString("en-IN")}
                       </p>
-                      <p className="text-[10px] text-[#7C889A]">
+                      <p className="text-[10px] text-slate-400">
                         {tx.type === "Credit" ? t("khata.moneyReceived") : t("khata.moneyGiven")}
                       </p>
                     </div>
@@ -362,15 +358,18 @@ export default function KhataPage() {
           {/* Header */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <h1 className="text-2xl font-bold tracking-tight text-[#F8FAFC]">{t("khata.title")}</h1>
-              <p className="text-xs sm:text-sm text-[#94A3B8] mt-0.5">
+              <div className="flex items-center gap-2">
+                <span className="size-2 rounded-full bg-[#D2F832]" />
+                <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">{t("khata.title")}</h1>
+              </div>
+              <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">
                 {t("khata.subtitle")}
               </p>
             </div>
 
             <button
               onClick={() => setShowAddCustomer(true)}
-              className="flex items-center justify-center gap-2 h-10 px-4 rounded-[8px] bg-[#2563EB] hover:bg-[#4F5B93] active:scale-[0.98] text-white text-xs font-semibold shadow-xs transition-all cursor-pointer self-start sm:self-auto"
+              className="flex items-center justify-center gap-2 h-10 px-5 rounded-full bg-[#0B0F15] dark:bg-white hover:bg-black dark:hover:bg-slate-100 active:scale-[0.98] text-white dark:text-[#0B0F15] text-xs font-semibold shadow-xs transition-all cursor-pointer self-start sm:self-auto"
             >
               <Plus size={16} />
               <span>{t("khata.addParty")}</span>
@@ -379,93 +378,92 @@ export default function KhataPage() {
 
           {/* Top Summary Banner */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="rounded-[10px] border border-slate-700/40 bg-[#131B2E] p-5 shadow-xs">
-              <p className="text-xs font-medium text-[#94A3B8]">{t("khata.totalToReceive")}</p>
+            <div className="rounded-2xl border border-emerald-500/30 bg-white dark:bg-[#0B0F15] p-5 shadow-xs">
+              <p className="text-xs font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-400">{t("khata.totalToReceive")}</p>
               <div className="flex items-center gap-1.5 mt-1">
-                <ArrowDownRight size={22} className="text-[#34D399]" />
-                <p className="text-2xl font-bold text-[#34D399] tabular-nums">
+                <ArrowDownRight size={22} className="text-emerald-500" />
+                <p className="text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400 tabular-nums">
                   ₹{totalToReceive.toLocaleString("en-IN")}
                 </p>
               </div>
-              <p className="text-[11px] text-[#64748B] mt-1.5">
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1.5">
                 {customerList.filter((c) => c.balance > 0).length} {t("khata.fromCustomers")}
               </p>
             </div>
 
-            <div className="rounded-[10px] border border-slate-700/40 bg-[#131B2E] p-5 shadow-xs">
-              <p className="text-xs font-medium text-[#94A3B8]">{t("khata.totalToPay")}</p>
+            <div className="rounded-2xl border border-rose-500/30 bg-white dark:bg-[#0B0F15] p-5 shadow-xs">
+              <p className="text-xs font-bold uppercase tracking-wider text-rose-700 dark:text-rose-400">{t("khata.totalToPay")}</p>
               <div className="flex items-center gap-1.5 mt-1">
-                <ArrowUpRight size={22} className="text-[#F87171]" />
-                <p className="text-2xl font-bold text-[#F87171] tabular-nums">
+                <ArrowUpRight size={22} className="text-rose-500" />
+                <p className="text-2xl sm:text-3xl font-black text-rose-600 dark:text-rose-400 tabular-nums">
                   ₹{totalToPay.toLocaleString("en-IN")}
                 </p>
               </div>
-              <p className="text-[11px] text-[#64748B] mt-1.5">
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1.5">
                 {t("khata.toSuppliers")}
               </p>
             </div>
 
-            <div className="rounded-[10px] border border-slate-700/40 bg-[#131B2E] p-5 shadow-xs">
-              <p className="text-xs font-medium text-[#94A3B8]">{t("khata.overdue")}</p>
+            <div className="rounded-2xl border border-amber-500/30 bg-white dark:bg-[#0B0F15] p-5 shadow-xs">
+              <p className="text-xs font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400">{t("khata.overdue")}</p>
               <div className="flex items-center gap-1.5 mt-1">
-                <AlertTriangle size={20} className="text-[#FBBF24]" />
-                <p className="text-2xl font-bold text-[#FBBF24] tabular-nums">
+                <AlertTriangle size={20} className="text-amber-500" />
+                <p className="text-2xl sm:text-3xl font-black text-amber-600 dark:text-amber-400 tabular-nums">
                   ₹{overdueAmount.toLocaleString("en-IN")}
                 </p>
               </div>
-              <p className="text-[11px] text-[#64748B] mt-1.5">
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1.5">
                 {t("khata.followUp")}
               </p>
             </div>
           </div>
 
           {/* Controls: Search + Filter Tabs */}
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 bg-[#131B2E] p-3 rounded-[10px] border border-slate-700/40">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 bg-white dark:bg-[#0B0F15] p-3 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-2xs">
             <div className="relative w-full sm:w-80">
-              <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#64748B]" />
+              <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder={t("khata.searchPlaceholder")}
-                className="w-full h-9 pl-9 pr-3 text-xs rounded-[8px] border border-slate-700/40 bg-[#0B0F19] text-[#F8FAFC] placeholder-[#64748B] focus:outline-none focus:border-blue-500"
+                className="w-full h-9 pl-9 pr-3 text-xs rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-[#0E1320] text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:border-slate-400 dark:focus:border-slate-600 transition-colors"
               />
             </div>
 
             <div className="flex items-center gap-1.5 w-full sm:w-auto">
               <button
                 onClick={() => setFilterType("all")}
-                className={`px-3 py-1.5 rounded-[6px] text-xs font-medium transition-all cursor-pointer ${
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
                   filterType === "all"
-                    ? "bg-[#2563EB] text-white"
-                    : "text-[#94A3B8] hover:bg-[#0E1322]"
+                    ? "bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-2xs"
+                    : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/60"
                 }`}
               >
                 {t("khata.all")} ({customerList.length})
               </button>
               <button
                 onClick={() => setFilterType("customer")}
-                className={`px-3 py-1.5 rounded-[6px] text-xs font-medium transition-all cursor-pointer ${
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
                   filterType === "customer"
-                    ? "bg-[#2563EB] text-white"
-                    : "text-[#94A3B8] hover:bg-[#0E1322]"
+                    ? "bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-2xs"
+                    : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/60"
                 }`}
               >
                 {t("khata.customers")}
               </button>
               <button
                 onClick={() => setFilterType("supplier")}
-                className={`px-3 py-1.5 rounded-[6px] text-xs font-medium transition-all cursor-pointer ${
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
                   filterType === "supplier"
-                    ? "bg-[#2563EB] text-white"
-                    : "text-[#94A3B8] hover:bg-[#0E1322]"
+                    ? "bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-2xs"
+                    : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/60"
                 }`}
               >
                 {t("khata.suppliers")}
               </button>
             </div>
           </div>
-
 
           {/* Swipe Toast Feedback */}
           <AnimatePresence>
@@ -474,40 +472,25 @@ export default function KhataPage() {
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
-                className="p-3 rounded-[8px] bg-[#064E3B] border border-[#10B981] text-xs font-semibold text-[#34D399] flex items-center justify-between shadow-lg"
+                className="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/80 border border-emerald-500/30 text-xs font-semibold text-emerald-700 dark:text-emerald-300 flex items-center justify-between shadow-lg"
               >
                 <span>{swipeToast}</span>
-                <button onClick={() => setSwipeToast(null)} className="text-[#34D399] hover:text-white cursor-pointer">✕</button>
+                <button onClick={() => setSwipeToast(null)} className="text-emerald-700 dark:text-emerald-300 hover:opacity-80 cursor-pointer">✕</button>
               </motion.div>
             )}
           </AnimatePresence>
 
-          {/* Customer Rows List with Tactile Swipe Gestures */}
-          <div className="rounded-[10px] border border-slate-700/40 bg-[#131B2E] divide-y divide-slate-700/40 overflow-hidden shadow-xs">
+          {/* Customer Rows List */}
+          <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-[#0B0F15] divide-y divide-slate-100 dark:divide-slate-800/80 overflow-hidden shadow-2xs">
             {filteredCustomers.length === 0 ? (
-              <div className="py-16 text-center text-xs text-[#64748B] space-y-2">
-                <Users size={32} className="mx-auto text-[#64748B]/40" />
-                <p className="text-sm font-semibold text-[#F8FAFC]">{t("khata.noCustomersFound")}</p>
+              <div className="py-16 text-center text-xs text-slate-500 dark:text-slate-400 space-y-2">
+                <Users size={32} className="mx-auto text-slate-300 dark:text-slate-600" />
+                <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">{t("khata.noCustomersFound")}</p>
                 <p>{t("khata.trySearchingAgain")}</p>
               </div>
             ) : (
               filteredCustomers.map((cust) => (
                 <div key={cust.id} className="relative overflow-hidden group">
-                  {/* Background Action Trays (revealed upon horizontal drag) */}
-                  <div className="absolute inset-0 flex items-center justify-between px-6 pointer-events-none select-none z-0">
-                    {/* Left Action (Swipe Right) */}
-                    <div className="flex items-center gap-2 text-xs font-bold text-[#34D399] bg-[#064E3B] px-3 py-1.5 rounded-full border border-[#10B981]">
-                      <Check size={14} />
-                      <span>{t("khata.recordPayment")}</span>
-                    </div>
-
-                    {/* Right Action (Swipe Left) */}
-                    <div className="flex items-center gap-2 text-xs font-bold text-[#60A5FA] bg-[#0E1322] px-3 py-1.5 rounded-full border border-blue-500">
-                      <span>{t("khata.whatsappReminder")}</span>
-                      <MessageSquare size={14} />
-                    </div>
-                  </div>
-
                   {/* Foreground Draggable Row */}
                   <motion.div
                     drag="x"
@@ -528,22 +511,22 @@ export default function KhataPage() {
                       }
                     }}
                     onClick={() => setSelectedCustomerId(cust.id)}
-                    className="relative z-10 p-4 bg-[#131B2E] hover:bg-[#0E1322] transition-colors flex items-center justify-between gap-4 cursor-grab active:cursor-grabbing"
+                    className="relative z-10 p-4 bg-white dark:bg-[#0B0F15] hover:bg-slate-50/80 dark:hover:bg-[#0E1320] transition-colors flex items-center justify-between gap-4 cursor-grab active:cursor-grabbing"
                   >
                     <div className="flex items-center gap-3.5 min-w-0">
-                      <div className="flex items-center justify-center size-10 rounded-full bg-blue-600/20 text-blue-400 border border-blue-500/30 font-bold text-sm shrink-0">
+                      <div className="flex items-center justify-center size-10 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white border border-slate-200 dark:border-slate-700 font-bold text-sm shrink-0">
                         {cust.name.charAt(0)}
                       </div>
                       <div className="min-w-0">
                         <div className="flex items-center gap-2">
-                          <h3 className="text-sm font-semibold text-[#F8FAFC] truncate">{cust.name}</h3>
-                          <span className={`text-[10px] font-semibold uppercase px-2 py-0.5 rounded-full ${
-                            cust.type === "customer" ? "bg-blue-600/20 text-blue-400 border border-blue-500/30" : "bg-[#0E1322] text-[#94A3B8]"
+                          <h3 className="text-sm font-semibold text-slate-900 dark:text-white truncate">{cust.name}</h3>
+                          <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${
+                            cust.type === "customer" ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20" : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300"
                           }`}>
                             {cust.type === "customer" ? t("khata.customer") : t("khata.supplier")}
                           </span>
                         </div>
-                        <p className="text-xs text-[#64748B] mt-0.5">
+                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                           {cust.phone} • {t("khata.lastActivity")}: {cust.lastActivity}
                         </p>
                       </div>
@@ -554,21 +537,21 @@ export default function KhataPage() {
                         <div className="flex items-center justify-end gap-1 font-bold text-sm tabular-nums">
                           {cust.balance >= 0 ? (
                             <>
-                              <span className="text-[#34D399]">↑</span>
-                              <span className="text-[#34D399]">₹{Math.abs(cust.balance).toLocaleString("en-IN")}</span>
+                              <span className="text-emerald-500">↑</span>
+                              <span className="text-emerald-600 dark:text-emerald-400">₹{Math.abs(cust.balance).toLocaleString("en-IN")}</span>
                             </>
                           ) : (
                             <>
-                              <span className="text-[#F87171]">↓</span>
-                              <span className="text-[#F87171]">₹{Math.abs(cust.balance).toLocaleString("en-IN")}</span>
+                              <span className="text-rose-500">↓</span>
+                              <span className="text-rose-600 dark:text-rose-400">₹{Math.abs(cust.balance).toLocaleString("en-IN")}</span>
                             </>
                           )}
                         </div>
-                        <p className="text-[11px] text-[#64748B]">
+                        <p className="text-[11px] text-slate-400">
                           {cust.balance >= 0 ? t("khata.youWillReceive") : t("khata.youWillPay")}
                         </p>
                       </div>
-                      <ChevronRight size={16} className="text-[#64748B]" />
+                      <ChevronRight size={16} className="text-slate-400" />
                     </div>
                   </motion.div>
                 </div>
@@ -580,68 +563,68 @@ export default function KhataPage() {
 
       {/* ── MODAL: ADD CUSTOMER ────────────────────────────────────────────────── */}
       {showAddCustomer && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-xs p-4">
-          <div className="bg-[#131B2E] rounded-[12px] border border-slate-700/40 max-w-md w-full p-6 space-y-4 shadow-2xl">
-            <h3 className="text-base font-bold text-[#F8FAFC]">{t("khata.addCustomerOrSupplier")}</h3>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4">
+          <div className="bg-white dark:bg-[#0B0F15] rounded-2xl border border-slate-200 dark:border-slate-800 max-w-md w-full p-6 space-y-4 shadow-2xl">
+            <h3 className="text-base font-bold text-slate-900 dark:text-white">{t("khata.addCustomerOrSupplier")}</h3>
             <form onSubmit={handleCreateCustomer} className="space-y-3.5">
               <div>
-                <label className="text-xs font-medium text-[#94A3B8] block mb-1">{t("khata.fullName")}</label>
+                <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 block mb-1">{t("khata.fullName")}</label>
                 <input
                   type="text"
                   required
                   value={newCustName}
                   onChange={(e) => setNewCustName(e.target.value)}
                   placeholder="e.g. Ramesh Kumar"
-                  className="w-full h-9 px-3 text-xs rounded-[8px] border border-slate-700/40 bg-[#0B0F19] text-[#F8FAFC] placeholder-[#64748B] focus:outline-none focus:border-blue-500"
+                  className="w-full h-10 px-3 text-xs rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-[#0E1320] text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:border-slate-400"
                 />
               </div>
 
               <div>
-                <label className="text-xs font-medium text-[#94A3B8] block mb-1">{t("khata.phone")}</label>
+                <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 block mb-1">{t("khata.phone")}</label>
                 <input
                   type="tel"
                   value={newCustPhone}
                   onChange={(e) => setNewCustPhone(e.target.value)}
                   placeholder="98765 43210"
-                  className="w-full h-9 px-3 text-xs rounded-[8px] border border-slate-700/40 bg-[#0B0F19] text-[#F8FAFC] placeholder-[#64748B] focus:outline-none focus:border-blue-500"
+                  className="w-full h-10 px-3 text-xs rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-[#0E1320] text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:border-slate-400"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs font-medium text-[#94A3B8] block mb-1">{t("khata.partyType")}</label>
+                  <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 block mb-1">{t("khata.partyType")}</label>
                   <select
                     value={newCustType}
                     onChange={(e) => setNewCustType(e.target.value as any)}
-                    className="w-full h-9 px-2 text-xs rounded-[8px] border border-slate-700/40 bg-[#0B0F19] text-[#F8FAFC] focus:outline-none focus:border-blue-500"
+                    className="w-full h-10 px-2 text-xs rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-[#0E1320] text-slate-900 dark:text-white focus:outline-none"
                   >
-                    <option value="customer" className="bg-[#131B2E] text-[#F8FAFC]">{t("khata.customer")}</option>
-                    <option value="supplier" className="bg-[#131B2E] text-[#F8FAFC]">{t("khata.supplier")}</option>
+                    <option value="customer">{t("khata.customer")}</option>
+                    <option value="supplier">{t("khata.supplier")}</option>
                   </select>
                 </div>
                 <div>
-                  <label className="text-xs font-medium text-[#94A3B8] block mb-1">{t("khata.openingBalance")}</label>
+                  <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 block mb-1">{t("khata.openingBalance")}</label>
                   <input
                     type="number"
                     value={newCustBalance}
                     onChange={(e) => setNewCustBalance(e.target.value)}
                     placeholder="0"
-                    className="w-full h-9 px-3 text-xs rounded-[8px] border border-slate-700/40 bg-[#0B0F19] text-[#F8FAFC] placeholder-[#64748B] focus:outline-none focus:border-blue-500"
+                    className="w-full h-10 px-3 text-xs rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-[#0E1320] text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:border-slate-400"
                   />
                 </div>
               </div>
 
-              <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-700/40">
+              <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100 dark:border-slate-800">
                 <button
                   type="button"
                   onClick={() => setShowAddCustomer(false)}
-                  className="h-9 px-4 rounded-[8px] border border-slate-700/40 text-xs font-medium text-[#94A3B8] hover:bg-[#0E1322] cursor-pointer"
+                  className="h-9 px-4 rounded-xl border border-slate-200 dark:border-slate-800 text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
                 >
                   {t("common.cancel")}
                 </button>
                 <button
                   type="submit"
-                  className="h-9 px-5 rounded-[8px] bg-[#2563EB] hover:bg-[#4F5B93] text-white text-xs font-semibold cursor-pointer shadow-xs"
+                  className="h-9 px-5 rounded-xl bg-[#0B0F15] dark:bg-white hover:bg-black dark:hover:bg-slate-100 text-white dark:text-[#0B0F15] text-xs font-semibold cursor-pointer shadow-xs"
                 >
                   {t("khata.saveCustomer")}
                 </button>
@@ -653,22 +636,22 @@ export default function KhataPage() {
 
       {/* ── MODAL: MANUAL ENTRY FOR CUSTOMER ───────────────────────────────────── */}
       {showAddEntry && selectedCustomer && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-xs p-4">
-          <div className="bg-[#131B2E] rounded-[12px] border border-slate-700/40 max-w-md w-full p-6 space-y-4 shadow-2xl">
-            <h3 className="text-base font-bold text-[#F8FAFC]">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4">
+          <div className="bg-white dark:bg-[#0B0F15] rounded-2xl border border-slate-200 dark:border-slate-800 max-w-md w-full p-6 space-y-4 shadow-2xl">
+            <h3 className="text-base font-bold text-slate-900 dark:text-white">
               {selectedCustomer.name} {t("khata.addEntryFor")}
             </h3>
             <form onSubmit={handleAddCustomerEntry} className="space-y-3.5">
               <div>
-                <label className="text-xs font-medium text-[#94A3B8] block mb-1">{t("khata.txType")}</label>
+                <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 block mb-1">{t("khata.txType")}</label>
                 <div className="grid grid-cols-2 gap-2">
                   <button
                     type="button"
                     onClick={() => setEntryType("Credit")}
-                    className={`h-9 rounded-[8px] text-xs font-semibold flex items-center justify-center gap-1.5 border transition-all cursor-pointer ${
+                    className={`h-10 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 border transition-all cursor-pointer ${
                       entryType === "Credit"
-                        ? "bg-[#064E3B]/40 border-[#10B981] text-[#34D399]"
-                        : "border-slate-700/40 bg-[#0B0F19] text-[#94A3B8] hover:bg-[#0E1322]"
+                        ? "bg-emerald-500/15 border-emerald-500 text-emerald-700 dark:text-emerald-300"
+                        : "border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-[#0E1320] text-slate-600 dark:text-slate-400"
                     }`}
                   >
                     <ArrowDownRight size={14} />
@@ -677,10 +660,10 @@ export default function KhataPage() {
                   <button
                     type="button"
                     onClick={() => setEntryType("Debit")}
-                    className={`h-9 rounded-[8px] text-xs font-semibold flex items-center justify-center gap-1.5 border transition-all cursor-pointer ${
+                    className={`h-10 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 border transition-all cursor-pointer ${
                       entryType === "Debit"
-                        ? "bg-[#7F1D1D]/40 border-[#EF4444] text-[#F87171]"
-                        : "border-slate-700/40 bg-[#0B0F19] text-[#94A3B8] hover:bg-[#0E1322]"
+                        ? "bg-rose-500/15 border-rose-500 text-rose-700 dark:text-rose-300"
+                        : "border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-[#0E1320] text-slate-600 dark:text-slate-400"
                     }`}
                   >
                     <ArrowUpRight size={14} />
@@ -690,42 +673,42 @@ export default function KhataPage() {
               </div>
 
               <div>
-                <label className="text-xs font-medium text-[#94A3B8] block mb-1">{t("voice.amount")}</label>
+                <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 block mb-1">{t("voice.amount")}</label>
                 <input
                   type="number"
                   required
                   value={entryAmount}
                   onChange={(e) => setEntryAmount(e.target.value)}
                   placeholder="e.g. 1200"
-                  className="w-full h-9 px-3 text-xs rounded-[8px] border border-slate-700/40 bg-[#0B0F19] text-[#F8FAFC] placeholder-[#64748B] font-bold focus:outline-none focus:border-blue-500"
+                  className="w-full h-10 px-3 text-xs rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-[#0E1320] text-slate-900 dark:text-white placeholder:text-slate-400 font-bold focus:outline-none focus:border-slate-400"
                 />
               </div>
 
               <div>
-                <label className="text-xs font-medium text-[#94A3B8] block mb-1">{t("voice.paymentMethod")}</label>
+                <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 block mb-1">{t("voice.paymentMethod")}</label>
                 <select
                   value={entryMethod}
                   onChange={(e) => setEntryMethod(e.target.value)}
-                  className="w-full h-9 px-2 text-xs rounded-[8px] border border-slate-700/40 bg-[#0B0F19] text-[#F8FAFC] focus:outline-none focus:border-blue-500"
+                  className="w-full h-10 px-2 text-xs rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-[#0E1320] text-slate-900 dark:text-white focus:outline-none"
                 >
-                  <option value="UPI" className="bg-[#131B2E] text-[#F8FAFC]">UPI</option>
-                  <option value="Cash" className="bg-[#131B2E] text-[#F8FAFC]">Cash</option>
-                  <option value="Bank Transfer" className="bg-[#131B2E] text-[#F8FAFC]">Bank Transfer</option>
-                  <option value="Credit" className="bg-[#131B2E] text-[#F8FAFC]">Khata Credit</option>
+                  <option value="UPI">UPI</option>
+                  <option value="Cash">Cash</option>
+                  <option value="Bank Transfer">Bank Transfer</option>
+                  <option value="Credit">Khata Credit</option>
                 </select>
               </div>
 
-              <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-700/40">
+              <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100 dark:border-slate-800">
                 <button
                   type="button"
                   onClick={() => setShowAddEntry(false)}
-                  className="h-9 px-4 rounded-[8px] border border-slate-700/40 text-xs font-medium text-[#94A3B8] hover:bg-[#0E1322] cursor-pointer"
+                  className="h-9 px-4 rounded-xl border border-slate-200 dark:border-slate-800 text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
                 >
                   {t("common.cancel")}
                 </button>
                 <button
                   type="submit"
-                  className="h-9 px-5 rounded-[8px] bg-[#2563EB] hover:bg-[#4F5B93] text-white text-xs font-semibold cursor-pointer shadow-xs"
+                  className="h-9 px-5 rounded-xl bg-[#0B0F15] dark:bg-white hover:bg-black dark:hover:bg-slate-100 text-white dark:text-[#0B0F15] text-xs font-semibold cursor-pointer shadow-xs"
                 >
                   {t("khata.saveToKhata")}
                 </button>

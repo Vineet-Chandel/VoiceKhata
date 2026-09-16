@@ -70,17 +70,17 @@
 }
 
 :root {
-    /* VoiceKhata Clean Slate Light Theme */
+    /* VoiceKhata Clean Slate Light Theme - Landing Page Continuation */
     --bg-primary: #F8FAFC;
     --surface: #FFFFFF;
     --surface-secondary: #F1F5F9;
     --surface-elevated: #FFFFFF;
-    --text-primary: #0F172A;
-    --text-secondary: #64748B;
+    --text-primary: #0B0F15;
+    --text-secondary: #475569;
     --text-muted: #94A3B8;
-    --border-primary: rgba(226, 232, 240, 0.9);
+    --border-primary: rgba(226, 232, 240, 0.85);
 
-    --radius: 0.5rem;
+    --radius: 0.625rem;
     --surface-card: #FFFFFF;
     --background: var(--bg-primary);
     --foreground: var(--text-primary);
@@ -88,82 +88,106 @@
     --card-foreground: var(--text-primary);
     --popover: #FFFFFF;
     --popover-foreground: var(--text-primary);
-    --primary: #2563EB;
-    --primary-foreground: #ffffff;
+    --primary: #0B0F15;
+    --primary-foreground: #FFFFFF;
     --secondary: #F1F5F9;
-    --secondary-foreground: var(--text-primary);
+    --secondary-foreground: #0B0F15;
     --muted: #F1F5F9;
     --muted-foreground: #64748B;
-    --accent: #EFF6FF;
-    --accent-foreground: #2563EB;
-    --destructive: oklch(0.577 0.245 27.325);
+    --accent: #F8FAFC;
+    --accent-foreground: #0B0F15;
+    --destructive: #E11D48;
     --border: #E2E8F0;
     --input: #E2E8F0;
-    --ring: #3B82F6;
-    --chart-1: #2563EB;
+    --ring: #0B0F15;
+    
+    /* Financial Semantics */
+    --success: #059669;
+    --success-soft: rgba(16, 185, 129, 0.12);
+    --warning: #D97706;
+    --warning-soft: rgba(245, 158, 11, 0.12);
+    --danger: #E11D48;
+    --brand-primary: #0B0F15;
+    --brand-dark: #070A11;
+    --brand-soft: rgba(11, 15, 21, 0.08);
+    --brand-neon: #D2F832;
+
+    --chart-1: #0B0F15;
     --chart-2: #10B981;
     --chart-3: #F59E0B;
-    --chart-4: #EF4444;
+    --chart-4: #F43F5E;
     --chart-5: #64748B;
 
     --sidebar: #FFFFFF;
-    --sidebar-foreground: #0F172A;
-    --sidebar-primary: #2563EB;
-    --sidebar-primary-foreground: #ffffff;
+    --sidebar-foreground: #0B0F15;
+    --sidebar-primary: #0B0F15;
+    --sidebar-primary-foreground: #FFFFFF;
     --sidebar-accent: #F1F5F9;
-    --sidebar-accent-foreground: #2563EB;
-    --sidebar-border: #E2E8F0;
-    --sidebar-ring: #3B82F6;
-    --sidebar-active: #EFF6FF;
-    --sidebar-active-foreground: #2563EB;
+    --sidebar-accent-foreground: #0B0F15;
+    --sidebar-border: rgba(226, 232, 240, 0.85);
+    --sidebar-ring: #0B0F15;
+    --sidebar-active: #F1F5F9;
+    --sidebar-active-foreground: #0B0F15;
 }
 
 .dark {
-    /* Custom Semantic Tokens - Dark Mode (Business Professional Slate Blue) */
-    --bg-primary: #020617; /* Slate 950 deep midnight blue */
-    --surface: #0f172a; /* Slate 900 rich navy blue */
-    --surface-secondary: #1e293b; /* Slate 800 */
-    --surface-elevated: #1e293b;
-    --text-primary: #f8fafc; /* Slate 50 */
-    --text-secondary: #94a3b8; /* Slate 400 */
-    --text-muted: #64748b; /* Slate 500 */
-    --border-primary: #334155; /* Slate 700 */
+    /* VoiceKhata Obsidian Dark Theme - Landing Page Source of Truth */
+    --bg-primary: #070A11; /* Deep obsidian background */
+    --surface: #0B0F15; /* Charcoal sleek card surface */
+    --surface-secondary: #0E1320; /* Slate 900 panel */
+    --surface-elevated: #141B2D;
+    --text-primary: #F8FAFC;
+    --text-secondary: #94A3B8;
+    --text-muted: #64748B;
+    --border-primary: #1E293B;
 
-    --surface-card: #0f172a;
+    --surface-card: #0B0F15;
     --background: var(--bg-primary);
     --foreground: var(--text-primary);
-    --card: var(--surface);
+    --card: #0B0F15;
     --card-foreground: var(--text-primary);
-    --popover: var(--surface-elevated);
+    --popover: #0E1320;
     --popover-foreground: var(--text-primary);
-    --primary: oklch(0.7 0.1 260); /* Lighter Blue for Dark Mode */
-    --primary-foreground: #020617;
-    --secondary: var(--surface-secondary);
+    --primary: #F8FAFC;
+    --primary-foreground: #070A11;
+    --secondary: #0E1320;
     --secondary-foreground: var(--text-primary);
-    --muted: var(--surface-secondary);
+    --muted: #0E1320;
     --muted-foreground: var(--text-muted);
-    --accent: var(--surface-secondary);
+    --accent: #141B2D;
     --accent-foreground: var(--text-primary);
-    --destructive: oklch(0.6 0.2 25);
+    --destructive: #F43F5E;
     --border: var(--border-primary);
     --input: var(--border-primary);
-    --ring: oklch(0.6 0.1 260);
-    --chart-1: oklch(0.6 0.1 260);
-    --chart-2: oklch(0.7 0.1 220);
-    --chart-3: oklch(0.8 0.1 180);
-    --chart-4: oklch(0.9 0.1 140);
-    --chart-5: oklch(0.7 0.1 300);
+    --ring: #D2F832;
 
-    --sidebar: var(--surface);
-    --sidebar-foreground: var(--text-primary);
-    --sidebar-primary: oklch(0.6 0.1 260);
-    --sidebar-primary-foreground: #ffffff;
-    --sidebar-accent: var(--surface-secondary);
+    /* Financial Semantics - Dark */
+    --success: #10B981;
+    --success-soft: rgba(16, 185, 129, 0.15);
+    --warning: #F59E0B;
+    --warning-soft: rgba(245, 158, 11, 0.15);
+    --danger: #F43F5E;
+    --brand-primary: #D2F832;
+    --brand-dark: #bce622;
+    --brand-soft: rgba(210, 248, 50, 0.15);
+    --brand-neon: #D2F832;
+
+    --chart-1: #D2F832;
+    --chart-2: #10B981;
+    --chart-3: #F59E0B;
+    --chart-4: #F43F5E;
+    --chart-5: #94A3B8;
+
+    --sidebar: #0B0F15;
+    --sidebar-foreground: #F8FAFC;
+    --sidebar-primary: #F8FAFC;
+    --sidebar-primary-foreground: #070A11;
+    --sidebar-accent: #0E1320;
     --sidebar-accent-foreground: var(--text-primary);
-    --sidebar-border: var(--border-primary);
-    --sidebar-ring: oklch(0.6 0.1 260);
-    --sidebar-active: var(--surface-elevated);
-    --sidebar-active-foreground: #60a5fa;
+    --sidebar-border: #1E293B;
+    --sidebar-ring: #D2F832;
+    --sidebar-active: #141B2D;
+    --sidebar-active-foreground: #FFFFFF;
 }
 
 /* Light mode dynamic overrides for components */

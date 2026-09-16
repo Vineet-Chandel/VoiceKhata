@@ -405,11 +405,12 @@ export function VoiceCaptureCard({
               ) : null}
 
               {/* Hero Circular Mic Button */}
-              <div className="relative flex items-center justify-center my-2">
+              <div className="relative flex items-center justify-center my-4">
                 {isListening && (
                   <>
-                    <span className="absolute size-40 rounded-full border-2 border-indigo-500/30 animate-ping pointer-events-none" />
-                    <span className="absolute size-32 rounded-full border border-indigo-500/25 animate-pulse pointer-events-none" />
+                    <span className="absolute size-44 rounded-full border-2 border-[#D2F832]/30 animate-ping pointer-events-none" />
+                    <span className="absolute size-36 rounded-full border border-emerald-500/25 animate-pulse pointer-events-none" />
+                    <span className="absolute size-48 rounded-full border border-[#D2F832]/20 animate-ping pointer-events-none" />
                   </>
                 )}
 
@@ -425,18 +426,20 @@ export function VoiceCaptureCard({
                   }}
                   className={`relative size-24 md:size-28 rounded-full flex items-center justify-center transition-all duration-300 cursor-pointer shadow-2xl ${
                     isListening
-                      ? "bg-red-500 text-white shadow-red-500/40 scale-105 ring-8 ring-red-500/20"
+                      ? "bg-emerald-500 text-white shadow-emerald-500/40 scale-105 ring-8 ring-emerald-500/25"
                       : isProcessing
-                      ? "bg-indigo-600 text-white shadow-indigo-500/40 scale-100 ring-8 ring-indigo-500/20 animate-pulse cursor-wait"
-                      : "bg-gradient-to-br from-indigo-500 via-indigo-600 to-blue-600 text-white hover:from-indigo-400 hover:to-indigo-500 hover:scale-105 shadow-indigo-500/30 ring-8 ring-indigo-500/10"
+                      ? "bg-slate-800 text-[#D2F832] shadow-[#D2F832]/30 scale-100 ring-8 ring-[#D2F832]/20 animate-pulse cursor-wait"
+                      : "bg-[#D2F832] text-black hover:bg-[#c3ea23] hover:scale-105 shadow-xl shadow-[#D2F832]/30 ring-8 ring-[#D2F832]/15"
                   }`}
                   title={isListening ? "Click to finish speaking" : isProcessing ? "Processing speech..." : "Click to speak"}
                 >
                   {isProcessing ? (
                     <Loader2 size={38} className="animate-spin text-white" />
                   ) : (
-                    <Mic size={38} className={isListening ? "animate-pulse" : ""} />
+                    <Mic size={38} className={isListening ? "animate-pulse text-white" : "text-black"} />
                   )}
+                  {/* Subtle brand neon accent dot */}
+                  <span className="absolute -top-1 -right-1 size-3 rounded-full bg-emerald-400 border-2 border-white dark:border-[#0B0F15]" />
                 </button>
               </div>
 
@@ -445,19 +448,19 @@ export function VoiceCaptureCard({
                 <div className="flex flex-col items-center gap-3 mt-3 w-full max-w-lg mx-auto animate-in fade-in zoom-in-95 duration-200">
                   {/* Subtle Waveform */}
                   <div className="h-6 w-32 flex items-center justify-center overflow-hidden">
-                    <VoiceWaveform analyserRef={analyserRef} isListening={true} color="rgba(99, 102, 241, 0.9)" />
+                    <VoiceWaveform analyserRef={analyserRef} isListening={true} color="#D2F832" />
                   </div>
 
                   {/* Real-Time Live Spoken Text Display */}
-                  <div className="w-full rounded-2xl border border-indigo-200/80 dark:border-indigo-500/20 bg-slate-50/90 dark:bg-slate-900/80 p-5 shadow-lg backdrop-blur-md text-center transition-all duration-150 min-h-[72px] flex items-center justify-center">
+                  <div className="w-full rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white/90 dark:bg-[#0E1320]/90 p-5 shadow-lg backdrop-blur-md text-center transition-all duration-150 min-h-[72px] flex items-center justify-center">
                     {displayedSpeech ? (
                       <p className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white leading-relaxed break-words w-full">
                         "{displayedSpeech}"
-                        <span className="inline-block w-2 h-4.5 ml-1 bg-indigo-600 dark:bg-indigo-400 align-middle animate-pulse rounded-xs" />
+                        <span className="inline-block w-2 h-4.5 ml-1 bg-[#D2F832] align-middle animate-pulse rounded-xs" />
                       </p>
                     ) : (
                       <p className="text-sm sm:text-base text-slate-400 dark:text-slate-400 italic text-center animate-pulse">
-                        🎙️ Listening... start speaking now
+                        🎙️ Sun rahe hain... Boliye (Listening...)
                       </p>
                     )}
                   </div>
@@ -478,7 +481,7 @@ export function VoiceCaptureCard({
                     <button
                       type="button"
                       onClick={stopListening}
-                      className="px-5 py-2 rounded-full text-xs font-bold text-white bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 border border-indigo-400/30 transition-all cursor-pointer flex items-center gap-1.5 shadow-md shadow-indigo-600/30 hover:scale-[1.02]"
+                      className="px-5 py-2 rounded-full text-xs font-bold text-black bg-[#D2F832] hover:bg-[#c3ea23] border border-[#D2F832]/30 transition-all cursor-pointer flex items-center gap-1.5 shadow-md shadow-[#D2F832]/30 hover:scale-[1.02]"
                     >
                       <Check size={15} strokeWidth={3} />
                       Done Speaking
@@ -490,8 +493,8 @@ export function VoiceCaptureCard({
                 </div>
               ) : isProcessing ? (
                 <div className="flex flex-col items-center gap-3 mt-4 w-full max-w-md mx-auto animate-in fade-in duration-200">
-                  <div className="flex items-center gap-2.5 px-4 py-2 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-indigo-700 dark:text-indigo-300">
-                    <Loader2 size={16} className="animate-spin text-indigo-600 dark:text-indigo-400" />
+                  <div className="flex items-center gap-2.5 px-4 py-2 rounded-full bg-[#D2F832]/10 border border-[#D2F832]/30 text-slate-900 dark:text-[#D2F832]">
+                    <Loader2 size={16} className="animate-spin text-[#D2F832]" />
                     <span className="text-xs sm:text-sm font-medium">Preparing your transaction review...</span>
                   </div>
                   {displayedSpeech && (
@@ -516,7 +519,7 @@ export function VoiceCaptureCard({
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -6 }}
                       transition={{ duration: 0.3 }}
-                      className="text-sm md:text-base font-medium text-indigo-300/90 italic cursor-pointer hover:text-indigo-200 transition-colors"
+                      className="text-sm md:text-base font-medium text-slate-900 dark:text-[#D2F832] italic cursor-pointer hover:underline transition-colors"
                       onClick={() => {
                         handleVoiceTranscript(prompts[promptIndex % prompts.length])
                       }}

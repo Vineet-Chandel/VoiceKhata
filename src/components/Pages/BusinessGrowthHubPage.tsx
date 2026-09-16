@@ -94,19 +94,20 @@ export default function BusinessGrowthHubPage() {
         <div className="flex items-center gap-3.5">
           <div className={`size-11 rounded-2xl flex items-center justify-center shrink-0 border ${
             isBiz 
-              ? "bg-blue-500/15 border-blue-500/30 text-blue-400" 
-              : "bg-emerald-500/15 border-emerald-500/30 text-emerald-400"
+              ? "bg-slate-100 dark:bg-slate-800/80 border-slate-200 dark:border-slate-700 text-slate-900 dark:text-[#D2F832]" 
+              : "bg-emerald-500/10 border-emerald-500/30 text-emerald-400"
           }`}>
             {isBiz ? <Store size={22} /> : <Sparkles size={22} />}
           </div>
           <div>
             <div className="flex items-center gap-2">
               <h1 className="text-2xl font-bold text-text-primary tracking-tight">Money Growth Engine</h1>
-              <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-full border ${
+              <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-full border flex items-center gap-1 ${
                 isBiz 
-                  ? "bg-blue-500/15 text-blue-300 border-blue-500/25" 
-                  : "bg-emerald-500/15 text-emerald-300 border-emerald-500/25"
+                  ? "bg-slate-100 dark:bg-slate-800/70 text-slate-800 dark:text-slate-200 border-slate-200 dark:border-slate-700" 
+                  : "bg-emerald-500/10 text-emerald-300 border-emerald-500/25"
               }`}>
+                <span className={`size-1.5 rounded-full ${isBiz ? "bg-[#D2F832]" : "bg-emerald-400"}`} />
                 {isBiz ? "Store Mode" : "Personal Mode"}
               </span>
             </div>
@@ -125,7 +126,7 @@ export default function BusinessGrowthHubPage() {
               onClick={() => setAppMode("PERSONAL")}
               className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all ${
                 !isBiz
-                  ? "bg-gradient-to-r from-emerald-500/20 to-teal-500/20 text-emerald-300 border border-emerald-500/30 shadow-sm"
+                  ? "bg-surface-elevated text-emerald-300 border border-emerald-500/30 shadow-sm"
                   : "text-text-muted hover:text-text-secondary"
               }`}
             >
@@ -136,7 +137,7 @@ export default function BusinessGrowthHubPage() {
               onClick={() => setAppMode("BUSINESS")}
               className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all ${
                 isBiz
-                  ? "bg-gradient-to-r from-blue-500/20 to-indigo-500/20 text-blue-300 border border-blue-500/30 shadow-sm"
+                  ? "bg-surface-elevated text-slate-900 dark:text-white border border-border shadow-sm"
                   : "text-text-muted hover:text-text-secondary"
               }`}
             >
@@ -151,7 +152,7 @@ export default function BusinessGrowthHubPage() {
             title="Recalculate AI financial metrics"
             className="flex items-center gap-1.5 px-3 py-1.5 bg-surface-secondary/70 hover:bg-surface-secondary border border-border rounded-xl text-xs font-medium text-text-secondary hover:text-text-primary transition-colors disabled:opacity-50"
           >
-            <RefreshCw size={13} className={growthLoading ? "animate-spin text-violet-400" : ""} />
+            <RefreshCw size={13} className={growthLoading ? "animate-spin text-slate-400" : ""} />
             <span className="hidden sm:inline">Refresh</span>
           </button>
         </div>
@@ -202,7 +203,7 @@ export default function BusinessGrowthHubPage() {
             <span className="text-xs font-semibold uppercase tracking-wider">
               {isBiz ? "Net Retained Profit" : "Net Monthly Surplus"}
             </span>
-            <div className="p-1.5 rounded-lg bg-violet-500/10 text-violet-400">
+            <div className="p-1.5 rounded-lg bg-[#D2F832]/10 text-[#D2F832]">
               <Wallet size={15} />
             </div>
           </div>
@@ -242,7 +243,7 @@ export default function BusinessGrowthHubPage() {
                       : "text-text-muted hover:text-text-secondary"
                   }`}
                 >
-                  <Layers size={14} className={activeTab === "flow" ? "text-violet-400" : ""} />
+                  <Layers size={14} className={activeTab === "flow" ? "text-[#D2F832]" : ""} />
                   Cash Flow & Allocations
                 </button>
                 <button

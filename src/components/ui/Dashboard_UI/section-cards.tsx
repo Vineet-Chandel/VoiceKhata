@@ -1,9 +1,8 @@
-import { IconTrendingDown, IconTrendingUp } from "@tabler/icons-react"
-import { Users } from "lucide-react"
+import React from "react"
+import { IconTrendingDown, IconTrendingUp, IconArrowUpRight, IconArrowDownRight, IconWallet } from "@tabler/icons-react"
+import { Users, PhoneCall, MessageSquare, ArrowRight, ShieldCheck } from "lucide-react"
+import { Link } from "react-router-dom"
 import { Badge } from "@/components/ui/Dashboard_UI/badge"
-import {
-  Card, CardAction, CardDescription, CardFooter, CardHeader, CardTitle,
-} from "@/components/ui/Dashboard_UI/card"
 import { useLanguage } from "@/context/LanguageContext"
 import type { AppMode } from "@/context/AppModeContext"
 
@@ -14,139 +13,162 @@ type SectionCardsProps = {
   savingsRate:  number
   appMode?:     AppMode
   receivables?: number
+  payables?:    number
 }
 
-export function SectionCards({ income, expense, balance, savingsRate, appMode = "BUSINESS", receivables = 0 }: SectionCardsProps) {
+export function SectionCards({
+  income,
+  expense,
+  balance,
+  savingsRate,
+  appMode = "BUSINESS",
+  receivables = 0,
+  payables = 0,
+}: SectionCardsProps) {
   const { t } = useLanguage()
   const isBusiness = appMode === "BUSINESS"
 
   return (
-    <div className="grid grid-cols-1 gap-4 px-4 *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card *:data-[slot=card]:shadow-xs lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-4 dark:*:data-[slot=card]:bg-card">
+    <div className="px-4 lg:px-6 space-y-4">
+      {/* ── TOP HERO FINANCIAL HIERARCHY: YOU WILL GET & YOU WILL GIVE ── */}
+      {isBusiness ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* YOU WILL GET (Receivables / Dues from customers) */}
+          <div className="relative overflow-hidden rounded-2xl border border-emerald-500/30 bg-white dark:bg-[#0B0F15] p-5 shadow-xs hover:border-emerald-500/50 transition-all group">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="size-2 rounded-full bg-emerald-500" />
+                <span className="text-xs font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-400">
+                  {t("cards.receivables") || "YOU WILL GET"} • आप लेंगे
+                </span>
+              </div>
+              <Link
+                to="/dashboard/khata"
+                className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400 hover:underline"
+              >
+                <span>View Khata</span>
+                <IconArrowUpRight className="size-3.5" />
+              </Link>
+            </div>
 
-      {/* BALANCE / NET CASH FLOW */}
-      <Card className={`@container/card transition-all ${balance < 0 ? "!border-rose-500/30 !bg-gradient-to-t !from-rose-500/10 !to-card shadow-rose-500/5" : ""}`}>
-        <CardHeader>
-          <CardDescription className={balance < 0 ? "text-rose-400 font-medium" : ""}>
-            {balance < 0 ? t("home.netDeficit") : isBusiness ? t("cards.businessBalance") : t("cards.totalBalance")}
-          </CardDescription>
-          <CardTitle className={`text-2xl font-semibold tabular-nums @[250px]/card:text-3xl ${balance < 0 ? "text-rose-400" : ""}`}>
+            <div className="mt-3 flex items-baseline gap-2">
+              <span className="text-3xl sm:text-4xl font-black text-emerald-600 dark:text-emerald-400 tabular-nums tracking-tight">
+                ₹{receivables.toLocaleString("en-IN")}
+              </span>
+            </div>
+
+            <div className="mt-3 pt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
+              <div className="flex items-center gap-1.5">
+                <Users className="size-3.5 text-emerald-500" />
+                <span>Pending from credit customers</span>
+              </div>
+              <span className="font-medium text-slate-700 dark:text-slate-300">
+                1-Tap WhatsApp Reminder
+              </span>
+            </div>
+          </div>
+
+          {/* YOU WILL GIVE (Payables / Due to suppliers) */}
+          <div className="relative overflow-hidden rounded-2xl border border-rose-500/30 bg-white dark:bg-[#0B0F15] p-5 shadow-xs hover:border-rose-500/50 transition-all group">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="size-2 rounded-full bg-rose-500" />
+                <span className="text-xs font-bold uppercase tracking-wider text-rose-700 dark:text-rose-400">
+                  YOU WILL GIVE • आप देंगे
+                </span>
+              </div>
+              <Link
+                to="/dashboard/transactions"
+                className="inline-flex items-center gap-1 text-xs font-semibold text-rose-600 dark:text-rose-400 hover:underline"
+              >
+                <span>Suppliers</span>
+                <IconArrowDownRight className="size-3.5" />
+              </Link>
+            </div>
+
+            <div className="mt-3 flex items-baseline gap-2">
+              <span className="text-3xl sm:text-4xl font-black text-rose-600 dark:text-rose-400 tabular-nums tracking-tight">
+                ₹{payables.toLocaleString("en-IN")}
+              </span>
+            </div>
+
+            <div className="mt-3 pt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
+              <div className="flex items-center gap-1.5">
+                <IconWallet className="size-3.5 text-rose-500" />
+                <span>Supplier / vendor dues</span>
+              </div>
+              <span className="font-medium text-slate-700 dark:text-slate-300">
+                Record Payment
+              </span>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      {/* ── SECONDARY METRICS: CASH FLOW, SALES & SPENDING ── */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {/* Net Working Capital / Balance */}
+        <div className="rounded-xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-[#0B0F15] p-4 shadow-2xs hover:border-slate-300 dark:hover:border-slate-700 transition-colors">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+              {isBusiness ? t("cards.businessBalance") : t("cards.totalBalance")}
+            </span>
+            <span className={`inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full ${
+              balance >= 0 
+                ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400" 
+                : "bg-rose-500/10 text-rose-600 dark:text-rose-400"
+            }`}>
+              {balance >= 0 ? "+ Live" : "Deficit"}
+            </span>
+          </div>
+
+          <p className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tabular-nums tracking-tight mt-2">
             {balance < 0 ? `-₹${Math.abs(balance).toLocaleString("en-IN")}` : `₹${balance.toLocaleString("en-IN")}`}
-          </CardTitle>
-          <CardAction>
-            {balance < 0 ? (
-              <Badge variant="outline" className="border-rose-500/40 bg-rose-500/10 text-rose-400 flex items-center gap-1">
-                <IconTrendingDown className="size-3.5" />
-                {t("cards.deficit")}
-              </Badge>
-            ) : (
-              <Badge variant="outline">
-                <IconTrendingUp />
-                {t("cards.live")}
-              </Badge>
-            )}
-          </CardAction>
-        </CardHeader>
-        <CardFooter className="flex-col items-start gap-1.5 text-sm">
-          <div className="line-clamp-1 flex gap-2 font-medium">
-            {balance < 0 ? (
-              <span className="text-rose-400">{t("cards.expensesExceedIncome")}</span>
-            ) : isBusiness ? (
-              t("cards.cashFlowDesc")
-            ) : (
-              t("cards.currentBalance")
-            )}
-          </div>
-          <div className="text-muted-foreground">
-            {balance < 0
-              ? `${t("cards.deficitOf")} ₹${Math.abs(balance).toLocaleString("en-IN")}`
-              : isBusiness
-              ? t("cards.acrossAccounts")
-              : t("cards.acrossAccounts")}
-          </div>
-        </CardFooter>
-      </Card>
+          </p>
 
-      {/* EXPENSE / BUSINESS OUTFLOWS */}
-      <Card className="@container/card">
-        <CardHeader>
-          <CardDescription>{isBusiness ? t("cards.businessExpenses") : t("home.totalExpenses")}</CardDescription>
-          <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            ₹{expense.toLocaleString("en-IN")}
-          </CardTitle>
-          <CardAction>
-            <Badge variant="outline">
-              <IconTrendingDown />
-              {t("tx.debit")}
-            </Badge>
-          </CardAction>
-        </CardHeader>
-        <CardFooter className="flex-col items-start gap-1.5 text-sm">
-          <div className="line-clamp-1 flex gap-2 font-medium">
-            {isBusiness ? t("cards.businessDebitDesc") : t("cards.spendingAcross")}
-          </div>
-          <div className="text-muted-foreground">
-            {t("cards.calculatedFromDebit")}
-          </div>
-        </CardFooter>
-      </Card>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+            {isBusiness ? "Net cash flow after all entries" : "Total available money across wallets"}
+          </p>
+        </div>
 
-      {/* INCOME / SALES & COLLECTIONS */}
-      <Card className="@container/card">
-        <CardHeader>
-          <CardDescription>{isBusiness ? t("cards.businessIncome") : t("home.totalIncome")}</CardDescription>
-          <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
+        {/* Total Inflows / Sales */}
+        <div className="rounded-xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-[#0B0F15] p-4 shadow-2xs hover:border-slate-300 dark:hover:border-slate-700 transition-colors">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+              {isBusiness ? t("cards.businessIncome") : t("home.totalIncome")}
+            </span>
+            <span className="size-2 rounded-full bg-[#D2F832]" />
+          </div>
+
+          <p className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tabular-nums tracking-tight mt-2">
             ₹{income.toLocaleString("en-IN")}
-          </CardTitle>
-          <CardAction>
-            <Badge variant="outline">
-              <IconTrendingUp />
-              {t("tx.credit")}
-            </Badge>
-          </CardAction>
-        </CardHeader>
-        <CardFooter className="flex-col items-start gap-1.5 text-sm">
-          <div className="line-clamp-1 flex gap-2 font-medium">
-            {isBusiness ? t("cards.businessCreditDesc") : t("cards.moneyReceived")}
-          </div>
-          <div className="text-muted-foreground">
-            {isBusiness ? t("cards.businessCreditDesc") : t("cards.fromSalary")}
-          </div>
-        </CardFooter>
-      </Card>
+          </p>
 
-      {/* RECEIVABLES (Business) / SAVINGS RATE (Personal) */}
-      <Card className="@container/card">
-        <CardHeader>
-          <CardDescription>
-            {isBusiness ? t("cards.receivables") : t("home.savingsRate")}
-          </CardDescription>
-          <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            {isBusiness ? `₹${receivables.toLocaleString("en-IN")}` : `${savingsRate}%`}
-          </CardTitle>
-          <CardAction>
-            {isBusiness ? (
-              <Badge variant="outline" className="flex items-center gap-1">
-                <Users className="size-3.5 text-rose-400" />
-                Khata
-              </Badge>
-            ) : (
-              <Badge variant="outline">
-                <IconTrendingUp />
-                {t("cards.saving")}
-              </Badge>
-            )}
-          </CardAction>
-        </CardHeader>
-        <CardFooter className="flex-col items-start gap-1.5 text-sm">
-          <div className="line-clamp-1 flex gap-2 font-medium">
-            {isBusiness ? t("cards.receivablesDesc") : t("cards.percentageSaved")}
-          </div>
-          <div className="text-muted-foreground">
-            {isBusiness ? t("cards.pendingFromCustomers") : t("cards.calculatedFromMetrics")}
-          </div>
-        </CardFooter>
-      </Card>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+            {isBusiness ? "Total business sales & collections" : "Income received from salary & transfers"}
+          </p>
+        </div>
 
+        {/* Total Outflows / Operating Expenses */}
+        <div className="rounded-xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-[#0B0F15] p-4 shadow-2xs hover:border-slate-300 dark:hover:border-slate-700 transition-colors">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+              {isBusiness ? t("cards.businessExpenses") : t("home.totalExpenses")}
+            </span>
+            <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+              {isBusiness ? "Outflow" : `${savingsRate}% Saved`}
+            </span>
+          </div>
+
+          <p className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tabular-nums tracking-tight mt-2">
+            ₹{expense.toLocaleString("en-IN")}
+          </p>
+
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+            {isBusiness ? "Stock purchases & operating costs" : "Monthly personal spend & living costs"}
+          </p>
+        </div>
+      </div>
     </div>
   )
 }

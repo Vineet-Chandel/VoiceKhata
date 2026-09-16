@@ -206,14 +206,14 @@ function NotifRow({
   return (
     <div
       onClick={onRead}
-      className={`group relative flex items-start gap-4 px-4 py-3.5 rounded-xl border cursor-pointer transition-all ${
+      className={`group relative flex items-start gap-4 px-4 py-3.5 rounded-2xl border cursor-pointer transition-all ${
         !n.read
-          ? 'bg-card border-border border-l-2 border-l-primary hover:bg-muted/10'
-          : 'bg-card border-border hover:bg-muted/20'
+          ? 'bg-card border-border border-l-2 border-l-[#D2F832] shadow-sm hover:bg-surface-elevated'
+          : 'bg-card/70 border-border/70 hover:bg-surface-elevated'
       }`}
     >
       {/* Type icon */}
-      <div className={`mt-0.5 flex-shrink-0 w-8 h-8 rounded-lg border flex items-center justify-center ${
+      <div className={`mt-0.5 flex-shrink-0 w-8 h-8 rounded-xl border flex items-center justify-center ${
         config?.badge ?? 'bg-muted/40 text-muted-foreground border-border'
       }`}>
         {config?.icon ?? <Bell size={14} />}
@@ -222,15 +222,15 @@ function NotifRow({
       {/* Content */}
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 flex-wrap mb-0.5">
-          <span className={`text-sm font-medium ${!n.read ? 'text-foreground' : 'text-muted-foreground'}`}>
+          <span className={`text-sm font-semibold ${!n.read ? 'text-foreground' : 'text-muted-foreground'}`}>
             {n.title}
           </span>
-          <span className={`text-[10px] px-1.5 py-0.5 rounded-md border font-medium ${
+          <span className={`text-[10px] px-2 py-0.5 rounded-full border font-medium ${
             config?.badge ?? 'bg-muted/40 text-muted-foreground border-border'
           }`}>
             {config?.label ?? n.type}
           </span>
-          {!n.read && <span className="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />}
+          {!n.read && <span className="size-1.5 rounded-full bg-[#D2F832] shadow-[0_0_6px_#D2F832] flex-shrink-0" />}
         </div>
         <p className="text-sm text-muted-foreground leading-relaxed line-clamp-2">{n.message}</p>
         <p className="text-xs text-muted-foreground/40 mt-1.5">

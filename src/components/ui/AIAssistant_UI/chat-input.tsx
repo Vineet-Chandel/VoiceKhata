@@ -482,13 +482,7 @@ export function ChatInput({ onSend, loading, guidedStep, replyingTo, onCancelRep
           <button
             onClick={handleSend}
             disabled={!canSend}
-            className={[
-              "mb-0.5 size-8 shrink-0 rounded-xl flex items-center justify-center transition-all duration-150",
-              variant === "light"
-                ? "bg-black text-white hover:bg-black/90"
-                : "bg-white text-black hover:bg-white/90",
-              "cursor-pointer disabled:pointer-events-none disabled:opacity-30 active:scale-95",
-            ].join(" ")}
+            className="mb-0.5 size-8 shrink-0 rounded-xl flex items-center justify-center transition-all duration-150 bg-[#D2F832] text-black shadow-sm hover:bg-[#c3ea23] cursor-pointer disabled:pointer-events-none disabled:opacity-30 active:scale-95 font-bold"
           >
             {loading || isScanning ? (
               <svg className="size-3.5 animate-spin" viewBox="0 0 24 24" fill="none">
@@ -506,10 +500,8 @@ export function ChatInput({ onSend, loading, guidedStep, replyingTo, onCancelRep
             className={[
               "mb-0.5 size-8 shrink-0 rounded-xl flex items-center justify-center transition-all duration-150 cursor-pointer disabled:opacity-40 disabled:pointer-events-none",
               voiceState === "listening"
-                ? "bg-red-500 text-white shadow-md shadow-red-500/40 animate-pulse"
-                : variant === "light"
-                ? "bg-black/[0.04] text-black hover:bg-black/[0.08]"
-                : "bg-surface-secondary text-text-muted hover:text-text-primary hover:bg-white/5",
+                ? "bg-[#D2F832] text-black shadow-md shadow-[#D2F832]/30 animate-pulse font-bold"
+                : "bg-surface-secondary text-text-muted hover:text-text-primary hover:bg-white/5 border border-border",
             ].join(" ")}
           >
             {voiceState === "processing" ? (
